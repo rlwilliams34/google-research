@@ -62,48 +62,48 @@ class BiggWithEdgeLen(RecurTreeGen):
         
       return edge_feats_normalized
   
-  def update_weight_stats(self, weights):
-      '''
-      Updates global mean and standard deviation of weights per batch if
-      standardizing weights prior to MLP embedding. Only performed during the
-      first epoch of training.
-      
-      Args Used:
-        weights: weights from current iteration batch
-      '''
-      
-      ## Current training weight statistics
-      with torch.no_grad():
-          mu_n = self.mu_wt
-          var_n = self.var_wt
-          n = self.n_obs
-          
-          ## New weight statistics
-          m = len(weights)
-          if m > 1:
-              var_m = torch.var(weights)
-          
-          else:
-              var_m = 0.0
-          
-          mu_m = torch.mean(weights)
-          tot = n + m
-          batch_max = weights.max()
-          batch_min = weights.min()
-          
-          ## Update weight statistics
-          new_mu = (n * mu_n + m * mu_m) / tot
-          
-          new_var_avg = (max(n - 1, 0) * var_n + (m - 1) * var_m)/(tot - 1)
-          new_var_resid = (m * mu_n**2 + n * mu_m**2)/(tot - 1) - (n * mu_m + m * mu_n)**2/(tot * (tot - 1))
-          new_var = new_var_avg + new_var_resid
-          
-          ## Save
-          self.mu_wt = new_mu
-          self.var_wt = new_var
-          self.n_obs += m
-          self.min_wt = torch.min(batch_min, self.min_wt)
-          self.max_wt = torch.max(batch_max, self.max_wt)
+    def update_weight_stats(self, weights):
+        '''
+        Updates global mean and standard deviation of weights per batch if
+        standardizing weights prior to MLP embedding. Only performed during the
+        first epoch of training.
+        
+        Args Used:
+          weights: weights from current iteration batch
+        '''
+        
+        ## Current training weight statistics
+        with torch.no_grad():
+            mu_n = self.mu_wt
+            var_n = self.var_wt
+            n = self.n_obs
+            
+            ## New weight statistics
+            m = len(weights)
+            if m > 1:
+                var_m = torch.var(weights)
+            
+            else:
+                var_m = 0.0
+            
+            mu_m = torch.mean(weights)
+            tot = n + m
+            batch_max = weights.max()
+            batch_min = weights.min()
+            
+            ## Update weight statistics
+            new_mu = (n * mu_n + m * mu_m) / tot
+            
+            new_var_avg = (max(n - 1, 0) * var_n + (m - 1) * var_m)/(tot - 1)
+            new_var_resid = (m * mu_n**2 + n * mu_m**2)/(tot - 1) - (n * mu_m + m * mu_n)**2/(tot * (tot - 1))
+            new_var = new_var_avg + new_var_resid
+            
+            ## Save
+            self.mu_wt = new_mu
+            self.var_wt = new_var
+            self.n_obs += m
+            self.min_wt = torch.min(batch_min, self.min_wt)
+            self.max_wt = torch.max(batch_max, self.max_wt)
     
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
