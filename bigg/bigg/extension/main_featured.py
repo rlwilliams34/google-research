@@ -170,6 +170,10 @@ if __name__ == '__main__':
     N = len(train_graphs)
     B = cmd_args.batch_size
     num_iter = N // B
+    
+    if num_iter != N / B:
+        num_iter += 1
+    
     best_loss = 99999
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
@@ -181,7 +185,12 @@ if __name__ == '__main__':
         for idx in pbar:
             start = idx * B
             stop = (idx + 1) * B
-            batch_indices = indices[start:stop]
+            
+            if stop >= N:
+                batch_indices = indices[start:]
+            
+            else:
+                batch_indices = indices[start:stop]
             
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
