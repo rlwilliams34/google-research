@@ -293,7 +293,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
             weights = []
             num_nodes.append(len(lobster))
             num_edges.append(len(lobster.edges()))
-            if False:
+            if cmd_args.has_edge_feats:
                 for (n1, n2, w) in lobster.edges(data=True):
                     w = w['weight']
                     weights.append(w)
