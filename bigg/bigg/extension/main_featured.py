@@ -107,6 +107,9 @@ if __name__ == '__main__':
         checkpoint = torch.load(cmd_args.model_dump)
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
+        
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = cmd_args.learning_rate
     
     #########################################################################################################
     if cmd_args.phase != 'train':
