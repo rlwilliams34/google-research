@@ -17,6 +17,7 @@ from bigg.model.tree_model import RecurTreeGen
 import torch
 from bigg.common.pytorch_util import glorot_uniform, MLP
 import torch.nn as nn
+import numpy 
 
 # pylint: skip-file
 
@@ -36,8 +37,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         mu_wt = torch.tensor(0, dtype = float)
         var_wt = torch.tensor(1, dtype = float)
         n_obs = torch.tensor(0, dtype = int)
-        min_wt = torch.tensor(np.inf, dtype = float)
-        max_wt = torch.tensor(-np.inf, dtype = float)
+        min_wt = torch.tensor(torch.inf, dtype = float)
+        max_wt = torch.tensor(-torch.inf, dtype = float)
         epoch_num = torch.tensor(0, dtype = int)
         
         self.register_buffer("mu_wt", mu_wt)
