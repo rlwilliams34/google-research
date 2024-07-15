@@ -9,7 +9,7 @@ import subprocess as sp
 import time
 import sys
 from scipy.linalg import eigvalsh
-from bigg.extension.eval_.mmd import *
+from bigg.evaluation.mmd import *
 
 PRINT_TIME = False
 
