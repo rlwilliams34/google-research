@@ -47,10 +47,11 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.register_buffer("min_wt", min_wt)
         self.register_buffer("max_wt", max_wt)
         self.register_buffer("epoch_num", epoch_num)
+        self.mode = "normalize"
 
     # to be customized
     
-    def standardize_weights(self, edge_feats, mode = "standardize", range_ = 1):    
+    def standardize_weights(self, edge_feats, mode = "normalize", range_ = 1):    
       if mode == "standardize":
           edge_feats_normalized = (edge_feats - self.mu_wt) / self.var_wt**0.5
           
