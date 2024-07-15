@@ -102,6 +102,12 @@ if __name__ == '__main__':
     model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
+    if cmd_args.model_dump is not None and os.path.isfile(cmd_args.model_dump):
+        print('loading from', cmd_args.model_dump)
+        checkpoint = torch.load(cmd_args.model_dump)
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+    
     #########################################################################################################
     if cmd_args.phase != 'train':
         # get num nodes dist
