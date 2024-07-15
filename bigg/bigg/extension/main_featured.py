@@ -125,7 +125,6 @@ if __name__ == '__main__':
         with torch.no_grad():
             for _ in tqdm(range(cmd_args.num_test_gen)):
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
-                #_, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = n, lb_list=lb_lst, ub_list=up_lst, col_range=None, display=cmd_args.display, num_nodes = num_nodes)
                 _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 
                 if cmd_args.has_edge_feats:
@@ -147,13 +146,12 @@ if __name__ == '__main__':
                             edge = (e[0], e[1], w)
                         else:
                             edge = (e[1], e[0], w)
-                        #print(edge)
+                        
                         fixed_edges.append(edge)
                     pred_g.add_weighted_edges_from(fixed_edges)
-                    #print(pred_g.edges())
                     gen_graphs.append(pred_g)
         
-        for idx in range(0):
+        for idx in range(10):
             print("edges: ", gen_graphs[idx].edges(data=True))
         
         print(cmd_args.g_type)
@@ -223,6 +221,8 @@ if __name__ == '__main__':
         
         print('epoch complete')
         cur = epoch + 1
+        model.epoch_num += 1
+        
         if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
             print('saving epoch')
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
