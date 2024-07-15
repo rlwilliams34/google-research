@@ -77,6 +77,15 @@ cmd_opt.add_argument('-display', default=False, type=eval, help='display progres
 cmd_opt.add_argument('-has_edge_feats', default=False, type=eval, help='has edge features?')
 cmd_opt.add_argument('-has_node_feats', default=False, type=eval, help='has node features?')
 
+cmd_opt.add_argument('-leaves', default=10, type=int, help='leaves in trees')
+cmd_opt.add_argument('-by_time', default=False, type=bool, help='order tree by time?')
+
+cmd_opt.add_argument('-num_lobster_nodes', default=80, type=int, help='leaves in trees')
+cmd_opt.add_argument('-p1', default=0.7, type=float, help='leaves in trees')
+cmd_opt.add_argument('-p2', default=0.7, type=float, help='leaves in trees')
+cmd_opt.add_argument('-min_nodes', default=5, type=int, help='leaves in trees')
+cmd_opt.add_argument('-max_nodes', default=100, type=int, help='leaves in trees')
+
 cmd_args, _ = cmd_opt.parse_known_args()
 
 if cmd_args.save_dir is not None:

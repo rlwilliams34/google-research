@@ -33,7 +33,9 @@ from collections import OrderedDict
 from bigg.common.configs import cmd_args, set_device
 from bigg.extension.customized_models import BiggWithEdgeLen
 from bigg.model.tree_clib.tree_lib import setup_treelib, TreeLib
-
+from bigg.extension.eval_.graph_stats import *
+from bigg.extension.eval_.mmd import *
+from bigg.extension.eval_.mmd_stats import *
 
 def get_node_feats(g):
     length = []
@@ -72,10 +74,13 @@ if __name__ == '__main__':
     set_device(cmd_args.gpu)
     setup_treelib(cmd_args)
     assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
-
-    with open(os.path.join(cmd_args.data_dir, 'Group202A.dat'), 'rb') as f:
+    
+    path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'train')
+    with open(path, 'rb') as f:
         train_graphs = cp.load(f)
+    
     [TreeLib.InsertGraph(g) for g in train_graphs]
+    print(train_graphs[0].edges(data=True))
 
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
@@ -85,37 +90,165 @@ if __name__ == '__main__':
     list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
 
     model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-
-    # debug_model(model, train_graphs[0], list_node_feats[0], list_edge_feats[0])
-
     optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    
+    #########################################################################################################
+    if cmd_args.phase != 'train':
+        # get num nodes dist
+        print("Now generating sampled graphs...")
+        num_node_dist = get_node_dist(train_graphs)
+        
+        path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'test')
+        
+        with open(path, 'rb') as f:
+            gt_graphs = cp.load(f)
+        
+        print('# gt graphs', len(gt_graphs))
+        
+        gen_graphs = []
+        with torch.no_grad():
+            for _ in tqdm(range(cmd_args.num_test_gen)):
+                num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
+                #_, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = n, lb_list=lb_lst, ub_list=up_lst, col_range=None, display=cmd_args.display, num_nodes = num_nodes)
+                _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+                
+                if cmd_args.has_edge_feats:
+                    weighted_edges = []
+                    for e, w in zip(pred_edges, pred_edge_feats):
+                        assert e[0] > e[1]
+                        weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
+                
+                else:
+                    pred_g = nx.Graph()
+                    fixed_edges = []
+                    for e in pred_edges:
+                        #print(e)
+                        w = 1.0
+                        if e[0] < e[1]:
+                            edge = (e[0], e[1], w)
+                        else:
+                            edge = (e[1], e[0], w)
+                        #print(edge)
+                        fixed_edges.append(edge)
+                    pred_g.add_weighted_edges_from(fixed_edges)
+                    #print(pred_g.edges())
+                    gen_graphs.append(pred_g)
+        
+        for idx in range(0):
+            print("edges: ", gen_graphs[idx].edges(data=True))
+        
+        print(cmd_args.g_type)
+        print("Generating Graph Stats")
+        get_graph_stats(gen_graphs, gt_graphs, cmd_args.g_type)
+        
+        print('saving graphs')
+        with open(cmd_args.model_dump + '.graphs-%s' % str(cmd_args.greedy_frac), 'wb') as f:
+            cp.dump(gen_graphs, f, cp.HIGHEST_PROTOCOL)
+        print('graph generation complete')
+        
+        sys.exit()
+    #########################################################################################################
+    
     indices = list(range(len(train_graphs)))
+    
     if cmd_args.epoch_load is None:
         cmd_args.epoch_load = 0
+    
+    prev = datetime.now()
+    N = len(train_graphs)
+    B = cmd_args.batch_size
+    num_iter = N // B
+    best_loss = 99999
+    
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
-        pbar = tqdm(range(cmd_args.epoch_save))
+        pbar = tqdm(range(num_iter))
+        random.shuffle(indices)
 
         optimizer.zero_grad()
+        start = 0
         for idx in pbar:
-            random.shuffle(indices)
-            batch_indices = indices[:cmd_args.batch_size]
+            start = idx * B
+            stop = (idx + 1) * B
+            batch_indices = indices[start:stop]
+            
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
+            node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
 
-            node_feats = torch.cat([list_node_feats[i] for i in batch_indices], dim=0)
-            edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
-
-            ll, _ = model.forward_train(batch_indices, node_feats=node_feats, edge_feats=edge_feats)
+            edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
+            
+            ll, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
             loss = -ll / num_nodes
             loss.backward()
             loss = loss.item()
+            
+            if loss < best_loss:
+                print('Lowest Training Loss Achieved: ', loss)
+                best_loss = loss
+                torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
             if (idx + 1) % cmd_args.accum_grad == 0:
                 if cmd_args.grad_clip > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
                 optimizer.step()
                 optimizer.zero_grad()
-            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / cmd_args.epoch_save, loss))
-        _, pred_edges, _, pred_node_feats, pred_edge_feats = model(len(train_graphs[0]))
-        print(pred_edges)
-        print(pred_node_feats)
-        print(pred_edge_feats)
+            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, loss))
+        
+        print('epoch complete')
+        cur = epoch + 1
+        if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
+            print('saving epoch')
+            checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+            torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
+            
+    
+    elapsed = datetime.now() - prev
+    print("Time elapsed during training: ", elapsed)
+    print("Model training complete.")
+    
+    #for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
+    #    pbar = tqdm(range(cmd_args.epoch_save))
+    #
+    #    optimizer.zero_grad()
+    #    for idx in pbar:
+    #        random.shuffle(indices)
+    #        batch_indices = indices[:cmd_args.batch_size]
+    #        num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
+    #
+    #        node_feats = torch.cat([list_node_feats[i] for i in batch_indices], dim=0)
+    #        edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
+    #
+    #        ll, _ = model.forward_train(batch_indices, node_feats=node_feats, edge_feats=edge_feats)
+    #        loss = -ll / num_nodes
+    #        loss.backward()
+    #        loss = loss.item()
+    #
+    #        if (idx + 1) % cmd_args.accum_grad == 0:
+    #            if cmd_args.grad_clip > 0:
+    #                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
+    #            optimizer.step()
+    #            optimizer.zero_grad()
+    #        pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / cmd_args.epoch_save, loss))
+    #    _, pred_edges, _, pred_node_feats, pred_edge_feats = model(len(train_graphs[0]))
+    #    print(pred_edges)
+    #    print(pred_node_feats)
+    #    print(pred_edge_feats)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        

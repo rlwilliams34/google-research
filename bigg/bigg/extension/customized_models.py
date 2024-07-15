@@ -25,7 +25,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def __init__(self, args):
         super().__init__(args)
-        self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
+        self.edgelen_encoding = MLP(1, [args.embed_dim // 4, args.embed_dim])
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         self.edgelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
@@ -72,11 +72,32 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
-        pred_edge_len = self.edgelen_pred(h)
+        mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
+        
         if edge_feats is None:
             ll = 0
-            edge_feats = pred_edge_len
+            pred_mean = mus
+            pred_lvar = lvars
+            pred_sd = torch.exp(0.5 * pred_lvar)
+            edge_feats = torch.normal(pred_mean, pred_sd)
+            edge_feats = torch.nn.functional.softplus(edge_feats)
+            
         else:
-            ll = -(edge_feats - pred_edge_len) ** 2
-            ll = torch.sum(ll) / 10.0  # need to balance the likelihood between graph structures and features
+            ### Update log likelihood with weight prediction
+            
+            ### Trying with softplus parameterization...
+            edge_feats_invsp = torch.log(torch.special.expm1(edge_feats))
+            
+            ## MEAN AND VARIANCE OF LOGNORMAL
+            var = torch.exp(lvars) 
+            
+            ## diff_sq = (mu - softminusw)^2
+            diff_sq = torch.square(torch.sub(mus, edge_feats_invsp))
+            
+            ## diff_sq2 = v^-1*diff_sq
+            diff_sq2 = torch.div(diff_sq, var)
+            
+            ## add to ll
+            ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+            ll = torch.sum(ll)
         return ll, edge_feats
