@@ -118,33 +118,33 @@ def edge_list_reindexed(G):
     for u in G.nodes():
         id2idx[str(u)] = idx
         idx += 1
-
+    
     edges = []
     for (u, v) in G.edges():
         edges.append((id2idx[str(u)], id2idx[str(v)]))
     return edges
 
 def orca(graph):
-    tmp_fname = 'eval/orca/tmp.txt'
-    f = open(tmp_fname, 'w')
+    path = '/u/home/r/rlwillia/VAE-LSTM/VAE_LSTM/eval_/orca/tmp.txt'
+    f = open(path, 'w')
     f.write(str(graph.number_of_nodes()) + ' ' + str(graph.number_of_edges()) + '\n')
     for (u, v) in edge_list_reindexed(graph):
         f.write(str(u) + ' ' + str(v) + '\n')
     f.close()
-
-    output = sp.check_output(['./eval/orca/orca', 'node', '4', 'eval/orca/tmp.txt', 'std'])
+    
+    output = sp.check_output(['/u/home/r/rlwillia/VAE-LSTM/VAE_LSTM/eval_/orca', 'node', '4', path, 'std'])
     output = output.decode('utf8').strip()
     
     idx = output.find(COUNT_START_STR) + len(COUNT_START_STR)
     output = output[idx:]
     node_orbit_counts = np.array([list(map(int, node_cnts.strip().split(' ') ))
           for node_cnts in output.strip('\n').split('\n')])
-
+    
     try:
         os.remove(tmp_fname)
     except OSError:
         pass
-
+    
     return node_orbit_counts
     
 
@@ -153,43 +153,43 @@ def motif_stats(graph_ref_list, graph_pred_list, motif_type='4cycle', ground_tru
     # normalized by graph size
     total_counts_ref = []
     total_counts_pred = []
-
+    
     num_matches_ref = []
     num_matches_pred = []
-
+    
     graph_pred_list_remove_empty = [G for G in graph_pred_list if not G.number_of_nodes() == 0]
     indices = motif_to_indices[motif_type]
     for G in graph_ref_list:
         orbit_counts = orca(G)
         motif_counts = np.sum(orbit_counts[:, indices], axis=1)
-
+        
         if ground_truth_match is not None:
             match_cnt = 0
             for elem in motif_counts:
                 if elem == ground_truth_match:
                     match_cnt += 1
             num_matches_ref.append(match_cnt / G.number_of_nodes())
-
+            
         #hist, _ = np.histogram(
         #        motif_counts, bins=bins, density=False)
         motif_temp = np.sum(motif_counts) / G.number_of_nodes()
         total_counts_ref.append(motif_temp)
-
+        
     for G in graph_pred_list_remove_empty:
         orbit_counts = orca(G)
         motif_counts = np.sum(orbit_counts[:, indices], axis=1)
-
+        
         if ground_truth_match is not None:
             match_cnt = 0
             for elem in motif_counts:
                 if elem == ground_truth_match:
                     match_cnt += 1
             num_matches_pred.append(match_cnt / G.number_of_nodes())
-
+            
         motif_temp = np.sum(motif_counts) / G.number_of_nodes()
         total_counts_pred.append(motif_temp)
-
-    mmd_dist = mmd.compute_mmd(total_counts_ref, total_counts_pred, kernel=mmd.gaussian,
+    
+    mmd_dist = compute_mmd(total_counts_ref, total_counts_pred, kernel=gaussian,
             is_hist=False)
     #print('-------------------------')
     #print(np.sum(total_counts_ref) / len(total_counts_ref))
@@ -222,7 +222,9 @@ def orbit_stats_all(graph_ref_list, graph_pred_list):
 
     total_counts_ref = np.array(total_counts_ref)
     total_counts_pred = np.array(total_counts_pred)
-    mmd_dist = mmd.compute_mmd(total_counts_ref, total_counts_pred, kernel=mmd.gaussian,
+    print(len(total_counts_red))
+    print(len(total_counts_pred))
+    mmd_dist = compute_mmd(total_counts_ref, total_counts_pred, kernel=gaussian,
             is_hist=False, sigma=30.0)
 
     print('-------------------------')
@@ -233,10 +235,20 @@ def orbit_stats_all(graph_ref_list, graph_pred_list):
     return mmd_dist
 
 
+
+
+
+
+
 ## FROM https://github.com/lrjconan/GRAN/blob/master/utils/eval_helper.py
-def spectral_worker(G):
+def spectral_worker(G, weighted):
   # eigs = nx.laplacian_spectrum(G)
-  eigs = eigvalsh(nx.normalized_laplacian_matrix(G).todense())  
+  if not weighted:
+    G2 = nx.Graph(G.edges())
+    eigs = eigvalsh(nx.normalized_laplacian_matrix(G2).todense())  
+  else:
+    eigs = eigvalsh(nx.normalized_laplacian_matrix(G).todense()) 
+   
   spectral_pmf, _ = np.histogram(eigs, bins=200, range=(-1e-5, 2), density=False)
   spectral_pmf = spectral_pmf / spectral_pmf.sum()
   # from scipy import stats  
@@ -247,7 +259,7 @@ def spectral_worker(G):
   # import pdb; pdb.set_trace()
   return spectral_pmf
 
-def spectral_stats(graph_ref_list, graph_pred_list, is_parallel=False):
+def spectral_stats(graph_ref_list, graph_pred_list, weighted, is_parallel=False):
   ''' Compute the distance between the degree distributions of two unordered sets of graphs.
     Args:
       graph_ref_list, graph_target_list: two lists of networkx graphs to be evaluated
@@ -276,10 +288,10 @@ def spectral_stats(graph_ref_list, graph_pred_list, is_parallel=False):
     #     sample_pred.append(spectral_density)
   else:
     for i in range(len(graph_ref_list)):
-      spectral_temp = spectral_worker(graph_ref_list[i])
+      spectral_temp = spectral_worker(graph_ref_list[i], weighted)
       sample_ref.append(spectral_temp)
     for i in range(len(graph_pred_list_remove_empty)):
-      spectral_temp = spectral_worker(graph_pred_list_remove_empty[i])
+      spectral_temp = spectral_worker(graph_pred_list_remove_empty[i], weighted)
       sample_pred.append(spectral_temp)
   # print(len(sample_ref), len(sample_pred))
 
@@ -292,3 +304,46 @@ def spectral_stats(graph_ref_list, graph_pred_list, is_parallel=False):
   if PRINT_TIME:
     print('Time computing degree mmd: ', elapsed)
   return mmd_dist
+
+
+def collect_weights(list_graphs):
+    list_graph_weights = []
+    max_wt = -np.inf
+    for g in list_graphs:
+        #print("Hi")
+        #print(g)
+        graph_weights = [g[n1][n2]['weight'] for (n1, n2) in g.edges()]
+        #print(graph_weights)
+        if len(graph_weights) > 0:
+            list_graph_weights.append(graph_weights)
+            max_wt_g = max(graph_weights)
+            max_wt = max(max_wt_g, max_wt)
+        else:
+            print("WARNING: Empty graph")
+    return list_graph_weights, max_wt
+
+def mmd_weights_only(sample_graphs, target_graphs, kernel):
+  sample_list, max_a = collect_weights(sample_graphs)
+  target_list, max_b = collect_weights(target_graphs)
+  #print(sample_list)
+  
+  sample_ref = []
+  sample_pred = []
+  
+  #max_a = max([max(a) for a in sample_list])
+  #max_b = max([max(b) for b in target_list])
+  max_ = max(max_a, max_b)
+  
+  for i in range(len(sample_list)):
+      hist_temp, _ = np.histogram(sample_list[i], range = (1e-5, max_), bins=25, density=False)
+      hist_temp = hist_temp / hist_temp.sum()
+      sample_ref.append(hist_temp)
+  
+  for i in range(len(target_list)):
+      hist_temp, _ = np.histogram(target_list[i], range = (1e-5, max_), bins=25, density=False)
+      hist_temp = hist_temp / hist_temp.sum()
+      sample_pred.append(hist_temp)
+  
+  mmd_dist = compute_mmd(sample_ref, sample_pred, kernel)
+  return mmd_dist
+  
