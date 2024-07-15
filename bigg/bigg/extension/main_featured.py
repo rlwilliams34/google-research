@@ -36,6 +36,7 @@ from bigg.model.tree_clib.tree_lib import setup_treelib, TreeLib
 from bigg.evaluation.graph_stats import *
 from bigg.evaluation.mmd import *
 from bigg.evaluation.mmd_stats import *
+from bigg.experiments.train_utils import get_node_dist
 
 def get_node_feats(g):
     length = []
