@@ -33,9 +33,9 @@ from collections import OrderedDict
 from bigg.common.configs import cmd_args, set_device
 from bigg.extension.customized_models import BiggWithEdgeLen
 from bigg.model.tree_clib.tree_lib import setup_treelib, TreeLib
-from bigg.extension.eval_.graph_stats import *
-from bigg.extension.eval_.mmd import *
-from bigg.extension.eval_.mmd_stats import *
+from bigg.extension.evaluation.graph_stats import *
+from bigg.evaluation.mmd import *
+from bigg.evaluation.mmd_stats import *
 
 def get_node_feats(g):
     length = []
