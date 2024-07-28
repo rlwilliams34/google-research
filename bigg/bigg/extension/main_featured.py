@@ -154,7 +154,7 @@ if __name__ == '__main__':
                     pred_g.add_weighted_edges_from(fixed_edges)
                     gen_graphs.append(pred_g)
         
-        for idx in range(10):
+        for idx in range(min(10, cmd_args.num_test_gen)):
             print("edges: ", gen_graphs[idx].edges(data=True))
         
         print(cmd_args.g_type)
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     if num_iter != N / B:
         num_iter += 1
     
-    best_loss = 99999
+    best_loss = np.inf
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         pbar = tqdm(range(num_iter))
