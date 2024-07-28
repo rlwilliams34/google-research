@@ -82,13 +82,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             ## New weight statistics
             m = len(weights)
-            if m > 1:
-                var_m = torch.var(weights)
-            
-            else:
-                var_m = 0.0
-            
             mu_m = torch.mean(weights)
+            var_m = (torch.var(weights) if m > 1 else 0.0)
             tot = n + m
             batch_max = weights.max()
             batch_min = weights.min()
@@ -114,8 +109,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.epoch_num == 0:
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_weights(edge_feats, mode = self.mode)
-        x = self.edgelen_encoding(edge_feats_normalized)
-        print(x)
         return self.edgelen_encoding(edge_feats_normalized)
 
     def predict_node_feats(self, state, node_feats=None):
