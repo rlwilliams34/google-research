@@ -11,7 +11,7 @@ orca_motifs(PyObject *self, PyObject *args)
     const char *orbit_type;
     int graphlet_size;
     const char *input_filename;
-    const char *output_filename;
+    char *output_filename;
     int sts;
 
     if (!PyArg_ParseTuple(args, "siss", &orbit_type, &graphlet_size, &input_filename, &output_filename))
