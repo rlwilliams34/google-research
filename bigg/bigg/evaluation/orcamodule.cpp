@@ -14,7 +14,7 @@ orca_motifs(PyObject *self, PyObject *args)
     const char *output_filename;
     int sts;
 
-    if (!PyArg_ParseTuple(args, 'siss', &orbit_type, &graphlet_size, &input_filename, &output_filename))
+    if (!PyArg_ParseTuple(args, "siss", &orbit_type, &graphlet_size, &input_filename, &output_filename))
         return NULL;
     sts = system(orbit_type);
     motif_counts(orbit_type, graphlet_size, input_filename, output_filename);
@@ -28,7 +28,7 @@ static PyMethodDef OrcaMethods[] = {
 
 static struct PyModuleDef orcamodule = {
    PyModuleDef_HEAD_INIT,
-   'orca',   /* name of module */
+   "orca",   /* name of module */
    NULL, /* module documentation, may be NULL */
    -1,       /* size of per-interpreter state of the module,
                 or -1 if the module keeps state in global variables. */
@@ -45,12 +45,12 @@ int main(int argc, char *argv[]) {
 
     wchar_t *program = Py_DecodeLocale(argv[0], NULL);
     if (program == NULL) {
-        fprintf(stderr, 'Fatal error: cannot decode argv[0]\n');
+        fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
         exit(1);
     }
 
     /* Add a built-in module, before Py_Initialize */
-    PyImport_AppendInittab('orca', PyInit_orca);
+    PyImport_AppendInittab("orca", PyInit_orca);
 
     /* Pass argv[0] to the Python interpreter */
     Py_SetProgramName(program);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     /* Optionally import the module; alternatively,
        import can be deferred until the embedded script
        imports it. */
-    PyImport_ImportModule('orca');
+    PyImport_ImportModule("orca");
 
     PyMem_RawFree(program);
 
