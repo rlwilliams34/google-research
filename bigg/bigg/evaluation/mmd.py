@@ -50,6 +50,9 @@ def gaussian_emd(x, y, sigma=1.0, distance_scaling=1.0):
     return np.exp(-emd * emd / (2 * sigma * sigma))
 
 def gaussian(x, y, sigma=1.0):
+    if not isinstance(x, list):
+        x = np.array([x])
+        y = np.array([y])
     dist = np.linalg.norm(x - y, 2)
     return np.exp(-dist * dist / (2 * sigma * sigma))
 
