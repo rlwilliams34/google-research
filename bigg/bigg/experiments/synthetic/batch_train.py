@@ -45,6 +45,7 @@ def load_graphs(graph_pkl):
             graphs.append(g)
     for g in graphs:
         TreeLib.InsertGraph(g)
+    print(graphs)
     return graphs
 
 
@@ -56,7 +57,6 @@ if __name__ == '__main__':
     setup_treelib(cmd_args)
 
     train_graphs = load_graphs(os.path.join(cmd_args.data_dir, 'train-graphs.pkl'))
-    print(train_graphs)
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
 
