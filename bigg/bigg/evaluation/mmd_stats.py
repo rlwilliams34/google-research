@@ -131,7 +131,7 @@ def orca(graph):
     for (u, v) in edge_list_reindexed(graph):
         f.write(str(u) + ' ' + str(v) + '\n')
     f.close()
-    output = sp.check_output(['/u/home/r/rlwillia/google-research/bigg/bigg/evaluation/orca', 'node', 'r', path, 'std'])
+    output = sp.check_output(['/u/home/r/rlwillia/google-research/bigg/bigg/evaluation/orca', 'node', 'r', path, 'std'], shell=True)
     output = output.decode('utf8').strip()
     
     idx = output.find(COUNT_START_STR) + len(COUNT_START_STR)
