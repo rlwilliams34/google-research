@@ -61,10 +61,8 @@ def is_lobster(graph):
     for n in big_n:
         big_neighbors = [x for x in g.neighbors(n) if g.degree(x) >= 2]
         if len(big_neighbors) > 2:
-            print("Not a lobster graph")
-            print(graph.edges())
-            return False
-    return True  
+     	    return False
+    return True
 
 def compute_probs(g, print_results = False):
     g_prime = nx.Graph(g.edges)
@@ -178,6 +176,88 @@ def is_grid(graph):
         return False
     return True
 
+def group_lobster_edges(g):
+    backbone, one_hop, two_hop = group_lobster_nodes(g)
+    
+    edge_1, edge_2, edge_3 = [], [], []
+    
+    
+    for (n1, n2, w) in g.edges(data=True):
+        w = w['weight']
+        if n1 in backbone and n2 in backbone:
+            edge_1.append(w)
+        
+        elif n1 in two_hop or n2 in two_hop:
+            edge_3.append(w)
+        
+        else:
+            edge_2.append(w)
+    
+    return edge_1, edge_2, edge_3
+
+def group_lobster_nodes(g):
+    g_prime = nx.Graph(g.edges)
+    leaves1 = [l for l in g_prime.nodes() if g_prime.degree(l) == 1]
+    g_prime.remove_nodes_from(leaves1)
+    
+    if len(g_prime.edges()) == 1:
+        leaves2 = []
+        
+    else:
+        leaves2 = [l for l in g_prime.nodes() if g_prime.degree(l) == 1]
+        g_prime.remove_nodes_from(leaves2)
+    
+    backbone = sorted(list(g_prime.nodes))
+    one_hop = []
+    two_hop = []
+    
+    for n in leaves2:
+        neighbors = list(g.neighbors(n))
+        k = min(neighbors)
+        if k in backbone:
+            one_hop += [n]
+        else:
+            two_hop += [n]
+    
+    for n in leaves1:
+        neighbors = list(g.neighbors(n))
+        k = min(neighbors)
+        if k in backbone:
+            one_hop += [n]
+        else:
+            two_hop += [n]
+    
+    assert len(backbone + one_hop + two_hop) == len(g)
+    return backbone, one_hop, two_hop
+
+
+def lobster_weight_statistics(graphs):
+    weights_1, weights_2, weights_3 = [], [], []
+    
+    for g in graphs:
+        edge_1, edge_2, edge_3 = group_lobster_edges(g)
+        weights_1 += edge_1
+        weights_2 += edge_2
+        weights_3 += edge_3
+    
+    mu_lo = np.mean(weights_1) - 1.96 * np.std(weights_1) / len(weights_1)**0.5
+    mu_up = np.mean(weights_1) + 1.96 * np.std(weights_1) / len(weights_1)**0.5
+    
+    print("Group 1 Weights Mean: ", np.mean(weights_1))
+    print("95% CI: ", "(", mu_lo, mu_up, ")")
+    
+    mu_lo = np.mean(weights_2) - 1.96 * np.std(weights_2) / len(weights_2)**0.5
+    mu_up = np.mean(weights_2) + 1.96 * np.std(weights_2) / len(weights_2)**0.5
+    
+    print("Group 2 Weights Mean: ", np.mean(weights_2))
+    print("95% CI: ", "(", mu_lo, mu_up, ")")
+    
+    mu_lo = np.mean(weights_3) - 1.96 * np.std(weights_3) / len(weights_3)**0.5
+    mu_up = np.mean(weights_3) + 1.96 * np.std(weights_3) / len(weights_3)**0.5
+    
+    print("Group 3 Weights Mean: ", np.mean(weights_3))
+    print("95% CI: ", "(", mu_lo, mu_up, ")")
+
 def tree_weight_statistics(graphs, transform = False):
   ## Returns summary statistics on weights for graphs
   weights = []
@@ -234,7 +314,7 @@ def tree_weight_statistics(graphs, transform = False):
   print('95% CI: ', ' (' + str(results_rounded[7]) + ',' + str(results_rounded[8]), ')')
   print('Empirical Interval: ', ' (' + str(s_t_lo) + ',' + str(s_t_hi) + ')')
   return results
-  
+
 def get_graph_stats(out_graphs, test_graphs, graph_type):
     if graph_type == "tree":
         prop, true_trees = correct_tree_topology_check(out_graphs)
@@ -285,30 +365,14 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
     elif graph_type == "lobster":
         prop, true_lobsters = correct_lobster_topology_check(out_graphs)
         print("Proportion Correct Lobster Graphs: ", prop)
-        xbars = []
-        vars_ = []
         num_nodes = []
         num_edges = []
         for lobster in out_graphs:
-            weights = []
             num_nodes.append(len(lobster))
             num_edges.append(len(lobster.edges()))
-            if cmd_args.has_edge_feats:
-                for (n1, n2, w) in lobster.edges(data=True):
-                    w = w['weight']
-                    weights.append(w)
-                xbars.append(np.mean(weights))
-                vars_.append(np.var(weights, ddof = 1))
         
         if cmd_args.has_edge_feats:
-            mu_lo = np.mean(xbars) - 1.96 * np.std(xbars) / len(xbars)**0.5
-            mu_up = np.mean(xbars) + 1.96 * np.std(xbars) / len(xbars)**0.5
-            
-            var_lo = np.mean(vars_) - 1.96 * np.std(vars_) / len(vars_)**0.5
-            var_up = np.mean(vars_) + 1.96 * np.std(vars_) / len(vars_)**0.5
-            
-            print("Mean Estimates: ", np.mean(xbars), (mu_lo, mu_up))
-            print("Var Estimates: ", np.mean(vars_)**0.5, (var_lo**0.5, var_up**0.5))
+            lobster_weight_statistics(out_graphs)
             
         print("Num Nodes: ", np.mean(num_nodes), (min(num_nodes), max(num_nodes)))
         print("Num Edges: ", np.mean(num_edges), (min(num_edges), max(num_edges)))
@@ -332,18 +396,18 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         print("Proportion Correct Topology: ", prop)
     
     elif graph_type == "db":
-        test = degree_stats(out_graphs, test_graphs)
-        print("MMD Test on Degree Stats: ", test)
-        test2 = spectral_stats(out_graphs, test_graphs, False)
-        print("MMD on Specta of L Normalized, Unweighted: ", test2)
-        test3 = spectral_stats(out_graphs, test_graphs, True)
-        print("MMD on Specta of L Normalized, Weighted: ", test3)
-        test4 = mmd_weights_only(out_graphs, test_graphs, gaussian_emd)
-        print("MMD on Weights Only: ", test4)
-        test5 = clustering_stats(out_graphs, test_graphs)
-        print("MMD on Clustering Coefficient: ", test5)
-        #test6 = motif_stats(out_graphs, test_graphs)
-        #print("MMD on Orbit: ", test6)    
+        #test = degree_stats(out_graphs, test_graphs)
+        #print("MMD Test on Degree Stats: ", test)
+        #test2 = spectral_stats(out_graphs, test_graphs, False)
+        #print("MMD on Specta of L Normalized, Unweighted: ", test2)
+        #test3 = spectral_stats(out_graphs, test_graphs, True)
+        #print("MMD on Specta of L Normalized, Weighted: ", test3)
+        #test4 = mmd_weights_only(out_graphs, test_graphs, gaussian_emd)
+        #print("MMD on Weights Only: ", test4)
+        #test5 = clustering_stats(out_graphs, test_graphs)
+        #print("MMD on Clustering Coefficient: ", test5)
+        test6 = motif_stats(out_graphs, test_graphs)
+        print("MMD on Orbit: ", test6)    
     else:
         print("Graph Type not yet implemented")
     return 0
