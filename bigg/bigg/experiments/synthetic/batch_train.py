@@ -151,7 +151,6 @@ if __name__ == '__main__':
         
         print('epoch complete')
         cur = epoch + 1
-        model.epoch_num += 1
         
         if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
             print('saving epoch')
