@@ -86,6 +86,11 @@ cmd_opt.add_argument('-p2', default=0.7, type=float, help='leaves in trees')
 cmd_opt.add_argument('-min_nodes', default=5, type=int, help='leaves in trees')
 cmd_opt.add_argument('-max_nodes', default=100, type=int, help='leaves in trees')
 
+## GCN
+cmd_opt.add_argument('-node_embed_dim', default=64, type=int, help='embed size')
+cmd_opt.add_argument('-out_dim', default=32, type=int, help='embed size')
+
+
 cmd_args, _ = cmd_opt.parse_known_args()
 
 if cmd_args.save_dir is not None:

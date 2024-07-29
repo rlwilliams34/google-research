@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from bigg.model.tree_model import RecurTreeGen
+from bigg.customized_model import gcn_build
 import torch
 from bigg.common.pytorch_util import glorot_uniform, MLP
 import torch.nn as nn
@@ -174,3 +175,18 @@ class BiggWithEdgeLen(RecurTreeGen):
             ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
             ll = torch.sum(ll)
         return ll, edge_feats
+
+
+
+
+class BiggWithGCN(RecurTreeGen):
+
+    def __init__(self, args):
+        super().__init__(args)
+        self.gcn_mod = GCN_Generate(args)
+        
+    def forward_train2(self, batch_indices, feat_idx, edge_list, batch_weight_idx):
+        ll_top, _ = self.forward_train(batch_indices)
+        ll_wt = -1 * self.gcn_mod.forward(feat_idx, edge_list, batch_weight_idx)
+        return ll_top + ll_wt
+    

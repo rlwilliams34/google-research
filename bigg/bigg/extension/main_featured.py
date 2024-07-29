@@ -38,6 +38,29 @@ from bigg.evaluation.mmd import *
 from bigg.evaluation.mmd_stats import *
 from bigg.experiments.train_utils import get_node_dist
 
+def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
+    batch_g = nx.Graph()
+    feat_idx = torch.Tensor().to(cmd_args.device)
+    batch_weight_idx = []
+    
+    for idx in batch_indices:
+        g = train_graphs[idx]
+        n = len(g)
+        
+        for e1, e2, w in g.edges(data=True):
+            batch_weight_idx.append((int(e1), int(e2), w['weight']))
+        feat_idx = torch.cat([feat_idx, torch.arange(n).to(cmd_args.device)])
+        
+        batch_g = nx.union(batch_g, g, rename = ("A", "B"))
+        batch_g = nx.convert_node_labels_to_integers(batch_g)
+    
+    edge_idx = torch.Tensor(list(batch_g.edges())).to(cmd_args.device).t()
+    edge_idx_weighted = list(batch_g.edges(data=True))
+    batch_weight_idx = torch.Tensor(batch_weight_idx).to(cmd_args.device)
+    
+    return feat_idx, edge_idx, batch_weight_idx
+
+
 def get_node_feats(g):
     length = []
     for i, (idx, feat) in enumerate(g.nodes(data=True)):
@@ -99,7 +122,12 @@ if __name__ == '__main__':
     else:
         list_edge_feats = None
     
-    model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+    if cmd_args.test_gcn:
+        model = BiggWithGCN(cmd_args).to(cmd_args.device)
+    
+    else:
+        model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+    
     optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     if cmd_args.model_dump is not None and os.path.isfile(cmd_args.model_dump):
@@ -205,7 +233,13 @@ if __name__ == '__main__':
 
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
             
-            ll, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+            if cmd_args.test_gcn:
+                feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
+                ll = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
+                
+            else:
+                ll, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+            
             loss = -ll / num_nodes
             loss.backward()
             loss = loss.item()
