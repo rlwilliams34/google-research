@@ -286,7 +286,8 @@ if __name__ == '__main__':
                 if cmd_args.accum_grad > 1:
                     with torch.no_grad():
                         for p in model.parameters():
-                            p.grad.div_(cmd_args.accum_grad)
+                            if p.grad is not None:
+                                p.grad.div_(cmd_args.accum_grad)
                 
                 if cmd_args.grad_clip > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
