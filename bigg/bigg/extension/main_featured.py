@@ -221,6 +221,7 @@ if __name__ == '__main__':
 
         optimizer.zero_grad()
         start = 0
+        losses = []
         for idx in pbar:
             if idx >= cmd_args.accum_grad * int(num_iter / cmd_args.accum_grad):
               print("Skipping iteration -- not enough sub-batches remaining for grad accumulation.")
