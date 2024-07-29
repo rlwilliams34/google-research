@@ -211,6 +211,9 @@ if __name__ == '__main__':
         num_iter += 1
     
     best_loss = np.inf
+    improvements = []
+    thresh = 5
+    patience = 0
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         pbar = tqdm(range(num_iter))
@@ -219,6 +222,10 @@ if __name__ == '__main__':
         optimizer.zero_grad()
         start = 0
         for idx in pbar:
+            if idx >= cmd_args.accum_grad * int(num_iter / cmd_args.accum_grad):
+              print("Skipping iteration -- not enough sub-batches remaining for grad accumulation.")
+              continue
+            
             start = idx * B
             stop = (idx + 1) * B
             
@@ -250,6 +257,29 @@ if __name__ == '__main__':
                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
             if (idx + 1) % cmd_args.accum_grad == 0:
+                if len(losses) > 0:
+                    avg_loss = np.mean(losses)
+                    if loss - avg_loss < 0:
+                        improvements.append(True)
+                        patience = 0
+            
+                    else:
+                        improvements.append(False)
+                        patience += 1
+              
+                losses.append(tot_loss)
+                
+                if patience > thresh:
+                    patience = 0
+                    print("Reducing Learning Rate")
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = max(param_group['lr'] / 2, 1e-5)
+                
+                if cmd_args.accum_grad > 1:
+                    with torch.no_grad():
+                        for p in model.parameters():
+                            p.grad.div_(cmd_args.accum_grad)
+                
                 if cmd_args.grad_clip > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
                 optimizer.step()
