@@ -10,11 +10,8 @@ import torch.nn.functional as F
 import torch_geometric
 from torch_geometric import nn
 from torch_geometric.nn import conv
-import os
-import sys
-sys.path.append('/u/home/r/rlwillia/VAE-LSTM/VAE_LSTM') ##workaround temporarily...
-from common.configs import cmd_args
-from common.pytorch_util import *
+from bigg.common.pytorch_util import glorot_uniform, MLP
+from bigg.common.configs import cmd_args, set_device
 
 ## Demo ##
 #class SAGE(nn.Module):
