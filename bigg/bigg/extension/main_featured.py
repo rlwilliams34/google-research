@@ -214,6 +214,8 @@ if __name__ == '__main__':
     improvements = []
     thresh = 5
     patience = 0
+    prior_loss = np.inf
+    losses = []
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
@@ -222,7 +224,7 @@ if __name__ == '__main__':
 
         optimizer.zero_grad()
         start = 0
-        losses = []
+        #losses = []
         for idx in pbar:
             if idx >= cmd_args.accum_grad * int(num_iter / cmd_args.accum_grad):
               print("Skipping iteration -- not enough sub-batches remaining for grad accumulation.")
@@ -271,6 +273,8 @@ if __name__ == '__main__':
                         patience += 1
               
                 losses.append(tot_loss)
+                if len(losses) > 10:
+                    losses = losses[1:]
                 tot_loss = 0.0
                 
                 if patience > thresh:
