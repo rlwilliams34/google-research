@@ -57,10 +57,11 @@ class BiggWithEdgeLen(RecurTreeGen):
           edge_feats_normalized = (edge_feats - self.mu_wt) / self.var_wt**0.5
           
       elif mode == "normalize":
-          print(self.min_wt)
-          print(self.max_wt)
           if self.min_wt != self.max_wt:
               edge_feats_normalized = -1 + 2 * (edge_feats - self.min_wt) / (self.max_wt - self.min_wt)
+          
+          else:
+              edge_feats_normalized = edge_feats
       
       elif mode == "exp":
          edge_feats_normalized = torch.exp(-1/edge_feats)
@@ -104,6 +105,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.n_obs += m
             self.min_wt = torch.min(batch_min, self.min_wt)
             self.max_wt = torch.max(batch_max, self.max_wt)
+            print(self.min_wt)
+            print(self.max_wt)
     
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
