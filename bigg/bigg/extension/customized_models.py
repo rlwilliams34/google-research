@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from bigg.model.tree_model import RecurTreeGen
-from bigg.customized_model import gcn_build
+from bigg.extension.gcn_build import *
 import torch
 from bigg.common.pytorch_util import glorot_uniform, MLP
 import torch.nn as nn
