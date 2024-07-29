@@ -251,6 +251,7 @@ if __name__ == '__main__':
             loss = -ll / num_nodes
             loss.backward()
             loss = loss.item()
+            tot_loss = tot_loss + loss / cmd_args.accum_grad
             
             if loss < best_loss:
                 print('Lowest Training Loss Achieved: ', loss)
@@ -269,6 +270,7 @@ if __name__ == '__main__':
                         patience += 1
               
                 losses.append(tot_loss)
+                tot_loss = 0.0
                 
                 if patience > thresh:
                     patience = 0
