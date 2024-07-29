@@ -216,6 +216,7 @@ if __name__ == '__main__':
     patience = 0
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
+        tot_loss = 0.0
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
 
