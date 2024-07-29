@@ -105,14 +105,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.n_obs += m
             self.min_wt = torch.min(batch_min, self.min_wt)
             self.max_wt = torch.max(batch_max, self.max_wt)
-            print(self.min_wt)
-            print(self.max_wt)
     
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
 
-    def embed_edge_feats(self, edge_feats):
-        if self.epoch_num == 0:
+    def embed_edge_feats(self, edge_feats, update_wt = False):
+        if self.epoch_num == 0 and update_wt:
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_weights(edge_feats, mode = self.mode)
         return self.edgelen_encoding(edge_feats_normalized)
