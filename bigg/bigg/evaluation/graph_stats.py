@@ -331,8 +331,8 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         print("MMD on Specta of L Normalized, Weighted: ", test3)
         test4 = mmd_weights_only(out_graphs, test_graphs, gaussian_emd)
         print("MMD on Weights Only: ", test4)
-        #test3 = clustering_stats(out_graphs, test_graphs)
-        #print("MMD on Clustering Coefficient: ", test3)
+        test5 = clustering_stats(out_graphs, test_graphs)
+        print("MMD on Clustering Coefficient: ", test5)
         
         #if len(true_trees) > 10000:
         #    for tree in true_trees:
@@ -388,8 +388,8 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         if cmd_args.has_edge_feats:
             test4 = mmd_weights_only(out_graphs, test_graphs, gaussian_emd)
             print("MMD on Weights Only: ", test4)
-        #test3 = clustering_stats(out_graphs, test_graphs)
-        #print("MMD on Clustering Coefficient: ", test3)
+        test5 = clustering_stats(out_graphs, test_graphs)
+        print("MMD on Clustering Coefficient: ", test5)
     
     elif graph_type == "grid":
         prop, true_lobsters = correct_grid_topology_check(out_graphs)
