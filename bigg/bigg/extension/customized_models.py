@@ -57,6 +57,8 @@ class BiggWithEdgeLen(RecurTreeGen):
           edge_feats_normalized = (edge_feats - self.mu_wt) / self.var_wt**0.5
           
       elif mode == "normalize":
+          print(self.min_wt)
+          print(self.max_wt)
           if self.min_wt != self.max_wt:
               edge_feats_normalized = -1 + 2 * (edge_feats - self.min_wt) / (self.max_wt - self.min_wt)
       
