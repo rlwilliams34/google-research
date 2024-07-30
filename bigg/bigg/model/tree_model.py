@@ -201,8 +201,8 @@ class FenwickTree(nn.Module):
         row_embeds = [(self.init_h0, self.init_c0)]
         print(len(h_bot))
         print(h_bot[0].shape)
-        print(len(c_bot))
-        print(c_bot[0].shape)
+        print(h_bot[1].shape)
+        print(c_bot.shape)
         print(h_buf0.shape)
         print(c_buf0.shape)
         print(prev_rowsum_h.shape)
