@@ -147,7 +147,7 @@ class FenwickTree(nn.Module):
         self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, args.embed_dim))
         glorot_uniform(self)
         if self.has_node_feats:
-            self.node_feat_update = MultiLSTMCell(args.embed_size, args.embed_size, args.rnn_layers)
+            self.node_feat_update = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
         self.merge_cell = BinaryTreeLSTMCell(args.embed_dim)
         self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
         if args.pos_enc:
@@ -349,12 +349,12 @@ class RecurTreeGen(nn.Module):
             self.pred_has_ch = MLP(args.embed_dim, [2 * args.embed_dim, 1])
             self.m_pred_has_left = MLP(args.embed_dim, [2 * args.embed_dim, 1])
             self.m_pred_has_right = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-            self.m_cell_topdown = MultiLSTMCell(args.embed_size, args.embed_size, args.rnn_layers)
-            self.m_cell_topright = MultiLSTMCell(args.embed_size, args.embed_size, args.rnn_layers)
+            self.m_cell_topdown = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
+            self.m_cell_topright = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
         else:
             fn_pred = lambda: MLP(args.embed_dim, [2 * args.embed_dim, 1])
             fn_tree_cell = lambda: BinaryTreeLSTMCell(args.embed_dim)
-            fn_lstm_cell = lambda: MultiLSTMCell(args.embed_size, args.embed_size, args.rnn_layers)
+            fn_lstm_cell = lambda: MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
             num_params = int(np.ceil(np.log2(args.max_num_nodes))) + 1
             self.pred_has_ch = fn_pred()
 
