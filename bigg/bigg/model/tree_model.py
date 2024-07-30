@@ -202,7 +202,7 @@ class FenwickTree(nn.Module):
         print(len(h_bot))
         print(h_bot[0].shape)
         print(h_bot[1].shape)
-        print(c_bot.shape)
+        print(c_bot)
         print(h_buf0.shape)
         print(c_buf0.shape)
         print(prev_rowsum_h.shape)
@@ -349,10 +349,10 @@ class RecurTreeGen(nn.Module):
         self.greedy_frac = args.greedy_frac
         self.share_param = args.share_param
         if not self.bits_compress:
-            self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, args.embed_dim))
-            self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, args.embed_dim))
-            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, args.embed_dim))
-            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, args.embed_dim))
+            self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
 
         self.topdown_left_embed = Parameter(torch.Tensor(2, args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
@@ -603,8 +603,8 @@ class RecurTreeGen(nn.Module):
             edge_feats = self.embed_edge_feats(edge_feats, True)
 
         if not self.bits_compress:
-            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=0)
-            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=0)
+            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
+            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
             fn_hc_bot = lambda d: (h_bot, c_bot)
         else:
             binary_embeds, base_feat = TreeLib.PrepareBinary()
