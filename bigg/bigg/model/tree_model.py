@@ -199,8 +199,10 @@ class FenwickTree(nn.Module):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
-        print(h_bot.shape)
-        print(c_bot.shape)
+        print(len(h_bot)
+        print(h_bot[0].shape)
+        print(len(c_bot))
+        print(c_bot[0].shape)
         print(h_buf0.shape)
         print(c_buf0.shape)
         print(prev_rowsum_h.shape)
