@@ -176,7 +176,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             ## add to ll
             ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
-            ll = torch.sum(ll)
+            ll = torch.sum(ll) / 10
         return ll, edge_feats
 
 
