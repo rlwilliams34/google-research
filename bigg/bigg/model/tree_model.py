@@ -75,7 +75,12 @@ def selective_update_hc(h, c, zero_one, feats):
     print(h.shape)
     print(local_edge_feats.shape)
     print(zero_one.shape)
-    h = torch.where(zero_one.repeat(1, 2), local_edge_feats.unsqueeze(1).repeat(1, 2, 1), h)
+    x = zero_one.repeat(1, 2)
+    y = local_edge_feats.unsqueeze(1).repeat(1, 2, 1)
+    print(x.shape)
+    print(y.shape)
+    #h = torch.where(zero_one.repeat(1, 2), local_edge_feats.unsqueeze(1).repeat(1, 2, 1), h)
+    h = torch.where(x, y, h)
     c = torch.where(zero_one.repeat(1, 2), local_edge_feats.unsqueeze(1).repeat(1, 2, 1), c)
     return h, c
 
