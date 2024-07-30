@@ -233,6 +233,8 @@ class FenwickTree(nn.Module):
         print(h_list[0].shape)
         joint_h = torch.cat(h_list, dim=0)
         joint_c = torch.cat(c_list, dim=0)
+        print(joint_h.shape)
+        
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
