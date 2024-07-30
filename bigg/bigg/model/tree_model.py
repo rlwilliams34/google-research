@@ -25,7 +25,7 @@ import torch.nn.functional as F
 from torch_scatter import scatter
 from collections import defaultdict
 from torch.nn.parameter import Parameter
-from bigg.common.pytorch_util import glorot_uniform, MLP, BinaryTreeLSTMCell, MultiLSTMCell
+from bigg.common.pytorch_util import glorot_uniform, MLP, BinaryTreeLSTMCell
 from tqdm import tqdm
 from bigg.model.util import AdjNode, ColAutomata, AdjRow
 from bigg.model.tree_clib.tree_lib import TreeLib
@@ -72,16 +72,8 @@ def selective_update_hc(h, c, zero_one, feats):
     nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
     local_edge_feats = scatter(feats, nz_idx, dim=0, dim_size=h.shape[0])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
-    print(h.shape)
-    print(local_edge_feats.shape)
-    print(zero_one.shape)
-    x = zero_one.squeeze(-1)
-    y = local_edge_feats.unsqueeze(1).repeat(1, 2, 1)
-    print(x.shape)
-    print(y.shape)
-    #h = torch.where(zero_one.repeat(1, 2), local_edge_feats.unsqueeze(1).repeat(1, 2, 1), h)
-    h = torch.where(x, y, h)
-    c = torch.where(zero_one.repeat(1, 2), local_edge_feats.unsqueeze(1).repeat(1, 2, 1), c)
+    h = torch.where(zero_one, local_edge_feats, h)
+    c = torch.where(zero_one, local_edge_feats, c)
     return h, c
 
 def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None):
@@ -151,11 +143,11 @@ class FenwickTree(nn.Module):
         super(FenwickTree, self).__init__()
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
-        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, args.embed_dim))
-        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, args.embed_dim))
+        self.init_h0 = Parameter(torch.Tensor(1, args.embed_dim))
+        self.init_c0 = Parameter(torch.Tensor(1, args.embed_dim))
         glorot_uniform(self)
         if self.has_node_feats:
-            self.node_feat_update = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
+            self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         self.merge_cell = BinaryTreeLSTMCell(args.embed_dim)
         self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
         if args.pos_enc:
@@ -207,14 +199,6 @@ class FenwickTree(nn.Module):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
-        print(len(h_bot))
-        print(h_bot[0].shape)
-        print(h_bot[1].shape)
-        print(c_bot)
-        print(h_buf0.shape)
-        print(c_buf0.shape)
-        print(prev_rowsum_h.shape)
-        print(prrev_rowsum_c.shape)
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
             if 'node' in feat_dict:
@@ -245,18 +229,8 @@ class FenwickTree(nn.Module):
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
         h_list, c_list = zip(*row_embeds)
-        print(len(h_list))
-        print(h_list[0].shape)
-        print(h_list[1].shape)
-        print(h_list[2].shape)
-        print(h_list[3].shape)
-        print(h_list[4].shape)
-        print(h_list[5].shape)
-        print(h_list[6].shape)
         joint_h = torch.cat(h_list, dim=0)
         joint_c = torch.cat(c_list, dim=0)
-        print(joint_h.shape)
-        
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
@@ -357,10 +331,10 @@ class RecurTreeGen(nn.Module):
         self.greedy_frac = args.greedy_frac
         self.share_param = args.share_param
         if not self.bits_compress:
-            self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_h0 = Parameter(torch.Tensor(1, args.embed_dim))
+            self.leaf_c0 = Parameter(torch.Tensor(1, args.embed_dim))
+            self.empty_h0 = Parameter(torch.Tensor(1, args.embed_dim))
+            self.empty_c0 = Parameter(torch.Tensor(1, args.embed_dim))
 
         self.topdown_left_embed = Parameter(torch.Tensor(2, args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
@@ -375,12 +349,12 @@ class RecurTreeGen(nn.Module):
             self.pred_has_ch = MLP(args.embed_dim, [2 * args.embed_dim, 1])
             self.m_pred_has_left = MLP(args.embed_dim, [2 * args.embed_dim, 1])
             self.m_pred_has_right = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-            self.m_cell_topdown = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
-            self.m_cell_topright = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
+            self.m_cell_topdown = nn.LSTMCell(args.embed_dim, args.embed_dim)
+            self.m_cell_topright = nn.LSTMCell(args.embed_dim, args.embed_dim)
         else:
             fn_pred = lambda: MLP(args.embed_dim, [2 * args.embed_dim, 1])
             fn_tree_cell = lambda: BinaryTreeLSTMCell(args.embed_dim)
-            fn_lstm_cell = lambda: MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
+            fn_lstm_cell = lambda: nn.LSTMCell(args.embed_dim, args.embed_dim)
             num_params = int(np.ceil(np.log2(args.max_num_nodes))) + 1
             self.pred_has_ch = fn_pred()
 
@@ -439,7 +413,7 @@ class RecurTreeGen(nn.Module):
     def gen_row(self, ll, state, tree_node, col_sm, lb, ub, edge_feats=None):
         assert lb <= ub
         if tree_node.is_root:
-            prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0][-1]))
+            prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0]))
 
             if col_sm.supervised:
                 has_edge = len(col_sm.indices) > 0
@@ -481,7 +455,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
+            left_prob = torch.sigmoid(self.pred_has_left(state[0], tree_node.depth))
 
             if col_sm.supervised:
                 has_left = col_sm.next_edge < mid
@@ -511,7 +485,7 @@ class RecurTreeGen(nn.Module):
             if not has_left:
                 has_right = True
             else:
-                right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0][-1], tree_node.depth))
+                right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0], tree_node.depth))
                 if col_sm.supervised:
                     has_right = col_sm.has_edge(mid, tree_node.col_range[1])
                 else:
@@ -611,8 +585,8 @@ class RecurTreeGen(nn.Module):
             edge_feats = self.embed_edge_feats(edge_feats, True)
 
         if not self.bits_compress:
-            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
-            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
+            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=0)
+            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=0)
             fn_hc_bot = lambda d: (h_bot, c_bot)
         else:
             binary_embeds, base_feat = TreeLib.PrepareBinary()
@@ -672,8 +646,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
         if self.has_edge_feats:
             edge_feats_embed = self.embed_edge_feats(edge_feats, True)
-        logit_has_edge = self.pred_has_ch(row_states[0][-1])
-        print(row_states[0].shape)
+        logit_has_edge = self.pred_has_ch(row_states[0])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
         ll = ll + self.binary_ll(logit_has_edge, has_ch)
         cur_states = (row_states[0][has_ch], row_states[1][has_ch])
@@ -690,7 +663,7 @@ class RecurTreeGen(nn.Module):
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
             cur_states = (cur_states[0][is_nonleaf], cur_states[1][is_nonleaf])
-            left_logits = self.pred_has_left(cur_states[0][-1], lv)
+            left_logits = self.pred_has_left(cur_states[0], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
@@ -720,7 +693,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
 
-            right_logits = self.pred_has_right(topdown_state[0][-1], lv)
+            right_logits = self.pred_has_right(topdown_state[0], lv)
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
             right_ll = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
