@@ -73,7 +73,7 @@ class MultiLSTMCell(nn.Module):
     def forward(self, x_input, states):
         x_input = x_input.unsqueeze(0)
         h, c = states
-        new_states = self.lstm(x_input, (h, c))
+        _, new_states = self.lstm(x_input, (h, c))
 
         h, c = new_states
 
