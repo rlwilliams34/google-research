@@ -199,6 +199,12 @@ class FenwickTree(nn.Module):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
+        print(h_bot.shape)
+        print(c_bot.shape)
+        print(h_buf0.shape)
+        print(c_buf0.shape)
+        print(prev_rowsum_h.shape)
+        print(prrev_rowsum_c.shape)
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
             if 'node' in feat_dict:
