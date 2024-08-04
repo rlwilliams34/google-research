@@ -49,6 +49,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.register_buffer("max_wt", max_wt)
         self.register_buffer("epoch_num", epoch_num)
         self.mode = "normalize"
+        
+        self.log_wt = False
+        self.sm_wt = False
 
     # to be customized
     
