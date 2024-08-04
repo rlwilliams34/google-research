@@ -212,7 +212,7 @@ if __name__ == '__main__':
     
     best_loss = np.inf
     improvements = []
-    thresh = 5
+    thresh = 10
     patience = 0
     prior_loss = np.inf
     losses = []
