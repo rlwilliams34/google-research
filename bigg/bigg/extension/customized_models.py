@@ -114,18 +114,18 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.var_wt = var_m
             self.n_obs = tot
          
-         else:
-           ## Update weight statistics
-           new_mu = (n * mu_n + m * mu_m) / tot
-           
-           new_var_avg = (max(n - 1, 0) * var_n + (m - 1) * var_m)/(tot - 1)
-           new_var_resid = n * m * (mu_n - mu_m)**2 / (tot * (tot - 1))
-           new_var = new_var_avg + new_var_resid
-           
-           ## Save
-           self.mu_wt = new_mu
-           self.var_wt = new_var
-           self.n_obs += m
+          else:
+            ## Update weight statistics
+            new_mu = (n * mu_n + m * mu_m) / tot
+            
+            new_var_avg = (max(n - 1, 0) * var_n + (m - 1) * var_m)/(tot - 1)
+            new_var_resid = n * m * (mu_n - mu_m)**2 / (tot * (tot - 1))
+            new_var = new_var_avg + new_var_resid
+            
+            ## Save
+            self.mu_wt = new_mu
+            self.var_wt = new_var
+            self.n_obs += m
         
         elif self.mode == "normalize":
           batch_max = weights.max()
