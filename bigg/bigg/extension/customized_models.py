@@ -48,7 +48,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.register_buffer("min_wt", min_wt)
         self.register_buffer("max_wt", max_wt)
         self.register_buffer("epoch_num", epoch_num)
-        self.mode = "normalize"
+        self.mode = "None"
         
         self.log_wt = False
         self.sm_wt = False
@@ -68,15 +68,15 @@ class BiggWithEdgeLen(RecurTreeGen):
         return weights
       
       if self.epoch_num == 1:
-        self.update_weight_stats(weights[x_top > 0])
+        self.update_weight_stats(weights)
       
       if self.mode == "score":
         weights = (weights - self.mu_wt) / (self.var_wt**0.5 + 1e-15)
-        weights = torch.mul(weights, x_top)
+        weights = torch.mul(weights)
           
       elif self.mode == "normalize":
         weights = -1 + 2 * (weights - self.min_wt) / (self.max_wt - self.min_wt + 1e-15)
-        weights = self.wt_range * torch.mul(weights, x_top)
+        weights = self.wt_range * weights
       
       elif self.mode == "scale":
         weights = weights * self.wt_scale

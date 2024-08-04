@@ -223,6 +223,7 @@ if __name__ == '__main__':
         random.shuffle(indices)
 
         optimizer.zero_grad()
+        model.epoch_num += 1
         start = 0
         #losses = []
         for idx in pbar:
