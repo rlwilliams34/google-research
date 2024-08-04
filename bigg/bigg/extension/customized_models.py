@@ -52,6 +52,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         self.log_wt = False
         self.sm_wt = False
+        self.wt_range = 1.0
+        self.wt_scale = 1.0
 
     # to be customized
     
