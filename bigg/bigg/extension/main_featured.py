@@ -257,7 +257,6 @@ if __name__ == '__main__':
             tot_loss = tot_loss + loss / cmd_args.accum_grad
             
             if loss < best_loss:
-                print('Lowest Training Loss Achieved: ', loss)
                 best_loss = loss
                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
