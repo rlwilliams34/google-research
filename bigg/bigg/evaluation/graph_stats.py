@@ -232,31 +232,41 @@ def group_lobster_nodes(g):
 
 
 def lobster_weight_statistics(graphs):
-    weights_1, weights_2, weights_3 = [], [], []
+    means_1, means_2, means_3 = [], [], []
     
     for g in graphs:
         edge_1, edge_2, edge_3 = group_lobster_edges(g)
-        weights_1 += edge_1
-        weights_2 += edge_2
-        weights_3 += edge_3
+        #print("Edge 1")
+        #print(edge_1)
+        #print("Edge 2")
+        #print(edge_2)
+        #print("Edge 3")
+        #print(edge_3)
+        
+        if len(edge_1) > 0:
+            means_1.append(np.mean(edge_1))
+        
+        if len(edge_2) > 0:
+            means_2.append(np.mean(edge_2))
+        
+        if len(edge_3) > 0:
+            means_3.append(np.mean(edge_3))
     
-    mu_lo = np.mean(weights_1) - 1.96 * np.std(weights_1) / len(weights_1)**0.5
-    mu_up = np.mean(weights_1) + 1.96 * np.std(weights_1) / len(weights_1)**0.5
+    mu_1_lo = np.percentile(means_1, 2.5)
+    mu_1_hi = np.percentile(means_1, 97.5)
+    print("Mean 1 Estimate", np.mean(means_1))
+    print('Empirical Interval: ', ' (' + str(mu_1_lo) + ',' + str(mu_1_hi) + ')')
     
-    print("Group 1 Weights Mean: ", np.mean(weights_1))
-    print("95% CI: ", "(", mu_lo, mu_up, ")")
+    mu_2_lo = np.percentile(means_2, 2.5)
+    mu_2_hi = np.percentile(means_2, 97.5)
+    print("Mean 2 Estimate", np.mean(means_2))
+    print('Empirical Interval: ', ' (' + str(mu_2_lo) + ',' + str(mu_2_hi) + ')')
     
-    mu_lo = np.mean(weights_2) - 1.96 * np.std(weights_2) / len(weights_2)**0.5
-    mu_up = np.mean(weights_2) + 1.96 * np.std(weights_2) / len(weights_2)**0.5
-    
-    print("Group 2 Weights Mean: ", np.mean(weights_2))
-    print("95% CI: ", "(", mu_lo, mu_up, ")")
-    
-    mu_lo = np.mean(weights_3) - 1.96 * np.std(weights_3) / len(weights_3)**0.5
-    mu_up = np.mean(weights_3) + 1.96 * np.std(weights_3) / len(weights_3)**0.5
-    
-    print("Group 3 Weights Mean: ", np.mean(weights_3))
-    print("95% CI: ", "(", mu_lo, mu_up, ")")
+    mu_3_lo = np.percentile(means_3, 2.5)
+    mu_3_hi = np.percentile(means_3, 97.5)
+    print("Mean 3 Estimate", np.mean(means_3))
+    print('Empirical Interval: ', ' (' + str(mu_3_lo) + ',' + str(mu_3_hi) + ')')
+
 
 def tree_weight_statistics(graphs, transform = False):
   ## Returns summary statistics on weights for graphs
