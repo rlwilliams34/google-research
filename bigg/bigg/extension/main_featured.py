@@ -305,6 +305,9 @@ if __name__ == '__main__':
         cur = epoch + 1
         model.epoch_num += 1
         
+        print("CURRENT LOSSES")
+        print("Top Loss: ", loss_top)
+        print("Wt Loss: ", loss_wt)
         if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
             print('saving epoch')
             print("Top Losses: ")
