@@ -210,7 +210,7 @@ if __name__ == '__main__':
     
     best_loss = np.inf
     improvements = []
-    thresh = 10
+    thresh = 5
     patience = 0
     prior_loss = np.inf
     losses = []
@@ -286,7 +286,7 @@ if __name__ == '__main__':
                     patience = 0
                     print("Reducing Learning Rate")
                     for param_group in optimizer.param_groups:
-                        param_group['lr'] = max(param_group['lr'] / 2, 1e-5)
+                        param_group['lr'] =  1e-5
                         print("Current Learning Rate: ", param_group['lr'])
                 
                 if cmd_args.accum_grad > 1:
