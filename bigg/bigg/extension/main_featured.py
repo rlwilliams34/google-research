@@ -214,6 +214,8 @@ if __name__ == '__main__':
     patience = 0
     prior_loss = np.inf
     losses = []
+    top_losses = []
+    wt_losses = []
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
@@ -223,7 +225,6 @@ if __name__ == '__main__':
         optimizer.zero_grad()
         model.epoch_num += 1
         start = 0
-        #losses = []
         for idx in pbar:
             if idx >= cmd_args.accum_grad * int(num_iter / cmd_args.accum_grad):
               print("Skipping iteration -- not enough sub-batches remaining for grad accumulation.")
@@ -248,9 +249,14 @@ if __name__ == '__main__':
                 ll = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+                ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
             
-            loss = -ll / num_nodes
+            
+            loss_top = -ll / num_nodes
+            loss_wt = -ll_wt / num_nodes
+            top_losses.append(loss_top.item())
+            wt_losses.append(loss_wt.item())
+            loss = -(ll + ll_wt) / num_nodes
             loss.backward()
             loss = loss.item()
             tot_loss = tot_loss + loss / cmd_args.accum_grad
@@ -299,6 +305,10 @@ if __name__ == '__main__':
         
         if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
             print('saving epoch')
+            print("Top Losses: ")
+            print(loss_top)
+            print("Weight Losses: ")
+            print(loss_wt)
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
             
