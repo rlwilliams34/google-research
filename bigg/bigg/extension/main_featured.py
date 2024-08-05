@@ -306,9 +306,9 @@ if __name__ == '__main__':
         if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
             print('saving epoch')
             print("Top Losses: ")
-            print(loss_top)
+            print(top_losses)
             print("Weight Losses: ")
-            print(loss_wt)
+            print(wt_losses)
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
             
