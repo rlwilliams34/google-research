@@ -255,7 +255,8 @@ if __name__ == '__main__':
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
             top_losses.append(loss_top.item())
-            wt_losses.append(loss_wt.item())
+            if cmd_args.has_edge_feats:
+                wt_losses.append(loss_wt.item())
             loss = -(ll + ll_wt) / num_nodes
             loss.backward()
             loss = loss.item()
