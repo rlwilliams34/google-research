@@ -48,7 +48,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.register_buffer("min_wt", min_wt)
         self.register_buffer("max_wt", max_wt)
         self.register_buffer("epoch_num", epoch_num)
-        self.mode = "None"
+        self.mode = args.wt_mode
         
         self.log_wt = False
         self.sm_wt = False
@@ -59,10 +59,10 @@ class BiggWithEdgeLen(RecurTreeGen):
     
     def standardize_weights(self, weights): 
       if self.log_wt:
-        weights = torch.log(weights + 1 - x_top)
+        weights = torch.log(weights)
       
       elif self.sm_wt:
-        weights = torch.log(torch.exp(weights) - x_top)
+        weights = torch.log(torch.exp(weights) - 1)
       
       if self.mode == "none":
         return weights
