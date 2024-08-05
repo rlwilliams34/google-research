@@ -287,6 +287,7 @@ if __name__ == '__main__':
                     print("Reducing Learning Rate")
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = max(param_group['lr'] / 2, 1e-5)
+                        print("Current Learning Rate: ", param_group['lr'])
                 
                 if cmd_args.accum_grad > 1:
                     with torch.no_grad():
