@@ -88,7 +88,7 @@ class GCN_Generate(torch.nn.Module):
         n_obs = torch.tensor(0, dtype = int)
         min_wt = torch.tensor(np.inf, dtype = float)
         max_wt = torch.tensor(-np.inf, dtype = float)
-        epoch_num = 0
+        epoch_num = torch.tensor(0, dtype = int)
         
         self.register_buffer("mu_wt", mu_wt)
         self.register_buffer("var_wt", var_wt)
