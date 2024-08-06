@@ -96,9 +96,6 @@ class BiggWithEdgeLen(RecurTreeGen):
       '''
       
       ## Current training weight statistics
-      print(self.mu_wt)
-      print(self.var_wt)
-      print(self.n_obs)
       with torch.no_grad():
         if self.mode == "score":
           mu_n = self.mu_wt
