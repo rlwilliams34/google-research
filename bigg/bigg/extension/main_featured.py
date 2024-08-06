@@ -159,7 +159,10 @@ if __name__ == '__main__':
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 
-                if cmd_args.has_edge_feats:
+                if cmd_args.test_gcn:
+                    print("implement sampling here...")
+                
+                elif cmd_args.has_edge_feats:
                     weighted_edges = []
                     for e, w in zip(pred_edges, pred_edge_feats):
                         assert e[0] > e[1]
