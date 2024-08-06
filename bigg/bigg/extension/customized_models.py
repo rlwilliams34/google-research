@@ -72,7 +72,6 @@ class BiggWithEdgeLen(RecurTreeGen):
       
       if self.mode == "score":
         weights = (weights - self.mu_wt) / (self.var_wt**0.5 + 1e-15)
-        weights = torch.mul(weights)
           
       elif self.mode == "normalize":
         weights = -1 + 2 * (weights - self.min_wt) / (self.max_wt - self.min_wt + 1e-15)
