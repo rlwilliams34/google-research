@@ -251,7 +251,7 @@ if __name__ == '__main__':
             
             if cmd_args.test_gcn:
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
-                ll = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
+                ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
                 ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)

@@ -5,6 +5,7 @@
 ## ~~ https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GCNConv.html#torch_geometric.nn.conv.GCNConv
 ## ~~ Good reading: https://docs.dgl.ai/en/0.8.x/guide/training-node.html
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 import torch_geometric
