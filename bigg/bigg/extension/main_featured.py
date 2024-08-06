@@ -182,7 +182,8 @@ if __name__ == '__main__':
                     gen_graphs.append(pred_g)
         
         for idx in range(min(10, cmd_args.num_test_gen)):
-            print("edges: ", gen_graphs[idx].edges(data=True))
+            print("edges:")
+            print(gen_graphs[idx].edges(data=True))
         
         print(cmd_args.g_type)
         print("Generating Graph Stats")
