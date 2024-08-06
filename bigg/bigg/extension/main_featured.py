@@ -228,7 +228,12 @@ if __name__ == '__main__':
         random.shuffle(indices)
 
         optimizer.zero_grad()
-        model.epoch_num += 1
+        if cmd_args.test_gcn:
+            model.gcn_mod.epoch_num += 1
+        
+        else:
+            model.epoch_num += 1
+        
         start = 0
         for idx in pbar:
             if idx >= cmd_args.accum_grad * int(num_iter / cmd_args.accum_grad):
