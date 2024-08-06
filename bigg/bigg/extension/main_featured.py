@@ -313,7 +313,6 @@ if __name__ == '__main__':
         
         print('epoch complete')
         cur = epoch + 1
-        model.epoch_num += 1
         
         print("CURRENT LOSSES")
         print("Top Loss: ", loss_top)
