@@ -111,7 +111,6 @@ class GCN_Generate(torch.nn.Module):
         logvar_wt = self.hidden_to_logvar(nodes)
         
         loss = self.compute_loss_w(mu_wt, logvar_wt, weights)
-        loss = loss / feat_idx.shape[0]
         
         std_wt = torch.exp(0.5 * logvar_wt)
         
@@ -185,7 +184,7 @@ class GCN_Generate(torch.nn.Module):
       loss_w = torch.sum(loss_w)
       return loss_w
     
-    def standardize_weights(self, x_adj, x_top, mode = "normalize", range_ = 1):    
+    def standardize_weights(self, x_adj, x_top, mode = "none", range_ = 1):    
       if mode == "standardize":
           x_adj = (x_adj - self.mu_wt) / self.var_wt**0.5
           x_adj = torch.mul(x_adj, x_top)
