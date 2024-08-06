@@ -88,12 +88,14 @@ class GCN_Generate(torch.nn.Module):
         n_obs = torch.tensor(0, dtype = int)
         min_wt = torch.tensor(np.inf, dtype = float)
         max_wt = torch.tensor(-np.inf, dtype = float)
+        epoch_num = 0
         
         self.register_buffer("mu_wt", mu_wt)
         self.register_buffer("var_wt", var_wt)
         self.register_buffer("n_obs", n_obs)
         self.register_buffer("min_wt", min_wt)
         self.register_buffer("max_wt", max_wt)
+        self.register_buffer("epoch_num", epoch_num)
     
     def forward(self, feat_idx, edge_list, batch_weight_idx):
         h = self.GCN_mod.forward(feat_idx, edge_list)
