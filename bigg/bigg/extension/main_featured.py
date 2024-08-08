@@ -124,6 +124,8 @@ if __name__ == '__main__':
         list_edge_feats = None
     
     if cmd_args.test_gcn:
+        cmd_args.has_edge_feats = False
+        cmd_args.has_node_feats = False
         model = BiggWithGCN(cmd_args).to(cmd_args.device)
     
     else:
@@ -257,7 +259,6 @@ if __name__ == '__main__':
             
             if cmd_args.test_gcn:
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
-                print(batch_indices)
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:

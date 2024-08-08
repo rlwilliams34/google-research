@@ -218,8 +218,6 @@ class BiggWithGCN(RecurTreeGen):
     def __init__(self, args):
         super().__init__(args)
         self.gcn_mod = GCN_Generate(args)
-        self.has_edge_feats = False
-        self.has_node_feats = False
         
     def forward_train2(self, batch_indices, feat_idx, edge_list, batch_weight_idx):
         print(batch_indices)
