@@ -188,8 +188,6 @@ def motif_stats(graph_ref_list, graph_pred_list, motif_type='4cycle', ground_tru
         motif_temp = np.sum(motif_counts) / G.number_of_nodes()
         total_counts_pred.append(motif_temp)
     
-    print(total_counts_ref)
-    print(total_counts_pred)
     
     mmd_dist = compute_mmd(total_counts_ref, total_counts_pred, kernel=gaussian,
             is_hist=False)

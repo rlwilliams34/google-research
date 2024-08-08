@@ -38,6 +38,7 @@ from bigg.evaluation.mmd import *
 from bigg.evaluation.mmd_stats import *
 from bigg.experiments.train_utils import get_node_dist
 
+
 def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     batch_g = nx.Graph()
     feat_idx = torch.Tensor().to(cmd_args.device)
@@ -255,9 +256,8 @@ if __name__ == '__main__':
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
             
             if cmd_args.test_gcn:
-                print(batch_indices)
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
-                print(batch_indicies)
+                print(batch_indices)
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
