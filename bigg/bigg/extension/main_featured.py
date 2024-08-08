@@ -160,7 +160,7 @@ if __name__ == '__main__':
                 _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 
                 if cmd_args.test_gcn:
-                    print("implement sampling here...")
+                    pred_edge_tensor = torch.tensor(pred_edges).to(cmd_args.device)
                 
                 elif cmd_args.has_edge_feats:
                     weighted_edges = []
@@ -255,7 +255,9 @@ if __name__ == '__main__':
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
             
             if cmd_args.test_gcn:
+                print(batch_indices)
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
+                print(batch_indicies)
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:

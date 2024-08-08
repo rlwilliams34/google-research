@@ -140,7 +140,7 @@ class GCN_Generate(torch.nn.Module):
         
         return loss
     
-    def sample(self, feat_idx, edge_list, edge_tensor, tol):
+    def sample(self, feat_idx, edge_list, edge_tensor):
         h = self.GCN_mod.forward(feat_idx, edge_list)
         edges = edge_tensor.long()
         
@@ -153,8 +153,9 @@ class GCN_Generate(torch.nn.Module):
         
         weights = torch.normal(mu_wt, std_wt)
         weights = self.softplus(w)
+        weighted_edges = torch.cat([edge_tensor, weights])
         
-        return weights
+        return weighted_edges
     
     ## Helper functions from LSTM model that are needed (weight loss, standardizing, ...)
     def compute_loss_w(self, mus, logvars, weights):
