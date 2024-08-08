@@ -225,5 +225,3 @@ class BiggWithGCN(RecurTreeGen):
         ll_wt = -1 * self.gcn_mod.forward(feat_idx, edge_list, batch_weight_idx)
         return ll_top, ll_wt
     
-    def sample2()
-    
