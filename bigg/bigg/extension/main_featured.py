@@ -111,6 +111,14 @@ if __name__ == '__main__':
     cmd_args.max_num_nodes = max_num_nodes
     print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
+    if cmd_args.test_gcn:
+        cmd_args.has_edge_feats = False
+        cmd_args.has_node_feats = False
+        model = BiggWithGCN(cmd_args).to(cmd_args.device)
+    
+    else:
+        model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+    
     if cmd_args.has_node_feats:
         list_node_feats = [torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs]
     
@@ -122,14 +130,6 @@ if __name__ == '__main__':
     
     else:
         list_edge_feats = None
-    
-    if cmd_args.test_gcn:
-        cmd_args.has_edge_feats = False
-        cmd_args.has_node_feats = False
-        model = BiggWithGCN(cmd_args).to(cmd_args.device)
-    
-    else:
-        model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     
     optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
