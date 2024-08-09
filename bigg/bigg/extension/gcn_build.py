@@ -63,7 +63,7 @@ class GCN(torch.nn.Module):
 
 
 class GCN_Generate(torch.nn.Module):
-    def __init__(self, args):#node_embed_dim, embed_dim, out_dim, max_num_nodes):
+    def __init__(self, args):
         super().__init__()
         ### Hyperparameters
         self.node_embed_dim = args.node_embed_dim
@@ -110,9 +110,7 @@ class GCN_Generate(torch.nn.Module):
         mu_wt = self.hidden_to_mu(nodes)
         logvar_wt = self.hidden_to_logvar(nodes)
         
-        loss = self.compute_loss_w(mu_wt, logvar_wt, weights)
-        
-        std_wt = torch.exp(0.5 * logvar_wt)
+        ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
         
         #for (n1, n2) in edge_list:
         #    h1 = h[n1] ## Embedding for node 1
@@ -138,11 +136,12 @@ class GCN_Generate(torch.nn.Module):
             #h[n1] = h1
             #h[n2] = h2
         
-        return loss
+        return ll_wt
     
-    def sample(self, feat_idx, edge_list, edge_tensor):
+    def sample(self, num_nodes, edge_list):
+        feat_idx = torch.arange(n).to(edge_list.device)
         h = self.GCN_mod.forward(feat_idx, edge_list)
-        edges = edge_tensor.long()
+        edges = edge_list.long()
         
         nodes = h[edges].flatten(1)
         
@@ -158,7 +157,7 @@ class GCN_Generate(torch.nn.Module):
         return weighted_edges
     
     ## Helper functions from LSTM model that are needed (weight loss, standardizing, ...)
-    def compute_loss_w(self, mus, logvars, weights):
+    def compute_ll_w(self, mus, logvars, weights):
       '''
       Computes loss of graph weights, if graph is weighted
       
@@ -178,11 +177,11 @@ class GCN_Generate(torch.nn.Module):
       weights = weights.flatten()
     
       # Compute Loss using a "SoftPlus Normal" Distribution
-      loss_w = torch.log(torch.exp(weights) - 1)
-      loss_w = torch.square(torch.sub(mus, loss_w))
-      loss_w = torch.mul(loss_w, torch.exp(-logvars))
-      loss_w = torch.mul(logvars, 0.5) + torch.mul(loss_w, 0.5)
-      loss_w = torch.sum(loss_w)
+      ll = torch.log(torch.exp(weights) - 1)
+      ll = torch.square(torch.sub(mus, ll))
+      ll = torch.mul(loss_w, torch.exp(-logvars))
+      ll = -torch.mul(logvars, 0.5) - torch.mul(loss_w, 0.5)
+      ll = torch.sum(ll)
       return loss_w
     
     def standardize_weights(self, x_adj, x_top, mode = "none", range_ = 1):    
