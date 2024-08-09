@@ -104,13 +104,12 @@ class GCN_Generate(torch.nn.Module):
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]
-        print(edges.shape)
         
         nodes = h[edges].flatten(1)
-        print(nodes.shape)
         
         mu_wt = self.hidden_to_mu(nodes)
         logvar_wt = self.hidden_to_logvar(nodes)
+        print(mu_wt)
         
         ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
         
