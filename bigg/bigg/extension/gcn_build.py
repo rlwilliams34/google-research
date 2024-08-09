@@ -154,7 +154,9 @@ class GCN_Generate(torch.nn.Module):
         
         weights = torch.normal(mu_wt, std_wt)
         weights = self.softplus(weights)
-        weighted_edges = torch.cat([edge_tensor, weights])
+        print(edge_list.shape)
+        print(weights.shape)
+        weighted_edges = torch.cat([edge_list.t(), weights])
         
         return weighted_edges
     
