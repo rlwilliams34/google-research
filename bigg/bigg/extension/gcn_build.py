@@ -104,8 +104,10 @@ class GCN_Generate(torch.nn.Module):
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]
+        print(edges.shape)
         
         nodes = h[edges].flatten(1)
+        print(nodes.shape)
         
         mu_wt = self.hidden_to_mu(nodes)
         logvar_wt = self.hidden_to_logvar(nodes)
@@ -140,14 +142,11 @@ class GCN_Generate(torch.nn.Module):
     
     def sample(self, num_nodes, edge_list):
         feat_idx = torch.arange(num_nodes).to(edge_list.device)
-        print(feat_idx)
-        print(edge_list)
-        print(edge_list.shape)
         h = self.GCN_mod.forward(feat_idx, edge_list)
         edges = edge_list.long()
         
+        print(edges.shape)
         nodes = h[edges].flatten(1)
-        print(nodes)
         print(nodes.shape)
         
         mu_wt = self.hidden_to_mu(nodes)
