@@ -102,7 +102,7 @@ class GCN_Generate(torch.nn.Module):
     def forward(self, feat_idx, edge_list, batch_weight_idx):
         h = self.GCN_mod.forward(feat_idx, edge_list)
         print(edge_list.shape)
-        print(edge_list)
+        print(edge_list[:, 0:198])
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]
