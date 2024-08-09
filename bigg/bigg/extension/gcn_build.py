@@ -139,7 +139,7 @@ class GCN_Generate(torch.nn.Module):
         return ll_wt
     
     def sample(self, num_nodes, edge_list):
-        feat_idx = torch.arange(n).to(edge_list.device)
+        feat_idx = torch.arange(num_nodes).to(edge_list.device)
         h = self.GCN_mod.forward(feat_idx, edge_list)
         edges = edge_list.long()
         
