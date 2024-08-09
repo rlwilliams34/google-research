@@ -296,7 +296,6 @@ if __name__ == '__main__':
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
             
             if cmd_args.test_gcn:
-                print(train_graphs[batch_indices[0]].edges())
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
