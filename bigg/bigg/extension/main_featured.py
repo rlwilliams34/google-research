@@ -165,8 +165,15 @@ if __name__ == '__main__':
                 if cmd_args.test_gcn:
                     pred_edge_tensor = torch.tensor(pred_edges).to(cmd_args.device)
                     pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
-                    print(pred_weighted_tensor)
-                    print(STOP)
+                    pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
+                    
+                    weighted_edges = []
+                    for e1, e2, w in pred_weighted_tensor:
+                        weighted_edges.append(int(e1), int(e2), np.round(w.item(), 4))
+                    
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
                 
                 elif cmd_args.has_edge_feats:
                     weighted_edges = []
