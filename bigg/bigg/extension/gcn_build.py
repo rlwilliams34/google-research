@@ -153,7 +153,7 @@ class GCN_Generate(torch.nn.Module):
         std_wt = torch.exp(0.5 * logvar_wt)
         
         weights = torch.normal(mu_wt, std_wt)
-        weights = self.softplus(w)
+        weights = self.softplus(weights)
         weighted_edges = torch.cat([edge_tensor, weights])
         
         return weighted_edges
@@ -181,10 +181,10 @@ class GCN_Generate(torch.nn.Module):
       # Compute Loss using a "SoftPlus Normal" Distribution
       ll = torch.log(torch.exp(weights) - 1)
       ll = torch.square(torch.sub(mus, ll))
-      ll = torch.mul(loss_w, torch.exp(-logvars))
-      ll = -torch.mul(logvars, 0.5) - torch.mul(loss_w, 0.5)
+      ll = torch.mul(ll, torch.exp(-logvars))
+      ll = -torch.mul(logvars, 0.5) - torch.mul(ll, 0.5)
       ll = torch.sum(ll)
-      return loss_w
+      return ll
     
     def standardize_weights(self, x_adj, x_top, mode = "none", range_ = 1):    
       if mode == "standardize":
