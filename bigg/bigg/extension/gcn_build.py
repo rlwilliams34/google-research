@@ -145,9 +145,7 @@ class GCN_Generate(torch.nn.Module):
         h = self.GCN_mod.forward(feat_idx, edge_list)
         edges = edge_list.long()
         
-        print(edges.shape)
-        nodes = h[edges].flatten(1)
-        print(nodes.shape)
+        nodes = h[edges.t()].flatten(1)
         
         mu_wt = self.hidden_to_mu(nodes)
         logvar_wt = self.hidden_to_logvar(nodes)
