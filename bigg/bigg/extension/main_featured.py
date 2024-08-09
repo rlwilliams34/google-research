@@ -169,7 +169,7 @@ if __name__ == '__main__':
                     
                     weighted_edges = []
                     for e1, e2, w in pred_weighted_tensor:
-                        weighted_edges.append(int(e1), int(e2), np.round(w.item(), 4))
+                        weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
                     
                     pred_g = nx.Graph()
                     pred_g.add_weighted_edges_from(weighted_edges)
