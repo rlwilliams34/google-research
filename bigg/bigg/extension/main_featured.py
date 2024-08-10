@@ -192,6 +192,8 @@ if __name__ == '__main__':
                 
                 if cmd_args.test_gcn:
                     pred_edge_tensor = torch.tensor(pred_edges).to(cmd_args.device)
+                    print(pred_edge_tensor)
+                    print(STOP)
                     pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
                     pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
                     
