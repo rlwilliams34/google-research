@@ -23,6 +23,20 @@ def correct_tree_topology_check(graphs):
         true_trees.append(g)
   return correct / len(graphs), true_trees
 
+def correct_tree_topology_check_two(graphs):
+    props = []
+    
+    for g in graphs:
+        root = [0]
+        leaves = [n for n in g.nodes() if g.degree(n) == 1]
+        internal = [n for n in g.nodes() if g.degree(n) == 3]
+        good_nodes = root + leaves + internal
+        props.append(len(good_nodes) / len(g))
+    
+    avg_prop = np.mean(props)
+    return avg_prop
+
+
 def correct_lobster_topology_check(graphs):
   correct = 0
   true_lobsters = []
@@ -328,7 +342,9 @@ def tree_weight_statistics(graphs, transform = False):
 def get_graph_stats(out_graphs, test_graphs, graph_type):
     if graph_type == "tree":
         prop, true_trees = correct_tree_topology_check(out_graphs)
+        prop2 = correct_tree_topology_check_two(out_graphs)
         print("Proportion Correct Topology: ", prop)
+         print("Alt Proportion Correct Topology: ", prop2)
         true_trees_edges = []
         true_train_edges = []
         
