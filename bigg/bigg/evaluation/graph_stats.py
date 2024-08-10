@@ -381,7 +381,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
             num_nodes.append(len(lobster))
             num_edges.append(len(lobster.edges()))
         
-        if cmd_args.has_edge_feats:
+        if cmd_args.has_edge_feats or cmd_args.test_gcn:
             lobster_weight_statistics(out_graphs)
             
         print("Num Nodes: ", np.mean(num_nodes), (min(num_nodes), max(num_nodes)))
