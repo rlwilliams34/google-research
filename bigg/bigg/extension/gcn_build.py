@@ -109,6 +109,8 @@ class GCN_Generate(torch.nn.Module):
         
         mu_wt = self.hidden_to_mu(nodes)
         logvar_wt = self.hidden_to_logvar(nodes)
+        print(mu_wt)
+        print(torch.exp(0.5 * logvar_wt))
         
         ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
         
