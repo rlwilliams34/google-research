@@ -199,9 +199,6 @@ if __name__ == '__main__':
                         else:
                             fix_edges.append((e1, e2))
                     pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
-                    print(pred_edge_tensor)
-                    print(pred_edge_tensor.shape)
-                    print(STOP)
                     pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
                     pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
                     
