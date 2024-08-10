@@ -192,7 +192,13 @@ if __name__ == '__main__':
                 
                 if cmd_args.test_gcn:
                     print(pred_edges)
-                    pred_edge_tensor = torch.tensor(pred_edges).to(cmd_args.device)
+                    fix_edges = []
+                    for e1, e2 in pred_edges:
+                        if e1 > e2:
+                            fix_edges.append((e2, e1))
+                        else:
+                            fix_edges.append((e1, e2))
+                    pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
                     print(pred_edge_tensor)
                     print(pred_edge_tensor.shape)
                     print(STOP)
