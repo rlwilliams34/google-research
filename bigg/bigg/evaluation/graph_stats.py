@@ -344,7 +344,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         prop, true_trees = correct_tree_topology_check(out_graphs)
         prop2 = correct_tree_topology_check_two(out_graphs)
         print("Proportion Correct Topology: ", prop)
-         print("Alt Proportion Correct Topology: ", prop2)
+        print("Alt Proportion Correct Topology: ", prop2)
         true_trees_edges = []
         true_train_edges = []
         
