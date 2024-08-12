@@ -411,7 +411,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         test3 = spectral_stats(out_graphs, test_graphs, True)
         print("MMD on Specta of L Normalized, Weighted: ", test3)
         
-        if cmd_args.has_edge_feats:
+        if cmd_args.has_edge_feats or cmd_args.test_gcn:
             test4 = mmd_weights_only(out_graphs, test_graphs, gaussian_emd)
             print("MMD on Weights Only: ", test4)
         test5 = clustering_stats(out_graphs, test_graphs)
