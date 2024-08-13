@@ -422,16 +422,31 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         print("Proportion Correct Topology: ", prop)
     
     elif graph_type == "db":
-        #test = degree_stats(out_graphs, test_graphs)
-        #print("MMD Test on Degree Stats: ", test)
-        #test2 = spectral_stats(out_graphs, test_graphs, False)
-        #print("MMD on Specta of L Normalized, Unweighted: ", test2)
-        #test3 = spectral_stats(out_graphs, test_graphs, True)
-        #print("MMD on Specta of L Normalized, Weighted: ", test3)
-        #test4 = mmd_weights_only(out_graphs, test_graphs, gaussian_emd)
-        #print("MMD on Weights Only: ", test4)
-        #test5 = clustering_stats(out_graphs, test_graphs)
-        #print("MMD on Clustering Coefficient: ", test5)
+        weights = []
+        for g in out_graphs:
+            for (n1, n2, w) in g.edges(data=True):
+                weights.append(w['weight'])
+        
+        print("Mean weight: ", np.mean(weights))
+        print("SD Weight: ", np.std(weights, ddof = 1))
+        
+        weights = []
+        for g in test_graphs:
+            for (n1, n2, w) in g.edges(data=True):
+                weights.append(w['weight'])
+        
+        print("Mean Test weight: ", np.mean(weights))
+        print("SD Test Weight: ", np.std(weights, ddof = 1))
+        test = degree_stats(out_graphs, test_graphs)
+        print("MMD Test on Degree Stats: ", test)
+        test2 = spectral_stats(out_graphs, test_graphs, False)
+        print("MMD on Specta of L Normalized, Unweighted: ", test2)
+        test3 = spectral_stats(out_graphs, test_graphs, True)
+        print("MMD on Specta of L Normalized, Weighted: ", test3)
+        test4 = mmd_weights_only(out_graphs, test_graphs, gaussian_emd)
+        print("MMD on Weights Only: ", test4)
+        test5 = clustering_stats(out_graphs, test_graphs)
+        print("MMD on Clustering Coefficient: ", test5)
         test6 = motif_stats(out_graphs, test_graphs)
         print("MMD on Orbit: ", test6)    
     else:
