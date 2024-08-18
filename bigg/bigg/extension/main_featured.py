@@ -223,6 +223,7 @@ if __name__ == '__main__':
     #########################################################################################################
     top_losses = []
     wt_losses = []
+    best_loss = np.inf
     indices = list(range(len(train_graphs)))
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
