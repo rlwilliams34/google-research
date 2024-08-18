@@ -223,6 +223,7 @@ if __name__ == '__main__':
     #########################################################################################################
     top_losses = []
     wt_losses = []
+    indices = list(range(len(train_graphs)))
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
@@ -236,7 +237,7 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         for idx in pbar:
-            random.shuffle(indicies)
+            random.shuffle(indices)
             batch_indices = indices[:cmd_args.batch_size]
             
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
