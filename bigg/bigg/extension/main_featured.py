@@ -236,7 +236,7 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         for idx in pbar:
-            random.shuffle(indices)
+            random.shuffle(indicies)
             batch_indices = indices[:cmd_args.batch_size]
             
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
