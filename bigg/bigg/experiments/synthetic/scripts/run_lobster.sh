@@ -44,3 +44,12 @@ python ../batch_train.py \
   -num_epochs 1000 \
   -gpu 0 \
   $@
+
+
+
+### BLKSIZE = -1
+### BATCHSIZE 128
+### BITS COMPRESS 256
+### Epoch_SAVE 500
+### NUM_EPOCHS 10000
+

@@ -40,31 +40,6 @@ from bigg.experiments.train_utils import get_node_dist
 
 
 
-#def GCNN_batch_train_graphs(train_graphs, batch_indices):
-#    batch_g = nx.Graph()
-#    feat_idx = torch.Tensor()
-#    batch_weight_idx = []
-#    edge_list = []
-#    offset = 0
-#    
-#    for idx in batch_indices:
-#        g = train_graphs[idx]
-#        n = len(g)
-#        feat_idx = torch.cat([feat_idx, torch.arange(n)])
-#        
-#        for e1, e2, w in g.edges(data=True):
-#            batch_weight_idx.append((int(e1), int(e2), w['weight']))
-#            edge_list.append((int(e1) + offset, int(e2) + offset))
-#        
-#        offset += n
-#    
-#    edge_idx = torch.Tensor(edge_list).t()
-#    edge_idx_weighted = list(batch_g.edges(data=True))
-#    batch_weight_idx = torch.Tensor(batch_weight_idx)
-#    
-#    return feat_idx, edge_idx, batch_weight_idx
-
-
 def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     batch_g = nx.Graph()
     feat_idx = torch.Tensor().to(cmd_args.device)
@@ -168,8 +143,8 @@ if __name__ == '__main__':
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         
-        #for param_group in optimizer.param_groups:
-        #    param_group['lr'] = cmd_args.learning_rate
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = cmd_args.learning_rate
     
     #########################################################################################################
     if cmd_args.phase != 'train':
@@ -246,34 +221,13 @@ if __name__ == '__main__':
         
         sys.exit()
     #########################################################################################################
-    
-    indices = list(range(len(train_graphs)))
-    
-    if cmd_args.epoch_load is None:
-        cmd_args.epoch_load = 0
-    
-    prev = datetime.now()
-    N = len(train_graphs)
-    B = cmd_args.batch_size
-    num_iter = N // B
-    
-    if num_iter != N / B:
-        num_iter += 1
-    
-    best_loss = np.inf
-    improvements = []
-    thresh = 10
-    patience = 0
-    prior_loss = np.inf
-    losses = []
     top_losses = []
     wt_losses = []
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
-        pbar = tqdm(range(num_iter))
-        random.shuffle(indices)
-
+        pbar = tqdm(range(cmd_args.epoch_save))
+        
         optimizer.zero_grad()
         if cmd_args.test_gcn:
             model.gcn_mod.epoch_num += 1
@@ -281,20 +235,9 @@ if __name__ == '__main__':
         else:
             model.epoch_num += 1
         
-        start = 0
         for idx in pbar:
-            if idx >= cmd_args.accum_grad * int(num_iter / cmd_args.accum_grad):
-              print("Skipping iteration -- not enough sub-batches remaining for grad accumulation.")
-              continue
-            
-            start = idx * B
-            stop = (idx + 1) * B
-            
-            if stop >= N:
-                batch_indices = indices[start:]
-            
-            else:
-                batch_indices = indices[start:stop]
+            random.shuffle(indices)
+            batch_indices = indices[:cmd_args.batch_size]
             
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
@@ -312,40 +255,19 @@ if __name__ == '__main__':
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
             top_losses.append(loss_top.item())
+            
             if cmd_args.has_edge_feats or cmd_args.test_gcn:
                 wt_losses.append(loss_wt.item())
+            
             loss = -(ll + ll_wt) / num_nodes
             loss.backward()
             loss = loss.item()
-            tot_loss = tot_loss + loss / cmd_args.accum_grad
             
             if loss < best_loss:
                 best_loss = loss
                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
             if (idx + 1) % cmd_args.accum_grad == 0:
-                if len(losses) > 0:
-                    avg_loss = np.mean(losses)
-                    if loss - avg_loss < 0:
-                        improvements.append(True)
-                        patience = 0
-            
-                    else:
-                        improvements.append(False)
-                        patience += 1
-              
-                losses.append(tot_loss)
-                if len(losses) > 10:
-                    losses = losses[1:]
-                tot_loss = 0.0
-                
-                if patience > thresh:
-                    patience = 0
-                    print("Reducing Learning Rate")
-                    for param_group in optimizer.param_groups:
-                        param_group['lr'] =  1e-5
-                        print("Current Learning Rate: ", param_group['lr'])
-                
                 if cmd_args.accum_grad > 1:
                     with torch.no_grad():
                         for p in model.parameters():
@@ -364,47 +286,174 @@ if __name__ == '__main__':
         print("CURRENT LOSSES")
         print("Top Loss: ", loss_top)
         print("Wt Loss: ", loss_wt)
-        if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
-            print('saving epoch')
-            print("Top Losses: ")
-            print(top_losses)
-            print("Weight Losses: ")
-            print(wt_losses)
-            checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-            torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
-            
-    
-    elapsed = datetime.now() - prev
-    print("Time elapsed during training: ", elapsed)
-    print("Model training complete.")
-    
-    #for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
-    #    pbar = tqdm(range(cmd_args.epoch_save))
-    #
-    #    optimizer.zero_grad()
-    #    for idx in pbar:
-    #        random.shuffle(indices)
-    #        batch_indices = indices[:cmd_args.batch_size]
-    #        num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
-    #
-    #        node_feats = torch.cat([list_node_feats[i] for i in batch_indices], dim=0)
-    #        edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
-    #
-    #        ll, _ = model.forward_train(batch_indices, node_feats=node_feats, edge_feats=edge_feats)
-    #        loss = -ll / num_nodes
-    #        loss.backward()
-    #        loss = loss.item()
-    #
-    #        if (idx + 1) % cmd_args.accum_grad == 0:
-    #            if cmd_args.grad_clip > 0:
-    #                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
-    #            optimizer.step()
-    #            optimizer.zero_grad()
-    #        pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / cmd_args.epoch_save, loss))
-    #    _, pred_edges, _, pred_node_feats, pred_edge_feats = model(len(train_graphs[0]))
-    #    print(pred_edges)
-    #    print(pred_node_feats)
-    #    print(pred_edge_feats)
+        #if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
+        print('saving epoch')
+            #print("Top Losses: ")
+            #print(top_losses)
+            #print("Weight Losses: ")
+            #print(wt_losses)
+        checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+        torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
+    print('training complete.')
+    ###################################################################################
+#     indices = list(range(len(train_graphs)))
+#     
+#     if cmd_args.epoch_load is None:
+#         cmd_args.epoch_load = 0
+#     
+#     prev = datetime.now()
+#     N = len(train_graphs)
+#     B = cmd_args.batch_size
+#     num_iter = N // B
+#     
+#     if num_iter != N / B:
+#         num_iter += 1
+#     
+#     best_loss = np.inf
+#     improvements = []
+#     thresh = 10
+#     patience = 0
+#     prior_loss = np.inf
+#     losses = []
+#     top_losses = []
+#     wt_losses = []
+#     
+#     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
+#         tot_loss = 0.0
+#         pbar = tqdm(range(num_iter))
+#         random.shuffle(indices)
+# 
+#         optimizer.zero_grad()
+#         if cmd_args.test_gcn:
+#             model.gcn_mod.epoch_num += 1
+#         
+#         else:
+#             model.epoch_num += 1
+#         
+#         start = 0
+#         for idx in pbar:
+#             if idx >= cmd_args.accum_grad * int(num_iter / cmd_args.accum_grad):
+#               print("Skipping iteration -- not enough sub-batches remaining for grad accumulation.")
+#               continue
+#             
+#             start = idx * B
+#             stop = (idx + 1) * B
+#             
+#             if stop >= N:
+#                 batch_indices = indices[start:]
+#             
+#             else:
+#                 batch_indices = indices[start:stop]
+#             
+#             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
+#             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
+# 
+#             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
+#             
+#             if cmd_args.test_gcn:
+#                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
+#                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
+#                 
+#             else:
+#                 ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+#             
+#             
+#             loss_top = -ll / num_nodes
+#             loss_wt = -ll_wt / num_nodes
+#             top_losses.append(loss_top.item())
+#             if cmd_args.has_edge_feats or cmd_args.test_gcn:
+#                 wt_losses.append(loss_wt.item())
+#             loss = -(ll + ll_wt) / num_nodes
+#             loss.backward()
+#             loss = loss.item()
+#             tot_loss = tot_loss + loss / cmd_args.accum_grad
+#             
+#             if loss < best_loss:
+#                 best_loss = loss
+#                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
+# 
+#             if (idx + 1) % cmd_args.accum_grad == 0:
+#                 if len(losses) > 0:
+#                     avg_loss = np.mean(losses)
+#                     if loss - avg_loss < 0:
+#                         improvements.append(True)
+#                         patience = 0
+#             
+#                     else:
+#                         improvements.append(False)
+#                         patience += 1
+#               
+#                 losses.append(tot_loss)
+#                 if len(losses) > 10:
+#                     losses = losses[1:]
+#                 tot_loss = 0.0
+#                 
+#                 if patience > thresh:
+#                     patience = 0
+#                     print("Reducing Learning Rate")
+#                     for param_group in optimizer.param_groups:
+#                         param_group['lr'] =  1e-5
+#                         print("Current Learning Rate: ", param_group['lr'])
+#                 
+#                 if cmd_args.accum_grad > 1:
+#                     with torch.no_grad():
+#                         for p in model.parameters():
+#                             if p.grad is not None:
+#                                 p.grad.div_(cmd_args.accum_grad)
+#                 
+#                 if cmd_args.grad_clip > 0:
+#                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
+#                 optimizer.step()
+#                 optimizer.zero_grad()
+#             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, loss))
+#         
+#         print('epoch complete')
+#         cur = epoch + 1
+#         
+#         print("CURRENT LOSSES")
+#         print("Top Loss: ", loss_top)
+#         print("Wt Loss: ", loss_wt)
+#         if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
+#             print('saving epoch')
+#             print("Top Losses: ")
+#             print(top_losses)
+#             print("Weight Losses: ")
+#             print(wt_losses)
+#             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+#             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
+#             
+#     
+#     elapsed = datetime.now() - prev
+#     print("Time elapsed during training: ", elapsed)
+#     print("Model training complete.")
+#     
+#     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
+#         pbar = tqdm(range(cmd_args.epoch_save))
+#     
+#         optimizer.zero_grad()
+#         for idx in pbar:
+#             random.shuffle(indices)
+#             batch_indices = indices[:cmd_args.batch_size]
+#             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
+#     
+#             node_feats = torch.cat([list_node_feats[i] for i in batch_indices], dim=0)
+#             edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
+#     
+#             ll, _ = model.forward_train(batch_indices, node_feats=node_feats, edge_feats=edge_feats)
+#             loss = -ll / num_nodes
+#             loss.backward()
+#             loss = loss.item()
+#     
+#             if (idx + 1) % cmd_args.accum_grad == 0:
+#                 if cmd_args.grad_clip > 0:
+#                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
+#                 optimizer.step()
+#                 optimizer.zero_grad()
+#             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / cmd_args.epoch_save, loss))
+#         _, pred_edges, _, pred_node_feats, pred_edge_feats = model(len(train_graphs[0]))
+#         print(pred_edges)
+#         print(pred_node_feats)
+#         print(pred_edge_feats)
         
         
         
