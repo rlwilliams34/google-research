@@ -416,6 +416,8 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
             print("MMD on Weights Only: ", test4)
         test5 = clustering_stats(out_graphs, test_graphs)
         print("MMD on Clustering Coefficient: ", test5)
+        test6 = motif_stats(out_graphs, test_graphs)
+        print("MMD on Orbit: ", test6)
     
     elif graph_type == "grid":
         prop, true_lobsters = correct_grid_topology_check(out_graphs)
