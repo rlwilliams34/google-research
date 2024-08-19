@@ -450,13 +450,64 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         test5 = clustering_stats(out_graphs, test_graphs)
         print("MMD on Clustering Coefficient: ", test5)
         test6 = motif_stats(out_graphs, test_graphs)
-        print("MMD on Orbit: ", test6)    
+        print("MMD on Orbit: ", test6)
+    
+    elif graph_type == "er":
+        probs = []
+        weights = []
+        for g in out_graphs:
+            n = len(g)
+            if n <= 1:
+                continue
+            m = len(g.edges())
+            p = 2 * m / (n * (n - 1))
+            probs.append(p)
+            for (n1, n2, w) in g.edges(data=True):
+                w_sm = np.log(np.exp(w['weight']) - 1)
+                weights.append(w_sm)
+        
+        p_lo = np.percentile(probs, 2.5)
+        p_hi = np.percentile(probs, 97.5)
+        p_mu = np.mean(probs)
+        print("Mean prob of edge existence: ", p_mu)
+        print("95% Credible Interval: ", "(", p_lo, ", ", p_hi, ")")
+        
+        print("Mean SM weight: ", np.mean(weights))
+        print("SD SM Weight: ", np.std(weights, ddof = 1))
+        
+        weights = []
+        for g in test_graphs:
+            for (n1, n2, w) in g.edges(data=True):
+                weights.append(w['weight'])
+        
+        print("Mean Test weight: ", np.mean(weights))
+        print("SD Test Weight: ", np.std(weights, ddof = 1))
+        test = degree_stats(out_graphs, test_graphs)
+        print("MMD Test on Degree Stats: ", test)
+        test2 = spectral_stats(out_graphs, test_graphs, False)
+        print("MMD on Specta of L Normalized, Unweighted: ", test2)
+        test3 = spectral_stats(out_graphs, test_graphs, True)
+        print("MMD on Specta of L Normalized, Weighted: ", test3)
+        test4 = mmd_weights_only(out_graphs, test_graphs, gaussian_emd)
+        print("MMD on Weights Only: ", test4)
+        test5 = clustering_stats(out_graphs, test_graphs)
+        print("MMD on Clustering Coefficient: ", test5)
+        test6 = motif_stats(out_graphs, test_graphs)
+        print("MMD on Orbit: ", test6)
+    
+    
     else:
         print("Graph Type not yet implemented")
     return 0
     
     
-
+#for g in graphs:
+#    n = len(g)
+#    if n <= 1:
+#        continue
+#    m = len(g.edges())
+#    p = 2 * m / (n * (n - 1))
+#    probs.append(p)
     
     
 
