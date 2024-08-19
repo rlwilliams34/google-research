@@ -226,6 +226,9 @@ if __name__ == '__main__':
     best_loss = np.inf
     indices = list(range(len(train_graphs)))
     
+    if cmd_args.epoch_load is None:
+        cmd_args.epoch_load = 0
+    
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
         pbar = tqdm(range(cmd_args.epoch_save))
