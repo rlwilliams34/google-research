@@ -141,7 +141,7 @@ def orca(graph):
           for node_cnts in output.strip('\n').split('\n')])
     
     try:
-        os.remove(tmp_fname)
+        os.remove(path)
     except OSError:
         pass
     
