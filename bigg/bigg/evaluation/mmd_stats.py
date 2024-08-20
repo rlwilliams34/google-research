@@ -222,7 +222,7 @@ def orbit_stats_all(graph_ref_list, graph_pred_list):
 
     total_counts_ref = np.array(total_counts_ref)
     total_counts_pred = np.array(total_counts_pred)
-    print(len(total_counts_red))
+    print(len(total_counts_pred))
     print(len(total_counts_pred))
     mmd_dist = compute_mmd(total_counts_ref, total_counts_pred, kernel=gaussian_tv,
             is_hist=False, sigma=30.0)
