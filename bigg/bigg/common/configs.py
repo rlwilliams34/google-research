@@ -86,6 +86,7 @@ cmd_opt.add_argument('-p2', default=0.7, type=float, help='leaves in trees')
 cmd_opt.add_argument('-min_nodes', default=5, type=int, help='leaves in trees')
 cmd_opt.add_argument('-max_nodes', default=100, type=int, help='leaves in trees')
 cmd_opt.add_argument('-wt_mode', default='None', type=str, help='mode to standardize weights')
+cmd_opt.add_argument('-save_every', default=10, type=int, help='mode to standardize weights')
 
 
 ## GCN

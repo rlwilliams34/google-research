@@ -293,7 +293,7 @@ if __name__ == '__main__':
         print("Wt Loss: ", loss_wt)
         #if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
         
-        if cur % 10 == 0:
+        if cur % cmd_args.save_every == 0:
             print('saving epoch')
             #print("Top Losses: ")
             #print(top_losses)
