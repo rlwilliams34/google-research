@@ -51,7 +51,7 @@ def degree_stats(graph_ref_list, graph_pred_list, is_parallel=False):
             degree_temp = np.array(nx.degree_histogram(graph_pred_list_remove_empty[i]))
             sample_pred.append(degree_temp)
     print(len(sample_ref),len(sample_pred))
-    mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian_emd)
+    mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian_tv)
     elapsed = datetime.now() - prev
     if PRINT_TIME:
         print('Time computing degree mmd: ', elapsed)
@@ -98,8 +98,8 @@ def clustering_stats(graph_ref_list, graph_pred_list, bins=100, is_parallel=Fals
                     clustering_coeffs_list, bins=bins, range=(0.0, 1.0), density=False)
             sample_pred.append(hist)
     
-    mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian_emd,
-                               sigma=1.0/10, distance_scaling=bins)
+    mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian_tv,
+                               sigma=1.0/10)#, distance_scaling=bins)
     elapsed = datetime.now() - prev
     if PRINT_TIME:
         print('Time computing clustering mmd: ', elapsed)
@@ -125,13 +125,14 @@ def edge_list_reindexed(G):
     return edges
 
 def orca(graph):
-    tmp_fname = '/u/home/r/rlwillia/google-research/bigg/bigg/evaluation/orca/tmp.txt' 
-    f = open(tmp_fname, 'w')
+    path = '/u/home/r/rlwillia/VAE-LSTM/VAE_LSTM/eval_/orca/tmp.txt'
+    f = open(path, 'w')
     f.write(str(graph.number_of_nodes()) + ' ' + str(graph.number_of_edges()) + '\n')
     for (u, v) in edge_list_reindexed(graph):
         f.write(str(u) + ' ' + str(v) + '\n')
     f.close()
-    output = sp.check_output(['/u/home/r/rlwillia/google-research/bigg/bigg/evaluation/orca/orca', 'node', '4', '/u/home/r/rlwillia/google-research/bigg/bigg/evaluation/orca/tmp.txt', 'std'])
+    
+    output = sp.check_output(['/u/home/r/rlwillia/VAE-LSTM/VAE_LSTM/eval_/orca', 'node', '4', path, 'std'])
     output = output.decode('utf8').strip()
     
     idx = output.find(COUNT_START_STR) + len(COUNT_START_STR)
@@ -188,7 +189,6 @@ def motif_stats(graph_ref_list, graph_pred_list, motif_type='4cycle', ground_tru
         motif_temp = np.sum(motif_counts) / G.number_of_nodes()
         total_counts_pred.append(motif_temp)
     
-    
     mmd_dist = compute_mmd(total_counts_ref, total_counts_pred, kernel=gaussian,
             is_hist=False)
     #print('-------------------------')
@@ -224,7 +224,7 @@ def orbit_stats_all(graph_ref_list, graph_pred_list):
     total_counts_pred = np.array(total_counts_pred)
     print(len(total_counts_red))
     print(len(total_counts_pred))
-    mmd_dist = compute_mmd(total_counts_ref, total_counts_pred, kernel=gaussian,
+    mmd_dist = compute_mmd(total_counts_ref, total_counts_pred, kernel=gaussian_tv,
             is_hist=False, sigma=30.0)
 
     print('-------------------------')
@@ -295,9 +295,9 @@ def spectral_stats(graph_ref_list, graph_pred_list, weighted, is_parallel=False)
       sample_pred.append(spectral_temp)
   # print(len(sample_ref), len(sample_pred))
 
-  mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian_emd)
+  # mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian_emd)
   # mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=emd)
-  # mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian_tv)
+  mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian_tv)
   # mmd_dist = compute_mmd(sample_ref, sample_pred, kernel=gaussian)
 
   elapsed = datetime.now() - prev
@@ -335,12 +335,12 @@ def mmd_weights_only(sample_graphs, target_graphs, kernel):
   max_ = max(max_a, max_b)
   
   for i in range(len(sample_list)):
-      hist_temp, _ = np.histogram(sample_list[i], range = (1e-5, max_), bins=25, density=False)
+      hist_temp, _ = np.histogram(sample_list[i], range = (-1e-5, max_), bins=200, density=False)
       hist_temp = hist_temp / hist_temp.sum()
       sample_ref.append(hist_temp)
   
   for i in range(len(target_list)):
-      hist_temp, _ = np.histogram(target_list[i], range = (1e-5, max_), bins=25, density=False)
+      hist_temp, _ = np.histogram(target_list[i], range = (-1e-5, max_), bins=200, density=False)
       hist_temp = hist_temp / hist_temp.sum()
       sample_pred.append(hist_temp)
   

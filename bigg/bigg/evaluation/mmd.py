@@ -7,6 +7,19 @@ import numpy as np
 from scipy.linalg import toeplitz
 import pyemd
 
+def gaussian_tv(x, y, sigma=1.0):  
+  support_size = max(len(x), len(y))
+  # convert histogram values x and y to float, and make them equal len
+  x = x.astype(float)
+  y = y.astype(float)
+  if len(x) < len(y):
+    x = np.hstack((x, [0.0] * (support_size - len(x))))
+  elif len(y) < len(x):
+    y = np.hstack((y, [0.0] * (support_size - len(y))))
+
+  dist = np.abs(x - y).sum() / 2.0
+  return np.exp(-dist * dist / (2 * sigma * sigma))
+
 def emd(x, y, distance_scaling=1.0):
     support_size = max(len(x), len(y))
     d_mat = toeplitz(range(support_size)).astype(float)

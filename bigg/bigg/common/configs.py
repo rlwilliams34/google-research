@@ -89,8 +89,8 @@ cmd_opt.add_argument('-wt_mode', default='None', type=str, help='mode to standar
 
 
 ## GCN
-cmd_opt.add_argument('-node_embed_dim', default=64, type=int, help='embed size')
-cmd_opt.add_argument('-out_dim', default=32, type=int, help='embed size')
+cmd_opt.add_argument('-node_embed_dim', default=256, type=int, help='embed size')
+cmd_opt.add_argument('-out_dim', default=256, type=int, help='embed size')
 cmd_opt.add_argument('-test_gcn', default = False, type = eval, help = "Test GCN Model?")
 
 

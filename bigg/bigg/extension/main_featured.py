@@ -292,13 +292,15 @@ if __name__ == '__main__':
         print("Top Loss: ", loss_top)
         print("Wt Loss: ", loss_wt)
         #if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
-        print('saving epoch')
+        
+        if cur % 10 == 0:
+            print('saving epoch')
             #print("Top Losses: ")
             #print(top_losses)
             #print("Weight Losses: ")
             #print(wt_losses)
-        checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-        torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
+            checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+            torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
     print('training complete.')
     ###################################################################################
 #     indices = list(range(len(train_graphs)))

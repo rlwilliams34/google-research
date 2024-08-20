@@ -14,14 +14,15 @@
 
 #!/bin/bash
 
-g_type=lobster
+g_type=db
 ordering=DFS
 blksize=-1
-bsize=128
+bsize=2
+accum_grad=15
 
-data_dir=../../../../data/$g_type-$ordering
+data_dir=/u/home/r/rlwillia/ADJ-LSTM/train_graphs/$g_type
 
-save_dir=../../../../results/$g_type/$ordering-blksize-$blksize-b-$bsize
+save_dir=../../../bigg-results/$g_type
 
 if [ ! -e $save_dir ];
 then
@@ -30,7 +31,7 @@ fi
 
 export CUDA_VISIBLE_DEVICES=0
 
-python ../batch_train.py \
+python ../main_featured.py \
   -$@ \
   -data_dir $data_dir \
   -save_dir $save_dir \
@@ -42,15 +43,11 @@ python ../batch_train.py \
   -bits_compress 256 \
   -batch_size $bsize \
   -num_test_gen 100 \
-  -num_epochs 1000 \
+  -num_epochs 100 \
   -gpu 0 \
+  -has_node_feats 0 \
+  -has_edge_feats 1 \
+  -accum_grad $accum_grad \
   $@
 
-
-
-### BLKSIZE = -1
-### BATCHSIZE 128
-### BITS COMPRESS 256
-### Epoch_SAVE 500
-### NUM_EPOCHS 10000
 
