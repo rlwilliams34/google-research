@@ -125,14 +125,14 @@ def edge_list_reindexed(G):
     return edges
 
 def orca(graph):
-    path = '/u/home/r/rlwillia/VAE-LSTM/VAE_LSTM/eval_/orca/tmp.txt'
+    path = '/u/home/r/rlwillia/ADJ-LSTM/eval_/orca/tmp.txt'
     f = open(path, 'w')
     f.write(str(graph.number_of_nodes()) + ' ' + str(graph.number_of_edges()) + '\n')
     for (u, v) in edge_list_reindexed(graph):
         f.write(str(u) + ' ' + str(v) + '\n')
     f.close()
     
-    output = sp.check_output(['/u/home/r/rlwillia/VAE-LSTM/VAE_LSTM/eval_/orca', 'node', '4', path, 'std'])
+    output = sp.check_output(['/u/home/r/rlwillia/ADJ-LSTM/eval_/orca', 'node', '4', path, 'std'])
     output = output.decode('utf8').strip()
     
     idx = output.find(COUNT_START_STR) + len(COUNT_START_STR)
