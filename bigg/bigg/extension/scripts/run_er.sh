@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-./run_featured.sh -gpu 0 -embed_dim 256 -has_node_feats 0 -has_edge_feats 1 -batch_size 100 -accum_grad 1 -num_epochs 1000 -epoch_save 200 
-
 #!/bin/bash
 
 g_type=er
@@ -42,7 +40,7 @@ python ../main_featured.py \
   -num_graphs $num_g \
   -blksize $blksize \
   -epoch_save 500 \
-  -bits_compress 256 \
+  -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 100 \
   -num_epochs 100 \

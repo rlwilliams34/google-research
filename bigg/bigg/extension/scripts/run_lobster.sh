@@ -40,7 +40,7 @@ python ../main_featured.py \
   -num_graphs $num_g \
   -blksize $blksize \
   -epoch_save 500 \
-  -bits_compress 256 \
+  -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 100 \
   -num_epochs 100 \
