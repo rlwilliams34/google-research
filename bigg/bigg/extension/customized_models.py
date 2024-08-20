@@ -142,6 +142,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def embed_edge_feats(self, edge_feats):
         print(self.epoch_num)
+        print(self.mu_wt)
         if self.epoch_num == 0:
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_weights(edge_feats)
