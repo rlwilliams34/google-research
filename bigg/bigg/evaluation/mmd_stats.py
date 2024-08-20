@@ -126,6 +126,7 @@ def edge_list_reindexed(G):
 
 def orca(graph):
     path = '/u/home/r/rlwillia/ADJ-LSTM/eval_/orca/tmp.txt'
+    print(path)
     f = open(path, 'w')
     f.write(str(graph.number_of_nodes()) + ' ' + str(graph.number_of_edges()) + '\n')
     for (u, v) in edge_list_reindexed(graph):
