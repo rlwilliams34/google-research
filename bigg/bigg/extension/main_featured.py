@@ -118,6 +118,7 @@ if __name__ == '__main__':
         cmd_args.has_edge_feats = False
         cmd_args.has_node_feats = False
         model = BiggWithGCN(cmd_args).to(cmd_args.device)
+        cmd_args.has_edge_feats = True
     
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
