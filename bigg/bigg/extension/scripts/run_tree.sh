@@ -19,6 +19,7 @@ ordering=DFS
 blksize=-1
 bsize=50
 accum_grad=2
+wt_mode=score
 
 data_dir=/u/home/r/rlwillia/ADJ-LSTM/train_graphs/$g_type
 
@@ -39,6 +40,7 @@ python ../main_featured.py \
   -node_order $ordering \
   -num_graphs $num_g \
   -blksize $blksize \
+  -wt_mode $wt_mode \
   -epoch_save 500 \
   -bits_compress 0 \
   -batch_size $bsize \
