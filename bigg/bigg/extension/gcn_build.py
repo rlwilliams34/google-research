@@ -55,7 +55,7 @@ class GCN(torch.nn.Module):
         #self.MLP1 = MLP(2 * self.node_embed_dim, [4 * self.node_embed_dim, self.embed_dim])
         #self.MLP2 = MLP(2 * self.embed_dim, [4 * self.embed_dim, self.out_dim])
         #self.conv1 = conv.EdgeCNN(in_channels = self.node_embed_dim, out_channels = 2 * self.embed_dim)
-        self.conv1 = nn.models.EdgeCNN(in_channels = self.node_embed_dim, hidden_channels = 2 * self.embed_dim, out_channels = self.out_dim, num_layers = 2)
+        self.conv1 = nn.models.EdgeCNN(in_channels = self.node_embed_dim, hidden_channels = 2 * self.embed_dim, out_channels = self.out_dim, num_layers = 3)
         #self.conv2 = conv.EdgeCNN(in_channels = 2 * self.embed_dim, out_channels = self.out_dim)
         self.node_embedding = torch.nn.Embedding(self.max_num_nodes, self.node_embed_dim)
     
