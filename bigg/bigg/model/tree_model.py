@@ -76,7 +76,7 @@ def selective_update_hc(h, c, zero_one, feats, cell_edge=None):
         h = torch.where(zero_one, local_edge_feats, h)
         c = torch.where(zero_one, local_edge_feats, c)
     
-    if True:
+    else:
         nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
         zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device)
         edge_state = (h[zero_one], c[zero_one])
