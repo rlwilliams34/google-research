@@ -579,8 +579,6 @@ class RecurTreeGen(nn.Module):
         TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
         # embed trees
         all_ids = TreeLib.PrepareTreeEmbed()
-        print(self.leaf_h0)
-        print(self.leaf_c0)
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
         if self.has_edge_feats:
