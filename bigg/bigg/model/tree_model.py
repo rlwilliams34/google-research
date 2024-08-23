@@ -68,29 +68,15 @@ def batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell):
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
-def selective_update_hc(h, c, zero_one, feats, cell_edge=None):
-    if cell_edge is None:
-        nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
-        local_edge_feats = scatter(feats, nz_idx, dim=0, dim_size=h.shape[0])
-        zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
-        h = torch.where(zero_one, local_edge_feats, h)
-        c = torch.where(zero_one, local_edge_feats, c)
-    
-    else:
-        nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
-        zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device)
-        edge_state = (h[zero_one], c[zero_one])
-        edge_update = cell_edge(feats, edge_state)
-        
-        edge_update_h = scatter(edge_update[0], nz_idx, dim=0, dim_size=h.shape[0])
-        edge_update_c = scatter(edge_update[1], nz_idx, dim=0, dim_size=h.shape[0])
-        zero_one = zero_one.unsqueeze(1)
-        h = torch.where(zero_one, edge_update_h, h)
-        c = torch.where(zero_one, edge_update_c, c)
-    
+def selective_update_hc(h, c, zero_one, feats):
+    nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
+    local_edge_feats = scatter(feats, nz_idx, dim=0, dim_size=h.shape[0])
+    zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
+    h = torch.where(zero_one, local_edge_feats, h)
+    c = torch.where(zero_one, local_edge_feats, c)
     return h, c
 
-def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None, cell_edge=None):
+def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None):
     new_ids = [list(fn_all_ids(0)), list(fn_all_ids(1))]
     lch_isleaf, rch_isleaf = new_ids[0][0], new_ids[1][0]
     new_ids[0][0] = new_ids[1][0] = None
@@ -105,7 +91,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[leaf_check], c_bot[leaf_check]
         if edge_feats is not None:
-            local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i], cell_edge)
+            local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
@@ -135,7 +121,7 @@ def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cel
         return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
-def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node, cell_edge):
+def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node):
     edge_feats = is_rch = None
     t_lch = t_rch = None
     if 'edge' in feat_dict:
@@ -143,11 +129,11 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, cell_edge)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
     elif h_buf is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, cell_edge)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node)
     else:
         raise NotImplementedError  #TODO: handle model parallelism with features
 
@@ -209,7 +195,7 @@ class FenwickTree(nn.Module):
                 state = self.summary_cell(state, cur_state)
         return state
 
-    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, cell_edge=None):
+    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
@@ -236,7 +222,7 @@ class FenwickTree(nn.Module):
                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
             if i == 0:
                 if self.has_edge_feats or self.has_node_feats:
-                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, cell_edge = cell_edge)
+                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update)
                 else:
                     new_states = lstm_func(h_bot, c_bot)
             else:
@@ -462,8 +448,7 @@ class RecurTreeGen(nn.Module):
                     edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll = ll + edge_ll
                     edge_embed = self.embed_edge_feats(cur_feats)
-                    update_state = self.edge_state_update(edge_embed, state)
-                    return ll, update_state, 1, cur_feats
+                    return ll, (edge_embed, edge_embed), 1, cur_feats
                 else:
                     return ll, (self.leaf_h0, self.leaf_c0), 1, None
         else:
@@ -590,7 +575,7 @@ class RecurTreeGen(nn.Module):
             return -loss, label
         return -loss
 
-    def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None, cell_edge = None):
+    def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None):
         TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
         # embed trees
         all_ids = TreeLib.PrepareTreeEmbed()
@@ -621,7 +606,7 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 local_edge_feats = edge_feats[edge_idx]
-                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, cell_edge = cell_edge)
+                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
             h_buf_list[d] = new_h
@@ -655,7 +640,7 @@ class RecurTreeGen(nn.Module):
         ll = 0.0
         ll_wt = 0.0
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
-                                                                           list_node_starts, num_nodes, list_col_ranges, cell_edge = self.edge_state_update)
+                                                                           list_node_starts, num_nodes, list_col_ranges)
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
@@ -697,7 +682,7 @@ class RecurTreeGen(nn.Module):
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                 left_feats = edge_feats_embed[edge_idx[~is_rch]]
                 h_bot, c_bot = h_bot[left_ids[0]], c_bot[left_ids[0]]
-                h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats,cell_edge=self.edge_state_update)
+                h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 left_ids = tuple([None] + list(left_ids[1:]))
 
             left_subtree_states = tree_state_select(h_bot, c_bot,
