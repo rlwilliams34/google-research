@@ -74,6 +74,14 @@ def selective_update_hc(h, c, zero_one, feats):
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
     h = torch.where(zero_one, local_edge_feats, h)
     c = torch.where(zero_one, local_edge_feats, c)
+    
+    print(h)
+    print(c)
+    print(h.shape)
+    print(c.shape)
+    print(feats)
+    print(feats.shape)
+    
     return h, c
 
 def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None):
