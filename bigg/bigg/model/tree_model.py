@@ -77,8 +77,8 @@ def selective_update_hc(h, c, zero_one, feats, cell_edge=None):
         c = torch.where(zero_one, local_edge_feats, c)
     
     else:
-        x = torch.arange(len(zero_one))[zero_one > 0]
-        edge_state = (h[x], c[x])
+        zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device)
+        edge_state = (h[zero_one], c[zero_one])
         print(h.shape)
         print(h[zero_one].shape)
         print(zero_one.shape)
@@ -86,6 +86,7 @@ def selective_update_hc(h, c, zero_one, feats, cell_edge=None):
         print(feats.shape)
         print(zero_one)
         edge_update = cell_edge(feats, edge_state)
+        zero_one = zero_one.unsqueeze(1)
         h = torch.where(zero_one, edge_update[0], h)
         c = torch.where(zero_one, edge_update[1], c)
     
