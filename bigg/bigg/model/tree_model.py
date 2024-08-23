@@ -69,7 +69,7 @@ def batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell):
 
 
 def selective_update_hc(h, c, zero_one, feats, cell_edge=None):
-    if cell_edge is not None:
+    if cell_edge is None:
         nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
         local_edge_feats = scatter(feats, nz_idx, dim=0, dim_size=h.shape[0])
         zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
