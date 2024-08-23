@@ -75,12 +75,18 @@ def selective_update_hc(h, c, zero_one, feats):
     h = torch.where(zero_one, local_edge_feats, h)
     c = torch.where(zero_one, local_edge_feats, c)
     
+    print("Hidden")
     print(h)
-    print(c)
     print(h.shape)
+    print("Cell")
+    print(c)
     print(c.shape)
+    print("Feats")
     print(feats)
     print(feats.shape)
+    print("Zero One")
+    print(zero_one)
+    print(zero_one.shape)
     
     return h, c
 
