@@ -77,7 +77,7 @@ def selective_update_hc(h, c, zero_one, feats, cell_edge=None):
         c = torch.where(zero_one, local_edge_feats, c)
     
     else:
-        edge_state = (h[zero_one.expand_dims(-1)], c[zero_one.expand_dims(-1)])
+        edge_state = (h[np.expand_dims(zero_one, -1)], c[np.expand_dims(zero_one, -1)])
         print(h.shape)
         print(h[zero_one].shape)
         print(zero_one.shape)
