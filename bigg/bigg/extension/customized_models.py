@@ -30,7 +30,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def __init__(self, args):
         super().__init__(args)
-        self.edgelen_encoding = MLP(1, [args.embed_dim // 4, args.embed_dim]) #nn.LSTMCell(1, args.embed_dim)
+        self.edgelen_encoding = MLP(1, [args.embed_dim // 4, args.embed_dim]) 
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         #self.edgelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
@@ -147,7 +147,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.epoch_num == 0:
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_weights(edge_feats)
-        return (self.edgelen_encoding(edge_feats_normalized), self.edgelen_encoding(edge_feats_normalized))
+        return self.edgelen_encoding(edge_feats_normalized)
 
     def predict_node_feats(self, state, node_feats=None):
         """
