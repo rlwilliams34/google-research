@@ -78,6 +78,9 @@ def selective_update_hc(h, c, zero_one, feats, cell_edge=None):
     
     else:
         edge_state = (h[zero_one], c[zero_one])
+        print(h.shape)
+        print(h[zero_one].shape)
+        print(zero_one.shape)
         print(edge_state[0].shape)
         print(feats.shape)
         print(zero_one)
