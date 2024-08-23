@@ -236,7 +236,7 @@ class FenwickTree(nn.Module):
                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
             if i == 0:
                 if self.has_edge_feats or self.has_node_feats:
-                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, cell_edge)
+                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, cell_edge = cell_edge)
                 else:
                     new_states = lstm_func(h_bot, c_bot)
             else:
@@ -620,7 +620,7 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 local_edge_feats = edge_feats[edge_idx]
-                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, cell_edge = self.edge_state_update)
+                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, cell_edge = cell_edge)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
             h_buf_list[d] = new_h
