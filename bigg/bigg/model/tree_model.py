@@ -447,7 +447,7 @@ class RecurTreeGen(nn.Module):
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll = ll + edge_ll
-                    edge_embed = self.embed_edge_feats(cur_feats)
+                    edge_embed = self.embed_edge_feats(cur_feats))
                     return ll, (edge_embed, edge_embed), 1, cur_feats
                 else:
                     return ll, (self.leaf_h0, self.leaf_c0), 1, None
@@ -579,6 +579,8 @@ class RecurTreeGen(nn.Module):
         TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
         # embed trees
         all_ids = TreeLib.PrepareTreeEmbed()
+        print(self.leaf_h0)
+        print(self.leaf_c0)
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
         if self.has_edge_feats:
