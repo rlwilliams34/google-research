@@ -266,7 +266,7 @@ if __name__ == '__main__':
                 wt_losses.append(loss_wt.item())
             
             true_loss = -(ll + ll_wt) / num_nodes
-            true_loss = true_loss.item
+            true_loss = true_loss.item()
             
             loss = -(ll + ll_wt / cmd_args.scale_loss) / num_nodes
             loss.backward()
