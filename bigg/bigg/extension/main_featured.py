@@ -265,12 +265,15 @@ if __name__ == '__main__':
             if cmd_args.has_edge_feats or cmd_args.test_gcn:
                 wt_losses.append(loss_wt.item())
             
-            loss = -(ll + ll_wt) / num_nodes
+            true_loss = -(ll + ll_wt) / num_nodes
+            true_loss = true_loss.item
+            
+            loss = -(ll + ll_wt / cmd_args.scale_loss) / num_nodes
             loss.backward()
             loss = loss.item()
             
-            if loss < best_loss:
-                best_loss = loss
+            if true_loss < best_loss:
+                best_loss = true_loss
                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
             if (idx + 1) % cmd_args.accum_grad == 0:
@@ -284,7 +287,7 @@ if __name__ == '__main__':
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
                 optimizer.step()
                 optimizer.zero_grad()
-            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / cmd_args.epoch_save, loss))
+            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / cmd_args.epoch_save, true_loss))
         
         print('epoch complete')
         cur = epoch + 1

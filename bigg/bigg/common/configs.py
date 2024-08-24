@@ -93,6 +93,7 @@ cmd_opt.add_argument('-save_every', default=10, type=int, help='mode to standard
 cmd_opt.add_argument('-node_embed_dim', default=256, type=int, help='embed size')
 cmd_opt.add_argument('-out_dim', default=256, type=int, help='embed size')
 cmd_opt.add_argument('-test_gcn', default = False, type = eval, help = "Test GCN Model?")
+cmd_opt.add_argument('-scale_loss', default=1, type=float, help='Amount to scale weight loss by during training')
 
 
 cmd_args, _ = cmd_opt.parse_known_args()
