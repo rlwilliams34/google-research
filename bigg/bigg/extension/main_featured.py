@@ -320,7 +320,7 @@ if __name__ == '__main__':
             
             gen_graphs = []
             with torch.no_grad():
-                for _ in tqdm(range(20)):
+                for _ in range(20):
                     num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                     _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes)
                     
