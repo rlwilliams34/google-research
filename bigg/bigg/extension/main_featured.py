@@ -332,6 +332,9 @@ if __name__ == '__main__':
                         pred_g.add_weighted_edges_from(weighted_edges)
                         gen_graphs.append(pred_g)
             
+            print("NUMBER GRAPHS:", len(gen_graphs))
+            for g in gen_graphs:
+                print(g.edges(data=True)))
             print("Generating Graph Stats")
             get_graph_stats(gen_graphs, None, cmd_args.g_type)
     print('training complete.')

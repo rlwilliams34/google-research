@@ -15,12 +15,14 @@ from bigg.common.configs import cmd_args, set_device
 
 		## Topology Check Functions
 def correct_tree_topology_check(graphs):
+  print("LEN OF GRAPHS:", len(graphs))
   correct = 0
   true_trees = []
   for g in graphs:
     if is_bifurcating_tree(g):
         correct += 1
         true_trees.append(g)
+  print("NUM CORRECT: ", correct)
   return correct / len(graphs), true_trees
 
 def correct_tree_topology_check_two(graphs):
