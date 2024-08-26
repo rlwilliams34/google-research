@@ -228,6 +228,7 @@ if __name__ == '__main__':
         
         sys.exit()
     #########################################################################################################
+    val_size_dict = {'lobster': 50, 'tree': 20, 'db': 0, 'er': 0}
     top_losses = []
     wt_losses = []
     best_loss = np.inf
@@ -323,7 +324,8 @@ if __name__ == '__main__':
             
             gen_graphs = []
             with torch.no_grad():
-                for _ in range(20):
+                val_size = val_size_dict[cmd_args.g_type]
+                for _ in range(val_size):
                     num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                     _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes)
                     
@@ -338,8 +340,9 @@ if __name__ == '__main__':
 #             print("NUMBER GRAPHS:", len(gen_graphs))
 #             for g in gen_graphs:
 #                 print(g.edges(data=True))
-            print("Generating Graph Stats")
-            get_graph_stats(gen_graphs, None, cmd_args.g_type)
+            if val_size > 0:
+                print("Generating Graph Stats")
+                get_graph_stats(gen_graphs, None, cmd_args.g_type)
     print('training complete.')
     ###################################################################################
 #     indices = list(range(len(train_graphs)))
