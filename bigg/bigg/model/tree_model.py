@@ -641,6 +641,10 @@ class RecurTreeGen(nn.Module):
         ll_wt = 0.0
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges)
+        print(hc_bot)
+        print(fn_hc_bot)
+        print(h_buf_list)
+        print(c_buf_list)
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
         print(row_states)
         print(next_states)
