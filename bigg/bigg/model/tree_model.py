@@ -205,6 +205,7 @@ class FenwickTree(nn.Module):
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         print("Test")
         print(list(range(tree_agg_ids)))
+        print("Done")
         row_embeds = [(self.init_h0, self.init_c0)]
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
