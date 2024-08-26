@@ -45,6 +45,11 @@ def hc_multi_select(ids_from, ids_to, h_froms, c_froms):
 
 def tree_state_select(h_bot, c_bot, h_buf, c_buf, fn_all_ids):
     bot_froms, bot_tos, prev_froms, prev_tos = fn_all_ids()
+    print("Tree State Select")
+    print(bot_froms)
+    print(bot_tos)
+    print(prev_froms)
+    print(prev_tos)
     if h_buf is None or prev_tos is None:
         h_vecs = multi_index_select([bot_froms], [bot_tos], h_bot)
         c_vecs = multi_index_select([bot_froms], [bot_tos], c_bot)
@@ -198,6 +203,7 @@ class FenwickTree(nn.Module):
     def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
+        print(tree_agg_ids)
         row_embeds = [(self.init_h0, self.init_c0)]
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
