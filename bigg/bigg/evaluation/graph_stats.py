@@ -376,18 +376,21 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         prop, _ = correct_lobster_topology_check(out_graphs)
         print("Proportion Correct Lobster Graphs: ", prop)
         
-        get_mmd_stats(out_graphs, test_graphs)
-        
-#         num_nodes = []
-#         num_edges = []
-#         for lobster in out_graphs:
-#             num_nodes.append(len(lobster))
-#             num_edges.append(len(lobster.edges()))
-#         print("Num Nodes: ", np.mean(num_nodes), (min(num_nodes), max(num_nodes)))
-#         print("Num Edges: ", np.mean(num_edges), (min(num_edges), max(num_edges)))
+        num_nodes = []
+        num_edges = []
+        for lobster in out_graphs:
+            num_nodes.append(len(lobster))
+            num_edges.append(len(lobster.edges()))
+        print("Num Nodes: ", np.mean(num_nodes), (min(num_nodes), max(num_nodes)))
+        print("Num Edges: ", np.mean(num_edges), (min(num_edges), max(num_edges)))
         
         if cmd_args.has_edge_feats:
             lobster_weight_statistics(out_graphs)
+        
+        if test_graphs is None:
+            return 0
+        
+        get_mmd_stats(out_graphs, test_graphs)
     
 #     elif graph_type == "grid":
 #         prop, true_lobsters = correct_grid_topology_check(out_graphs)
