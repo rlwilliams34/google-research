@@ -222,16 +222,16 @@ def orbit_stats_all(graph_ref_list, graph_pred_list):
 
     total_counts_ref = np.array(total_counts_ref)
     total_counts_pred = np.array(total_counts_pred)
-    print(len(total_counts_pred))
-    print(len(total_counts_pred))
+    #print(len(total_counts_pred))
+    #print(len(total_counts_pred))
     mmd_dist = compute_mmd(total_counts_ref, total_counts_pred, kernel=gaussian_tv,
             is_hist=False, sigma=30.0)
 
-    print('-------------------------')
-    print(np.sum(total_counts_ref, axis=0) / len(total_counts_ref))
-    print('...')
-    print(np.sum(total_counts_pred, axis=0) / len(total_counts_pred))
-    print('-------------------------')
+    #print('-------------------------')
+    #print(np.sum(total_counts_ref, axis=0) / len(total_counts_ref))
+    #print('...')
+    #print(np.sum(total_counts_pred, axis=0) / len(total_counts_pred))
+    #print('-------------------------')
     return mmd_dist
 
 

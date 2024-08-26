@@ -107,6 +107,10 @@ if __name__ == '__main__':
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
+    path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'val')
+    with open(path, 'rb') as f:
+        val_graphs = cp.load(f)
+    
     [TreeLib.InsertGraph(g) for g in train_graphs]
     print(train_graphs[0].edges(data=True))
 
@@ -225,14 +229,21 @@ if __name__ == '__main__':
     top_losses = []
     wt_losses = []
     best_loss = np.inf
-    indices = list(range(len(train_graphs)))
+    
+    N = len(train_graphs)
+    B = cmd_args.batch_size
+    indices = list(range(N))
+    num_iter = int(N / B)
+    
+    num_node_dist = get_node_dist(train_graphs)
     
     if cmd_args.epoch_load is None:
         cmd_args.epoch_load = 0
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
-        pbar = tqdm(range(cmd_args.epoch_save))
+        pbar = tqdm(range(num_iter))
+        random.shuffle(indices)
         
         optimizer.zero_grad()
         if cmd_args.test_gcn:
@@ -242,12 +253,13 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         for idx in pbar:
-            random.shuffle(indices)
-            batch_indices = indices[:cmd_args.batch_size]
+            start = B * idx
+            stop = B * (idx + 1)
+            batch_indices = indices[start:stop]
             
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
+            
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
-
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
             
             if cmd_args.test_gcn:
@@ -268,20 +280,19 @@ if __name__ == '__main__':
             true_loss = -(ll + ll_wt) / num_nodes
             true_loss = true_loss.item()
             
-            loss = -(ll + ll_wt / cmd_args.scale_loss) / num_nodes
+            loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
             loss.backward()
-            loss = loss.item()
             
             if true_loss < best_loss:
                 best_loss = true_loss
                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
             if (idx + 1) % cmd_args.accum_grad == 0:
-                if cmd_args.accum_grad > 1:
-                    with torch.no_grad():
-                        for p in model.parameters():
-                            if p.grad is not None:
-                                p.grad.div_(cmd_args.accum_grad)
+#                 if cmd_args.accum_grad > 1:
+#                     with torch.no_grad():
+#                         for p in model.parameters():
+#                             if p.grad is not None:
+#                                 p.grad.div_(cmd_args.accum_grad)
                 
                 if cmd_args.grad_clip > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
@@ -297,14 +308,30 @@ if __name__ == '__main__':
         print("Wt Loss: ", loss_wt)
         #if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
         
-        if cur % cmd_args.save_every == 0:
+        if cur % cmd_args.epoch_save == 0:
             print('saving epoch')
-            #print("Top Losses: ")
-            #print(top_losses)
-            #print("Weight Losses: ")
-            #print(wt_losses)
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
+        
+        if cur % cmd_args.epoch_save == 0:
+            print('validating')
+            
+            gen_graphs = []
+            with torch.no_grad():
+                for _ in tqdm(range(20)):
+                    num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
+                    _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes)
+                    
+                    weighted_edges = []
+                    for e, w in zip(pred_edges, pred_edge_feats):
+                        assert e[0] > e[1]
+                        weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
+                        pred_g = nx.Graph()
+                        pred_g.add_weighted_edges_from(weighted_edges)
+                        gen_graphs.append(pred_g)
+            
+            print("Generating Graph Stats")
+            get_graph_stats(gen_graphs, val_graphs, cmd_args.g_type)
     print('training complete.')
     ###################################################################################
 #     indices = list(range(len(train_graphs)))
