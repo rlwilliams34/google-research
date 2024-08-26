@@ -326,11 +326,11 @@ if __name__ == '__main__':
                     
                     weighted_edges = []
                     for e, w in zip(pred_edges, pred_edge_feats):
-                        assert e[0] > e[1]
                         weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
-                        pred_g = nx.Graph()
-                        pred_g.add_weighted_edges_from(weighted_edges)
-                        gen_graphs.append(pred_g)
+                    
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
             
             print("NUMBER GRAPHS:", len(gen_graphs))
             for g in gen_graphs:
