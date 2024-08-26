@@ -30,12 +30,12 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def __init__(self, args):
         super().__init__(args)
-        self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim]) 
+        self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = 0.5)
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         
-        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1])
+        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = 0.5)
+        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = 0.5)
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
         mu_wt = torch.tensor(0, dtype = float)

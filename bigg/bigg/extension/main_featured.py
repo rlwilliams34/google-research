@@ -238,6 +238,8 @@ if __name__ == '__main__':
     num_iter = int(N / B)
     
     num_node_dist = get_node_dist(train_graphs)
+    grad_accum_counter = 0
+    optimizer.zero_grad()
     
     if cmd_args.epoch_load is None:
         cmd_args.epoch_load = 0
@@ -247,7 +249,6 @@ if __name__ == '__main__':
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
-        optimizer.zero_grad()
         if cmd_args.test_gcn:
             model.gcn_mod.epoch_num += 1
         
@@ -284,12 +285,13 @@ if __name__ == '__main__':
             
             loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
             loss.backward()
+            grad_accum_counter += 1
             
             if true_loss < best_loss:
                 best_loss = true_loss
                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
-            if (idx + 1) % cmd_args.accum_grad == 0:
+            if grad_accum_counter == cmd_args.accum_grad:
 #                 if cmd_args.accum_grad > 1:
 #                     with torch.no_grad():
 #                         for p in model.parameters():
@@ -300,6 +302,7 @@ if __name__ == '__main__':
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
                 optimizer.step()
                 optimizer.zero_grad()
+                grad_accum_counter = 0
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
         
         print('epoch complete')
