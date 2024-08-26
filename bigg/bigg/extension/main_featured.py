@@ -313,7 +313,7 @@ if __name__ == '__main__':
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
         
-        if cur % cmd_args.epoch_save == 0:
+        if cur % cmd_args.epoch_save == 0 and cur >= 20:
             print('validating')
             
             gen_graphs = []
