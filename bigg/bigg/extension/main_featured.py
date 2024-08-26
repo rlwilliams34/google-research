@@ -38,7 +38,9 @@ from bigg.evaluation.mmd import *
 from bigg.evaluation.mmd_stats import *
 from bigg.experiments.train_utils import get_node_dist
 
-
+import gc
+torch.cuda.empty_cache()
+gc.collect()
 
 def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     batch_g = nx.Graph()
