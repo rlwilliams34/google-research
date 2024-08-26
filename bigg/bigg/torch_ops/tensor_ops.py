@@ -49,7 +49,7 @@ class MultiIndexSelectFunc(Function):
                 print(x_to)
                 print(x_from)
                 print(out[x_to])
-                print(out[x_from])
+                print(mat[x_from])
                 out[x_to] = mat[x_from].detach()
 
         ctx.idx_froms = idx_froms
