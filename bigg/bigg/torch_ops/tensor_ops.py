@@ -46,6 +46,10 @@ class MultiIndexSelectFunc(Function):
                 out[x_to] = mat.detach()
             else:
                 assert len(x_from) == len(x_to)
+                print(x_to)
+                print(x_from)
+                print(out[x_to])
+                print(out[x_from])
                 out[x_to] = mat[x_from].detach()
 
         ctx.idx_froms = idx_froms
