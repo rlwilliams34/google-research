@@ -135,11 +135,7 @@ if __name__ == '__main__':
     else:
         list_edge_feats = None
     
-    if cmd_args.g_type == "tree":
-        optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
-    
-    else:
-        optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     print(cmd_args.model_dump)
     if cmd_args.model_dump is not None and os.path.isfile(cmd_args.model_dump):
