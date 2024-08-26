@@ -287,6 +287,7 @@ if __name__ == '__main__':
             loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
             loss.backward()
             grad_accum_counter += 1
+            print(STOP)
             
             if true_loss < best_loss:
                 best_loss = true_loss
@@ -311,7 +312,7 @@ if __name__ == '__main__':
         
         print("CURRENT LOSSES")
         print("Top Loss: ", loss_top)
-        print("Wt Loss: ", loss_wt)
+        print("Wt Loss: ", loss_wt)P)
         #if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
         
         if cur % cmd_args.epoch_save == 0:
