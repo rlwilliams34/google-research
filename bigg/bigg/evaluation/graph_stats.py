@@ -15,14 +15,12 @@ from bigg.common.configs import cmd_args, set_device
 
 		## Topology Check Functions
 def correct_tree_topology_check(graphs):
-  print("LEN OF GRAPHS:", len(graphs))
   correct = 0
   true_trees = []
   for g in graphs:
     if is_bifurcating_tree(g):
         correct += 1
         true_trees.append(g)
-  print("NUM CORRECT: ", correct)
   return correct / len(graphs), true_trees
 
 def correct_tree_topology_check_two(graphs):
@@ -373,7 +371,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         
     
     elif graph_type == "lobster":
-        prop, _ = correct_lobster_topology_check(out_graphs)
+        prop, true_lobs = correct_lobster_topology_check(out_graphs)
         print("Proportion Correct Lobster Graphs: ", prop)
         
         num_nodes = []
@@ -386,6 +384,8 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         
         if cmd_args.has_edge_feats:
             lobster_weight_statistics(out_graphs)
+            print("checking with true lobsters")
+            lobster_weight_statistics(true_lobs)
         
         if test_graphs is None:
             return 0
@@ -404,6 +404,14 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         print("Mean weight: ", np.mean(weights))
         print("SD Weight: ", np.std(weights, ddof = 1))
         
+        num_nodes = []
+        num_edges = []
+        for lobster in out_graphs:
+            num_nodes.append(len(lobster))
+            num_edges.append(len(lobster.edges()))
+        print("Num Nodes: ", np.mean(num_nodes), (min(num_nodes), max(num_nodes)))
+        print("Num Edges: ", np.mean(num_edges), (min(num_edges), max(num_edges)))
+        
         get_mmd_stats(out_graphs, test_graphs)
     
     elif graph_type == "er":
@@ -419,6 +427,14 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
             for (n1, n2, w) in g.edges(data=True):
                 w_sm = np.log(np.exp(w['weight']) - 1)
                 weights.append(w_sm)
+        
+        num_nodes = []
+        num_edges = []
+        for lobster in out_graphs:
+            num_nodes.append(len(lobster))
+            num_edges.append(len(lobster.edges()))
+        print("Num Nodes: ", np.mean(num_nodes), (min(num_nodes), max(num_nodes)))
+        print("Num Edges: ", np.mean(num_edges), (min(num_edges), max(num_edges)))
         
         p_lo = np.percentile(probs, 2.5)
         p_hi = np.percentile(probs, 97.5)
