@@ -700,6 +700,8 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
+            
+            print(topdown_state[0])
 
             right_logits = self.pred_has_right(topdown_state[0], lv)
             right_update = self.topdown_right_embed[has_right]
