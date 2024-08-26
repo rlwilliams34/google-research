@@ -360,14 +360,15 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         prop2 = correct_tree_topology_check_two(out_graphs)
         print("Alt Proportion Correct Topology: ", prop2)
         
+        if cmd_args.has_edge_feats:
+            print("Weight stats of ALL graphs")
+            test_stats2 = tree_weight_statistics(out_graphs)
+        
         if test_graphs is None:
             return 0
                 
         get_mmd_stats(out_graphs, test_graphs)
         
-        if cmd_args.has_edge_feats:
-            print("Weight stats of ALL graphs")
-            test_stats2 = tree_weight_statistics(out_graphs)
     
     elif graph_type == "lobster":
         prop, _ = correct_lobster_topology_check(out_graphs)
