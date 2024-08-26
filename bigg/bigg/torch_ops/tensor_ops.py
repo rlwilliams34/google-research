@@ -30,9 +30,11 @@ class MultiIndexSelectFunc(Function):
     @staticmethod
     def forward(ctx, idx_froms, idx_tos, *mats):
         assert len(idx_tos) == len(idx_froms) == len(mats)
-        cols = mats[0].shape[1]
-        assert all([len(x.shape) == 2 for x in mats])
-        assert all([x.shape[1] == cols for x in mats])
+        cols = mats[0].shape[2]
+        #assert all([len(x.shape) == 2 for x in mats])
+        assert all([len(x.shape) == 3 for x in mats])
+        #assert all([x.shape[1] == cols for x in mats])
+        assert all([x.shape[2] == cols for x in mats])
 
         num_rows = sum([len(x) for x in idx_tos])
         out = mats[0].new(num_rows, cols)

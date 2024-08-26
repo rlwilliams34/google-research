@@ -588,8 +588,9 @@ class RecurTreeGen(nn.Module):
             edge_feats = self.embed_edge_feats(edge_feats)
 
         if not self.bits_compress:
-            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=0)
-            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=0)
+            ### CHANGED HERE
+            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
+            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
             fn_hc_bot = lambda d: (h_bot, c_bot)
         else:
             binary_embeds, base_feat = TreeLib.PrepareBinary()
