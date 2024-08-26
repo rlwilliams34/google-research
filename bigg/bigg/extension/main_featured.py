@@ -107,9 +107,9 @@ if __name__ == '__main__':
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
-    path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'val')
-    with open(path, 'rb') as f:
-        val_graphs = cp.load(f)
+    #path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'val')
+    #with open(path, 'rb') as f:
+    #    val_graphs = cp.load(f)
     
     [TreeLib.InsertGraph(g) for g in train_graphs]
     print(train_graphs[0].edges(data=True))
@@ -331,7 +331,7 @@ if __name__ == '__main__':
                         gen_graphs.append(pred_g)
             
             print("Generating Graph Stats")
-            get_graph_stats(gen_graphs, val_graphs, cmd_args.g_type)
+            get_graph_stats(gen_graphs, None, cmd_args.g_type)
     print('training complete.')
     ###################################################################################
 #     indices = list(range(len(train_graphs)))

@@ -360,6 +360,9 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         prop2 = correct_tree_topology_check_two(out_graphs)
         print("Alt Proportion Correct Topology: ", prop2)
         
+        if test_graphs is None:
+            return 0
+                
         get_mmd_stats(out_graphs, test_graphs)
         
         if cmd_args.has_edge_feats:
