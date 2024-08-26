@@ -334,7 +334,7 @@ if __name__ == '__main__':
             
             print("NUMBER GRAPHS:", len(gen_graphs))
             for g in gen_graphs:
-                print(g.edges(data=True)))
+                print(g.edges(data=True))
             print("Generating Graph Stats")
             get_graph_stats(gen_graphs, None, cmd_args.g_type)
     print('training complete.')
