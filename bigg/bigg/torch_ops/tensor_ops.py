@@ -30,19 +30,12 @@ class MultiIndexSelectFunc(Function):
     @staticmethod
     def forward(ctx, idx_froms, idx_tos, *mats):
         assert len(idx_tos) == len(idx_froms) == len(mats)
-        print(mats[0])
-        print(mats[0].shape)
-        print("Stop 1")
         cols = mats[0].shape[2]
-        #assert all([len(x.shape) == 2 for x in mats])
         assert all([len(x.shape) == 3 for x in mats])
-        #assert all([x.shape[1] == cols for x in mats])
         assert all([x.shape[2] == cols for x in mats])
 
         num_rows = sum([len(x) for x in idx_tos])
         out = mats[0].new(2, num_rows, cols)
-        print(out)
-        print(out.shape)
 
         for i, mat in enumerate(mats):
             x_from = idx_froms[i]
@@ -51,10 +44,6 @@ class MultiIndexSelectFunc(Function):
                 out[x_to] = mat.detach()
             else:
                 assert len(x_from) == len(x_to)
-                print(x_to)
-                print(x_from)
-                print(out[x_to])
-                print(mat[x_from])
                 out[x_to] = mat[x_from].detach()
 
         ctx.idx_froms = idx_froms
