@@ -186,7 +186,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
-        mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
+        mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         if edge_feats is None:
             ll = 0
