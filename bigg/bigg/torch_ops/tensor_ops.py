@@ -90,6 +90,7 @@ class MultiIndexSelectFunc(Function):
         print(idx_tos)
 
         list_grad_mats = [None, None]
+        grad_mat = None
         for i in range(len(idx_froms)):
             x_from = idx_froms[i]
             x_to = idx_tos[i]
@@ -101,9 +102,18 @@ class MultiIndexSelectFunc(Function):
                 print(grad_mat)
                 print(grad_output)
                 print(grad_output[0][x_to])
-                print(grad_max[0])
-                for layer in range(grad_output.shape[0]):
-                    grad_mat[layer] = grad_output[layer][x_to].detach()
+                print(grad_mat[0])
+                if grad_mat is None:
+                    grad_mat_list = []
+                    for layer in range(grad_output.shape[0]):
+                        grad_mat_list.append(grad_output[layer][x_to].detach())
+                    
+                    grad_mat = torch.cat(grad_mat_list, dim = 0)
+                
+                else:
+                    for layer in range(grad_output.shape[0]):
+                        grad_mat[layer] = grad_output[layer][x_to].detach()
+            
             else:
                 print("Hello 2")
                 grad_mat = grad_output.new(ctx.shapes[i]).zero_()
