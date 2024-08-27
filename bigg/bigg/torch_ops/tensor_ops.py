@@ -33,6 +33,11 @@ class MultiIndexSelectFunc(Function):
         cols = mats[0].shape[2]
         assert all([len(x.shape) == 3 for x in mats])
         assert all([x.shape[2] == cols for x in mats])
+        
+        print(idx_froms)
+        print(idx_tos)
+        print(mats)
+        
 
         num_rows = sum([len(x) for x in idx_tos])
         out = mats[0].new(2, num_rows, cols)
