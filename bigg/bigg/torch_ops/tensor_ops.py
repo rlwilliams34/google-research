@@ -38,15 +38,17 @@ class MultiIndexSelectFunc(Function):
         #print(idx_froms)
         #print("idx_tos")
         #print(idx_tos)
-        #print("mats")
-        #print(mats)
+        print("mats")
+        print(mats)
+        print("mats above")
         
 
         num_rows = sum([len(x) for x in idx_tos])
         out = mats[0].new(2, num_rows, cols)
         print("out")
         print(out)
-        print(STOP)
+        print("out above")
+        print(mats[0])
 
         for i, mat in enumerate(mats):
             print(i)
