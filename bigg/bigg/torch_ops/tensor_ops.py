@@ -111,7 +111,7 @@ class MultiIndexSelectFunc(Function):
                 if True:
                     grad_mat_list = []
                     for layer in range(grad_output.shape[0]):
-                        grad_mat_list.append(grad_output[layer][x_to].detach())
+                        grad_mat_list.append(grad_output[layer][x_to].unsqueeze(0).detach())
                     
                     grad_mat = torch.cat(grad_mat_list, dim = 0)
                 
