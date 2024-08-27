@@ -464,8 +464,6 @@ class RecurTreeGen(nn.Module):
                     ll = ll + edge_ll
                     edge_embed = self.embed_edge_feats(cur_feats)
                     
-                    #edge_embed = edge_embed.unsqueeze(1)
-                    #print(edge_embed.shape)
                     edge_embed = edge_embed.repeat(self.num_layers, 1).unsqueeze(1)
                     return ll, (edge_embed, edge_embed), 1, cur_feats
                 else:
