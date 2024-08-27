@@ -319,7 +319,7 @@ if __name__ == '__main__':
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
         
-        if cur % cmd_args.epoch_save == 0 and cur >= 20 and cmd_args.has_edge_feats:
+        if cur % cmd_args.epoch_save == 0 and cur >= 20:
             print('validating')
             
             gen_graphs = []
@@ -329,13 +329,27 @@ if __name__ == '__main__':
                     num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                     _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes)
                     
-                    weighted_edges = []
-                    for e, w in zip(pred_edges, pred_edge_feats):
-                        weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
+                    if cmd_args.has_edge_feats:
+                        weighted_edges = []
+                        for e, w in zip(pred_edges, pred_edge_feats):
+                            weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
                     
-                    pred_g = nx.Graph()
-                    pred_g.add_weighted_edges_from(weighted_edges)
-                    gen_graphs.append(pred_g)
+                        pred_g = nx.Graph()
+                        pred_g.add_weighted_edges_from(weighted_edges)
+                        gen_graphs.append(pred_g)
+                    
+                    else:
+                        pred_g = nx.Graph()
+                        fixed_edges = []
+                        for e in pred_edges:
+                            w = 1.0
+                            if e[0] < e[1]:
+                                edge = (e[0], e[1], w)
+                            else:
+                                edge = (e[1], e[0], w)
+                            fixed_edges.append(edge)
+                        pred_g.add_weighted_edges_from(fixed_edges)
+                        gen_graphs.append(pred_g)
             
 #             print("NUMBER GRAPHS:", len(gen_graphs))
 #             for g in gen_graphs:
