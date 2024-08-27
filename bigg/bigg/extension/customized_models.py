@@ -33,7 +33,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         if args.has_edge_feats:
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim * args.rnn_layers, args.rnn_layers * args.embed_dim])
         else:
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.rnn_layers])
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         
