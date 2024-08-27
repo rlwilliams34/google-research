@@ -354,6 +354,7 @@ class RecurTreeGen(nn.Module):
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
         glorot_uniform(self)
         self.num_layers = args.rnn_layers
+        self.embed_dim = args.embed_dim
 
         if self.bits_compress > 0:
             self.bit_rep_net = BitsRepNet(args)
@@ -467,7 +468,8 @@ class RecurTreeGen(nn.Module):
                     ll = ll + edge_ll
                     edge_embed = self.embed_edge_feats(cur_feats)
                     
-                    edge_embed = edge_embed.repeat(self.num_layers, 1).unsqueeze(1)
+                    #edge_embed = edge_embed.repeat(self.num_layers, 1).unsqueeze(1)
+                    edge_embed = edge_embed.reshape(self.num_layers, self.embed_dim).unsqueeze(1)
                     return ll, (edge_embed, edge_embed), 1, cur_feats
                 else:
                     return ll, (self.leaf_h0, self.leaf_c0), 1, None
