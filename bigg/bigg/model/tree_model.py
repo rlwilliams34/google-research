@@ -143,8 +143,8 @@ class FenwickTree(nn.Module):
         super(FenwickTree, self).__init__()
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
-        self.init_h0 = Parameter(torch.Tensor(2, 1, args.embed_dim))
-        self.init_c0 = Parameter(torch.Tensor(2, 1, args.embed_dim))
+        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
         glorot_uniform(self)
         if self.has_node_feats:
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
@@ -342,10 +342,10 @@ class RecurTreeGen(nn.Module):
         self.greedy_frac = args.greedy_frac
         self.share_param = args.share_param
         if not self.bits_compress:
-            self.leaf_h0 = Parameter(torch.Tensor(2, 1, args.embed_dim))
-            self.leaf_c0 = Parameter(torch.Tensor(2, 1, args.embed_dim))
-            self.empty_h0 = Parameter(torch.Tensor(2, 1, args.embed_dim))
-            self.empty_c0 = Parameter(torch.Tensor(2, 1, args.embed_dim))
+            self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
 
         self.topdown_left_embed = Parameter(torch.Tensor(2, args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
