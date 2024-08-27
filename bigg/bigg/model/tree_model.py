@@ -202,7 +202,7 @@ class FenwickTree(nn.Module):
         #print(list(range(tree_agg_ids)))
         #print("Done")
         row_embeds = [(self.init_h0, self.init_c0)]
-        print(row_embeds)
+        #print(row_embeds)
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
             if 'node' in feat_dict:
@@ -234,17 +234,17 @@ class FenwickTree(nn.Module):
             
             row_embeds.append(new_states)
         h_list, c_list = zip(*row_embeds)
-        print(h_list)
-        for i in range(len(h_list)):
-            print(h_list[i].shape)
+        #print(h_list)
+        #for i in range(len(h_list)):
+        #    print(h_list[i].shape)
         
         joint_h = torch.cat(h_list, dim=1)
         joint_c = torch.cat(c_list, dim=1)
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-        print(init_select)
-        print(joint_h.shape)
+        #print(init_select)
+        #print(joint_h.shape)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
@@ -671,7 +671,7 @@ class RecurTreeGen(nn.Module):
 
         lv = 0
         while True:
-            print("Testing")
+            #print("Testing")
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
