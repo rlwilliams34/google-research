@@ -45,6 +45,7 @@ class MultiIndexSelectFunc(Function):
         num_rows = sum([len(x) for x in idx_tos])
         out = mats[0].new(2, num_rows, cols)
         print(out)
+        print("Out shape above")
 
         for i, mat in enumerate(mats):
             x_from = idx_froms[i]
