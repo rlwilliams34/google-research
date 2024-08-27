@@ -83,7 +83,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     is_leaf = [lch_isleaf, rch_isleaf]
     if edge_feats is not None:
         print(edge_feats.shape)
-        edge_feats = [edge_feats[:, ~is_rch], edge_feats[:, is_rch]]
+        edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
         assert np.sum(is_rch) == np.sum(rch_isleaf)
     node_feats = [t_lch, t_rch]
     h_list = []
