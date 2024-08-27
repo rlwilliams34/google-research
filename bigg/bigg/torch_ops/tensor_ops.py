@@ -97,6 +97,11 @@ class MultiIndexSelectFunc(Function):
             print(x_to)
             if x_from is None:
                 print("Hello 1")
+                print(x_to)
+                print(grad_mat)
+                print(grad_output)
+                print(grad_output[0][x_to])
+                print(grad_max[0])
                 for layer in range(grad_output.shape[0]):
                     grad_mat[layer] = grad_output[layer][x_to].detach()
             else:
