@@ -69,7 +69,9 @@ class MultiIndexSelectFunc(Function):
                 print(mat.shape)
                 print("x_from")
                 print(x_from)
-                out[x_to] = mat[x_from].detach()
+                for layer in range(mat.shape[0]):
+                    out[layer][x_to] = mat[layer][x_from].detach()
+                #out[x_to] = mat[x_from].detach()
 
         ctx.idx_froms = idx_froms
         ctx.idx_tos = idx_tos
