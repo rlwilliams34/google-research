@@ -92,7 +92,7 @@ class MultiIndexSelectFunc(Function):
             x_to = idx_tos[i]
             if x_from is None:
                 for layer in range(grad_output.shape[0]):
-                    grad_mat[layers] = grad_output[layer][x_to].detach()
+                    grad_mat[layer] = grad_output[layer][x_to].detach()
             else:
                 grad_mat = grad_output.new(ctx.shapes[i]).zero_()
                 for layer in range(grad_output.shape[0]):
