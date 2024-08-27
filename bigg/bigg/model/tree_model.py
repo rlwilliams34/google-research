@@ -233,6 +233,9 @@ class FenwickTree(nn.Module):
             row_embeds.append(new_states)
         h_list, c_list = zip(*row_embeds)
         print(h_list)
+        for i in range(len(h_list)):
+            print(h_list[i].shape)
+        
         joint_h = torch.cat(h_list, dim=0)
         joint_c = torch.cat(c_list, dim=0)
 
@@ -649,13 +652,8 @@ class RecurTreeGen(nn.Module):
         ll_wt = 0.0
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges)
-        print(hc_bot)
-        print(fn_hc_bot)
-        print(h_buf_list)
-        print(c_buf_list)
+        
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
-        print(row_states)
-        print(next_states)
         
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
