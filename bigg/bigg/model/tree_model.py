@@ -267,7 +267,7 @@ class FenwickTree(nn.Module):
             hist_rnn_states.append(cur_state)
 
             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
-            sub_state = cur_state[0][proceed_from], cur_state[1][proceed_from]
+            sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
             cur_state = self.summary_cell(sub_state, next_input)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
