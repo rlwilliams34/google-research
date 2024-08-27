@@ -58,7 +58,8 @@ class MultiIndexSelectFunc(Function):
                 print(out)
                 print(x_to)
                 print(mat)
-                out[x_to] = mat.detach()
+                for layer in range(mat.shape[0]):
+                    out[layer][x_to] = mat[layer].detach()
             else:
                 assert len(x_from) == len(x_to)
                 
