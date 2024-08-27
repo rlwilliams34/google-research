@@ -52,6 +52,7 @@ def tree_state_select(h_bot, c_bot, h_buf, c_buf, fn_all_ids):
     print(prev_tos)
     print("Params")
     print(h_bot)
+    print(h_bot.shape)
     print(c_bot)
     print(h_buf)
     print(c_buf)
