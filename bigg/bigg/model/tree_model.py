@@ -711,7 +711,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
 
-            right_logits = self.pred_has_right(topdown_state[0], lv)
+            right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
             right_ll = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
