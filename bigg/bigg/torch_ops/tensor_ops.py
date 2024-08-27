@@ -85,6 +85,9 @@ class MultiIndexSelectFunc(Function):
     @staticmethod
     def backward(ctx, grad_output):
         idx_froms, idx_tos = ctx.idx_froms, ctx.idx_tos
+        print(grad_output)
+        print(idx_froms)
+        print(idx_tos)
 
         list_grad_mats = [None, None]
         for i in range(len(idx_froms)):
