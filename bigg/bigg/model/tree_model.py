@@ -427,7 +427,7 @@ class RecurTreeGen(nn.Module):
     def gen_row(self, ll, state, tree_node, col_sm, lb, ub, edge_feats=None):
         assert lb <= ub
         if tree_node.is_root:
-            prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0]))
+            prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0][-1]))
 
             if col_sm.supervised:
                 has_edge = len(col_sm.indices) > 0
@@ -469,7 +469,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            left_prob = torch.sigmoid(self.pred_has_left(state[0], tree_node.depth))
+            left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
 
             if col_sm.supervised:
                 has_left = col_sm.next_edge < mid
@@ -499,7 +499,7 @@ class RecurTreeGen(nn.Module):
             if not has_left:
                 has_right = True
             else:
-                right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0], tree_node.depth))
+                right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0][-1], tree_node.depth))
                 if col_sm.supervised:
                     has_right = col_sm.has_edge(mid, tree_node.col_range[1])
                 else:
