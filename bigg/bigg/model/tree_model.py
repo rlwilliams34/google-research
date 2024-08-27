@@ -257,7 +257,7 @@ class FenwickTree(nn.Module):
                 needs_base_nodes = torch.tensor(needs_base_nodes, dtype=torch.bool).to(node_feats.device).unsqueeze(1)
                 cur_state = [torch.where(needs_base_nodes, new_cur[i], cur_state[i]) for i in range(2)]
                 cur_state = tuple(cur_state)
-        ret_state = (joint_h[next_ids], joint_c[next_ids])
+        ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
         hist_rnn_states = []
         hist_froms = []
         hist_tos = []
