@@ -46,10 +46,10 @@ class MultiIndexSelectFunc(Function):
             x_from = idx_froms[i]
             x_to = idx_tos[i]
             if x_from is None:
-                out[x_to] = mat.detach()
+                out[:][x_to] = mat.detach()
             else:
                 assert len(x_from) == len(x_to)
-                out[x_to] = mat[x_from].detach()
+                out[:][x_to] = mat[x_from].detach()
 
         ctx.idx_froms = idx_froms
         ctx.idx_tos = idx_tos
