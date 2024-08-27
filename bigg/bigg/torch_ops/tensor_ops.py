@@ -91,10 +91,12 @@ class MultiIndexSelectFunc(Function):
             x_from = idx_froms[i]
             x_to = idx_tos[i]
             if x_from is None:
-                grad_mat = grad_output[x_to].detach()
+                for layer in range(grad_output.shape[0]):
+                    grad_mat[layers] = grad_output[layer][x_to].detach()
             else:
                 grad_mat = grad_output.new(ctx.shapes[i]).zero_()
-                grad_mat[x_from] = grad_output[x_to].detach()
+                for layer in range(grad_output.shape[0]):
+                    grad_mat[layer][x_from] = grad_output[layer][x_to].detach()
             list_grad_mats.append(grad_mat)
 
         return tuple(list_grad_mats)
