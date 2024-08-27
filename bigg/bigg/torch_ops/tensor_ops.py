@@ -34,8 +34,11 @@ class MultiIndexSelectFunc(Function):
         assert all([len(x.shape) == 3 for x in mats])
         assert all([x.shape[2] == cols for x in mats])
         
+        print("idx_froms")
         print(idx_froms)
+        print("idx_tos")
         print(idx_tos)
+        print("mats")
         print(mats)
         
 
@@ -49,11 +52,16 @@ class MultiIndexSelectFunc(Function):
                 out[:][x_to] = mat.detach()
             else:
                 assert len(x_from) == len(x_to)
+                
+                print("out")
                 print(out)
                 print(out.shape)
+                print("x_to")
                 print(x_to)
+                print("max")
                 print(mat)
                 print(mat.shape)
+                print("x_from")
                 print(x_from)
                 out[:][x_to] = mat[x_from].detach()
 
