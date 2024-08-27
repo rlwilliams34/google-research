@@ -363,8 +363,8 @@ class RecurTreeGen(nn.Module):
             #self.m_cell_topdown = nn.LSTMCell(args.embed_dim, args.embed_dim)
             #self.m_cell_topright = nn.LSTMCell(args.embed_dim, args.embed_dim)
             ## CHANGED HERE
-            self.m_cell_topdown = MultiLSTMCell(args.embed_dim, args.embed_dim, 2)
-            self.m_cell_topright = MultiLSTMCell(args.embed_dim, args.embed_dim, 2)
+            self.m_cell_topdown = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
+            self.m_cell_topright = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
         else:
             fn_pred = lambda: MLP(args.embed_dim, [2 * args.embed_dim, 1])
             fn_tree_cell = lambda: BinaryTreeLSTMCell(args.embed_dim)
