@@ -667,7 +667,7 @@ class RecurTreeGen(nn.Module):
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
         ll = ll + self.binary_ll(logit_has_edge, has_ch)
-        cur_states = (row_states[0][has_ch], row_states[1][has_ch])
+        cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
 
         lv = 0
         while True:
@@ -675,13 +675,13 @@ class RecurTreeGen(nn.Module):
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
-                edge_state = (cur_states[0][~is_nonleaf], cur_states[1][~is_nonleaf])
+                edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
                 edge_ll, _ = self.predict_edge_feats(edge_state, target_feats)
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
-            cur_states = (cur_states[0][is_nonleaf], cur_states[1][is_nonleaf])
+            cur_states = (cur_states[0][:, is_nonleaf], cur_states[1][:, is_nonleaf])
             left_logits = self.pred_has_left(cur_states[0][-1], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
