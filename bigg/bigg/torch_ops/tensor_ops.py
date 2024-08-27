@@ -97,11 +97,16 @@ class MultiIndexSelectFunc(Function):
             print(x_from)
             print(x_to)
             if x_from is None:
-                print("Hello 1")
+                print("Hello Checking X from is None!")
+                print("x_to")
                 print(x_to)
+                print("grad_mat")
                 print(grad_mat)
+                print("grad output")
                 print(grad_output)
+                print("grad output 0 x to")
                 print(grad_output[0][x_to])
+                print("grad mat 0")
                 print(grad_mat[0])
                 if grad_mat is None:
                     grad_mat_list = []
