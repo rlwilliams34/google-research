@@ -671,6 +671,7 @@ class RecurTreeGen(nn.Module):
 
         lv = 0
         while True:
+            print("Hello")
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
@@ -701,6 +702,8 @@ class RecurTreeGen(nn.Module):
                 h_bot, c_bot = h_bot[left_ids[0]], c_bot[left_ids[0]]
                 h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 left_ids = tuple([None] + list(left_ids[1:]))
+            
+            print()
 
             left_subtree_states = tree_state_select(h_bot, c_bot,
                                                     h_next_buf, c_next_buf,
