@@ -75,7 +75,7 @@ def selective_update_hc(h, c, zero_one, feats):
     feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
     print(nz_idx)
     print(nz_idx.shape)
-    local_edge_feats = scatter(feats, nz_idx, dim=0, dim_size=h.shape[1])
+    local_edge_feats = scatter(feats, nz_idx, dim=1, dim_size=h.shape[1])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
     h = torch.where(zero_one, local_edge_feats, h)
     c = torch.where(zero_one, local_edge_feats, c)
