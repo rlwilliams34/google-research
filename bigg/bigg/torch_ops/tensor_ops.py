@@ -85,29 +85,29 @@ class MultiIndexSelectFunc(Function):
     @staticmethod
     def backward(ctx, grad_output):
         idx_froms, idx_tos = ctx.idx_froms, ctx.idx_tos
-        print(grad_output)
-        print(idx_froms)
-        print(idx_tos)
+        #print(grad_output)
+        #print(idx_froms)
+        #print(idx_tos)
 
         list_grad_mats = [None, None]
         grad_mat = None
         for i in range(len(idx_froms)):
             x_from = idx_froms[i]
             x_to = idx_tos[i]
-            print(x_from)
-            print(x_to)
+            #print(x_from)
+            #print(x_to)
             if x_from is None:
-                print("Hello Checking X from is None!")
-                print("x_to")
-                print(x_to)
-                print("grad_mat")
-                print(grad_mat)
-                print("grad output")
-                print(grad_output)
-                print("grad output 0 x to")
-                print(grad_output[0][x_to])
-                print("grad mat 0")
-                print(grad_mat[0])
+                #print("Hello Checking X from is None!")
+                #print("x_to")
+                #print(x_to)
+                #print("grad_mat")
+                #print(grad_mat)
+                #print("grad output")
+                #print(grad_output)
+                #print("grad output 0 x to")
+                #print(grad_output[0][x_to])
+                #print("grad mat 0")
+                #print(grad_mat[0])
                 if True:
                     grad_mat_list = []
                     for layer in range(grad_output.shape[0]):
@@ -120,7 +120,7 @@ class MultiIndexSelectFunc(Function):
                         grad_mat[layer] = grad_output[layer][x_to].detach()
             
             else:
-                print("Hello 2")
+                #print("Hello 2")
                 grad_mat = grad_output.new(ctx.shapes[i]).zero_()
                 for layer in range(grad_output.shape[0]):
                     grad_mat[layer][x_from] = grad_output[layer][x_to].detach()
