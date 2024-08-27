@@ -45,18 +45,6 @@ def hc_multi_select(ids_from, ids_to, h_froms, c_froms):
 
 def tree_state_select(h_bot, c_bot, h_buf, c_buf, fn_all_ids):
     bot_froms, bot_tos, prev_froms, prev_tos = fn_all_ids()
-    print("Tree State Select")
-    print(bot_froms)
-    print(bot_tos)
-    print(prev_froms)
-    print(prev_tos)
-    print("Params")
-    print(h_bot)
-    print(h_bot.shape)
-    print(c_bot)
-    print(h_buf)
-    print(c_buf)
-    print("STOP")
     if h_buf is None or prev_tos is None:
         h_vecs = multi_index_select([bot_froms], [bot_tos], h_bot)
         c_vecs = multi_index_select([bot_froms], [bot_tos], c_bot)
@@ -597,9 +585,6 @@ class RecurTreeGen(nn.Module):
         TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
         # embed trees
         all_ids = TreeLib.PrepareTreeEmbed()
-        print("Tree Embed")
-        print(all_ids)
-        print(list(all_ids))
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
         if self.has_edge_feats:
@@ -722,9 +707,6 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
-            
-            print(topdown_state[0])
-            print(topdown_state[0].shape)
 
             right_logits = self.pred_has_right(topdown_state[0], lv)
             right_update = self.topdown_right_embed[has_right]
