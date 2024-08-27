@@ -38,6 +38,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
+        self.embed_dim = args.embed_dim
+        self.num_layers = args.rnn_layers
+        
         mu_wt = torch.tensor(0, dtype = float)
         var_wt = torch.tensor(1, dtype = float)
         n_obs = torch.tensor(0, dtype = int)
@@ -150,9 +153,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.epoch_num == 0:
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_weights(edge_feats)
-        x = self.edgelen_encoding(edge_feats_normalized)
-        print(x)
-        print(x.shape)
+        out = self.edgelen_encoding(edge_feats_normalized).reshape(out.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
         return self.edgelen_encoding(edge_feats_normalized)
 
     def predict_node_feats(self, state, node_feats=None):
