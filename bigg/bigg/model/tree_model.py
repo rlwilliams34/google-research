@@ -72,7 +72,6 @@ def selective_update_hc(h, c, zero_one, feats):
     nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
     local_edge_feats = scatter(feats, nz_idx, dim=0, dim_size=h.shape[1])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
-    
     h = torch.where(zero_one, local_edge_feats, h)
     c = torch.where(zero_one, local_edge_feats, c)
     return h, c
@@ -464,6 +463,10 @@ class RecurTreeGen(nn.Module):
                     edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll = ll + edge_ll
                     edge_embed = self.embed_edge_feats(cur_feats)
+                    
+                    edge_embed = edge_embed.unsqueeze(1)
+                    eded_embed = edge_embed.repeat(self.num_layers, 1, 1)
+                    
                     return ll, (edge_embed, edge_embed), 1, cur_feats
                 else:
                     return ll, (self.leaf_h0, self.leaf_c0), 1, None
