@@ -38,20 +38,20 @@ class MultiIndexSelectFunc(Function):
         #print(idx_froms)
         #print("idx_tos")
         #print(idx_tos)
-        print("mats")
-        print(mats)
-        print("mats above")
+        #print("mats")
+        #print(mats)
+        #print("mats above")
         
 
         num_rows = sum([len(x) for x in idx_tos])
         out = mats[0].new(2, num_rows, cols)
-        print("out")
-        print(out)
-        print("out above")
-        print(mats[0])
+        #print("out")
+        #print(out)
+        #print("out above")
+        #print(mats[0])
 
         for i, mat in enumerate(mats):
-            print(i)
+            #print(i)
             x_from = idx_froms[i]
             x_to = idx_tos[i]
             if x_from is None:
@@ -59,16 +59,16 @@ class MultiIndexSelectFunc(Function):
             else:
                 assert len(x_from) == len(x_to)
                 
-                print("out")
-                print(out)
-                print(out.shape)
-                print("x_to")
-                print(x_to)
-                print("max")
-                print(mat)
-                print(mat.shape)
-                print("x_from")
-                print(x_from)
+                #print("out")
+                #print(out)
+                #print(out.shape)
+                #print("x_to")
+                #print(x_to)
+                #print("max")
+                #print(mat)
+                #print(mat.shape)
+                #print("x_from")
+                #print(x_from)
                 for layer in range(mat.shape[0]):
                     out[layer][x_to] = mat[layer][x_from].detach()
                 #out[x_to] = mat[x_from].detach()
