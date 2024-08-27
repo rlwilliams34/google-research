@@ -143,8 +143,8 @@ class FenwickTree(nn.Module):
         super(FenwickTree, self).__init__()
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
-        self.init_h0 = Parameter(torch.Tensor(1, args.embed_dim))
-        self.init_c0 = Parameter(torch.Tensor(1, args.embed_dim))
+        self.init_h0 = Parameter(torch.Tensor(2, 1, args.embed_dim))
+        self.init_c0 = Parameter(torch.Tensor(2, 1, args.embed_dim))
         glorot_uniform(self)
         if self.has_node_feats:
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
@@ -202,6 +202,7 @@ class FenwickTree(nn.Module):
         #print(list(range(tree_agg_ids)))
         #print("Done")
         row_embeds = [(self.init_h0, self.init_c0)]
+        print(row_embeds)
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
             if 'node' in feat_dict:
@@ -230,8 +231,7 @@ class FenwickTree(nn.Module):
                     new_states = lstm_func(h_bot, c_bot)
             else:
                 new_states = lstm_func(None, None)
-            print(i)
-            print(new_states)
+            
             row_embeds.append(new_states)
         h_list, c_list = zip(*row_embeds)
         print(h_list)
