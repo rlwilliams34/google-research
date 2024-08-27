@@ -73,8 +73,6 @@ def selective_update_hc(h, c, zero_one, feats):
     num_layers = h.shape[0]
     embed_dim = h.shape[2]
     feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
-    print(nz_idx)
-    print(nz_idx.shape)
     local_edge_feats = scatter(feats, nz_idx, dim=1, dim_size=h.shape[1])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
     h = torch.where(zero_one, local_edge_feats, h)
@@ -87,7 +85,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     new_ids[0][0] = new_ids[1][0] = None
     is_leaf = [lch_isleaf, rch_isleaf]
     if edge_feats is not None:
-        print(edge_feats.shape)
         edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
         assert np.sum(is_rch) == np.sum(rch_isleaf)
     node_feats = [t_lch, t_rch]
