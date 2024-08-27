@@ -700,7 +700,7 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                 left_feats = edge_feats_embed[edge_idx[~is_rch]]
-                h_bot, c_bot = h_bot[left_ids[0]], c_bot[left_ids[0]]
+                h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
                 h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 left_ids = tuple([None] + list(left_ids[1:]))
 

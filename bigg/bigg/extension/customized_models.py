@@ -164,7 +164,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the node_feats as it is
         """
         h, _ = state
-        pred_node_len = self.nodelen_pred(h)
+        pred_node_len = self.nodelen_pred(h[-1])
         state_update = self.embed_node_feats(pred_node_len) if node_feats is None else self.embed_node_feats(node_feats)
         new_state = self.node_state_update(state_update, state)
         if node_feats is None:
