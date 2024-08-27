@@ -245,7 +245,7 @@ class FenwickTree(nn.Module):
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         print(init_select)
         print(joint_h.shape)
-        cur_state = (joint_h[init_select], joint_c[init_select])
+        cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
             if len(base_nodes):
