@@ -155,7 +155,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         edge_feats_normalized = self.standardize_weights(edge_feats)
         out = self.edgelen_encoding(edge_feats_normalized)
         print(out.shape)
-        out = out.reshape(self.num_layers, self.embed_dim).movedim(0, 1)
+        out = out.reshape(out.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
         print(out.shape)
         return out #self.edgelen_encoding(edge_feats_normalized)
 
