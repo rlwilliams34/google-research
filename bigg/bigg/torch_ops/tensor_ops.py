@@ -44,7 +44,8 @@ class MultiIndexSelectFunc(Function):
         
 
         num_rows = sum([len(x) for x in idx_tos])
-        out = mats[0].new(2, num_rows, cols)
+        num_layers = mats[0].shape[0]
+        out = mats[0].new(num_layers, num_rows, cols)
         #print("out")
         #print(out)
         #print("out above")
