@@ -108,7 +108,7 @@ class MultiIndexSelectFunc(Function):
                 print(grad_output[0][x_to])
                 print("grad mat 0")
                 print(grad_mat[0])
-                if grad_mat is None:
+                if True
                     grad_mat_list = []
                     for layer in range(grad_output.shape[0]):
                         grad_mat_list.append(grad_output[layer][x_to].detach())
