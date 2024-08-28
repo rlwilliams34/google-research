@@ -259,10 +259,10 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         if epoch >= 20 and epoch < 50:
-            cmd_args.scale_loss = 1
+            cmd_args.scale_loss = 100
         
         elif epoch >= 50 and epoch < 100:
-            cmd_args.scale_loss = 1
+            cmd_args.scale_loss = 10
         
         elif epoch >= 100:
             cmd_args.scale_loss = 1
