@@ -16,7 +16,7 @@
 from bigg.model.tree_model import RecurTreeGen
 from bigg.extension.gcn_build import *
 import torch
-from bigg.common.pytorch_util import glorot_uniform, MLP
+from bigg.common.pytorch_util import glorot_uniform, MLP, MultiLSTMCell
 import torch.nn as nn
 import numpy 
 
@@ -31,7 +31,8 @@ class BiggWithEdgeLen(RecurTreeGen):
     def __init__(self, args):
         super().__init__(args)
         if args.has_edge_feats:
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim * args.rnn_layers, args.rnn_layers * args.embed_dim])
+            self.edgelen_encoding = MLP(1, [32, 16])
+            self.edgeLSTM = MultiLSTMCell(16, args.embed_dim, args.rnn_layers)
         else:
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
@@ -156,7 +157,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.epoch_num == 0:
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_weights(edge_feats)
-        out = self.edgelen_encoding(edge_feats_normalized)
+        edge_embed = self.edgelen_encoding(edge_feats_normalized)
+        state = self.edgeLSTM(edge_embed, (self.leaf_h0, self.leaf_c0))
+        return state
         #out = out.reshape(out.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
         return out #self.edgelen_encoding(edge_feats_normalized)
 

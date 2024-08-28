@@ -72,7 +72,7 @@ def selective_update_hc(h, c, zero_one, feats):
     nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
     num_layers = h.shape[0]
     embed_dim = h.shape[2]
-    feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
+    #feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
     local_edge_feats = scatter(feats, nz_idx, dim=1, dim_size=h.shape[1])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
     h = torch.where(zero_one, local_edge_feats, h)
@@ -470,6 +470,9 @@ class RecurTreeGen(nn.Module):
                     
                     #edge_embed = edge_embed.repeat(self.num_layers, 1).unsqueeze(1)
                     edge_embed = edge_embed.reshape(self.num_layers, self.embed_dim).unsqueeze(1)
+                    
+                    ## LSTM: Dimensionality == (# Layers, Embed Size)
+                    
                     return ll, (edge_embed, edge_embed), 1, cur_feats
                 else:
                     return ll, (self.leaf_h0, self.leaf_c0), 1, None
