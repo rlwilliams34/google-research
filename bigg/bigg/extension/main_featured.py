@@ -245,7 +245,7 @@ if __name__ == '__main__':
     if cmd_args.epoch_load is None:
         cmd_args.epoch_load = 0
         
-    cmd_args.scale_loss = np.inf
+    cmd_args.scale_loss = 1
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
@@ -258,14 +258,21 @@ if __name__ == '__main__':
         else:
             model.epoch_num += 1
         
-        if epoch >= 20 and epoch < 50:
-            cmd_args.scale_loss = 100
+        #if epoch >= 20 and epoch < 50:
+        #    cmd_args.scale_loss = 100
         
-        elif epoch >= 50 and epoch < 100:
+        if epoch == 100:
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = 1e-5
+        
+        if epoch >= 100 and epoch < 200:
             cmd_args.scale_loss = 10
         
-        elif epoch >= 100:
-            cmd_args.scale_loss = 1
+        elif epoch >= 200 and epoch < 400:
+            cmd_args.scale_loss = 100
+        
+        elif epoch >= 400:
+            cmd_args.scale_loss = 1000
         
         for idx in pbar:
             start = B * idx
