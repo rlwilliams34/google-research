@@ -73,6 +73,7 @@ def selective_update_hc(h, c, zero_one, feats):
     num_layers = h.shape[0]
     embed_dim = h.shape[2]
     #feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
+    feats = self.edgeLSTM(feats, (self.leaf_h0.repeat(1, edge_embed.shape[0], 1), self.leaf_c0.repeat(1, edge_embed.shape[0], 1)))
     local_edge_feats = scatter(feats, nz_idx, dim=1, dim_size=h.shape[1])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
     h = torch.where(zero_one, local_edge_feats, h)
