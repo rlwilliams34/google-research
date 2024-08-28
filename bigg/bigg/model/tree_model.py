@@ -470,7 +470,7 @@ class RecurTreeGen(nn.Module):
                     edge_embed = self.embed_edge_feats(cur_feats)
                     
                     #edge_embed = edge_embed.repeat(self.num_layers, 1).unsqueeze(1)
-                    edge_embed = edge_embed.reshape(self.num_layers, self.embed_dim).unsqueeze(1)
+                    #edge_embed = edge_embed.reshape(self.num_layers, self.embed_dim).unsqueeze(1)
                     
                     ## LSTM: Dimensionality == (# Layers, Embed Size)
                     
