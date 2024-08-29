@@ -33,17 +33,17 @@ class BiggWithEdgeLen(RecurTreeGen):
         super().__init__(args)
         self.method = args.method
         
-        if method == "MLP-repeat":
+        if self.method == "MLP-repeat":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         
-        if method == "MLP-multi":
+        if self.method == "MLP-multi":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
         
-        if method == "LSTM":
+        if self.method == "LSTM":
             self.edgeLSTM = MultiLSTMCell(16, args.embed_dim, args.rnn_layers)
             self.edgelen_encoding = MLP(1, [32, 16])
         
-        if method == "MLP-Leaf":
+        if self.method == "MLP-Leaf":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers // 2])
             self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
             self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
@@ -174,26 +174,24 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_weights(edge_feats)
         
-        method = self.method
-        
-        if method == "MLP-repeat":
+        if self.method == "MLP-repeat":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
-        if method == "MLP-multi":
+        if self.method == "MLP-multi":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
-        if method == "LSTM":
+        if self.method == "LSTM":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             state = self.edgeLSTM(edge_embed, (self.leaf_h0.repeat(1, edge_embed.shape[0], 1), self.leaf_c0.repeat(1, edge_embed.shape[0],1)))
             return state
         
-        if method == "MLP-Leaf":
+        if self.method == "MLP-Leaf":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             out = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim // 2).movedim(0, 1)
             out_h = torch.cat([out, self.leaf_h0_wt.repeat(1, edge_feats.shape[0], 1)], dim = -1)
