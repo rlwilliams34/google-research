@@ -33,8 +33,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         if args.has_edge_feats:
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
             #self.edgeLSTM = MultiLSTMCell(16, args.embed_dim, args.rnn_layers)
-            self.leaf_h0 = 
-            self.leaf_c0 = 
         else:
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
