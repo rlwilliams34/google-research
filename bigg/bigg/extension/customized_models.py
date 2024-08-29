@@ -19,6 +19,7 @@ import torch
 from bigg.common.pytorch_util import glorot_uniform, MLP, MultiLSTMCell
 import torch.nn as nn
 import numpy 
+from torch.nn.parameter import Parameter
 
 # pylint: skip-file
 
