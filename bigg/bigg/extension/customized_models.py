@@ -165,6 +165,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         #return state
         print(edge_feats.shape)
         out = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim // 2).movedim(0, 1)
+        print(out.shape)
         out_h = torch.cat([out, self.leaf_h0_wt.repeat(1, edge_feats.shape[0], 1)], dim = 0)
         out_c = torch.cat([out, self.leaf_c0_wt.repeat(1, edge_feats.shape[0], 1)], dim = 0)
         print(out_h.shape)
