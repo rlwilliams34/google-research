@@ -31,7 +31,6 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def __init__(self, args):
         super().__init__(args)
-        if args.has_edge_feats:
         self.method = args.method
         
         if method == "MLP-repeat":
