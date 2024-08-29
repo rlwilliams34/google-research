@@ -363,9 +363,9 @@ class RecurTreeGen(nn.Module):
         if self.share_param:
             self.m_l2r_cell = BinaryTreeLSTMCell(args.embed_dim)
             self.lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
-            self.pred_has_ch = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-            self.m_pred_has_left = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-            self.m_pred_has_right = MLP(args.embed_dim, [2 * args.embed_dim, 1])
+            self.pred_has_ch = MLP(args.embed_dim, [2 * args.embed_dim, args.embed_dim, 1])
+            self.m_pred_has_left = MLP(args.embed_dim, [2 * args.embed_dim, args.embed_dim, 1])
+            self.m_pred_has_right = MLP(args.embed_dim, [2 * args.embed_dim, args.embed_dim, 1])
             #self.m_cell_topdown = nn.LSTMCell(args.embed_dim, args.embed_dim)
             #self.m_cell_topright = nn.LSTMCell(args.embed_dim, args.embed_dim)
             ## CHANGED HERE
