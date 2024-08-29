@@ -23,6 +23,8 @@ import pickle as cp
 import torch
 
 
+cmd_opt = argparse.ArgumentParser(description='Argparser for model runs', allow_abbrev=False)
+
 cmd_opt.add_argument('-save_dir', default='.', help='result output root')
 cmd_opt.add_argument('-data_dir', default='.', help='data dir')
 cmd_opt.add_argument('-eval_folder', default=None, help='data eval_dir')
