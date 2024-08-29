@@ -31,8 +31,10 @@ class BiggWithEdgeLen(RecurTreeGen):
     def __init__(self, args):
         super().__init__(args)
         if args.has_edge_feats:
-            self.edgelen_encoding = MLP(1, [32, 16])
-            self.edgeLSTM = MultiLSTMCell(16, args.embed_dim, args.rnn_layers)
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
+            #self.edgeLSTM = MultiLSTMCell(16, args.embed_dim, args.rnn_layers)
+            self.leaf_h0 = 
+            self.leaf_c0 = 
         else:
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
@@ -158,10 +160,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_weights(edge_feats)
         edge_embed = self.edgelen_encoding(edge_feats_normalized)
-        state = self.edgeLSTM(edge_embed, (self.leaf_h0.repeat(1, edge_embed.shape[0], 1), self.leaf_c0.repeat(1, edge_embed.shape[0],1)))
-        return state
-        #out = out.reshape(out.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
-        return out #self.edgelen_encoding(edge_feats_normalized)
+        #state = self.edgeLSTM(edge_embed, (self.leaf_h0.repeat(1, edge_embed.shape[0], 1), self.leaf_c0.repeat(1, edge_embed.shape[0],1)))
+        #return state
+        out = out.reshape(out.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
+        out_h = torch.cat([out_h, self.leaf_h0], dim = 0)
+        out_c = torch.cat([out_h, self.leaf_c0], dim = 0)
+        return (out_h, out_c) #self.edgelen_encoding(edge_feats_normalized)
 
     def predict_node_feats(self, state, node_feats=None):
         """

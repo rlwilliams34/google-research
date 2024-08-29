@@ -346,8 +346,8 @@ class RecurTreeGen(nn.Module):
         self.greedy_frac = args.greedy_frac
         self.share_param = args.share_param
         if not self.bits_compress:
-            self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // (1 + self.has_edge_feats)))
+            self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // (1 + self.has_edge_feats)))
             self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
 
