@@ -164,6 +164,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         out = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim // 2).movedim(0, 1)
         out_h = torch.cat([out, self.leaf_h0.repeat(1, edge_feats.shape[0], 1)], dim = 0)
         out_c = torch.cat([out, self.leaf_c0.repeat(1, edge_feats.shape[0], 1)], dim = 0)
+        print(out_h.shape)
         return (out_h, out_c) #self.edgelen_encoding(edge_feats_normalized)
 
     def predict_node_feats(self, state, node_feats=None):
