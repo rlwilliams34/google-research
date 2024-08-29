@@ -163,12 +163,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         edge_embed = self.edgelen_encoding(edge_feats_normalized)
         #state = self.edgeLSTM(edge_embed, (self.leaf_h0.repeat(1, edge_embed.shape[0], 1), self.leaf_c0.repeat(1, edge_embed.shape[0],1)))
         #return state
-        print(edge_feats.shape)
         out = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim // 2).movedim(0, 1)
-        print(out.shape)
-        out_h = torch.cat([out, self.leaf_h0_wt.repeat(1, edge_feats.shape[0], 1)], dim = 0)
-        out_c = torch.cat([out, self.leaf_c0_wt.repeat(1, edge_feats.shape[0], 1)], dim = 0)
-        print(out_h.shape)
+        out_h = torch.cat([out, self.leaf_h0_wt.repeat(1, edge_feats.shape[0], 1)], dim = -1)
+        out_c = torch.cat([out, self.leaf_c0_wt.repeat(1, edge_feats.shape[0], 1)], dim = -1)
         return (out_h, out_c) #self.edgelen_encoding(edge_feats_normalized)
 
     def predict_node_feats(self, state, node_feats=None):
