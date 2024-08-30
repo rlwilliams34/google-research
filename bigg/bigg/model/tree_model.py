@@ -366,11 +366,11 @@ class RecurTreeGen(nn.Module):
             self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
             self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
             
-            if args.method == "MLP-Leaf":
-                self.empty_h0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
-                self.empty_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
+            #if args.method == "MLP-Leaf":
+            #    self.empty_h0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
+            #    self.empty_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
             
-            else:
+            if True: #else:
                 self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
                 self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
 
@@ -683,6 +683,18 @@ class RecurTreeGen(nn.Module):
                       list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
         ll = 0.0
         ll_wt = 0.0
+        
+        if self.method == "MLP-Leaf":
+            dev = edge_feats.device
+            mask = torch.cat([torch.ones(1, args.embed_dim, device = dev), torch.zeros(1, int(args.embed_dim // 2), device = dev)], dim = -1)
+            self.init_h0 = mask * self.init_h0
+            self.init_c0 = mask * self.init_c0
+            
+            self.empty_h0 = mask * self.empty_h0
+            self.empty_c0 = mask * self.empty_c0
+            
+            
+        
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges)
         
