@@ -190,7 +190,13 @@ class FenwickTree(nn.Module):
     def forward(self, new_state=None):
         if new_state is None:
             if len(self.list_states) == 0:
-                return (self.init_h0, self.init_c0)
+                if self.method == "MLP-Leaf":
+                    dev = self.init_h0.device
+                    mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
+                    return (mask * self.init_h0, mask * self.init_c0)
+                
+                else:
+                    return (self.init_h0, self.init_c0)
         else:
             self.append_state(new_state, 0)
         pos = 0
@@ -454,6 +460,10 @@ class RecurTreeGen(nn.Module):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
         else:
+            if self.method == "MLP-Leaf":
+                    dev = self.init_h0.device
+                    mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
+                    return (mask * self.empty_h0, mask * self.empty_c0)
             return (self.empty_h0, self.empty_c0)
 
     def get_prob_fix(self, prob):
