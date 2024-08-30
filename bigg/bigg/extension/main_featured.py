@@ -261,18 +261,22 @@ if __name__ == '__main__':
         #if epoch >= 20 and epoch < 50:
         #    cmd_args.scale_loss = 100
         
-        if epoch == 100:
+        if epoch >= 100:
             for param_group in optimizer.param_groups:
                 param_group['lr'] = 1e-5
         
-        if epoch >= 100 and epoch < 200:
-            cmd_args.scale_loss = 10
-        
-        elif epoch >= 200 and epoch < 400:
-            cmd_args.scale_loss = 100
-        
-        elif epoch >= 400:
-            cmd_args.scale_loss = 1000
+        if cmd_args.schedule:
+            if epoch < 100:
+                cmd_args.scale_loss = 1
+                
+            if epoch >= 100 and epoch < 200:
+                cmd_args.scale_loss = 10
+            
+            elif epoch >= 200 and epoch < 400:
+                cmd_args.scale_loss = 100
+            
+            elif epoch >= 400:
+                cmd_args.scale_loss = 1000
         
         for idx in pbar:
             start = B * idx

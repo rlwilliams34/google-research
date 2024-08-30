@@ -468,12 +468,6 @@ class RecurTreeGen(nn.Module):
                     edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll = ll + edge_ll
                     edge_embed = self.embed_edge_feats(cur_feats)
-                    #x.unsqueeze(1).repeat(1, 2, 1).shape
-                    #edge_embed = edge_embed.repeat(self.num_layers, 1).unsqueeze(1)
-                    #edge_embed = edge_embed.reshape(self.num_layers, self.embed_dim).unsqueeze(1)
-                    
-                    ## LSTM: Dimensionality == (# Layers, Embed Size)
-                    
                     return ll, edge_embed, 1, cur_feats
                 else:
                     return ll, (self.leaf_h0, self.leaf_c0), 1, None
