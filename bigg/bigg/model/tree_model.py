@@ -461,7 +461,7 @@ class RecurTreeGen(nn.Module):
             return self.bit_rep_net([], 1)
         else:
             if self.method == "MLP-Leaf":
-                    dev = self.init_h0.device
+                    dev = self.empty_h0.device
                     mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
                     return (mask * self.empty_h0, mask * self.empty_c0)
             return (self.empty_h0, self.empty_c0)
