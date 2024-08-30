@@ -84,6 +84,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.sm_wt = False
         self.wt_range = 1.0
         self.wt_scale = 1.0
+        
+        glorot_uniform(self)
 
     # to be customized
     
