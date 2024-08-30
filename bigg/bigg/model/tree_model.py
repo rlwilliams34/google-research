@@ -148,6 +148,7 @@ class FenwickTree(nn.Module):
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
         self.method = args.method
+        self.embed_dim = args.embed_dim
         
         multiplier = 1.0
         if args.method == "MLP-Leaf":
