@@ -147,6 +147,7 @@ class FenwickTree(nn.Module):
         super(FenwickTree, self).__init__()
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
+        self.method = args.method
         
         multiplier = 1.0
         if args.method == "MLP-Leaf":
@@ -216,7 +217,13 @@ class FenwickTree(nn.Module):
         #print("Test")
         #print(list(range(tree_agg_ids)))
         #print("Done")
-        row_embeds = [(self.init_h0, self.init_c0)]
+        if self.method == "MLP-Leaf":
+            dev = self.init_h0.device
+            mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
+            row_embeds = [(mask * self.init_h0, mask * self.init_c0)]
+        
+        else:
+            row_embeds = [(self.init_h0, self.init_c0)]
         #print(row_embeds)
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
@@ -350,6 +357,7 @@ class RecurTreeGen(nn.Module):
         self.directed = args.directed
         
         multiplier = 1.0
+        self.method = args.method
         
         if args.method == "MLP-Leaf":
             multiplier = 1.5
@@ -629,8 +637,19 @@ class RecurTreeGen(nn.Module):
 
         if not self.bits_compress:
             ### CHANGED HERE
-            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
-            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
+            
+            if self.method == "MLP-Leaf":
+                dev = self.empty_h0.device
+                mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
+                
+                h_bot = torch.cat([mask * self.empty_h0, self.leaf_h0], dim=1)
+                c_bot = torch.cat([mask * self.empty_c0, self.leaf_c0], dim=1)
+                
+            
+            else: 
+                h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
+                c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
+            
             fn_hc_bot = lambda d: (h_bot, c_bot)
         else:
             binary_embeds, base_feat = TreeLib.PrepareBinary()
@@ -682,18 +701,7 @@ class RecurTreeGen(nn.Module):
     def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
                       list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
         ll = 0.0
-        ll_wt = 0.0
-        
-        if self.method == "MLP-Leaf":
-            dev = edge_feats.device
-            mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
-            self.init_h0 = mask * self.row_tree.init_h0
-            self.init_c0 = mask * self.row_tree.init_c0
-            
-            self.empty_h0 = mask * self.empty_h0
-            self.empty_c0 = mask * self.empty_c0
-            
-            
+        ll_wt = 0.0        
         
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges)
