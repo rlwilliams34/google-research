@@ -148,7 +148,7 @@ class FenwickTree(nn.Module):
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
         
-        if args.method == "MLP-leaf":
+        if args.method == "MLP-Leaf":
             self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(1.5 * args.embed_dim)))
             self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(1.5 * args.embed_dim)))
         
@@ -346,7 +346,7 @@ class RecurTreeGen(nn.Module):
         self.directed = args.directed
         
         multiplier = 1.0
-        if args.method == "MLP-leaf":
+        if args.method == "MLP-Leaf":
             multiplier = 1.5
         
         self.self_loop = args.self_loop
