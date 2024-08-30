@@ -152,8 +152,14 @@ class FenwickTree(nn.Module):
         if args.method == "MLP-Leaf":
             multiplier = 1.5
         
-        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
-        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+        
+        if args.method == "MLP-Leaf":
+            self.init = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1)
+            self.init_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1)
+        
+        else:
+            self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+            self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
         
         glorot_uniform(self)
         if self.has_node_feats:
@@ -360,8 +366,14 @@ class RecurTreeGen(nn.Module):
         if not self.bits_compress:
             self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
             self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
-            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
-            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+            
+            if args.method == "MLP-Leaf":
+                self.empty_h0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1)
+                self.empty_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1)
+            
+            else:
+                self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+                self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
 
         self.topdown_left_embed = Parameter(torch.Tensor(2, int(multiplier * args.embed_dim)))
         self.topdown_right_embed = Parameter(torch.Tensor(2, int(multiplier * args.embed_dim)))
