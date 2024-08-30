@@ -711,7 +711,7 @@ class RecurTreeGen(nn.Module):
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
                 edge_ll, _ = self.predict_edge_feats(edge_state, target_feats)
-                ll_wt = ll_wt + 
+                ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
             cur_states = (cur_states[0][:, is_nonleaf], cur_states[1][:, is_nonleaf])
