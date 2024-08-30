@@ -147,8 +147,15 @@ class FenwickTree(nn.Module):
         super(FenwickTree, self).__init__()
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
-        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+        
+        if args.method == "MLP-leaf":
+            self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(1.5 * args.embed_dim)))
+            self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(1.5 * args.embed_dim)))
+        
+        else:
+            self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+        
         glorot_uniform(self)
         if self.has_node_feats:
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
@@ -337,6 +344,11 @@ class RecurTreeGen(nn.Module):
         super(RecurTreeGen, self).__init__()
 
         self.directed = args.directed
+        
+        multiplier = 1.0
+        if args.method == "MLP-leaf":
+            multiplier = 1.5
+        
         self.self_loop = args.self_loop
         self.bits_compress = args.bits_compress
         self.has_edge_feats = args.has_edge_feats
@@ -348,11 +360,11 @@ class RecurTreeGen(nn.Module):
         if not self.bits_compress:
             self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
 
-        self.topdown_left_embed = Parameter(torch.Tensor(2, args.embed_dim))
-        self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
+        self.topdown_left_embed = Parameter(torch.Tensor(2, int(multiplier * args.embed_dim)))
+        self.topdown_right_embed = Parameter(torch.Tensor(2, int(multiplier * args.embed_dim)))
         glorot_uniform(self)
         self.num_layers = args.rnn_layers
         self.embed_dim = args.embed_dim
@@ -361,16 +373,16 @@ class RecurTreeGen(nn.Module):
             self.bit_rep_net = BitsRepNet(args)
 
         if self.share_param:
-            self.m_l2r_cell = BinaryTreeLSTMCell(args.embed_dim)
-            self.lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
-            self.pred_has_ch = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-            self.m_pred_has_left = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-            self.m_pred_has_right = MLP(args.embed_dim, [2 * args.embed_dim, 1])
+            self.m_l2r_cell = BinaryTreeLSTMCell(int(multiplier * args.embed_dim))
+            self.lr2p_cell = BinaryTreeLSTMCell(int(multiplier * args.embed_dim))
+            self.pred_has_ch = MLP(int(multiplier * args.embed_dim), [2 * args.embed_dim, 1])
+            self.m_pred_has_left = MLP(int(multiplier * args.embed_dim), [2 * args.embed_dim, 1])
+            self.m_pred_has_right = MLP(int(multiplier * args.embed_dim), [2 * args.embed_dim, 1])
             #self.m_cell_topdown = nn.LSTMCell(args.embed_dim, args.embed_dim)
             #self.m_cell_topright = nn.LSTMCell(args.embed_dim, args.embed_dim)
             ## CHANGED HERE
-            self.m_cell_topdown = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
-            self.m_cell_topright = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
+            self.m_cell_topdown = MultiLSTMCell(args.embed_dim, int(multiplier * args.embed_dim), args.rnn_layers)
+            self.m_cell_topright = MultiLSTMCell(args.embed_dim, int(multiplier * args.embed_dim), args.rnn_layers)
         else:
             fn_pred = lambda: MLP(args.embed_dim, [2 * args.embed_dim, 1])
             fn_tree_cell = lambda: BinaryTreeLSTMCell(args.embed_dim)

@@ -33,6 +33,13 @@ class BiggWithEdgeLen(RecurTreeGen):
         super().__init__(args)
         self.method = args.method
         
+        self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
+        self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
+        
+        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1])
+        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1])
+        self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
+        
         if self.method == "MLP-repeat":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
             
@@ -48,17 +55,13 @@ class BiggWithEdgeLen(RecurTreeGen):
             #self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
         
         if self.method == "MLP-Leaf":
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers // 2])
-            self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
-            self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
-        
-        self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
-        self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-        
-        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-        self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
-        
+            self.edgelen_encoding = MLP(1, [args.embed_dim, args.embed_dim * args.rnn_layers // 2])
+            self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            
+            self.edgelen_mean = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1])
+            self.edgelen_lvar = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1])
+            
         self.embed_dim = args.embed_dim
         self.num_layers = args.rnn_layers
         
