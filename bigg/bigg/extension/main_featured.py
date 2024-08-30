@@ -272,10 +272,10 @@ if __name__ == '__main__':
             if epoch >= 100 and epoch < 200:
                 cmd_args.scale_loss = 10
             
-            elif epoch >= 200 and epoch < 400:
+            elif epoch >= 200 and epoch < 300:
                 cmd_args.scale_loss = 100
             
-            elif epoch >= 400:
+            elif epoch >= 300:
                 cmd_args.scale_loss = 1000
         
         for idx in pbar:
