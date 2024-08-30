@@ -148,21 +148,20 @@ class FenwickTree(nn.Module):
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
         
+        multipler = 1.0
         if args.method == "MLP-Leaf":
-            self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(1.5 * args.embed_dim)))
-            self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(1.5 * args.embed_dim)))
+            multiplier = 1.5
         
-        else:
-            self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
         
         glorot_uniform(self)
         if self.has_node_feats:
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
-        self.merge_cell = BinaryTreeLSTMCell(args.embed_dim)
-        self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
+        self.merge_cell = BinaryTreeLSTMCell(int(multiplier * args.embed_dim))
+        self.summary_cell = BinaryTreeLSTMCell(int(multiplier * args.embed_dim))
         if args.pos_enc:
-            self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
+            self.pos_enc = PosEncoding(int(multiplier * args.embed_dim), args.device, args.pos_base)
         else:
             self.pos_enc = lambda x: 0
 
