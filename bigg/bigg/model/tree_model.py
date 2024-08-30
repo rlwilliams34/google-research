@@ -696,6 +696,7 @@ class RecurTreeGen(nn.Module):
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
         ll = ll + self.binary_ll(logit_has_edge, has_ch)
+        print(ll)
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
 
         lv = 0
@@ -708,6 +709,7 @@ class RecurTreeGen(nn.Module):
                 target_feats = edge_feats[edge_of_lv]
                 edge_ll, _ = self.predict_edge_feats(edge_state, target_feats)
                 ll_wt = ll_wt + edge_ll
+                print(ll_wt)
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
             cur_states = (cur_states[0][:, is_nonleaf], cur_states[1][:, is_nonleaf])
@@ -716,6 +718,7 @@ class RecurTreeGen(nn.Module):
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
             ll = ll + left_ll
+            print(ll)
 
             cur_states = self.cell_topdown(left_update, cur_states, lv)
 
@@ -746,6 +749,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
             right_ll = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
             ll = ll + torch.sum(right_ll)
+            print(ll)
             lr_ids = TreeLib.GetLeftRightSelect(lv, np.sum(has_left), np.sum(has_right))
             new_states = []
             for i in range(2):
@@ -754,5 +758,6 @@ class RecurTreeGen(nn.Module):
                 new_states.append(new_s)
             cur_states = tuple(new_states)
             lv += 1
+            print(STOP)
 
         return ll, ll_wt, next_states
