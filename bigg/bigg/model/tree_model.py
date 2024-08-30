@@ -148,7 +148,7 @@ class FenwickTree(nn.Module):
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
         
-        multipler = 1.0
+        multiplier = 1.0
         if args.method == "MLP-Leaf":
             multiplier = 1.5
         
@@ -683,7 +683,6 @@ class RecurTreeGen(nn.Module):
                       list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
         ll = 0.0
         ll_wt = 0.0
-        print(self.empty_h0)
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges)
         
