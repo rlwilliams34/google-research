@@ -374,8 +374,8 @@ class RecurTreeGen(nn.Module):
                 self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
                 self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
 
-        self.topdown_left_embed = Parameter(torch.Tensor(2, int(multiplier * args.embed_dim)))
-        self.topdown_right_embed = Parameter(torch.Tensor(2, int(multiplier * args.embed_dim)))
+        self.topdown_left_embed = Parameter(torch.Tensor(2,  args.embed_dim))
+        self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
         glorot_uniform(self)
         self.num_layers = args.rnn_layers
         self.embed_dim = args.embed_dim
