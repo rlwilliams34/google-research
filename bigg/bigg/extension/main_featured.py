@@ -308,9 +308,6 @@ if __name__ == '__main__':
             loss_wt = -ll_wt / num_nodes
             top_losses.append(loss_top.item())
             
-            print(loss_top)
-            print(loss_wt)
-            
             if cmd_args.has_edge_feats or cmd_args.test_gcn:
                 wt_losses.append(loss_wt.item())
             
