@@ -270,7 +270,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_feats_invsp = torch.log(torch.special.expm1(edge_feats))
             
             ### Standardize
-            edge_feats_invsp = standardize_weights(edge_feats_invsp)
+            edge_feats_invsp = self.standardize_weights(edge_feats_invsp)
             
             ## MEAN AND VARIANCE OF LOGNORMAL
             var = torch.exp(lvars) 
