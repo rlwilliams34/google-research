@@ -183,19 +183,19 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_edge_feats(edge_feats)
         
-        if self.method == "MLP-repeat":
+        if self.method == "MLP-Repeat":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
-        if self.method == "MLP-multi":
+        if self.method == "MLP-Multi":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
-        if self.method == "MLP-double":
+        if self.method == "MLP-Double":
             edge_embed_h = self.edgelen_encoding_h(edge_feats_normalized)
             edge_embed_h = edge_embed_h.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
             
