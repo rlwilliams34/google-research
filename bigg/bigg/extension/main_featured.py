@@ -253,8 +253,9 @@ if __name__ == '__main__':
     
     if cmd_args.epoch_load is None:
         cmd_args.epoch_load = 0
-        
-    cmd_args.scale_loss = 1
+    
+    if not cmd_args.schedule:
+        cmd_args.scale_loss = 1
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
@@ -543,12 +544,12 @@ if __name__ == '__main__':
 #         print(pred_edge_feats)
         
 
-path = os.path.join(os.getcwd(), 'tree-time-data.pkl')
-with open(path, 'rb') as f:
-    stats = cp.load(f)
-
-df = pd.DataFrame(stats)
-df.to_csv('tree_time_results.csv')
+# path = os.path.join(os.getcwd(), 'tree-time-data.pkl')
+# with open(path, 'rb') as f:
+#     stats = cp.load(f)
+# 
+# df = pd.DataFrame(stats)
+# df.to_csv('tree_time_results.csv')
         
         
         
