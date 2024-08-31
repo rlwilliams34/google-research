@@ -290,7 +290,7 @@ if __name__ == '__main__':
             
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
-            print(edge_feats.shape)
+            print(list_edge_feats)
             
             if cmd_args.test_gcn:
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
