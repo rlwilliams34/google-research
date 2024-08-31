@@ -254,7 +254,7 @@ if __name__ == '__main__':
     if cmd_args.epoch_load is None:
         cmd_args.epoch_load = 0
     
-    if not cmd_args.schedule:
+    if cmd_args.schedule:
         cmd_args.scale_loss = 1
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
@@ -308,7 +308,7 @@ if __name__ == '__main__':
             
             true_loss = -(ll + ll_wt) / num_nodes
             true_loss = true_loss.item()
-            
+            print(cmd_args.scale_loss)
             loss = -(ll * cmd_args.scale_loss + ll_wt) / (num_nodes * cmd_args.accum_grad)
             loss.backward()
             grad_accum_counter += 1
