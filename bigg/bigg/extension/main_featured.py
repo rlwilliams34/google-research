@@ -261,6 +261,13 @@ if __name__ == '__main__':
         tot_loss = 0.0
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
+        print(epoch)
+        if epoch == 0 and cmd_args.has_edge_feats:
+            for i in range(len(list_edge_feats)):
+                edge_feats = list_edge_feats[i]
+                model.update_weight_stats(edge_feats)
+            print(model.mu_wt)
+            print(model.var_wt)
         
         if cmd_args.test_gcn:
             model.gcn_mod.epoch_num += 1
@@ -290,7 +297,6 @@ if __name__ == '__main__':
             
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
-            print(list_edge_feats)
             
             if cmd_args.test_gcn:
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
