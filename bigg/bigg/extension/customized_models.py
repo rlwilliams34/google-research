@@ -216,7 +216,27 @@ class BiggWithEdgeLen(RecurTreeGen):
             out_h = torch.cat([self.leaf_h0_wt.repeat(1, edge_feats.shape[0], 1), out], dim = -1)
             out_c = torch.cat([self.leaf_c0_wt.repeat(1, edge_feats.shape[0], 1), out], dim = -1)
             return (out_h, out_c) 
-
+            
+    
+    def compute_softminus(self, edge_feats, threshold = 20):
+      '''
+      Computes 'softminus' of weights: log(exp(w) - 1). For numerical stability,
+      reverts to linear function if w > 20.
+      
+      Args Used:
+        x_adj: adjacency vector at this iteration
+        threshold: threshold value to revert to linear function
+      
+      Returns:
+        x_sm: adjacency vector with softminus applied to weight entries
+      '''
+      x_thresh = (edge_feats <= threshold).float()
+      x_sm = torch.mul(x_adj, x_thresh)
+      x_sm = torch.log(torch.special.expm1(x_sm))
+      x_sm = x_sm + torch.mul(edge_feats, 1 - x_thresh)
+      return x_sm
+    
+    
     def predict_node_feats(self, state, node_feats=None):
         """
         Args:
@@ -259,17 +279,17 @@ class BiggWithEdgeLen(RecurTreeGen):
             pred_lvar = lvars
             pred_sd = torch.exp(0.5 * pred_lvar)
             edge_feats = torch.normal(pred_mean, pred_sd)
-            #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
+            edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
             edge_feats = torch.nn.functional.softplus(edge_feats)
             
         else:
             ### Update log likelihood with weight prediction
             
             ### Trying with softplus parameterization...
-            edge_feats_invsp = torch.log(torch.special.expm1(edge_feats))
+            edge_feats_invsp = self.compute_softminus(edge_feats)
             
             ### Standardize
-            #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
+            edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
             
             ## MEAN AND VARIANCE OF LOGNORMAL
             var = torch.exp(lvars) 
