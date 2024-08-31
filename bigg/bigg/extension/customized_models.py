@@ -93,45 +93,45 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     # to be customized
     
-    def standardize_weights(self, weights): 
+    def standardize_edge_feats(self, edge_feats): 
       if self.log_wt:
-        weights = torch.log(weights)
+        edge_feats = torch.log(edge_feats)
       
       elif self.sm_wt:
-        weights = torch.log(torch.exp(weights) - 1)
+        edge_feats = torch.log(torch.special.expm1(edge_feats))
       
       if self.mode == "none":
-        return weights
+        return edge_feats
       
       if self.epoch_num == 1:
-        self.update_weight_stats(weights)
+        self.update_weight_stats(edge_feats)
       
       if self.mode == "score":
-        weights = (weights - self.mu_wt) / (self.var_wt**0.5 + 1e-15)
+        edge_feats = (edge_feats - self.mu_wt) / (self.var_wt**0.5 + 1e-15)
           
       elif self.mode == "normalize":
-        weights = -1 + 2 * (weights - self.min_wt) / (self.max_wt - self.min_wt + 1e-15)
-        weights = self.wt_range * weights
+        edge_feats = -1 + 2 * (edge_feats - self.min_wt) / (self.max_wt - self.min_wt + 1e-15)
+        edge_feats = self.wt_range * edge_feats
       
       elif self.mode == "scale":
-        weights = weights * self.wt_scale
+        edge_feats = edge_feats * self.wt_scale
       
       elif self.mode == "exp":
-        weights = torch.exp(-1/weights)
+        edge_feats = torch.exp(-1/edge_feats)
       
       elif self.mode == "exp-log":
-        weights = torch.exp(-1 / torch.log(1 + weights))
+        edge_feats = torch.exp(-1 / torch.log(1 + edge_feats))
         
-      return weights
+      return edge_feats
   
-    def update_weight_stats(self, weights):
+    def update_weight_stats(self, edge_feats):
       '''
-      Updates global mean and standard deviation of weights per batch if
-      standardizing weights prior to MLP embedding. Only performed during the
+      Updates necessary global statistics (mean, variance, min, max) of edge_feats per batch
+      if standardizing edge_feats prior to MLP embedding. Only performed during the
       first epoch of training.
       
       Args Used:
-        weights: weights from current iteration batch
+        edge_feats: edge_feats from current iteration batch
       '''
       
       ## Current training weight statistics
@@ -142,14 +142,14 @@ class BiggWithEdgeLen(RecurTreeGen):
           n = self.n_obs
           
           ## New weight statistics
-          m = len(weights)
+          m = len(edge_feats)
           
           if m > 1:
-            var_m = torch.var(weights)
+            var_m = torch.var(edge_feats)
           else:
             var_m = 0.0
             
-          mu_m = torch.mean(weights)
+          mu_m = torch.mean(edge_feats)
           tot = n + m
           
           if tot == 1:
@@ -171,8 +171,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.n_obs += m
         
         elif self.mode == "normalize":
-          batch_max = weights.max()
-          batch_min = weights.min()
+          batch_max = edge_feats.max()
+          batch_min = edge_feats.min()
           self.min_wt = torch.min(batch_min, self.min_wt)
           self.max_wt = torch.max(batch_max, self.max_wt)
     
@@ -181,8 +181,8 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def embed_edge_feats(self, edge_feats):
         if self.epoch_num == 0:
-            self.update_weight_stats(torch.log(torch.special.expm1(edge_feats)))
-        edge_feats_normalized = self.standardize_weights(torch.log(torch.special.expm1(edge_feats)))
+            self.update_weight_stats(edge_feats)
+        edge_feats_normalized = self.standardize_edge_feats(edge_feats)
         
         if self.method == "MLP-repeat":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
@@ -260,7 +260,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             pred_lvar = lvars
             pred_sd = torch.exp(0.5 * pred_lvar)
             edge_feats = torch.normal(pred_mean, pred_sd)
-            edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
+            #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
             edge_feats = torch.nn.functional.softplus(edge_feats)
             
         else:
@@ -270,7 +270,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_feats_invsp = torch.log(torch.special.expm1(edge_feats))
             
             ### Standardize
-            edge_feats_invsp = self.standardize_weights(edge_feats_invsp)
+            #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
             
             ## MEAN AND VARIANCE OF LOGNORMAL
             var = torch.exp(lvars) 

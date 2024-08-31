@@ -96,6 +96,11 @@ def debug_model(model, graph, node_feats, edge_feats):
     import sys
     sys.exit()
 
+def fix_tree_weights(graphs):
+    for g in graphs:
+        for (n1, n2, w) in g.edges(data=True):
+            g[n1][n2]['weight'] = w['weight'] / 10
+    return graphs
 
 if __name__ == '__main__':
     random.seed(cmd_args.seed)
@@ -109,6 +114,8 @@ if __name__ == '__main__':
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
+    if cmd_args.g_type == 'tree':
+        train_graphs = fix_tree_weights(train_graphs)
     #path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'val')
     #with open(path, 'rb') as f:
     #    val_graphs = cp.load(f)
@@ -164,6 +171,8 @@ if __name__ == '__main__':
         with open(path, 'rb') as f:
             gt_graphs = cp.load(f)
         
+        if cmd_args.g_type == 'tree':
+            gt_graphs = fix_tree_weights(gt_graphs)
         print('# gt graphs', len(gt_graphs))
         
         gen_graphs = []
@@ -540,8 +549,13 @@ if __name__ == '__main__':
 #         print(pred_node_feats)
 #         print(pred_edge_feats)
         
-        
-        
+
+path = os.path.join(os.getcwd(), 'tree-time-data.pkl')
+with open(path, 'rb') as f:
+    stats = cp.load(f)
+
+df = pd.DataFrame(stats)
+df.to_csv('tree_time_results.csv')
         
         
         
