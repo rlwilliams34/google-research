@@ -89,7 +89,7 @@ cmd_opt.add_argument('-min_nodes', default=5, type=int, help='leaves in trees')
 cmd_opt.add_argument('-max_nodes', default=100, type=int, help='leaves in trees')
 cmd_opt.add_argument('-wt_mode', default='None', type=str, help='mode to standardize weights')
 cmd_opt.add_argument('-save_every', default=10, type=int, help='mode to standardize weights')
-cmd_opt.add_argument('-method', default='MLP-repeat', type=str, help='mode to standardize weights')
+cmd_opt.add_argument('-method', default='MLP-Repeat', type=str, help='mode to standardize weights')
 
 
 ## GCN

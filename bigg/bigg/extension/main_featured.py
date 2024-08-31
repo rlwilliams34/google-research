@@ -96,11 +96,11 @@ def debug_model(model, graph, node_feats, edge_feats):
     import sys
     sys.exit()
 
-def fix_tree_weights(graphs):
-    for g in graphs:
-        for (n1, n2, w) in g.edges(data=True):
-            g[n1][n2]['weight'] = w['weight'] / 10
-    return graphs
+# def fix_tree_weights(graphs):
+#    for g in graphs:
+#        for (n1, n2, w) in g.edges(data=True):
+#            g[n1][n2]['weight'] = w['weight'] / 10
+#    return graphs
 
 if __name__ == '__main__':
     random.seed(cmd_args.seed)
@@ -114,15 +114,15 @@ if __name__ == '__main__':
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
-    if cmd_args.g_type == 'tree':
-        train_graphs = fix_tree_weights(train_graphs)
+    #if cmd_args.g_type == 'tree':
+    #    train_graphs = fix_tree_weights(train_graphs)
     #path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'val')
     #with open(path, 'rb') as f:
     #    val_graphs = cp.load(f)
     
     [TreeLib.InsertGraph(g) for g in train_graphs]
     print(train_graphs[0].edges(data=True))
-
+    
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
     print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
@@ -171,8 +171,8 @@ if __name__ == '__main__':
         with open(path, 'rb') as f:
             gt_graphs = cp.load(f)
         
-        if cmd_args.g_type == 'tree':
-            gt_graphs = fix_tree_weights(gt_graphs)
+        #if cmd_args.g_type == 'tree':
+        #    gt_graphs = fix_tree_weights(gt_graphs)
         print('# gt graphs', len(gt_graphs))
         
         gen_graphs = []
@@ -266,13 +266,6 @@ if __name__ == '__main__':
         
         else:
             model.epoch_num += 1
-        
-        #if epoch >= 20 and epoch < 50:
-        #    cmd_args.scale_loss = 100
-        
-        if epoch >= 100:
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = 1e-5
         
         if cmd_args.schedule:
             if epoch < 100:

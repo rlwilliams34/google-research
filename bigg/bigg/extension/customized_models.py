@@ -40,13 +40,13 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
-        if self.method == "MLP-repeat":
+        if self.method == "MLP-Repeat":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
             
-        if self.method == "MLP-multi":
+        if self.method == "MLP-Multi":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
         
-        if self.method == "MLP-double":
+        if self.method == "MLP-Double":
             self.edgelen_encoding_h = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
             self.edgelen_encoding_c = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
         
@@ -154,7 +154,6 @@ class BiggWithEdgeLen(RecurTreeGen):
           
           if tot == 1:
             self.mu_wt = mu_m
-            self.var_wt = var_m
             self.n_obs = tot
          
           else:
