@@ -261,13 +261,11 @@ if __name__ == '__main__':
         tot_loss = 0.0
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
-        print(epoch)
+        
         if epoch == 0 and cmd_args.has_edge_feats:
             for i in range(len(list_edge_feats)):
                 edge_feats = list_edge_feats[i]
                 model.update_weight_stats(edge_feats)
-            print(model.mu_wt)
-            print(model.var_wt)
         
         if cmd_args.test_gcn:
             model.gcn_mod.epoch_num += 1
@@ -309,6 +307,9 @@ if __name__ == '__main__':
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
             top_losses.append(loss_top.item())
+            
+            print(loss_top)
+            print(loss_wt)
             
             if cmd_args.has_edge_feats or cmd_args.test_gcn:
                 wt_losses.append(loss_wt.item())
