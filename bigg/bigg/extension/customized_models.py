@@ -46,6 +46,10 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "MLP-multi":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
         
+        if self.method == "MLP-double":
+            self.edgelen_encoding_h = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
+            self.edgelen_encoding_c = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
+        
         if self.method == "LSTM":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
             self.edgeLSTM = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
@@ -177,7 +181,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def embed_edge_feats(self, edge_feats):
         if self.epoch_num == 0:
-            self.update_weight_stats(edge_feats)
+            self.update_weight_stats(torch.log(torch.special.expm1(edge_feats)))
         edge_feats_normalized = self.standardize_weights(edge_feats)
         
         if self.method == "MLP-repeat":
@@ -190,6 +194,16 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
             edge_embed = (edge_embed, edge_embed)
+            return edge_embed
+        
+        if self.method == "MLP-double":
+            edge_embed_h = self.edgelen_encoding_h(edge_feats_normalized)
+            edge_embed_h = edge_embed_h.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
+            
+            edge_embed_c = self.edgelen_encoding_c(edge_feats_normalized)
+            edge_embed_c = edge_embed_c.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
+            
+            edge_embed = (edge_embed_h, edge_embed_c)
             return edge_embed
         
         if self.method == "LSTM":
@@ -246,6 +260,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             pred_lvar = lvars
             pred_sd = torch.exp(0.5 * pred_lvar)
             edge_feats = torch.normal(pred_mean, pred_sd)
+            edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
             edge_feats = torch.nn.functional.softplus(edge_feats)
             
         else:
@@ -253,6 +268,9 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             ### Trying with softplus parameterization...
             edge_feats_invsp = torch.log(torch.special.expm1(edge_feats))
+            
+            ### Standardize
+            edge_feats_invsp = standardize_weights(edge_feats_invsp)
             
             ## MEAN AND VARIANCE OF LOGNORMAL
             var = torch.exp(lvars) 
