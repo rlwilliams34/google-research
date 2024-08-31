@@ -231,8 +231,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         x_sm: adjacency vector with softminus applied to weight entries
       '''
       x_thresh = (edge_feats <= threshold).float()
-      x_sm = torch.mul(x_adj, x_thresh)
       x_sm = torch.log(torch.special.expm1(x_sm))
+      x_sm = torch.mul(x_sm, x_thresh)
       x_sm = x_sm + torch.mul(edge_feats, 1 - x_thresh)
       return x_sm
     
