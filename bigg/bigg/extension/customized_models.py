@@ -65,7 +65,14 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             self.edgelen_mean = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1])
             self.edgelen_lvar = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1])
+        
+        if self.method == "MLP-Dropout":
+            self.edgelen_encoding_h = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = 0.7)
+            self.edgelen_encoding_c = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = 0.7)
             
+            self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = 0.7)
+        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = 0.7)
+        
         self.embed_dim = args.embed_dim
         self.num_layers = args.rnn_layers
         
@@ -190,7 +197,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
-        if self.method == "MLP-Multi":
+        if self.method == "MLP-Multi" or self.method == "MLP-Dropout":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
             edge_embed = (edge_embed, edge_embed)
