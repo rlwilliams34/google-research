@@ -177,6 +177,7 @@ if __name__ == '__main__':
         
         gen_graphs = []
         with torch.no_grad():
+            model.eval()
             for _ in tqdm(range(cmd_args.num_test_gen)):
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
@@ -257,6 +258,7 @@ if __name__ == '__main__':
     if cmd_args.schedule:
         cmd_args.scale_loss = 1
     
+    model.train()
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
         pbar = tqdm(range(num_iter))
