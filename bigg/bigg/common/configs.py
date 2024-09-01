@@ -91,6 +91,9 @@ cmd_opt.add_argument('-wt_mode', default='None', type=str, help='mode to standar
 cmd_opt.add_argument('-save_every', default=10, type=int, help='mode to standardize weights')
 cmd_opt.add_argument('-method', default='MLP-Repeat', type=str, help='mode to standardize weights')
 
+cmd_opt.add_argument('-wt_drop', default=-1, type=float, help='dropout for weight MLPs. -1 signifies NO dropout')
+
+
 
 ## GCN
 cmd_opt.add_argument('-node_embed_dim', default=256, type=int, help='embed size')

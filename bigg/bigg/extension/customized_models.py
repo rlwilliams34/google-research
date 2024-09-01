@@ -36,41 +36,35 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         
-        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1])
-        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1])
+        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
+        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
         if self.method == "MLP-Repeat":
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
             
         if self.method == "MLP-Multi":
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = cmd_args.wt_drop)
         
         if self.method == "MLP-Double":
-            self.edgelen_encoding_h = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
-            self.edgelen_encoding_c = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers])
+            self.edgelen_encoding_h = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = cmd_args.wt_drop)
+            self.edgelen_encoding_c = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = cmd_args.wt_drop)
         
         if self.method == "LSTM":
-            self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim])
-            self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+            self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
+            self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers, dropout = cmd_args.wt_drop)
             #self.edgelen_encoding = MLP(1, [32, 16])
             
             #self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
             #self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
         
         if self.method == "MLP-Leaf":
-            self.edgelen_encoding = MLP(1, [args.embed_dim, args.embed_dim * args.rnn_layers // 2])
+            self.edgelen_encoding = MLP(1, [args.embed_dim, args.embed_dim * args.rnn_layers // 2], dropout = cmd_args.wt_drop)
             self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             
-            self.edgelen_mean = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1])
-            self.edgelen_lvar = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1])
-        
-        if self.method == "MLP-Dropout":
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = 0.7)
-            
-            self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = 0.7)
-            self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = 0.7)
+            self.edgelen_mean = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
+            self.edgelen_lvar = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         
         self.embed_dim = args.embed_dim
         self.num_layers = args.rnn_layers
@@ -196,7 +190,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
-        if self.method == "MLP-Multi" or self.method == "MLP-Dropout":
+        if self.method == "MLP-Multi":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim).movedim(0, 1)
             edge_embed = (edge_embed, edge_embed)
