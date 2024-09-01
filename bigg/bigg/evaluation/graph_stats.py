@@ -242,35 +242,59 @@ def group_lobster_nodes(g):
     return backbone, one_hop, two_hop
 
 
+# def lobster_weight_statistics(graphs):
+#     means_1, means_2, means_3 = [], [], []
+#     
+#     for g in graphs:
+#         edge_1, edge_2, edge_3 = group_lobster_edges(g)
+#         
+#         if len(edge_1) > 0:
+#             means_1.append(np.mean(edge_1))
+#         
+#         if len(edge_2) > 0:
+#             means_2.append(np.mean(edge_2))
+#         
+#         if len(edge_3) > 0:
+#             means_3.append(np.mean(edge_3))
+#     
+#     mu_1_lo = np.percentile(means_1, 2.5)
+#     mu_1_hi = np.percentile(means_1, 97.5)
+#     print("Mean 1 Estimate", np.mean(means_1))
+#     print('Empirical Interval: ', ' (' + str(mu_1_lo) + ',' + str(mu_1_hi) + ')')
+#     
+#     mu_2_lo = np.percentile(means_2, 2.5)
+#     mu_2_hi = np.percentile(means_2, 97.5)
+#     print("Mean 2 Estimate", np.mean(means_2))
+#     print('Empirical Interval: ', ' (' + str(mu_2_lo) + ',' + str(mu_2_hi) + ')')
+#     
+#     mu_3_lo = np.percentile(means_3, 2.5)
+#     mu_3_hi = np.percentile(means_3, 97.5)
+#     print("Mean 3 Estimate", np.mean(means_3))
+#     print('Empirical Interval: ', ' (' + str(mu_3_lo) + ',' + str(mu_3_hi) + ')')
+
 def lobster_weight_statistics(graphs):
-    means_1, means_2, means_3 = [], [], []
+    means = []
+    vars_ = []
     
     for g in graphs:
-        edge_1, edge_2, edge_3 = group_lobster_edges(g)
+        weights = []
+        for (n1, n2) in g.edges():
+            weights.append(g[n1][n2]['weight'])
         
-        if len(edge_1) > 0:
-            means_1.append(np.mean(edge_1))
+        means.append(np.mean(weights))
+        vars_.append(np.var(weights, ddof = 1))
         
-        if len(edge_2) > 0:
-            means_2.append(np.mean(edge_2))
-        
-        if len(edge_3) > 0:
-            means_3.append(np.mean(edge_3))
+    mu_lo = np.percentile(means, 2.5)
+    mu_hi = np.percentile(means, 97.5)
+    print("Mean Estimate", np.mean(means))
+    print('Empirical Interval: ', ' (' + str(mu_lo) + ',' + str(mu_hi) + ')')   
     
-    mu_1_lo = np.percentile(means_1, 2.5)
-    mu_1_hi = np.percentile(means_1, 97.5)
-    print("Mean 1 Estimate", np.mean(means_1))
-    print('Empirical Interval: ', ' (' + str(mu_1_lo) + ',' + str(mu_1_hi) + ')')
+    var_lo = np.percentile(vars_, 2.5)
+    var_hi = np.percentile(vars_, 97.5)
+    print("Var Estimate", np.mean(vars_))
+    print('Empirical Interval: ', ' (' + str(var_lo) + ',' + str(var_hi) + ')')    
     
-    mu_2_lo = np.percentile(means_2, 2.5)
-    mu_2_hi = np.percentile(means_2, 97.5)
-    print("Mean 2 Estimate", np.mean(means_2))
-    print('Empirical Interval: ', ' (' + str(mu_2_lo) + ',' + str(mu_2_hi) + ')')
-    
-    mu_3_lo = np.percentile(means_3, 2.5)
-    mu_3_hi = np.percentile(means_3, 97.5)
-    print("Mean 3 Estimate", np.mean(means_3))
-    print('Empirical Interval: ', ' (' + str(mu_3_lo) + ',' + str(mu_3_hi) + ')')
+            
 
 def tree_weight_statistics(graphs, transform = False):
   ## Returns summary statistics on weights for graphs

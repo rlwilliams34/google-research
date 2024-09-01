@@ -98,7 +98,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         edge_feats = torch.log(edge_feats)
       
       elif self.sm_wt:
-        edge_feats = torch.log(torch.special.expm1(edge_feats))
+        edge_feats = self.compute_softminus(edge_feats)
       
       if self.mode == "none":
         return edge_feats
