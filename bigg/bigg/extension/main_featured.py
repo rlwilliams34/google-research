@@ -353,6 +353,7 @@ if __name__ == '__main__':
         
         if cur % cmd_args.epoch_save == 0 and cur >= 20:
             print('validating')
+            model.eval()
             
             gen_graphs = []
             with torch.no_grad():
@@ -386,6 +387,7 @@ if __name__ == '__main__':
 #             print("NUMBER GRAPHS:", len(gen_graphs))
 #             for g in gen_graphs:
 #                 print(g.edges(data=True))
+            model.train()
             if val_size > 0:
                 print("Generating Graph Stats")
                 get_graph_stats(gen_graphs, None, cmd_args.g_type)
