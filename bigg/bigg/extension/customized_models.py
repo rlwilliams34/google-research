@@ -36,8 +36,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         
-        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1])#, dropout = cmd_args.wt_drop)
-        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1])#, dropout = cmd_args.wt_drop)
+        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
+        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
         if self.method == "MLP-Repeat":
@@ -52,7 +52,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "LSTM":
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
-            self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+            self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers, dropout = cmd_args.wt_drop)
             #self.edgelen_encoding = MLP(1, [32, 16])
             
             #self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
@@ -98,7 +98,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         edge_feats = torch.log(edge_feats)
       
       elif self.sm_wt:
-        edge_feats = self.compute_softminus(edge_feats)
+        edge_feats = torch.log(torch.special.expm1(edge_feats))
       
       if self.mode == "none":
         return edge_feats
@@ -319,4 +319,5 @@ class BiggWithGCN(RecurTreeGen):
         ll_top, _, _ = self.forward_train(batch_indices)
         ll_wt = self.gcn_mod.forward(feat_idx, edge_list, batch_weight_idx)
         return ll_top, ll_wt
+    
     
