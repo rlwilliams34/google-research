@@ -540,7 +540,7 @@ class RecurTreeGen(nn.Module):
                 print(left_edge_feats.shape)
                 print(" ")
                 test = self.embed_edge_feats(left_edge_feats)
-                test2 = torch.sum(torch.square(test - left_state[0]))
+                test2 = torch.sum(torch.square(test[0] - left_state[0]))
                 print(test2)
             else:
                 left_state = self.get_empty_state()
