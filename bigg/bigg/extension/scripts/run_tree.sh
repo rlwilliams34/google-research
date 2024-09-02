@@ -50,6 +50,7 @@ python ../main_featured.py \
   -has_node_feats 0 \
   -has_edge_feats 1 \
   -rnn_layers 2 \
+  -scale_loss 20 \
   -accum_grad $accum_grad \
   $@
 
