@@ -562,6 +562,7 @@ class RecurTreeGen(nn.Module):
 
             if has_right:  # has edge in right child
                 ll, right_state, num_right, right_edge_feats = self.gen_row(ll, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats)
+                print(right_edge_feats)
                 pred_edge_feats.append(right_edge_feats)
             else:
                 right_state = self.get_empty_state()
