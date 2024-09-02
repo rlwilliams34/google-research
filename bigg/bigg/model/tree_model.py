@@ -563,6 +563,7 @@ class RecurTreeGen(nn.Module):
             if has_right:  # has edge in right child
                 ll, right_state, num_right, right_edge_feats = self.gen_row(ll, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats)
                 print(right_edge_feats)
+                print(right_edge_feats.shape)
                 print(" ")
                 pred_edge_feats.append(right_edge_feats)
             else:
@@ -574,8 +575,8 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.lr2p_cell(left_state, right_state)
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
-            print("EDGE FEATS")
-            print(edge_feats)
+            #print("EDGE FEATS")
+            #print(edge_feats)
             return ll, summary_state, num_left + num_right, edge_feats
 
     def forward(self, node_end, edge_list=None, node_feats=None, edge_feats=None, node_start=0, list_states=[], lb_list=None, ub_list=None, col_range=None, num_nodes=None, display=False):
