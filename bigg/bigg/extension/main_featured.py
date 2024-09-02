@@ -238,10 +238,11 @@ if __name__ == '__main__':
         
         sys.exit()
     #########################################################################################################
-    val_size_dict = {'lobster': 50, 'tree': 20, 'db': 0, 'er': 0}
+    val_size_dict = {'lobster': 50, 'tree': 50, 'db': 0, 'er': 0}
     top_losses = []
     wt_losses = []
     best_loss = np.inf
+    best_prop = 0
     
     N = len(train_graphs)
     B = cmd_args.batch_size
@@ -276,17 +277,11 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         if cmd_args.schedule:
-            if epoch < 100:
-                cmd_args.scale_loss = 1
-                
-            if epoch >= 100 and epoch < 200:
-                cmd_args.scale_loss = 10
+            cmd_args.scale_loss = 20
             
-            elif epoch >= 200 and epoch < 300:
-                cmd_args.scale_loss = 100
-            
-            elif epoch >= 300:
-                cmd_args.scale_loss = 1000
+            if epoch >= 100:
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = 1e-5
         
         for idx in pbar:
             start = B * idx
@@ -351,7 +346,7 @@ if __name__ == '__main__':
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
         
-        if cur % cmd_args.epoch_save == 0 and cur >= 20:
+        if cur % cmd_args.val_every == 0:
             print('validating')
             model.eval()
             
@@ -390,7 +385,16 @@ if __name__ == '__main__':
             model.train()
             if val_size > 0:
                 print("Generating Graph Stats")
-                get_graph_stats(gen_graphs, None, cmd_args.g_type)
+                prop = get_graph_stats(gen_graphs, None, cmd_args.g_type)
+                
+                if prop > best_prop:
+                    best_prop = prop
+                    best_prop_epoch = epoch + 1
+                    print('Saving best prop model')
+                    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+                    torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
+    print('best prop: ', best_prop)
+    print('best prop epoch: ', best_prop_epoch)
     print('training complete.')
     ###################################################################################
 #     indices = list(range(len(train_graphs)))

@@ -389,7 +389,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
             test_stats2 = tree_weight_statistics(out_graphs)
         
         if test_graphs is None:
-            return 0
+            return prop
                 
         get_mmd_stats(out_graphs, test_graphs)
         
@@ -412,7 +412,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
             lobster_weight_statistics(true_lobs)
         
         if test_graphs is None:
-            return 0
+            return prop
         
         get_mmd_stats(out_graphs, test_graphs)
     

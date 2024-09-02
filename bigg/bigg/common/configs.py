@@ -65,7 +65,7 @@ cmd_opt.add_argument('-tree_pos_enc', default=False, type=eval, help='pos enc fo
 cmd_opt.add_argument('-blksize', default=-1, type=int, help='num blksize steps')
 cmd_opt.add_argument('-accum_grad', default=1, type=int, help='accumulate grad for batching purpose')
 
-cmd_opt.add_argument('-epoch_save', default=100, type=int, help='num epochs between save')
+cmd_opt.add_argument('-epoch_save', default=50, type=int, help='num epochs between save')
 cmd_opt.add_argument('-epoch_load', default=None, type=int, help='epoch for loading')
 
 cmd_opt.add_argument('-batch_exec', default=False, type=eval, help='run with dynamic batching?')
@@ -88,12 +88,11 @@ cmd_opt.add_argument('-p2', default=0.7, type=float, help='leaves in trees')
 cmd_opt.add_argument('-min_nodes', default=5, type=int, help='leaves in trees')
 cmd_opt.add_argument('-max_nodes', default=100, type=int, help='leaves in trees')
 cmd_opt.add_argument('-wt_mode', default='None', type=str, help='mode to standardize weights')
-cmd_opt.add_argument('-save_every', default=10, type=int, help='mode to standardize weights')
+cmd_opt.add_argument('-save_every', default=50, type=int, help='mode to standardize weights')
 cmd_opt.add_argument('-method', default='MLP-Repeat', type=str, help='mode to standardize weights')
 
 cmd_opt.add_argument('-wt_drop', default=-1, type=float, help='dropout for weight MLPs. -1 signifies NO dropout')
-
-
+cmd_opt.add_argument('-val_every', default=10, type=int, help='dropout for weight MLPs. -1 signifies NO dropout')
 
 ## GCN
 cmd_opt.add_argument('-node_embed_dim', default=256, type=int, help='embed size')

@@ -41,14 +41,15 @@ python ../main_featured.py \
   -num_graphs $num_g \
   -blksize $blksize \
   -wt_mode $wt_mode \
-  -epoch_save 500 \
+  -epoch_save 100 \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 100 \
-  -num_epochs 100 \
+  -num_epochs 1000 \
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \
+  -rnn_layers 2 \
   -accum_grad $accum_grad \
   $@
 
