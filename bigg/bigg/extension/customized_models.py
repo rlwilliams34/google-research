@@ -179,7 +179,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         return self.nodelen_encoding(node_feats)
 
     def embed_edge_feats(self, edge_feats):
-        edge_feats = self.compute_softminus(edge_feats)
+        #edge_feats = self.compute_softminus(edge_feats)
         #if self.epoch_num == 0:
         #    self.update_weight_stats(edge_feats)
         edge_feats_normalized = self.standardize_edge_feats(edge_feats)
@@ -280,7 +280,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             pred_lvar = lvars
             pred_sd = torch.exp(0.5 * pred_lvar)
             edge_feats = torch.normal(pred_mean, pred_sd)
-            edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
+            #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
             edge_feats = torch.nn.functional.softplus(edge_feats)
             
         else:
@@ -290,7 +290,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_feats_invsp = self.compute_softminus(edge_feats)
             
             ### Standardize
-            edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
+            #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
             
             ## MEAN AND VARIANCE OF LOGNORMAL
             var = torch.exp(lvars) 
