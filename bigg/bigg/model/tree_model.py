@@ -536,12 +536,12 @@ class RecurTreeGen(nn.Module):
                 llb = max(0, lb - tree_node.rch.n_cols)
                 ll, left_state, num_left, left_edge_feats = self.gen_row(ll, state, tree_node.lch, col_sm, llb, lub, edge_feats)
                 pred_edge_feats.append(left_edge_feats)
-                print(left_edge_feats)
-                print(left_edge_feats.shape)
-                print(" ")
+                #print(left_edge_feats)
+                #print(left_edge_feats.shape)
+                #print(" ")
                 test = self.embed_edge_feats(left_edge_feats)
                 test2 = torch.sum(torch.square(test[0] - left_state[0]))
-                print(test2)
+                #print(test2)
             else:
                 left_state = self.get_empty_state()
                 num_left = 0
