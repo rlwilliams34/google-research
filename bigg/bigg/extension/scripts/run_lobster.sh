@@ -50,7 +50,7 @@ python ../main_featured.py \
   -has_node_feats 0 \
   -has_edge_feats 1 \
   -scale_loss 20 \
-  -wt_mode $mode \
+  -wt_mode $wt_mode \
   -method MLP_multi \
   -accum_grad $accum_grad \
   $@
