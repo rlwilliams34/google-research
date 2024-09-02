@@ -19,6 +19,7 @@ ordering=DFS
 blksize=-1
 bsize=100
 accum_grad=1
+wt_mode=score
 
 data_dir=/u/home/r/rlwillia/ADJ-LSTM/train_graphs/$g_type
 
@@ -48,7 +49,9 @@ python ../main_featured.py \
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \
+  -scale_loss 20 \
+  -wt_mode $mode \
+  -method MLP_multi \
   -accum_grad $accum_grad \
   $@
-
 
