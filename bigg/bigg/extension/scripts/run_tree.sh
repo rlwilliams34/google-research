@@ -52,6 +52,7 @@ python ../main_featured.py \
   -rnn_layers 2 \
   -scale_loss 20 \
   -accum_grad $accum_grad \
+  -method MLP-Multi \
   $@
 
 
