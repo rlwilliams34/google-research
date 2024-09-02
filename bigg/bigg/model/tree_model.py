@@ -536,12 +536,6 @@ class RecurTreeGen(nn.Module):
                 llb = max(0, lb - tree_node.rch.n_cols)
                 ll, left_state, num_left, left_edge_feats = self.gen_row(ll, state, tree_node.lch, col_sm, llb, lub, edge_feats)
                 pred_edge_feats.append(left_edge_feats)
-                #print(left_edge_feats)
-                #print(left_edge_feats.shape)
-                #print(" ")
-                #test = self.embed_edge_feats(left_edge_feats)
-                #test2 = torch.sum(torch.square(test[0] - left_state[0]))
-                #print(test2)
             else:
                 left_state = self.get_empty_state()
                 num_left = 0
@@ -578,8 +572,6 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.lr2p_cell(left_state, right_state)
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
-            #print("EDGE FEATS")
-            #print(edge_feats)
             return ll, summary_state, num_left + num_right, edge_feats
 
     def forward(self, node_end, edge_list=None, node_feats=None, edge_feats=None, node_start=0, list_states=[], lb_list=None, ub_list=None, col_range=None, num_nodes=None, display=False):
@@ -797,6 +789,4 @@ class RecurTreeGen(nn.Module):
             #print(STOP)
 
         return ll, ll_wt, next_states
-        
-
 

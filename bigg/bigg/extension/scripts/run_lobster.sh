@@ -51,7 +51,7 @@ python ../main_featured.py \
   -has_edge_feats 1 \
   -scale_loss 20 \
   -wt_mode $wt_mode \
-  -method MLP_multi \
+  -method MLP_Multi \
   -accum_grad $accum_grad \
   $@
 
