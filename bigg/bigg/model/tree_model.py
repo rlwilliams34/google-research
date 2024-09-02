@@ -561,6 +561,9 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.cell_topright(self.topdown_right_embed[[int(has_right)]], topdown_state, tree_node.depth)
 
             if has_right:  # has edge in right child
+                print("Edge before")
+                print(edge_feats)
+                print(" ")
                 ll, right_state, num_right, right_edge_feats = self.gen_row(ll, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats)
                 print(right_edge_feats)
                 print(right_edge_feats.shape)
