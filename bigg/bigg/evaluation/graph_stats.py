@@ -409,7 +409,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         if cmd_args.has_edge_feats:
             lobster_weight_statistics(out_graphs)
             print("checking with true lobsters")
-            lobster_weight_statistics(true_lobs)
+            lobster_weight_statistics(test_graphs)
         
         if test_graphs is None:
             return prop
