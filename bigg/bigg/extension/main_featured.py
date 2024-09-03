@@ -387,7 +387,13 @@ if __name__ == '__main__':
                 print("Generating Graph Stats")
                 prop = get_graph_stats(gen_graphs, None, cmd_args.g_type)
                 
-                if prop > 0.80:
+                if cmd_args.g_type == "tree":
+                    cutoff = 0.70
+                
+                else:
+                    cutoff = 0.80
+                
+                if prop > cutoff:
                     if prop >= best_prop:
                         best_prop = prop
                     best_prop_epoch = epoch + 1
