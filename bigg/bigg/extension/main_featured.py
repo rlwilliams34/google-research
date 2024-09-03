@@ -387,7 +387,7 @@ if __name__ == '__main__':
                 print("Generating Graph Stats")
                 prop = get_graph_stats(gen_graphs, None, cmd_args.g_type)
                 
-                if prop > best_prop:
+                if prop >= best_prop:
                     best_prop = prop
                     best_prop_epoch = epoch + 1
                     print('Saving best prop model')
