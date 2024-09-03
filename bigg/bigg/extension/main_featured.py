@@ -387,8 +387,9 @@ if __name__ == '__main__':
                 print("Generating Graph Stats")
                 prop = get_graph_stats(gen_graphs, None, cmd_args.g_type)
                 
-                if prop >= best_prop:
-                    best_prop = prop
+                if prop > 0.80:
+                    if prop >= best_prop:
+                        best_prop = prop
                     best_prop_epoch = epoch + 1
                     print('Saving best prop model')
                     checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
