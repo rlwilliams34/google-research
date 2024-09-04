@@ -243,6 +243,9 @@ if __name__ == '__main__':
     wt_losses = []
     best_loss = np.inf
     best_prop = 0
+    times = []
+    loss_times = []
+    epoch_list = []
     
     N = len(train_graphs)
     B = cmd_args.batch_size
@@ -252,6 +255,7 @@ if __name__ == '__main__':
     num_node_dist = get_node_dist(train_graphs)
     grad_accum_counter = 0
     optimizer.zero_grad()
+    prev = datetime.now()
     
     if cmd_args.epoch_load is None:
         cmd_args.epoch_load = 0
@@ -315,6 +319,11 @@ if __name__ == '__main__':
             loss = -(ll * cmd_args.scale_loss + ll_wt) / (num_nodes * cmd_args.accum_grad)
             loss.backward()
             grad_accum_counter += 1
+            
+            cur = datetime.now() - prev
+            times.append(cur.total_seconds())
+            loss_times.append(loss)
+            epoch_list.append(epoch)
             
             if true_loss < best_loss:
                 best_loss = true_loss
@@ -404,6 +413,11 @@ if __name__ == '__main__':
     print('best prop: ', best_prop)
     print('best prop epoch: ', best_prop_epoch)
     print('training complete.')
+    
+    time_data = {'times': times, 'loss_times': loss_times, 'epoch_list': epoch_list}
+    
+    with open('%s-time-data.pkl' % cmd_args.graph_type, 'wb') as f:
+        cp.dump(time_data, f, protocol=cp.HIGHEST_PROTOCOL)
     ###################################################################################
 #     indices = list(range(len(train_graphs)))
 #     
