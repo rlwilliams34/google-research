@@ -7,7 +7,7 @@ LDFLAGS += -lm
 
 UNAME := $(shell uname)
 
-CUDA_HOME := /u/local/cuda/11.8
+CUDA_HOME := /u/local/cuda/11.2
 NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
 
