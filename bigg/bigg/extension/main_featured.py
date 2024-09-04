@@ -279,7 +279,8 @@ if __name__ == '__main__':
         if cmd_args.schedule:
             cmd_args.scale_loss = 20
             
-            if epoch >= 100:
+            if epoch >= 100 and cmd_args.learning_rate != 1e-5:
+                cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
         

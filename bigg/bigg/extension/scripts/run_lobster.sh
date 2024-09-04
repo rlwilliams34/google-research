@@ -40,11 +40,11 @@ python ../main_featured.py \
   -node_order $ordering \
   -num_graphs $num_g \
   -blksize $blksize \
-  -epoch_save 100 \
+  -epoch_save 50 \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 100 \
-  -num_epochs 1000 \
+  -num_epochs 500 \
   -rnn_layers 2 \
   -gpu 0 \
   -has_node_feats 0 \
@@ -53,5 +53,6 @@ python ../main_featured.py \
   -wt_mode $wt_mode \
   -method MLP-Multi \
   -accum_grad $accum_grad \
+  -wt_drop 0.5 \
   $@
 
