@@ -31,7 +31,7 @@ fi
 
 export CUDA_VISIBLE_DEVICES=0
 
-python ../main_featured.py \
+python3 ../main_featured.py \
   -$@ \
   -data_dir $data_dir \
   -save_dir $save_dir \
@@ -39,11 +39,11 @@ python ../main_featured.py \
   -node_order $ordering \
   -num_graphs $num_g \
   -blksize $blksize \
-  -epoch_save 10 \
+  -epoch_save 50 \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 9 \
-  -num_epochs 100 \
+  -num_epochs 500 \
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \

@@ -472,7 +472,8 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         weights = []
         for g in test_graphs:
             for (n1, n2, w) in g.edges(data=True):
-                weights.append(w['weight'])
+                w_sm = np.log(np.exp(w['weight']) - 1)
+                weights.append(w_sm)
         
         print("Mean Test weight: ", np.mean(weights))
         print("SD Test Weight: ", np.std(weights, ddof = 1))

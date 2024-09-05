@@ -243,6 +243,7 @@ if __name__ == '__main__':
     wt_losses = []
     best_loss = np.inf
     best_prop = 0
+    best_prop_epoch = 0
     times = []
     loss_times = []
     epoch_list = []
