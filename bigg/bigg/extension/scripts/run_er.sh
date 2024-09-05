@@ -17,8 +17,8 @@
 g_type=er
 ordering=DFS
 blksize=-1
-bsize=10
-accum_grad=10
+bsize=20
+accum_grad=5
 
 data_dir=/u/home/r/rlwillia/ADJ-LSTM/train_graphs/$g_type
 
@@ -31,7 +31,7 @@ fi
 
 export CUDA_VISIBLE_DEVICES=0
 
-python ../main_featured.py \
+python3 ../main_featured.py \
   -$@ \
   -data_dir $data_dir \
   -save_dir $save_dir \
