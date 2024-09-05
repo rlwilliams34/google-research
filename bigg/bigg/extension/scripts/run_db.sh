@@ -17,8 +17,8 @@
 g_type=db
 ordering=DFS
 blksize=-1
-bsize=2
-accum_grad=15
+bsize=1
+accum_grad=30
 
 data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type
 
