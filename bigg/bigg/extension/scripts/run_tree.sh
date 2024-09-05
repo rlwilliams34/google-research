@@ -32,7 +32,7 @@ fi
 
 export CUDA_VISIBLE_DEVICES=0
 
-python ../main_featured.py \
+python3 ../main_featured.py \
   -$@ \
   -data_dir $data_dir \
   -save_dir $save_dir \
@@ -53,6 +53,7 @@ python ../main_featured.py \
   -scale_loss 20 \
   -accum_grad $accum_grad \
   -method MLP-Multi \
+  -wt_drop 0.5 \
   $@
 
 
