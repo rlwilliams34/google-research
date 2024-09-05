@@ -403,7 +403,7 @@ if __name__ == '__main__':
                 else:
                     cutoff = 0.80
                 
-                if prop > cutoff:
+                if prop > cutoff or prop > best_prop:
                     if prop >= best_prop:
                         best_prop = prop
                     best_prop_epoch = epoch + 1
