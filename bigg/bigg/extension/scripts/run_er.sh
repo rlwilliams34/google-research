@@ -20,7 +20,7 @@ blksize=-1
 bsize=5
 accum_grad=8
 
-data_dir=../../../../..//ADJ-LSTM/train_graphs/$g_type
+data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type
 
 save_dir=../../../bigg-results/$g_type
 
