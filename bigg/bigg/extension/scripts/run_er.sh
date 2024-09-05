@@ -48,6 +48,7 @@ python3 ../main_featured.py \
   -has_node_feats 0 \
   -has_edge_feats 1 \
   -accum_grad $accum_grad \
+  -wt_drop 0.5 \
   $@
 
 
