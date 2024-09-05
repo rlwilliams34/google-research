@@ -110,6 +110,7 @@ if __name__ == '__main__':
     setup_treelib(cmd_args)
     assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
     
+    import pickle5 as cp
     path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'train')
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
