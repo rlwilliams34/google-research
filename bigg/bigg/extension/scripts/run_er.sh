@@ -17,8 +17,8 @@
 g_type=er
 ordering=DFS
 blksize=-1
-bsize=10
-accum_grad=10
+bsize=5
+accum_grad=8
 
 data_dir=../../../../..//ADJ-LSTM/train_graphs/$g_type
 
@@ -39,11 +39,11 @@ python3 ../main_featured.py \
   -node_order $ordering \
   -num_graphs $num_g \
   -blksize $blksize \
-  -epoch_save 10 \
+  -epoch_save 50 \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 50 \
-  -num_epochs 100 \
+  -num_epochs 500 \
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \
