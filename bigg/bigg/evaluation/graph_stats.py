@@ -437,6 +437,25 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         print("Num Edges: ", np.mean(num_edges), (min(num_edges), max(num_edges)))
         
         get_mmd_stats(out_graphs, test_graphs)
+        
+        print("TEST GRAPH STATS")
+        
+        weights = []
+        for g in test_graphs:
+            for (n1, n2, w) in g.edges(data=True):
+                weights.append(w['weight']) 
+        print("Mean weight: ", np.mean(weights))
+        print("SD Weight: ", np.std(weights, ddof = 1))
+        
+        num_nodes = []
+        num_edges = []
+        for lobster in test_graphs:
+            num_nodes.append(len(lobster))
+            num_edges.append(len(lobster.edges()))
+        print("Num Nodes: ", np.mean(num_nodes), (min(num_nodes), max(num_nodes)))
+        print("Num Edges: ", np.mean(num_edges), (min(num_edges), max(num_edges)))
+        
+        
     
     elif graph_type == "er":
         probs = []
