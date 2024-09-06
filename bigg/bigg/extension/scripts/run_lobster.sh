@@ -20,7 +20,7 @@ blksize=-1
 bsize=100
 accum_grad=1
 wt_mode=score
-model=BiGG_E
+model=BiGG_GCN
 
 data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type
 
