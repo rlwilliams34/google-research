@@ -43,8 +43,6 @@ def load_graphs(graph_pkl):
             except:
                 break
             graphs.append(g)
-    if len(graphs) == 1:
-        graphs = graphs[0]
     for g in graphs:
         TreeLib.InsertGraph(g)
     return graphs
@@ -60,6 +58,9 @@ if __name__ == '__main__':
     train_graphs = load_graphs(os.path.join(cmd_args.data_dir, 'train-graphs.pkl'))
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
+    
+    cmd_args.has_edge_feats = 0
+    cmd_args.has_node_feats = 0
 
     model = RecurTreeGen(cmd_args).to(cmd_args.device)
     if cmd_args.model_dump is not None and os.path.isfile(cmd_args.model_dump):
@@ -91,42 +92,20 @@ if __name__ == '__main__':
     indices = list(range(len(train_graphs)))
     if cmd_args.epoch_load is None:
         cmd_args.epoch_load = 0
-    
-    N = len(train_graphs)
-    B = cmd_args.batch_size
-    num_iter = N // B
-    
-    if num_iter != N / B:
-        num_iter += 1
-    
-    best_loss = np.inf
-    
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
-        pbar = tqdm(range(num_iter))
-        random.shuffle(indices)
+        pbar = tqdm(range(cmd_args.epoch_save))
 
         optimizer.zero_grad()
-        start = 0
         for idx in pbar:
-            start = idx * B
-            stop = (idx + 1) * B
-            
-            if stop >= N:
-                batch_indices = indices[start:]
-            
-            else:
-                batch_indices = indices[start:stop]
-            
+            random.shuffle(indices)
+            batch_indices = indices[:cmd_args.batch_size]
+
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
-            
-            
-            
             if cmd_args.blksize < 0 or num_nodes <= cmd_args.blksize:
                 ll, _ = model.forward_train(batch_indices)
                 loss = -ll / num_nodes
                 loss.backward()
                 loss = loss.item()
-            
             else:
                 ll = 0.0
                 for i in batch_indices:
@@ -135,24 +114,11 @@ if __name__ == '__main__':
                                                     num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n)
                     ll += cur_ll
                 loss = -ll / num_nodes
-            
-            
-            if loss < best_loss:
-                print('Lowest Training Loss Achieved: ', loss)
-                best_loss = loss
-                torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
-
             if (idx + 1) % cmd_args.accum_grad == 0:
                 if cmd_args.grad_clip > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
                 optimizer.step()
                 optimizer.zero_grad()
-            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, loss))
-        
-        print('epoch complete')
-        cur = epoch + 1
-        
-        if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs: #save every 10th / last epoch
-            print('saving epoch')
-            checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-            torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
+            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / cmd_args.epoch_save, loss))
+
+        torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
