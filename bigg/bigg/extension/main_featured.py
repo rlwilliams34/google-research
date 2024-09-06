@@ -163,7 +163,79 @@ if __name__ == '__main__':
             param_group['lr'] = cmd_args.learning_rate
     
     #########################################################################################################
-    if cmd_args.phase != 'train':
+    if cmd_args.phase = 'validate':
+        # get num nodes dist
+        print("Now generating sampled graphs...")
+        num_node_dist = get_node_dist(train_graphs)
+        
+        path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'val')
+        
+        with open(path, 'rb') as f:
+            val_graphs = cp.load(f)
+        
+        #if cmd_args.g_type == 'tree':
+        #    gt_graphs = fix_tree_weights(gt_graphs)
+        print('# val graphs', len(val_graphs))
+        
+        gen_graphs = []
+        with torch.no_grad():
+            model.eval()
+            for _ in tqdm(range(cmd_args.num_test_gen)):
+                num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
+                _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+                
+                if cmd_args.test_gcn:
+                    fix_edges = []
+                    for e1, e2 in pred_edges:
+                        if e1 > e2:
+                            fix_edges.append((e2, e1))
+                        else:
+                            fix_edges.append((e1, e2))
+                    pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+                    pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
+                    pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
+                    
+                    weighted_edges = []
+                    for e1, e2, w in pred_weighted_tensor:
+                        weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
+                    
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
+                
+                elif cmd_args.has_edge_feats:
+                    weighted_edges = []
+                    for e, w in zip(pred_edges, pred_edge_feats):
+                        assert e[0] > e[1]
+                        weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
+                
+                else:
+                    pred_g = nx.Graph()
+                    fixed_edges = []
+                    for e in pred_edges:
+                        w = 1.0
+                        if e[0] < e[1]:
+                            edge = (e[0], e[1], w)
+                        else:
+                            edge = (e[1], e[0], w)
+                        fixed_edges.append(edge)
+                    pred_g.add_weighted_edges_from(fixed_edges)
+                    gen_graphs.append(pred_g)
+        
+        for idx in range(min(10, cmd_args.num_test_gen)):
+            print("edges:")
+            print(gen_graphs[idx].edges(data=True))
+        
+        print("Generating Graph Validation Stats")
+        get_graph_stats(gen_graphs, val_graphs, cmd_args.g_type)
+        
+        sys.exit()
+        
+    
+    elif cmd_args.phase == 'test':
         # get num nodes dist
         print("Now generating sampled graphs...")
         num_node_dist = get_node_dist(train_graphs)
@@ -359,7 +431,7 @@ if __name__ == '__main__':
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
         
-        if cur % cmd_args.val_every == 0:
+        if cur % cmd_args.epoch_save == 0:
             print('validating')
             model.eval()
             
