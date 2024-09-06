@@ -163,7 +163,7 @@ if __name__ == '__main__':
             param_group['lr'] = cmd_args.learning_rate
     
     #########################################################################################################
-    if cmd_args.phase = 'validate':
+    if cmd_args.phase == 'validate':
         # get num nodes dist
         print("Now generating sampled graphs...")
         num_node_dist = get_node_dist(train_graphs)
