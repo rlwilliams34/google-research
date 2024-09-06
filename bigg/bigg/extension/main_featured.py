@@ -129,7 +129,7 @@ if __name__ == '__main__':
     cmd_args.max_num_nodes = max_num_nodes
     print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
-    if cmd_args.test_gcn:
+    if cmd_args.model == "BiGG_GCN":
         cmd_args.has_edge_feats = False
         cmd_args.has_node_feats = False
         model = BiggWithGCN(cmd_args).to(cmd_args.device)
@@ -184,7 +184,7 @@ if __name__ == '__main__':
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 
-                if cmd_args.test_gcn:
+                if cmd_args.model == "BiGG_GCN":
                     fix_edges = []
                     for e1, e2 in pred_edges:
                         if e1 > e2:
@@ -256,7 +256,7 @@ if __name__ == '__main__':
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 
-                if cmd_args.test_gcn:
+                if cmd_args.model = "BiGG_GCN":
                     fix_edges = []
                     for e1, e2 in pred_edges:
                         if e1 > e2:
@@ -349,7 +349,7 @@ if __name__ == '__main__':
                 edge_feats = list_edge_feats[i]
                 model.update_weight_stats(edge_feats)
         
-        if cmd_args.test_gcn:
+        if cmd_args.model == "BiGG_GCN":
             model.gcn_mod.epoch_num += 1
         
         else:
@@ -373,7 +373,7 @@ if __name__ == '__main__':
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
             
-            if cmd_args.test_gcn:
+            if cmd_args.model == "BiGG_GCN":
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
@@ -385,7 +385,7 @@ if __name__ == '__main__':
             loss_wt = -ll_wt / num_nodes
             top_losses.append(loss_top.item())
             
-            if cmd_args.has_edge_feats or cmd_args.test_gcn:
+            if cmd_args.has_edge_feats or cmd_args.model == "BiGG_GCN":
                 wt_losses.append(loss_wt.item())
             
             true_loss = -(ll + ll_wt) / num_nodes

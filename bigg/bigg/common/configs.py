@@ -97,7 +97,7 @@ cmd_opt.add_argument('-val_every', default=10, type=int, help='dropout for weigh
 ## GCN
 cmd_opt.add_argument('-node_embed_dim', default=256, type=int, help='embed size')
 cmd_opt.add_argument('-out_dim', default=256, type=int, help='embed size')
-cmd_opt.add_argument('-test_gcn', default = False, type = eval, help = "Test GCN Model?")
+cmd_opt.add_argument('-model', default = "BiGG_E", type = eval, help = "BiGG-E or GCN?")
 cmd_opt.add_argument('-scale_loss', default=1, type=float, help='Amount to scale weight loss by during training')
 cmd_opt.add_argument('-schedule', default=True, type=eval, help='Amount to scale weight loss by during training')
 
