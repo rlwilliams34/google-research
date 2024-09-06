@@ -442,7 +442,26 @@ if __name__ == '__main__':
                     num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                     _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes)
                     
-                    if cmd_args.has_edge_feats:
+                    if cmd_args.model == "BiGG_GCN":
+                        fix_edges = []
+                        for e1, e2 in pred_edges:
+                            if e1 > e2:
+                                fix_edges.append((e2, e1))
+                            else:
+                                fix_edges.append((e1, e2))
+                        pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+                        pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
+                        pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
+                        
+                        weighted_edges = []
+                        for e1, e2, w in pred_weighted_tensor:
+                            weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
+                        
+                        pred_g = nx.Graph()
+                        pred_g.add_weighted_edges_from(weighted_edges)
+                        gen_graphs.append(pred_g)
+                    
+                    elif cmd_args.has_edge_feats:
                         weighted_edges = []
                         for e, w in zip(pred_edges, pred_edge_feats):
                             weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
