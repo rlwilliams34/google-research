@@ -19,10 +19,11 @@ ordering=DFS
 blksize=-1
 bsize=5
 accum_grad=8
+model=BiGG_GCN
 
 data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type
 
-save_dir=../../../bigg-results/$g_type
+save_dir=../../../bigg-results/$g_type-$model
 
 if [ ! -e $save_dir ];
 then
@@ -49,6 +50,7 @@ python3 ../main_featured.py \
   -has_edge_feats 1 \
   -accum_grad $accum_grad \
   -wt_drop 0.5 \
+  -model $model \
   $@
 
 
