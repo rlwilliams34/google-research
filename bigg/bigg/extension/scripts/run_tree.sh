@@ -22,9 +22,9 @@ accum_grad=2
 wt_mode=score
 model=BiGG_GCN
 
-data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type-$model
+data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type
 
-save_dir=../../../bigg-results/$g_type
+save_dir=../../../bigg-results/$g_type-$model
 
 if [ ! -e $save_dir ];
 then
