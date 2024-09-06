@@ -55,6 +55,7 @@ python3 ../main_featured.py \
   -accum_grad $accum_grad \
   -method MLP-Multi \
   -wt_drop 0.5 \
+  -model $model \
   $@
 
 
