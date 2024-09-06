@@ -256,7 +256,7 @@ if __name__ == '__main__':
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 
-                if cmd_args.model = "BiGG_GCN":
+                if cmd_args.model == "BiGG_GCN":
                     fix_edges = []
                     for e1, e2 in pred_edges:
                         if e1 > e2:
