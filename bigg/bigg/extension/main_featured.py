@@ -114,10 +114,10 @@ if __name__ == '__main__':
         import pickle5 as cp
     path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'train')
     
-    if cmd_args.phase == "train":
-        with open(path, 'rb') as f:
-            train_graphs = cp.load(f)
-        
+     with open(path, 'rb') as f:
+        train_graphs = cp.load(f)
+    
+    if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
     
         if cmd_args.has_node_feats:
