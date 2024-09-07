@@ -35,6 +35,7 @@ export CUDA_VISIBLE_DEVICES=0
 
 python3 ../main_featured.py \
   -$@ \
+  -seed 200
   -data_dir $data_dir \
   -save_dir $save_dir \
   -g_type $g_type \
@@ -42,7 +43,7 @@ python3 ../main_featured.py \
   -num_graphs $num_g \
   -blksize $blksize \
   -wt_mode $wt_mode \
-  -epoch_save 100 \
+  -epoch_save 250 \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 100 \
