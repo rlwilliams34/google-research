@@ -43,7 +43,7 @@ python3 ../main_featured.py \
   -epoch_save 500 \
   -bits_compress 0 \
   -batch_size $bsize \
-  -num_test_gen 50 \
+  -num_test_gen 20 \
   -num_epochs 2000 \
   -gpu 0 \
   -has_node_feats 0 \
