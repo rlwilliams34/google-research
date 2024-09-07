@@ -114,7 +114,7 @@ if __name__ == '__main__':
         import pickle5 as cp
     path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'train')
     
-     with open(path, 'rb') as f:
+    with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
     if cmd_args.phase == "train": 
