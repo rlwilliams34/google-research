@@ -331,7 +331,7 @@ if __name__ == '__main__':
         cmd_args.epoch_load = 0
     
     if cmd_args.schedule:
-        cmd_args.scale_loss = 1
+        cmd_args.scale_loss = 20
     
     model.train()
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
