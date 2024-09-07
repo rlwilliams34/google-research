@@ -33,9 +33,8 @@ fi
 
 export CUDA_VISIBLE_DEVICES=0
 
-python3 ../main_featured.py \
-  -$@ \
-  -seed 200
+python3 ../main_featured.py 
+  -seed 200 \
   -data_dir $data_dir \
   -save_dir $save_dir \
   -g_type $g_type \
