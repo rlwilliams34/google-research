@@ -310,15 +310,17 @@ if __name__ == '__main__':
         
         sys.exit()
     #########################################################################################################
-    val_size_dict = {'lobster': 50, 'tree': 50, 'db': 0, 'er': 0}
+    #val_size_dict = {'lobster': 50, 'tree': 50, 'db': 0, 'er': 0}
     top_losses = []
     wt_losses = []
     best_loss = np.inf
-    best_prop = 0
-    best_prop_epoch = 0
+    #best_prop = 0
+    #best_prop_epoch = 0
     times = []
     loss_times = []
     epoch_list = []
+    lr_scheduler = {'lobster': 250, 'tree': 250 , 'db': 1000, 'er': 500}
+    epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
     
     N = len(train_graphs)
     B = cmd_args.batch_size
@@ -354,9 +356,7 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         if cmd_args.schedule:
-            cmd_args.scale_loss = 20
-            
-            if epoch >= 100 and cmd_args.learning_rate != 1e-5:
+            if epoch >= epoch_lr_decrease and cmd_args.learning_rate != 1e-5:
                 cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
@@ -429,82 +429,82 @@ if __name__ == '__main__':
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
         
-        if cur % cmd_args.epoch_save == 0:
-            print('validating')
-            model.eval()
-            
-            gen_graphs = []
-            with torch.no_grad():
-                val_size = val_size_dict[cmd_args.g_type]
-                for _ in range(val_size):
-                    num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
-                    _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes)
-                    
-                    if cmd_args.model == "BiGG_GCN":
-                        fix_edges = []
-                        for e1, e2 in pred_edges:
-                            if e1 > e2:
-                                fix_edges.append((e2, e1))
-                            else:
-                                fix_edges.append((e1, e2))
-                        pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
-                        pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
-                        pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
-                        
-                        weighted_edges = []
-                        for e1, e2, w in pred_weighted_tensor:
-                            weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
-                        
-                        pred_g = nx.Graph()
-                        pred_g.add_weighted_edges_from(weighted_edges)
-                        gen_graphs.append(pred_g)
-                    
-                    elif cmd_args.has_edge_feats:
-                        weighted_edges = []
-                        for e, w in zip(pred_edges, pred_edge_feats):
-                            weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
-                    
-                        pred_g = nx.Graph()
-                        pred_g.add_weighted_edges_from(weighted_edges)
-                        gen_graphs.append(pred_g)
-                    
-                    else:
-                        pred_g = nx.Graph()
-                        fixed_edges = []
-                        for e in pred_edges:
-                            w = 1.0
-                            if e[0] < e[1]:
-                                edge = (e[0], e[1], w)
-                            else:
-                                edge = (e[1], e[0], w)
-                            fixed_edges.append(edge)
-                        pred_g.add_weighted_edges_from(fixed_edges)
-                        gen_graphs.append(pred_g)
-            
-#             print("NUMBER GRAPHS:", len(gen_graphs))
-#             for g in gen_graphs:
-#                 print(g.edges(data=True))
-            model.train()
-            if val_size > 0:
-                print("Generating Graph Stats")
-                prop = get_graph_stats(gen_graphs, None, cmd_args.g_type)
-                
-                if cmd_args.g_type == "tree":
-                    cutoff = 0.70
-                
-                else:
-                    cutoff = 0.80
-                
-                if prop > cutoff or prop > best_prop:
-                    if prop >= best_prop:
-                        best_prop = prop
-                    best_prop_epoch = epoch + 1
-                    print('Saving best prop model')
-                    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-                    torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
-    print('best prop: ', best_prop)
-    print('best prop epoch: ', best_prop_epoch)
-    print('training complete.')
+#         if cur % cmd_args.epoch_save == 0:
+#             print('validating')
+#             model.eval()
+#             
+#             gen_graphs = []
+#             with torch.no_grad():
+#                 val_size = val_size_dict[cmd_args.g_type]
+#                 for _ in range(val_size):
+#                     num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
+#                     _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes)
+#                     
+#                     if cmd_args.model == "BiGG_GCN":
+#                         fix_edges = []
+#                         for e1, e2 in pred_edges:
+#                             if e1 > e2:
+#                                 fix_edges.append((e2, e1))
+#                             else:
+#                                 fix_edges.append((e1, e2))
+#                         pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+#                         pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
+#                         pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
+#                         
+#                         weighted_edges = []
+#                         for e1, e2, w in pred_weighted_tensor:
+#                             weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
+#                         
+#                         pred_g = nx.Graph()
+#                         pred_g.add_weighted_edges_from(weighted_edges)
+#                         gen_graphs.append(pred_g)
+#                     
+#                     elif cmd_args.has_edge_feats:
+#                         weighted_edges = []
+#                         for e, w in zip(pred_edges, pred_edge_feats):
+#                             weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
+#                     
+#                         pred_g = nx.Graph()
+#                         pred_g.add_weighted_edges_from(weighted_edges)
+#                         gen_graphs.append(pred_g)
+#                     
+#                     else:
+#                         pred_g = nx.Graph()
+#                         fixed_edges = []
+#                         for e in pred_edges:
+#                             w = 1.0
+#                             if e[0] < e[1]:
+#                                 edge = (e[0], e[1], w)
+#                             else:
+#                                 edge = (e[1], e[0], w)
+#                             fixed_edges.append(edge)
+#                         pred_g.add_weighted_edges_from(fixed_edges)
+#                         gen_graphs.append(pred_g)
+#             
+# #             print("NUMBER GRAPHS:", len(gen_graphs))
+# #             for g in gen_graphs:
+# #                 print(g.edges(data=True))
+#             model.train()
+#             if val_size > 0:
+#                 print("Generating Graph Stats")
+#                 prop = get_graph_stats(gen_graphs, None, cmd_args.g_type)
+#                 
+#                 if cmd_args.g_type == "tree":
+#                     cutoff = 0.70
+#                 
+#                 else:
+#                     cutoff = 0.80
+#                 
+#                 if prop > cutoff or prop > best_prop:
+#                     if prop >= best_prop:
+#                         best_prop = prop
+#                     best_prop_epoch = epoch + 1
+#                     print('Saving best prop model')
+#                     checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+#                     torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
+#     print('best prop: ', best_prop)
+#     print('best prop epoch: ', best_prop_epoch)
+#     print('training complete.')
     
     time_data = {'times': times, 'loss_times': loss_times, 'epoch_list': epoch_list}
     
