@@ -113,17 +113,25 @@ if __name__ == '__main__':
     if cmd_args.g_type == "db":
         import pickle5 as cp
     path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'train')
-    print(path)
-    with open(path, 'rb') as f:
-        train_graphs = cp.load(f)
     
-    #if cmd_args.g_type == 'tree':
-    #    train_graphs = fix_tree_weights(train_graphs)
-    #path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'val')
-    #with open(path, 'rb') as f:
-    #    val_graphs = cp.load(f)
+    if cmd_args.phase == "train":
+        with open(path, 'rb') as f:
+            train_graphs = cp.load(f)
+        
+        [TreeLib.InsertGraph(g) for g in train_graphs]
     
-    [TreeLib.InsertGraph(g) for g in train_graphs]
+        if cmd_args.has_node_feats:
+            list_node_feats = [torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs]
+        
+        else:
+           list_node_feats = None
+        
+        if cmd_args.has_edge_feats:
+            list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
+        
+        else:
+            list_edge_feats = None
+    
     
     #print(train_graphs[0].edges(data=True))
     
@@ -139,18 +147,6 @@ if __name__ == '__main__':
     
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    
-    if cmd_args.has_node_feats:
-        list_node_feats = [torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs]
-    
-    else:
-        list_node_feats = None
-    
-    if cmd_args.has_edge_feats:
-        list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
-    
-    else:
-        list_edge_feats = None
     
     optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
