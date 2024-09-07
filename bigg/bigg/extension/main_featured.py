@@ -113,6 +113,7 @@ if __name__ == '__main__':
     if cmd_args.g_type == "db":
         import pickle5 as cp
     path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'train')
+    print(path)
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
