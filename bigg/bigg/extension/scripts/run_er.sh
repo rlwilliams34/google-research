@@ -19,7 +19,7 @@ ordering=DFS
 blksize=-1
 bsize=5
 accum_grad=8
-model=BiGG_GCN
+model=BiGG_E
 
 data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type
 
@@ -40,16 +40,17 @@ python3 ../main_featured.py \
   -node_order $ordering \
   -num_graphs $num_g \
   -blksize $blksize \
-  -epoch_save 50 \
+  -epoch_save 500 \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 50 \
-  -num_epochs 500 \
+  -num_epochs 2000 \
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \
   -accum_grad $accum_grad \
   -wt_drop 0.5 \
+  -wt_mode score \
   -model $model \
   $@
 
