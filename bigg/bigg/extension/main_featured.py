@@ -308,13 +308,12 @@ if __name__ == '__main__':
     #val_size_dict = {'lobster': 50, 'tree': 50, 'db': 0, 'er': 0}
     top_losses = []
     wt_losses = []
-    best_loss = np.inf
     #best_prop = 0
     #best_prop_epoch = 0
     times = []
     loss_times = []
     epoch_list = []
-    lr_scheduler = {'lobster': 100, 'tree': 100 , 'db': 1000, 'er': 500}
+    lr_scheduler = {'lobster': 100, 'tree': 100 , 'db': 1000, 'er': 250}
     epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
     
     N = len(train_graphs)
@@ -332,6 +331,9 @@ if __name__ == '__main__':
     
     if cmd_args.schedule:
         cmd_args.scale_loss = 20
+    
+    if cmd_args.model == "BiGG_GCN":
+        cmd_args.scale_loss = 1
     
     model.train()
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
@@ -393,9 +395,9 @@ if __name__ == '__main__':
             loss_times.append(loss)
             epoch_list.append(epoch)
             
-            if true_loss < best_loss:
-                best_loss = true_loss
-                torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
+#             if true_loss < best_loss:
+#                 best_loss = true_loss
+#                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
             if grad_accum_counter == cmd_args.accum_grad:
 #                 if cmd_args.accum_grad > 1:
