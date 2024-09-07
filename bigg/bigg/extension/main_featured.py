@@ -123,7 +123,8 @@ if __name__ == '__main__':
     #    val_graphs = cp.load(f)
     
     [TreeLib.InsertGraph(g) for g in train_graphs]
-    print(train_graphs[0].edges(data=True))
+    
+    #print(train_graphs[0].edges(data=True))
     
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
@@ -225,10 +226,6 @@ if __name__ == '__main__':
                     pred_g.add_weighted_edges_from(fixed_edges)
                     gen_graphs.append(pred_g)
         
-        for idx in range(min(10, cmd_args.num_test_gen)):
-            print("edges:")
-            print(gen_graphs[idx].edges(data=True))
-        
         print("Generating Graph Validation Stats")
         get_graph_stats(gen_graphs, val_graphs, cmd_args.g_type)
         
@@ -297,9 +294,10 @@ if __name__ == '__main__':
                     pred_g.add_weighted_edges_from(fixed_edges)
                     gen_graphs.append(pred_g)
         
-        for idx in range(min(10, cmd_args.num_test_gen)):
-            print("edges:")
-            print(gen_graphs[idx].edges(data=True))
+        if cmd_args.max_num_nodes < 250:
+            for idx in range(min(2, cmd_args.num_test_gen)):
+                print("edges:")
+                print(gen_graphs[idx].edges(data=True))
         
         print(cmd_args.g_type)
         print("Generating Graph Stats")
