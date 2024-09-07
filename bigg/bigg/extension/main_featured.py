@@ -131,14 +131,13 @@ if __name__ == '__main__':
         
         else:
             list_edge_feats = None
+        
+        max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
+        cmd_args.max_num_nodes = max_num_nodes
+        print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     
     #print(train_graphs[0].edges(data=True))
-    
-    max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
-    cmd_args.max_num_nodes = max_num_nodes
-    print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
-    
     if cmd_args.model == "BiGG_GCN":
         cmd_args.has_edge_feats = False
         cmd_args.has_node_feats = False
@@ -150,7 +149,6 @@ if __name__ == '__main__':
     
     optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
-    print(cmd_args.model_dump)
     if cmd_args.model_dump is not None and os.path.isfile(cmd_args.model_dump):
         print('loading from', cmd_args.model_dump)
         checkpoint = torch.load(cmd_args.model_dump)
