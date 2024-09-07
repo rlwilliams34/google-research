@@ -320,7 +320,7 @@ if __name__ == '__main__':
     times = []
     loss_times = []
     epoch_list = []
-    lr_scheduler = {'lobster': 250, 'tree': 250 , 'db': 1000, 'er': 500}
+    lr_scheduler = {'lobster': 100, 'tree': 100 , 'db': 1000, 'er': 500}
     epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
     
     N = len(train_graphs)
