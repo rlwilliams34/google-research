@@ -45,7 +45,7 @@ python3 ../main_featured.py \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 200 \
-  -num_epochs 500 \
+  -num_epochs 300 \
   -rnn_layers 2 \
   -gpu 0 \
   -has_node_feats 0 \

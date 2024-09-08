@@ -45,6 +45,7 @@ python3 ../main_featured.py \
   -batch_size $bsize \
   -num_test_gen 20 \
   -num_epochs 2000 \
+  -scale_loss 20
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \
