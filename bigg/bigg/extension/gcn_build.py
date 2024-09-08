@@ -52,7 +52,7 @@ class GCN(torch.nn.Module):
         
         self.conv1 = conv.GCNConv(in_channels = self.node_embed_dim, out_channels = 2 * self.embed_dim)
         self.conv2 = conv.GCNConv(in_channels = 2 * self.embed_dim, out_channels = self.out_dim)
-       self.node_embedding = torch.nn.Embedding(self.max_num_nodes, self.node_embed_dim)
+        self.node_embedding = torch.nn.Embedding(self.max_num_nodes, self.node_embed_dim)
     
     def forward(self, feat_idx, edge_list):
         node_embeddings = self.node_embedding.weight[feat_idx.long()]
