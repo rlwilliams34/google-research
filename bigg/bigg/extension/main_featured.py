@@ -315,6 +315,7 @@ if __name__ == '__main__':
     epoch_list = []
     lr_scheduler = {'lobster': 100, 'tree': 100 , 'db': 1000, 'er': 250}
     epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
+    batch_loss = 0.0
     
     N = len(train_graphs)
     B = cmd_args.batch_size
@@ -384,14 +385,13 @@ if __name__ == '__main__':
                 wt_losses.append(loss_wt.item())
             
             true_loss = -(ll + ll_wt) / num_nodes
-            true_loss = true_loss.item()
+            batch_loss = true_loss.item() / cmd_args.accum_grad + batch_loss
             
             loss = -(ll * cmd_args.scale_loss + ll_wt) / (num_nodes)#* cmd_args.accum_grad)
             loss.backward()
             grad_accum_counter += 1
             
-            cur = datetime.now() - prev
-            times.append(cur.total_seconds())
+            
             loss_times.append(loss)
             epoch_list.append(epoch)
             
@@ -400,11 +400,11 @@ if __name__ == '__main__':
 #                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
             if grad_accum_counter == cmd_args.accum_grad:
-#                 if cmd_args.accum_grad > 1:
-#                     with torch.no_grad():
-#                         for p in model.parameters():
-#                             if p.grad is not None:
-#                                 p.grad.div_(cmd_args.accum_grad)
+                cur = datetime.now() - prev
+                times.append(cur.total_seconds())
+                loss_times.append(batch_loss)
+                epoch_list.append(epoch)
+                batch_loss = 0.0
                 
                 if cmd_args.grad_clip > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
@@ -412,6 +412,11 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
                 grad_accum_counter = 0
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
+            
+        time_data = {'times': times, 'loss_times': loss_times, 'epoch_list': epoch_list}
+    
+        with open('%s-time-data.pkl' % cmd_args.g_type, 'wb') as f:
+            cp.dump(time_data, f, protocol=cp.HIGHEST_PROTOCOL)
         
         print('epoch complete')
         cur = epoch + 1
@@ -503,10 +508,6 @@ if __name__ == '__main__':
 #     print('best prop epoch: ', best_prop_epoch)
 #     print('training complete.')
     
-    time_data = {'times': times, 'loss_times': loss_times, 'epoch_list': epoch_list}
-    
-    with open('%s-time-data.pkl' % cmd_args.g_type, 'wb') as f:
-        cp.dump(time_data, f, protocol=cp.HIGHEST_PROTOCOL)
     ###################################################################################
 #     indices = list(range(len(train_graphs)))
 #     
