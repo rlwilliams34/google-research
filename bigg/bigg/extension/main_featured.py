@@ -117,6 +117,9 @@ if __name__ == '__main__':
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
+    max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
+    cmd_args.max_num_nodes = max_num_nodes
+    
     if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
     
@@ -132,8 +135,6 @@ if __name__ == '__main__':
         else:
             list_edge_feats = None
         
-        max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
-        cmd_args.max_num_nodes = max_num_nodes
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     
