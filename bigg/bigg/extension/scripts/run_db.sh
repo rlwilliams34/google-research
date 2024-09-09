@@ -39,11 +39,11 @@ python3 ../main_featured.py \
   -node_order $ordering \
   -num_graphs $num_g \
   -blksize $blksize \
-  -epoch_save 50 \
+  -epoch_save 500 \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 9 \
-  -num_epochs 500 \
+  -num_epochs 3000 \
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \
