@@ -110,6 +110,9 @@ if cmd_args.save_dir is not None:
     if not os.path.isdir(cmd_args.save_dir):
         os.makedirs(cmd_args.save_dir)
 
+if cmd_args.epoch_load == -1:
+    cmd_args.epoch_load = cmd_args.num_epochs
+
 if cmd_args.epoch_load is not None and cmd_args.model_dump is None:
     cmd_args.model_dump = os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % cmd_args.epoch_load)
 
