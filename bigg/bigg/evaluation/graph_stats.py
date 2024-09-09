@@ -371,8 +371,8 @@ def get_mmd_stats(out_graphs, test_graphs):
         mmd_weights = mmd_weights_only(out_graphs, test_graphs, gaussian_tv)
         print("MMD on Weights Only: ", mmd_weights)
     
-    mmd_orbit = motif_stats(out_graphs, test_graphs)
-    #mmd_orbit = orbit_stats_all(out_graphs, test_graphs)
+    #mmd_orbit = motif_stats(out_graphs, test_graphs)
+    mmd_orbit = orbit_stats_all(out_graphs, test_graphs)
     print("MMD on Orbit: ", mmd_orbit)
 
 
