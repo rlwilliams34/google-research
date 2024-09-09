@@ -20,7 +20,7 @@ blksize=-1
 bsize=50
 accum_grad=2
 wt_mode=score
-model=BiGG_GCN
+model=BiGG_E
 
 data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type
 
@@ -46,7 +46,7 @@ python3 ../main_featured.py \
   -bits_compress 0 \
   -batch_size $bsize \
   -num_test_gen 200 \
-  -num_epochs 500 \
+  -num_epochs 300 \
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \
