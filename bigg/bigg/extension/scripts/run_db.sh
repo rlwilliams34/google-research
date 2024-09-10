@@ -19,10 +19,11 @@ ordering=DFS
 blksize=-1
 bsize=1
 accum_grad=30
+model=BiGG_E
 
 data_dir=../../../../../ADJ-LSTM/train_graphs/$g_type
 
-save_dir=../../../bigg-results/$g_type
+save_dir=../../../bigg-results/$g_type-$model
 
 if [ ! -e $save_dir ];
 then
@@ -44,6 +45,7 @@ python3 ../main_featured.py \
   -batch_size $bsize \
   -num_test_gen 9 \
   -num_epochs 3000 \
+  -scale_loss 20 \
   -gpu 0 \
   -has_node_feats 0 \
   -has_edge_feats 1 \
