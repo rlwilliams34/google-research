@@ -51,6 +51,8 @@ python3 ../main_featured.py \
   -has_edge_feats 1 \
   -accum_grad $accum_grad \
   -wt_drop 0.5 \
+  -wt_mode score \
+  -model $model \
   $@
 
 
