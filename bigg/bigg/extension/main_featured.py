@@ -393,8 +393,8 @@ if __name__ == '__main__':
             grad_accum_counter += 1
             
             
-            loss_times.append(loss)
-            epoch_list.append(epoch)
+            #loss_times.append(loss)
+            #epoch_list.append(epoch)
             
 #             if true_loss < best_loss:
 #                 best_loss = true_loss
@@ -416,7 +416,7 @@ if __name__ == '__main__':
             
         time_data = {'times': times, 'loss_times': loss_times, 'epoch_list': epoch_list}
     
-        with open('%s-time-data.pkl' % cmd_args.g_type, 'wb') as f:
+        with open('%s-' % cmd_args.model, '%s-time-data.pkl' % cmd_args.g_type, 'wb') as f:
             cp.dump(time_data, f, protocol=cp.HIGHEST_PROTOCOL)
         
         print('epoch complete')
