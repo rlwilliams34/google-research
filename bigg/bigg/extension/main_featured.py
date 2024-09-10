@@ -416,7 +416,7 @@ if __name__ == '__main__':
             
         time_data = {'times': times, 'loss_times': loss_times, 'epoch_list': epoch_list}
     
-        with open(os.path.join('%s-' % cmd_args.model, '%s-time-data.pkl' % cmd_args.g_type), 'wb') as f:
+        with open('%s-' % cmd_args.model + '%s-time-data.pkl' % cmd_args.g_type, 'wb') as f:
             cp.dump(time_data, f, protocol=cp.HIGHEST_PROTOCOL)
         
         print('epoch complete')
