@@ -118,7 +118,7 @@ if __name__ == '__main__':
         train_graphs = cp.load(f)
     
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
-    cmd_args.max_num_nodes = 749 #max_num_nodes
+    cmd_args.max_num_nodes = 743#max_num_nodes
     
     if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
