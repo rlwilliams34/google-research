@@ -142,6 +142,7 @@ if __name__ == '__main__':
         ordered_graphs += cano_g
     
     train_graphs = ordered_graphs[:num_train]
+    print(train_graphs)
     test_graphs = ordered_graphs[num_train:]
     
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
