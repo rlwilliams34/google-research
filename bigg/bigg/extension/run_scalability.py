@@ -119,6 +119,7 @@ if __name__ == '__main__':
     
     ## CREATE TRAINING GRAPHS HERE    
     train_graphs = get_rand_er(cmd_args.num_nodes, 80, low_p = 0.5, high_p = 1.5)
+    print(train_graphs)
     val_graphs = train_graphs[:19]
     test_graphs = get_rand_er(cmd_args.num_nodes, 20, low_p = 0.5, high_p = 1.5)
     
