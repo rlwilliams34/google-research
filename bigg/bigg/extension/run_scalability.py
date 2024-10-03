@@ -76,7 +76,14 @@ def get_rand_er(num_nodes, num_graphs, low_p = 1.0, high_p = 1.0, args = cmd_arg
         graphs += [g]
     return graphs
 
+
 if __name__ == '__main__':
+    cmd_args.scale = 20
+    cmd_args.wt_drop = 0.5
+    cmd_args.wt_mode = score
+    cmd_args.has_edge_feats = True
+    cmd_args.has_node_feats = False
+    
     random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
     np.random.seed(cmd_args.seed)
