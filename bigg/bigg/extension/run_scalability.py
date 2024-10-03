@@ -176,7 +176,8 @@ if __name__ == '__main__':
     
     if cmd_args.training_time:
         print("Getting training times")
-        num_nodes_list = [100, 200, 500, 1e3, 5e3, 1e4, 5e4, 1e5]
+        num_nodes_list = [cmd_args.num_nodes]
+        #num_nodes = [50, 100, 200, 500, 1e3, 5e3, 1e4]
         times = []
         
         for num_nodes in num_nodes_list:
