@@ -203,6 +203,7 @@ if __name__ == '__main__':
             
             cur = datetime.now() - init
             times.append(cur.total_seconds())
+            print(times)
             
         print(num_nodes_list)
         print(times)
