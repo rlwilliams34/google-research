@@ -203,10 +203,10 @@ if __name__ == '__main__':
             cur = datetime.now() - init
             times.append(cur.total_seconds())
             
-            print(num_nodes_list)
-            print(times)
+        print(num_nodes_list)
+        print(times)
             
-            sys.exit()
+        sys.exit()
     
     ## CREATE TRAINING GRAPHS HERE    
     graphs = get_rand_er(cmd_args.num_nodes, 100, low_p = 0.5, high_p = 1.5)
