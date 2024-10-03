@@ -127,9 +127,22 @@ if __name__ == '__main__':
             sys.exit()
     
     ## CREATE TRAINING GRAPHS HERE    
-    train_graphs = get_rand_er(cmd_args.num_nodes, 80, low_p = 0.5, high_p = 1.5)
-    val_graphs = train_graphs[:19]
-    test_graphs = get_rand_er(cmd_args.num_nodes, 20, low_p = 0.5, high_p = 1.5)
+    graphs = get_rand_er(cmd_args.num_nodes, 100, low_p = 0.5, high_p = 1.5)
+    
+    num_graphs = len(graphs)
+    num_train = 80
+    num_test_gt = num_graphs - num_train
+
+    # npr = np.random.RandomState(cmd_args.seed)
+    # npr.shuffle(graphs)
+    ordered_graphs = []
+    
+    for g in len(graphs):
+        cano_g = get_graph_data(g, 'DFS')
+        ordered_graphs += cano_g
+    
+    train_graphs = ordered_graphs[:num_train]
+    test_graphs = ordered_graphs[num_train:]
     
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
