@@ -176,7 +176,7 @@ if __name__ == '__main__':
     
     if cmd_args.training_time:
         print("Getting training times")
-        num_nodes_list = [50, 100, 200, 500, 1e3, 5e3, 1e4, 5e4, 1e5]
+        num_nodes_list = [100, 200, 500, 1e3, 5e3, 1e4, 5e4, 1e5]
         times = []
         
         for num_nodes in num_nodes_list:
@@ -188,9 +188,9 @@ if __name__ == '__main__':
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
             optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
             
-            init = datetime.now()
             edge_feats = torch.from_numpy(get_edge_feats(g)).to(cmd_args.device)
             
+            init = datetime.now()
             ll, ll_wt, _ = model.forward_train([0], node_feats = None, edge_feats = edge_feats)
             loss = -(ll + ll_wt) / num_nodes
             loss.backward()
