@@ -103,6 +103,7 @@ if __name__ == '__main__':
         
         for num_nodes in num_nodes_list:
             g = get_rand_er(num_nodes, 1)[0]
+            print(g.edges)
             [TreeLib.InsertGraph(g)]
             
             init = datetime.now()
@@ -128,7 +129,6 @@ if __name__ == '__main__':
     
     ## CREATE TRAINING GRAPHS HERE    
     train_graphs = get_rand_er(cmd_args.num_nodes, 80, low_p = 0.5, high_p = 1.5)
-    print(train_graphs)
     val_graphs = train_graphs[:19]
     test_graphs = get_rand_er(cmd_args.num_nodes, 20, low_p = 0.5, high_p = 1.5)
     
@@ -176,7 +176,6 @@ if __name__ == '__main__':
             node_feats = None
             edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
             
-            print(edge_feats.shape)
             ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
             
             loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
