@@ -180,6 +180,7 @@ if __name__ == '__main__':
         times = []
         
         for num_nodes in num_nodes_list:
+            print(num_nodes)
             g = get_rand_er(num_nodes, 1)[0]
             g = get_graph_data(g, 'DFS')[0]
             [TreeLib.InsertGraph(g)]
