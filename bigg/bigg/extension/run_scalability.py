@@ -289,7 +289,7 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
                 grad_accum_counter = 0
             
-            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
+            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, loss))
         
         if cmd_args.learning_rate != 1e-5:
             plateu = int(epoch_loss > prev_loss)
