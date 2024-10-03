@@ -137,7 +137,7 @@ if __name__ == '__main__':
     # npr.shuffle(graphs)
     ordered_graphs = []
     
-    for g in len(graphs):
+    for g in range(len(graphs)):
         cano_g = get_graph_data(g, 'DFS')
         ordered_graphs += cano_g
     
