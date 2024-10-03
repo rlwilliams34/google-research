@@ -174,8 +174,9 @@ if __name__ == '__main__':
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
             
             node_feats = None
-            edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
+            edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
             
+            print(edge_feats.shape)
             ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
             
             loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
