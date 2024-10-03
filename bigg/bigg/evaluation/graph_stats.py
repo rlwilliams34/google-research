@@ -500,6 +500,16 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         
         get_mmd_stats(out_graphs, test_graphs)
     
+    elif graph_type == "scale_test":
+        mmd_sepctral_weighted = spectral_stats(out_graphs, test_graphs, True)
+        print("MMD on Specta of L Normalized, Weighted: ", mmd_sepctral_weighted)
+        
+        mmd_weights = mmd_weights_only(out_graphs, test_graphs, gaussian_tv)
+        print("MMD on Weights Only: ", mmd_weights)
+        
+        mmd_orbit = orbit_stats_all(out_graphs, test_graphs)
+        print("MMD on Orbit: ", mmd_orbit)
+    
     else:
         print("Graph Type not yet implemented")
     return 0
