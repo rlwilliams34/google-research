@@ -93,9 +93,6 @@ if __name__ == '__main__':
     setup_treelib(cmd_args)
     assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
     
-    model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
-    
     if cmd_args.training_time:
         print("Getting training times")
         num_nodes_list = [50, 100, 200, 500, 1e3, 5e3, 1e4, 5e4, 1e5]
@@ -103,8 +100,10 @@ if __name__ == '__main__':
         
         for num_nodes in num_nodes_list:
             g = get_rand_er(num_nodes, 1)[0]
-            print(g.edges)
             [TreeLib.InsertGraph(g)]
+            
+            model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+            optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
             
             init = datetime.now()
             edge_feats = torch.from_numpy(get_edge_feats(g)).to(cmd_args.device)
@@ -136,6 +135,9 @@ if __name__ == '__main__':
     cmd_args.max_num_nodes = max_num_nodes
     
     [TreeLib.InsertGraph(g) for g in train_graphs]
+    
+    model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     list_node_feats = None
     list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
