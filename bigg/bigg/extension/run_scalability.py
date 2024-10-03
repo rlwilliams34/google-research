@@ -129,7 +129,7 @@ if __name__ == '__main__':
     list_node_feats = None
     list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
     
-    print('# graphs', len(train_graphs), '# nodes', max_num_nodes
+    print('# graphs', len(train_graphs), '# nodes', max_num_nodes)
     print("Begin training")
     
     N = len(train_graphs)
