@@ -102,6 +102,7 @@ def debug_model(model, graph, node_feats, edge_feats):
 #            g[n1][n2]['weight'] = w['weight'] / 10
 #    return graphs
 
+
 if __name__ == '__main__':
     random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
@@ -369,6 +370,8 @@ if __name__ == '__main__':
             
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
+            
+            print(edge_feats.shape)
             
             if cmd_args.model == "BiGG_GCN":
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
