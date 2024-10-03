@@ -37,9 +37,54 @@ from bigg.evaluation.graph_stats import *
 from bigg.evaluation.mmd import *
 from bigg.evaluation.mmd_stats import *
 from bigg.experiments.train_utils import get_node_dist
-from bigg.data_process.data_util import create_graphs, get_graph_data
+#from bigg.data_process.data_util import create_graphs, get_graph_data
 
-
+def get_graph_data(G, node_order, leaves_last = False, order_only=False):
+    G = G.to_undirected()
+    out_list = []
+    orig_node_labels = sorted(list(G.nodes()))
+    orig_map = {}
+    for i, x in enumerate(orig_node_labels):
+        orig_map[x] = i
+    G = nx.relabel_nodes(G, orig_map)
+    
+    if node_order == 'default':
+        out_list.append(apply_order(G, list(range(len(G))), order_only))
+    
+    elif node_order == 'DFS' or node_order == 'BFS':
+            ### BFS & DFS from largest-degree node
+            CGs = [G.subgraph(c) for c in nx.connected_components(G)]
+            
+            # rank connected componets from large to small size
+            CGs = sorted(CGs, key=lambda x: x.number_of_nodes(), reverse=True)
+            
+            node_list_bfs = []
+            node_list_dfs = []
+            
+            for ii in range(len(CGs)):
+                node_degree_list = [(n, d) for n, d in CGs[ii].degree()]
+                degree_sequence = sorted(
+                    node_degree_list, key=lambda tt: tt[1], reverse=True)
+                bfs_tree = nx.bfs_tree(CGs[ii], source=degree_sequence[0][0])
+                node_list_bfs += list(bfs_tree.nodes())
+                dfs_tree = nx.dfs_tree(CGs[ii], source=degree_sequence[0][0])
+                node_list_dfs += list(dfs_tree.nodes())
+            
+            if node_order == 'BFS':
+                node_list_bfs[0], node_list_bfs[1] = node_list_bfs[1], node_list_bfs[0]
+                out_list.append(apply_order(G, node_list_bfs, order_only))
+            if node_order == 'DFS':
+                node_list_dfs[0], node_list_dfs[1] = node_list_dfs[1], node_list_dfs[0]
+                out_list.append(apply_order(G, node_list_dfs, order_only))
+    
+    else: 
+        if node_order == "time":
+            out_list.append(order_tree(G, leaves_last))
+    
+    if len(out_list) == 0:
+        out_list = [apply_order(G, list(range(len(G))), order_only)]
+    
+    return out_list
 
 def get_node_feats(g):
     length = []
@@ -142,7 +187,7 @@ if __name__ == '__main__':
         ordered_graphs += cano_g
     
     train_graphs = ordered_graphs[:num_train]
-    print(train_graphs)
+    print(train_graphs[0].edges(data=True))
     test_graphs = ordered_graphs[num_train:]
     
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
