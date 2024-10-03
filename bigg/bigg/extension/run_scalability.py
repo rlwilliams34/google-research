@@ -83,6 +83,8 @@ if __name__ == '__main__':
     cmd_args.wt_mode = "score"
     cmd_args.has_edge_feats = True
     cmd_args.has_node_feats = False
+    cmd_args.bits_compress = 0
+    cmd_args.gpu = 0
     
     random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
