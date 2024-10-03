@@ -39,6 +39,42 @@ from bigg.evaluation.mmd_stats import *
 from bigg.experiments.train_utils import get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
+def get_node_map(nodelist, shift=0):
+    node_map = {}
+    for i, x in enumerate(nodelist):
+        node_map[x + shift] = i + shift
+    return node_map
+
+
+def apply_order(G, nodelist, order_only):
+    if order_only:
+        return nodelist
+    node_map = get_node_map(nodelist)
+    g = nx.relabel_nodes(G, node_map)
+    return g
+
+def order_tree(G, leaves_last = False): 
+    n = len(G)
+    leaves = sorted([x for x in G.nodes() if G.degree(x)==1])
+    nodes = sorted([x for x in G.nodes() if x not in leaves])
+    
+    #npl = [node for node in nx.single_source_dijkstra(G, 0)[0]]
+    #npl = [node for node in nx.single_source_shortest_path_length(G, 0)[0]]
+    
+    npl_dict = nx.single_source_shortest_path_length(G, 0)
+    npl_list = [k for k in npl_dict.keys()]
+    
+    if leaves_last:
+        npl_n = [node for node in npl if node in nodes]
+        npl_l = [node for node in npl if node in leaves]
+        npl = npl_n + npl_l
+    
+    reorder = {}
+    for k in range(n):
+        reorder[npl_list[k]] = k
+    new_G = nx.relabel_nodes(G, mapping = reorder)
+    return new_G
+
 def get_graph_data(G, node_order, leaves_last = False, order_only=False):
     G = G.to_undirected()
     out_list = []
