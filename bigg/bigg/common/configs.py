@@ -104,6 +104,7 @@ cmd_opt.add_argument('-schedule', default=True, type=eval, help='Amount to scale
 cmd_opt.add_argument('-weight_embed_dim', default=16, type=int, help='embed size for weights')
 
 cmd_opt.add_argument('-training_time', default=False, type=eval, help='computing training times')
+cmd_opt.add_argument('-num_nodes', default=100, type=int, help='for scalability test')
 
 
 
