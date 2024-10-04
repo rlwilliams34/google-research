@@ -261,7 +261,7 @@ if __name__ == '__main__':
         sys.exit()
     
     ## CREATE TRAINING GRAPHS HERE    
-    graphs = get_rand_er(cmd_args.num_nodes, 100, low_p = 0.5, high_p = 1.5)
+    g = graph_generator(cmd_args.num_leaves, 100, cmd_args.seed)
     
     num_graphs = len(graphs)
     num_train = 80
@@ -382,13 +382,6 @@ if __name__ == '__main__':
                 cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
-    
-    
-    
-    
-    
-    
-    
     
     print("Evaluation...")
     num_node_dist = get_node_dist(train_graphs)
