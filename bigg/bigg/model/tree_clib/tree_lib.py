@@ -282,6 +282,7 @@ class _tree_lib(object):
         return edge_idx
 
     def GetEdgeAndLR(self, lv):
+        print("lv", lv)
         n = self.lib.NumEdgesAtLevel(lv)
         lr = np.empty((n,), dtype=np.int32)
         self.lib.GetIsEdgeRch(lv, ctypes.c_void_p(lr.ctypes.data))
