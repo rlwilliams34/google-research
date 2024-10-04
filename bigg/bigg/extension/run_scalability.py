@@ -195,7 +195,7 @@ if __name__ == '__main__':
             
             #if save_tree:
             g = get_rand_er(int(num_nodes), 1)[0]
-            g = get_graph_data(g, 'DFS')
+            g = get_graph_data(g, 'DFS')[0]
             #    with open('temp_graphs', 'wb') as f:
             #        cp.dump(g, f, cp.HIGHEST_PROTOCOL)
             #    sys.exit()
