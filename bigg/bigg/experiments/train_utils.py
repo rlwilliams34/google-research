@@ -48,7 +48,7 @@ def sqrtn_forward_backward(model,
                            init_states=[None, None],
                            top_grad=None,
                            edge_feats=None,
-                           edge_idx=None
+                           edge_idx=None,
                            **kwargs):
     assert len(graph_ids) == 1
     if blksize < 0 or blksize > num_nodes:
