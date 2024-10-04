@@ -98,7 +98,7 @@ def sqrtn_forward_backward(model,
             #print(node_st)
             #print(cur_num)
             cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
-            cur_edge_feats = edge_feats
+            cur_edge_feats = edge_feats[cur_edge_idx]
         print("cur num node st")
         print(cur_num)
         print(node_st)
