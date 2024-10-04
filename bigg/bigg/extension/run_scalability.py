@@ -173,6 +173,7 @@ if __name__ == '__main__':
     cmd_args.has_node_feats = False
     cmd_args.bits_compress = 0
     cmd_args.gpu = 0
+    cmd_args.rnn_layers = 1
     
     random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
