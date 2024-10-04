@@ -48,6 +48,7 @@ def sqrtn_forward_backward(model,
                            init_states=[None, None],
                            top_grad=None,
                            edge_feats=None,
+                           edge_idx=None
                            **kwargs):
     assert len(graph_ids) == 1
     if blksize < 0 or blksize > num_nodes:
@@ -62,14 +63,16 @@ def sqrtn_forward_backward(model,
         with torch.no_grad():
             cur_num = num_nodes - node_st if node_st + blksize > num_nodes else blksize
             print("ST DELTA")
-            print(st_delta)
-            print(node_st)
-            print(cache_stages[-1])
+            cur_edge_feats = None
+            if edge_feats is not None:
+                cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
+                cur_edge_feats = edge_feats[cur_edge_idx]
+            
             _, new_states = model.forward_row_summaries(graph_ids,
                                                         list_node_starts=[node_st],
                                                         num_nodes=cur_num,
                                                         prev_rowsum_states=prev_states,
-                                                        edge_feats=edge_feats,
+                                                        edge_feats=cur_edge_feats,
                                                         **kwargs)
             prev_states = new_states
             list_caches.append(new_states)
@@ -83,11 +86,17 @@ def sqrtn_forward_backward(model,
         if prev_states[0] is not None:
             for x in prev_states:
                 x.requires_grad = True
+        
+        cur_edge_feats = None
+        if edge_feats is not None:
+            cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
+            cur_edge_feats = edge_feats[cur_edge_idx]
+        
         ll, ll_wt, cur_states = model.forward_train(graph_ids,
                                              list_node_starts=[node_st],
                                              num_nodes=cur_num,
                                              prev_rowsum_states=prev_states,
-                                             edge_feats=edge_feats,
+                                             edge_feats=cur_edge_feats,
                                              **kwargs)
         ll = ll * cmd_args.scale_loss + ll_wt
         tot_ll += ll.item()

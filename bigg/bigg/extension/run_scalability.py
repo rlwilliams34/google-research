@@ -54,27 +54,6 @@ def apply_order(G, nodelist, order_only):
     g = nx.relabel_nodes(G, node_map)
     return g
 
-def order_tree(G, leaves_last = False): 
-    n = len(G)
-    leaves = sorted([x for x in G.nodes() if G.degree(x)==1])
-    nodes = sorted([x for x in G.nodes() if x not in leaves])
-    
-    #npl = [node for node in nx.single_source_dijkstra(G, 0)[0]]
-    #npl = [node for node in nx.single_source_shortest_path_length(G, 0)[0]]
-    
-    npl_dict = nx.single_source_shortest_path_length(G, 0)
-    npl_list = [k for k in npl_dict.keys()]
-    
-    if leaves_last:
-        npl_n = [node for node in npl if node in nodes]
-        npl_l = [node for node in npl if node in leaves]
-        npl = npl_n + npl_l
-    
-    reorder = {}
-    for k in range(n):
-        reorder[npl_list[k]] = k
-    new_G = nx.relabel_nodes(G, mapping = reorder)
-    return new_G
 
 def get_graph_data(G, node_order, leaves_last = False, order_only=False):
     G = G.to_undirected()
@@ -131,13 +110,40 @@ def get_node_feats(g):
     return np.expand_dims(np.array(length, dtype=np.float32), axis=1)
 
 
-def get_edge_feats(g):
+def get_edge_feats(g, blksize = -1):
     edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
     weights = [x[2]['weight'] for x in edges]
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
 
+def get_edge_idx(g):
+    edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
+    edge_idx = [x[1] for x in edges]
+    return np.array(edge_idx)
+
 def get_rand_er(num_nodes, num_graphs, low_p = 1.0, high_p = 1.0, args = cmd_args, p = 0.01):
     npr = np.random.RandomState(args.seed)
+    graphs = []
+    
+    min_er_nodes = int(low_p * num_nodes)
+    max_er_nodes = int(high_p * num_nodes)
+    
+    for i in range(num_graphs):
+        if i % 10 == 0:
+            g_num_nodes = num_nodes
+        
+        else:
+            g_num_nodes = np.random.randint(min_er_nodes, max_er_nodes + 1)
+        
+        g = nx.fast_gnp_random_graph(g_num_nodes, p)
+        for n1, n2 in g.edges():
+            z = scipy.stats.norm.rvs(size = 1).item()
+            w = np.log(np.exp(z) + 1)
+            g[n1][n2]['weight'] = w
+        graphs += [g]
+    return graphs
+
+
+def get_rand_er(num_nodes, num_graphs, low_p = 1.0, high_p = 1.0, p = 0.01):
     graphs = []
     
     min_er_nodes = int(low_p * num_nodes)
@@ -241,6 +247,9 @@ if __name__ == '__main__':
     list_node_feats = None
     list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
     
+    if cmd_args.blksize > 0:
+        list_edge_idx = [get_edge_idx(g) for g in train_graphs]
+    
     print('# graphs', len(train_graphs), '# nodes', max_num_nodes)
     print("Begin training")
     
@@ -288,7 +297,7 @@ if __name__ == '__main__':
                 for i in batch_indices:
                     n = len(train_graphs[i])
                     cur_ll, _ = sqrtn_forward_backward(model, graph_ids=[i], list_node_starts=[0],
-                                                    num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n, edge_feats = list_edge_feats[i])
+                                                    num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n, edge_feats = list_edge_feats[i], edge_idx = list_edge_idx[i])
                     ll += cur_ll
                 loss = -ll / num_nodes
             
