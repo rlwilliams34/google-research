@@ -213,8 +213,9 @@ if __name__ == '__main__':
         times = []
         
         for num_leaves in num_leaves_list:
-            print(num_leaves)
-            num_nodes = 2 * num_leaves - 1
+            num_leaves = int(num_leaves)
+            num_nodes = 2 * int(num_leaves) - 1
+            print(num_nodes)
             #save_tree = False
             #load_tree = True
             
