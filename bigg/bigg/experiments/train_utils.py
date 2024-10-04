@@ -47,7 +47,7 @@ def sqrtn_forward_backward(model,
                            loss_scale,
                            init_states=[None, None],
                            top_grad=None,
-                           edge_feats=None
+                           edge_feats=None,
                            **kwargs):
     assert len(graph_ids) == 1
     if blksize < 0 or blksize > num_nodes:
@@ -83,7 +83,7 @@ def sqrtn_forward_backward(model,
                                              list_node_starts=[node_st],
                                              num_nodes=cur_num,
                                              prev_rowsum_states=prev_states,
-                                             edge_feats=edge_feats
+                                             edge_feats=edge_feats,
                                              **kwargs)
         ll = ll * cmd_args.scale_loss + ll_wt
         tot_ll += ll.item()
