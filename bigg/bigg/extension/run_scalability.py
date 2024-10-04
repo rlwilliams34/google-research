@@ -37,6 +37,7 @@ from bigg.evaluation.graph_stats import *
 from bigg.evaluation.mmd import *
 from bigg.evaluation.mmd_stats import *
 from bigg.experiments.train_utils import get_node_dist
+from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
 def get_node_map(nodelist, shift=0):
