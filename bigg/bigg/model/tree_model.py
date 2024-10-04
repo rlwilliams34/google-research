@@ -754,7 +754,7 @@ class RecurTreeGen(nn.Module):
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             print("is not leaf: ", is_nonleaf)
             print("lv", lv)
-            if self.has_edge_feats and is_nonleaf is not None and torch.sum(is_nonleaf) > 0:
+            if self.has_edge_feats and is_nonleaf is not None and np.sum(is_nonleaf) > 0:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
