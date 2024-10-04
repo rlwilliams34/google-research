@@ -117,7 +117,7 @@ def get_edge_feats(g, blksize = -1):
 
 def get_edge_idx(g):
     edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
-    edge_idx = [x[1] for x in edges]
+    edge_idx = [x[0] for x in edges]
     return np.array(edge_idx)
 
 def get_rand_er(num_nodes, num_graphs, low_p = 1.0, high_p = 1.0, args = cmd_args, p = 0.01):
