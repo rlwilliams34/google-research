@@ -219,7 +219,7 @@ if __name__ == '__main__':
             
             #if save_tree:
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
-            g = get_graph_data(g, 'DFS')[0]
+            g = get_graph_data(g[0], 'DFS')
             #    with open('temp_graphs', 'wb') as f:
             #        cp.dump(g, f, cp.HIGHEST_PROTOCOL)
             #    sys.exit()
@@ -230,7 +230,7 @@ if __name__ == '__main__':
             #        g = cp.load(f)
             
             #g = g[0]
-            [TreeLib.InsertGraph(g)]
+            [TreeLib.InsertGraph(g[0])]
             
             
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
