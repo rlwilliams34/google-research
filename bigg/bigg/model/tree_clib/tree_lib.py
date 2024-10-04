@@ -273,7 +273,7 @@ class _tree_lib(object):
 
     def GetEdgeOf(self, lv):
         n = self.lib.NumEdgesAtLevel(lv)
-        #print("n", n)
+        print("n", n)
         if n == 0:
             return None
         edge_idx = np.empty((n,), dtype=np.int32)
