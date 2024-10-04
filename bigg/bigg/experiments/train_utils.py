@@ -69,11 +69,9 @@ def sqrtn_forward_backward(model,
                 print(node_st)
                 print(cur_num)
                 cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
-                cur_edge_feats = edge_feats
+                cur_edge_feats = edge_feats[cur_edge_idx]
             print(count_)
             count_+=1
-            print("Edge Feats Shape")
-            print(cur_edge_feats.shape)
             _, new_states = model.forward_row_summaries(graph_ids,
                                                         list_node_starts=[node_st],
                                                         num_nodes=cur_num,
@@ -82,7 +80,7 @@ def sqrtn_forward_backward(model,
                                                         **kwargs)
             prev_states = new_states
             list_caches.append(new_states)
-
+    
     tot_ll = 0.0
     print("Done with first block")
     print(list(range(len(cache_stages) - 1, -1, -1)))
@@ -101,7 +99,7 @@ def sqrtn_forward_backward(model,
             print(node_st)
             print(cur_num)
             cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
-            cur_edge_feats = edge_feats
+            cur_edge_feats = edge_feats[cur_edge_idx]
         
         ll, ll_wt, cur_states = model.forward_train(graph_ids,
                                              list_node_starts=[node_st],

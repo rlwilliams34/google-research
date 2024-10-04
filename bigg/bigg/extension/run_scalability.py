@@ -298,7 +298,7 @@ if __name__ == '__main__':
                 for i in batch_indices:
                     n = len(train_graphs[i])
                     cur_ll, _ = sqrtn_forward_backward(model, graph_ids=[i], list_node_starts=[0],
-                                                    num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n, edge_feats = list_edge_feats[i], edge_idx = list_edge_idx[i])
+                                                    num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n)#, edge_feats = list_edge_feats[i], edge_idx = list_edge_idx[i])
                     ll += cur_ll
                 loss = -ll / num_nodes
                 epoch_loss += loss / num_iter
