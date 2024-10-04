@@ -64,7 +64,7 @@ def sqrtn_forward_backward(model,
             print("ST DELTA")
             print(st_delta)
             print(node_st)
-            print(cache_states[-1])
+            print(cache_stages[-1])
             _, new_states = model.forward_row_summaries(graph_ids,
                                                         list_node_starts=[node_st],
                                                         num_nodes=cur_num,
