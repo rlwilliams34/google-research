@@ -99,7 +99,8 @@ def sqrtn_forward_backward(model,
             print(cur_num)
             cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
             cur_edge_feats = edge_feats
-        
+        print(cur_num)
+        print(node_st)
         ll, ll_wt, cur_states = model.forward_train(graph_ids,
                                              list_node_starts=[node_st],
                                              num_nodes=cur_num,
