@@ -141,7 +141,17 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     elif h_buf is None:
         return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node)
     else:
-        raise NotImplementedError  #TODO: handle model parallelism with features
+        h_list = []
+        c_list = []
+        for i in range(2):
+            bot_froms, bot_tos, prev_froms, prev_tos, past_froms, past_tos = fn_all_ids(i)
+            h_vecs, c_vecs = hc_multi_select([bot_froms, prev_froms, past_froms],
+                                             [bot_tos, prev_tos, past_tos],
+                                             [h_bot, h_buf, h_past],
+                                             [c_bot, c_buf, c_past])
+            h_list.append(h_vecs)
+            c_list.append(c_vecs)
+        return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
 class FenwickTree(nn.Module):
