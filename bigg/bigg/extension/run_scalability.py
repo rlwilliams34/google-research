@@ -172,7 +172,7 @@ if __name__ == '__main__':
     np.random.seed(cmd_args.seed)
     set_device(cmd_args.gpu)
     setup_treelib(cmd_args)
-    assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
+    #assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
     
     if cmd_args.training_time:
         print("Getting training times")
