@@ -383,10 +383,8 @@ if __name__ == '__main__':
                 cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
-    
-    if (epoch + 1) % cmd_args.epoch_save == 0 or epoch + 1 == cmd_args.num_epochs:
-    
-    print('Saving Epoch')
+     
+    print('Saving Model')
     checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
     torch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
     
