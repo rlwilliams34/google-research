@@ -80,6 +80,7 @@ def sqrtn_forward_backward(model,
 
     tot_ll = 0.0
     print("Done with first block")
+    print(list(range(len(cache_stages) - 1, -1, -1)))
     for i in range(len(cache_stages) - 1, -1, -1):
         print(i)
         st_delta = cache_stages[i]
@@ -95,7 +96,7 @@ def sqrtn_forward_backward(model,
             print(node_st)
             print(cur_num)
             cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
-            cur_edge_feats = edge_feats[cur_edge_idx]
+            cur_edge_feats = edge_feats#[cur_edge_idx]
         
         ll, ll_wt, cur_states = model.forward_train(graph_ids,
                                              list_node_starts=[node_st],
