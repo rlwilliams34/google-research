@@ -214,6 +214,7 @@ if __name__ == '__main__':
         
         for num_leaves in num_leaves_list:
             print(num_leaves)
+            num_nodes = 2 * num_leaves - 1
             #save_tree = False
             #load_tree = True
             
