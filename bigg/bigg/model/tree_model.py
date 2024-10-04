@@ -681,6 +681,7 @@ class RecurTreeGen(nn.Module):
                 c_buf = c_buf_list[d + 1]
             h_bot, c_bot = fn_hc_bot(d + 1)
             if self.has_edge_feats:
+                print("d: ", d)
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 print("Edge idx shape")
                 if edge_idx is not None:
