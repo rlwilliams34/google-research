@@ -58,6 +58,7 @@ def sqrtn_forward_backward(model,
     cache_stages = list(range(0, num_nodes, blksize))
 
     list_caches = []
+    count = 0
     for st_delta in cache_stages[:-1]:
         node_st = list_node_starts[0] + st_delta
         with torch.no_grad():
@@ -67,6 +68,7 @@ def sqrtn_forward_backward(model,
             if edge_feats is not None:
                 cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
                 cur_edge_feats = edge_feats[cur_edge_idx]
+            print(count)
             print("Edge Feats Shape")
             print(cur_edge_feats.shape)
             _, new_states = model.forward_row_summaries(graph_ids,
@@ -96,7 +98,7 @@ def sqrtn_forward_backward(model,
             print(node_st)
             print(cur_num)
             cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
-            cur_edge_feats = edge_feats#[cur_edge_idx]
+            cur_edge_feats = edge_feats[cur_edge_idx]
         
         ll, ll_wt, cur_states = model.forward_train(graph_ids,
                                              list_node_starts=[node_st],
