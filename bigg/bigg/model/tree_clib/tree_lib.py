@@ -277,7 +277,7 @@ class _tree_lib(object):
         if n == 0:
             return None
         edge_idx = np.empty((n,), dtype=np.int32)
-        #print("edge index: ", edge_idx)
+        print("lv: ", lv)
         self.lib.GetEdgesOfLevel(lv, ctypes.c_void_p(edge_idx.ctypes.data))
         return edge_idx
 
