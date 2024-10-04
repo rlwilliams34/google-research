@@ -176,7 +176,7 @@ def graph_generator(num_leaves, num_graphs = 100, seed = 34):
     for _ in range(num_graphs):
         g = tree_generator(num_leaves)
         mu = np.random.uniform(7, 13)
-        weights = np.random.gamma(mu*mu, 1/mu, 2 * n + 1)
+        weights = np.random.gamma(mu*mu, 1/mu, 2 * num_leaves + 1)
         
         weighted_edge_list = []
         for (n1,n2),w in zip(g.edges(), weights):
