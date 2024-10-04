@@ -262,7 +262,7 @@ if __name__ == '__main__':
         sys.exit()
     
     ## CREATE TRAINING GRAPHS HERE    
-    g = graph_generator(cmd_args.num_leaves, 100, cmd_args.seed)
+    graphs = graph_generator(cmd_args.num_leaves, 100, cmd_args.seed)
     
     num_graphs = len(graphs)
     num_train = 80
