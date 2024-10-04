@@ -282,12 +282,13 @@ class _tree_lib(object):
         return edge_idx
 
     def GetEdgeAndLR(self, lv):
-        #print("lv", lv)
+        print("lv", lv)
         n = self.lib.NumEdgesAtLevel(lv)
         lr = np.empty((n,), dtype=np.int32)
         self.lib.GetIsEdgeRch(lv, ctypes.c_void_p(lr.ctypes.data))
         edge_idx = self.GetEdgeOf(lv)
-        #print("edge index: ", edge_idx)
+        print("edge index: ", edge_idx)
+        print("lr: ", lr)
         return edge_idx, lr.astype(bool)
 
     def GetTrivialNodes(self):
