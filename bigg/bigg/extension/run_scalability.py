@@ -120,48 +120,72 @@ def get_edge_idx(g):
     edge_idx = [x[0] for x in edges]
     return np.array(edge_idx)
 
-def get_rand_er(num_nodes, num_graphs, low_p = 1.0, high_p = 1.0, args = cmd_args, p = 0.01):
-    npr = np.random.RandomState(args.seed)
-    graphs = []
-    
-    min_er_nodes = int(low_p * num_nodes)
-    max_er_nodes = int(high_p * num_nodes)
-    
-    for i in range(num_graphs):
-        if i % 10 == 0:
-            g_num_nodes = num_nodes
-        
+# def get_rand_er(num_nodes, num_graphs, low_p = 1.0, high_p = 1.0, args = cmd_args, p = 0.01):
+#     npr = np.random.RandomState(args.seed)
+#     graphs = []
+#     
+#     min_er_nodes = int(low_p * num_nodes)
+#     max_er_nodes = int(high_p * num_nodes)
+#     
+#     for i in range(num_graphs):
+#         if i % 10 == 0:
+#             g_num_nodes = num_nodes
+#         
+#         else:
+#             g_num_nodes = np.random.randint(min_er_nodes, max_er_nodes + 1)
+#         
+#         g = nx.fast_gnp_random_graph(g_num_nodes, p)
+#         for n1, n2 in g.edges():
+#             z = scipy.stats.norm.rvs(size = 1).item()
+#             w = np.log(np.exp(z) + 1)
+#             g[n1][n2]['weight'] = w
+#         graphs += [g]
+#     return graphs
+
+def tree_generator(n):
+    '''
+    Generates a random bifurcating tree w/ n nodes
+    Args:
+        n: number of leaves
+    '''
+    g = nx.Graph()
+    for j in range(n - 1):
+        if j == 0:
+            g.add_edges_from([(0, 1), (0, 2)])
         else:
-            g_num_nodes = np.random.randint(min_er_nodes, max_er_nodes + 1)
-        
-        g = nx.fast_gnp_random_graph(g_num_nodes, p)
-        for n1, n2 in g.edges():
-            z = scipy.stats.norm.rvs(size = 1).item()
-            w = np.log(np.exp(z) + 1)
-            g[n1][n2]['weight'] = w
-        graphs += [g]
-    return graphs
+            sample_set = [k for k in g.nodes() if g.degree(k) == 1]
+            selected_node = random.sample(sample_set, 1).pop()
+            g.add_edges_from([(selected_node, 2*j+1), (selected_node, 2*j+2)])
+    return g
 
 
-def get_rand_er(num_nodes, num_graphs, low_p = 1.0, high_p = 1.0, p = 0.01):
+def graph_generator(num_leaves, num_graphs = 100, seed = 34):
+    '''
+    Generates requested number of bifurcating trees
+    Args:
+    	n: number of leaves
+    	num_graphs: number of requested graphs
+    	constant_topology: if True, all graphs are topologically identical
+    	constant_weights: if True, all weights across all graphs are identical
+    	mu_weight: mean weight 
+    	scale: SD of weights
+    '''
+    npr = np.random.RandomState(seed)
     graphs = []
     
-    min_er_nodes = int(low_p * num_nodes)
-    max_er_nodes = int(high_p * num_nodes)
-    
-    for i in range(num_graphs):
-        if i % 10 == 0:
-            g_num_nodes = num_nodes
+    for _ in range(num_graphs):
+        g = tree_generator(num_leaves)
+        mu = np.random.uniform(7, 13)
+        weights = np.random.gamma(mu*mu, 1/mu, 2 * n + 1)
         
-        else:
-            g_num_nodes = np.random.randint(min_er_nodes, max_er_nodes + 1)
+        weighted_edge_list = []
+        for (n1,n2),w in zip(g.edges(), weights):
+            weighted_edge_list.append((n1, n2, w))
         
-        g = nx.fast_gnp_random_graph(g_num_nodes, p)
-        for n1, n2 in g.edges():
-            z = scipy.stats.norm.rvs(size = 1).item()
-            w = np.log(np.exp(z) + 1)
-            g[n1][n2]['weight'] = w
-        graphs += [g]
+        g = nx.Graph()
+        g.add_weighted_edges_from(weighted_edge_list)
+        
+        graphs.append(g)
     return graphs
 
 
@@ -184,17 +208,17 @@ if __name__ == '__main__':
     
     if cmd_args.training_time:
         print("Getting training times")
-        num_nodes_list = [cmd_args.num_nodes]
+        num_leaves_list = [cmd_args.num_nodes]
         #num_nodes = [50, 100, 200, 500, 1e3, 5e3, 1e4]
         times = []
         
-        for num_nodes in num_nodes_list:
+        for num_leaves in num_leaves_list:
             print(num_nodes)
             #save_tree = False
             #load_tree = True
             
             #if save_tree:
-            g = get_rand_er(int(num_nodes), 1)[0]
+            g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
             g = get_graph_data(g, 'DFS')[0]
             #    with open('temp_graphs', 'wb') as f:
             #        cp.dump(g, f, cp.HIGHEST_PROTOCOL)
