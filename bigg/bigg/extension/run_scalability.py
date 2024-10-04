@@ -291,6 +291,7 @@ if __name__ == '__main__':
                 ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
                 loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
                 loss.backward()
+                epoch_loss += loss.item() / num_iter
             
             else:
                 ll = 0.0
@@ -300,6 +301,7 @@ if __name__ == '__main__':
                                                     num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n, edge_feats = list_edge_feats[i], edge_idx = list_edge_idx[i])
                     ll += cur_ll
                 loss = -ll / num_nodes
+                epoch_loss += loss / num_iter
             
             if (idx + 1) % cmd_args.accum_grad == 0:
                 if cmd_args.grad_clip > 0:
@@ -313,8 +315,6 @@ if __name__ == '__main__':
             #loss.backward()
             
             grad_accum_counter += 1
-            
-            epoch_loss += loss.item() / num_iter
             
             if grad_accum_counter == cmd_args.accum_grad:
                 if cmd_args.grad_clip > 0:
