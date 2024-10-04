@@ -66,11 +66,11 @@ def sqrtn_forward_backward(model,
             
             cur_edge_feats = None
             if edge_feats is not None:
-                print(node_st)
-                print(cur_num)
+                #print(node_st)
+                #print(cur_num)
                 cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
                 cur_edge_feats = edge_feats#[cur_edge_idx]
-            print(count_)
+            #print(count_)
             count_+=1
             _, new_states = model.forward_row_summaries(graph_ids,
                                                         list_node_starts=[node_st],
@@ -82,10 +82,10 @@ def sqrtn_forward_backward(model,
             list_caches.append(new_states)
     
     tot_ll = 0.0
-    print("Done with first block")
-    print(list(range(len(cache_stages) - 1, -1, -1)))
+    #print("Done with first block")
+    #print(list(range(len(cache_stages) - 1, -1, -1)))
     for i in range(len(cache_stages) - 1, -1, -1):
-        print(i)
+        #print(i)
         st_delta = cache_stages[i]
         node_st = list_node_starts[0] + st_delta
         cur_num = num_nodes - node_st if node_st + blksize > num_nodes else blksize
@@ -95,8 +95,8 @@ def sqrtn_forward_backward(model,
                 x.requires_grad = True
         
         if edge_feats is not None:
-            print(node_st)
-            print(cur_num)
+            #print(node_st)
+            #print(cur_num)
             cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
             cur_edge_feats = edge_feats
         print("cur num node st")
