@@ -69,11 +69,8 @@ def sqrtn_forward_backward(model,
                 print(node_st)
                 print(cur_num)
                 cur_edge_idx = (edge_idx>=node_st)&(edge_idx<node_st+cur_num)
-                cur_edge_feats = edge_feats[cur_edge_idx]
+                cur_edge_feats = edge_feats#[cur_edge_idx]
             print(count_)
-            print("cur num node st")
-            print(cur_num)
-            print(node_st)
             count_+=1
             _, new_states = model.forward_row_summaries(graph_ids,
                                                         list_node_starts=[node_st],
