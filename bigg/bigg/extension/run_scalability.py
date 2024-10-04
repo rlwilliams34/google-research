@@ -173,7 +173,8 @@ def graph_generator(num_leaves, num_graphs = 100, seed = 34):
     npr = np.random.RandomState(seed)
     graphs = []
     
-    for _ in range(num_graphs):
+    for k in range(num_graphs):
+        print(k)
         g = tree_generator(num_leaves)
         mu = np.random.uniform(7, 13)
         weights = np.random.gamma(mu*mu, 1/mu, 2 * num_leaves + 1)
@@ -382,6 +383,12 @@ if __name__ == '__main__':
                 cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
+    
+    if (epoch + 1) % cmd_args.epoch_save == 0 or epoch + 1 == cmd_args.num_epochs:
+    
+    print('Saving Epoch')
+    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+    torch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
     
     print("Evaluation...")
     num_node_dist = get_node_dist(train_graphs)
