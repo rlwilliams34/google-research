@@ -647,7 +647,7 @@ class RecurTreeGen(nn.Module):
             node_feats = self.embed_node_feats(node_feats)
         if self.has_edge_feats:
             edge_feats = self.embed_edge_feats(edge_feats)
-            #print(edge_feats[0].shape)
+            print(edge_feats[0].shape)
 
         if not self.bits_compress:
             ### CHANGED HERE
