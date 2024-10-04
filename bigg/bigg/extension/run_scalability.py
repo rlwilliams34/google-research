@@ -213,7 +213,7 @@ if __name__ == '__main__':
         times = []
         
         for num_leaves in num_leaves_list:
-            print(num_nodes)
+            print(num_leaves)
             #save_tree = False
             #load_tree = True
             
