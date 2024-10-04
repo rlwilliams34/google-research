@@ -190,24 +190,23 @@ if __name__ == '__main__':
         
         for num_nodes in num_nodes_list:
             print(num_nodes)
-            save_tree = False
-            load_tree = True
+            #save_tree = False
+            #load_tree = True
             
-            if save_tree:
-                g = get_rand_er(int(num_nodes), 1)[0]
-                g = get_graph_data(g, 'DFS')
-                with open('temp_graphs', 'wb') as f:
-                    cp.dump(g, f, cp.HIGHEST_PROTOCOL)
-                sys.exit()
+            #if save_tree:
+            g = get_rand_er(int(num_nodes), 1)[0]
+            g = get_graph_data(g, 'DFS')
+            #    with open('temp_graphs', 'wb') as f:
+            #        cp.dump(g, f, cp.HIGHEST_PROTOCOL)
+            #    sys.exit()
             
-            if load_tree:
-                path = os.path.join(os.getcwd(), 'temp_graphs')
-                with open(path, 'rb') as f:
-                    g = cp.load(f)
+            #if load_tree:
+            #    path = os.path.join(os.getcwd(), 'temp_graphs')
+            #    with open(path, 'rb') as f:
+            #        g = cp.load(f)
             
-            g = g[0]
+            #g = g[0]
             [TreeLib.InsertGraph(g)]
-            
             
             
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
