@@ -102,6 +102,7 @@ def sqrtn_forward_backward(model,
         #print("cur num node st")
         #print(cur_num)
         #print(node_st)
+        print("i: ", i)
         ll, ll_wt, cur_states = model.forward_train(graph_ids,
                                              list_node_starts=[node_st],
                                              num_nodes=cur_num,
