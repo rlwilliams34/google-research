@@ -189,8 +189,8 @@ if __name__ == '__main__':
         
         for num_nodes in num_nodes_list:
             print(num_nodes)
-            save_tree = True
-            load_tree = False
+            save_tree = False
+            load_tree = True
             
             if save_tree:
                 g = get_rand_er(int(num_nodes), 1)[0]
