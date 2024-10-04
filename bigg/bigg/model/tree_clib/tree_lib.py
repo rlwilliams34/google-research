@@ -288,8 +288,8 @@ class _tree_lib(object):
         lr = np.empty((n,), dtype=np.int32)
         self.lib.GetIsEdgeRch(lv, ctypes.c_void_p(lr.ctypes.data))
         edge_idx = self.GetEdgeOf(lv)
-        if edge_idx is not None and edge_idx[0] > 1000:
-            print("edge index: ", edge_idx)
+        #if edge_idx is not None and edge_idx[0] > 1000:
+        #    print("edge index: ", edge_idx)
         #print("edge index: ", edge_idx)
         #print("lr: ", lr)
         return edge_idx, lr.astype(bool)
