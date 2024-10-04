@@ -61,6 +61,7 @@ def sqrtn_forward_backward(model,
         node_st = list_node_starts[0] + st_delta
         with torch.no_grad():
             cur_num = num_nodes - node_st if node_st + blksize > num_nodes else blksize
+            print(edge_feats.shape)
             _, new_states = model.forward_row_summaries(graph_ids,
                                                         list_node_starts=[node_st],
                                                         num_nodes=cur_num,
