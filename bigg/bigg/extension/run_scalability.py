@@ -204,8 +204,8 @@ if __name__ == '__main__':
                 with open(path, 'rb') as f:
                     g = cp.load(f)
             
-            print(g)
-            [TreeLib.InsertGraph(g[0][0])]
+            g = g[0]
+            [TreeLib.InsertGraph(g)]
             
             
             
