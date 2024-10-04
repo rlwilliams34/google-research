@@ -276,10 +276,32 @@ if __name__ == '__main__':
             node_feats = None
             edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
             
-            ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+            ###
+            if cmd_args.blksize < 0 or num_nodes <= cmd_args.blksize:
+                ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+                loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
+                loss.backward()
             
-            loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
-            loss.backward()
+            else:
+                ll = 0.0
+                for i in batch_indices:
+                    n = len(train_graphs[i])
+                    cur_ll, _ = sqrtn_forward_backward(model, graph_ids=[i], list_node_starts=[0],
+                                                    num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n, edge_feats = list_edge_feats[i])
+                    ll += cur_ll
+                loss = -ll / num_nodes
+            
+            if (idx + 1) % cmd_args.accum_grad == 0:
+                if cmd_args.grad_clip > 0:
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
+                optimizer.step()
+                optimizer.zero_grad()
+            ###
+            
+            #ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+            #loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
+            #loss.backward()
+            
             grad_accum_counter += 1
             
             epoch_loss += loss.item() / num_iter
@@ -308,6 +330,13 @@ if __name__ == '__main__':
                 cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
+    
+    
+    
+    
+    
+    
+    
     
     print("Evaluation...")
     num_node_dist = get_node_dist(train_graphs)
