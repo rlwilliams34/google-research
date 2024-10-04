@@ -657,7 +657,7 @@ class RecurTreeGen(nn.Module):
             node_feats = self.embed_node_feats(node_feats)
         if self.has_edge_feats:
             edge_feats = self.embed_edge_feats(edge_feats)
-            print(edge_feats[0].shape)
+            #print(edge_feats[0].shape)
 
         if not self.bits_compress:
             ### CHANGED HERE
@@ -691,7 +691,7 @@ class RecurTreeGen(nn.Module):
                 c_buf = c_buf_list[d + 1]
             h_bot, c_bot = fn_hc_bot(d + 1)
             if self.has_edge_feats:
-                print("d: ", d)
+                #print("d: ", d)
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 if edge_idx is None:
                     local_edge_feats = None
@@ -752,8 +752,8 @@ class RecurTreeGen(nn.Module):
         while True:
             #print("Testing")
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
-            print("is not leaf: ", is_nonleaf)
-            print("lv", lv)
+            #print("is not leaf: ", is_nonleaf)
+            #print("lv", lv)
             if self.has_edge_feats and is_nonleaf is not None and np.sum(1 - is_nonleaf) > 0:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
