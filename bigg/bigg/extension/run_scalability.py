@@ -211,10 +211,10 @@ if __name__ == '__main__':
     
     if cmd_args.training_time:
         print("Getting training times")
-        num_leaves_list = [cmd_args.num_nodes]
-        #num_leaves_list = [50, 100, 200, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
+        #num_leaves_list = [cmd_args.num_nodes]
+        num_leaves_list = [50, 100, 200, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
         times = []
-        
+        i = 0
         for num_leaves in num_leaves_list:
             num_leaves = int(num_leaves)
             num_nodes = 2 * int(num_leaves) - 1
@@ -241,7 +241,7 @@ if __name__ == '__main__':
             edge_feats = torch.from_numpy(get_edge_feats(g)).to(cmd_args.device)
             
             init = datetime.now()
-            ll, ll_wt, _ = model.forward_train([0], node_feats = None, edge_feats = edge_feats)
+            ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
             loss = -(ll + ll_wt) / num_nodes
             loss.backward()
             
@@ -253,6 +253,7 @@ if __name__ == '__main__':
             
             cur = datetime.now() - init
             times.append(cur.total_seconds())
+            i+=1
             
         print(num_leaves_list)
         print(times)
