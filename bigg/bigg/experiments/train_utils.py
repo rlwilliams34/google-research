@@ -63,6 +63,8 @@ def sqrtn_forward_backward(model,
             cur_num = num_nodes - node_st if node_st + blksize > num_nodes else blksize
             print("ST DELTA")
             print(st_delta)
+            print(node_st)
+            print(cache_states[-1])
             _, new_states = model.forward_row_summaries(graph_ids,
                                                         list_node_starts=[node_st],
                                                         num_nodes=cur_num,
