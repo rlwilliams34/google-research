@@ -688,6 +688,7 @@ class RecurTreeGen(nn.Module):
                     print(edge_idx.shape)
                 else:
                     print("edge idx: ", edge_idx)
+                    print(is_rch)
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 print(local_edge_feats[0].shape)
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
