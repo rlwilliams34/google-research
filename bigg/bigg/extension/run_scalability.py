@@ -180,7 +180,6 @@ if __name__ == '__main__':
     set_device(cmd_args.gpu)
     setup_treelib(cmd_args)
     #assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
-    cmd_args.has_edge_feats = False
     
     if cmd_args.training_time:
         print("Getting training times")
@@ -299,7 +298,7 @@ if __name__ == '__main__':
                 for i in batch_indices:
                     n = len(train_graphs[i])
                     cur_ll, _ = sqrtn_forward_backward(model, graph_ids=[i], list_node_starts=[0],
-                                                    num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n)#, edge_feats = list_edge_feats[i], edge_idx = list_edge_idx[i])
+                                                    num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n, edge_feats = list_edge_feats[i], edge_idx = list_edge_idx[i])
                     ll += cur_ll
                 loss = -ll / num_nodes
                 epoch_loss += loss / num_iter
