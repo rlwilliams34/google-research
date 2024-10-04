@@ -189,9 +189,23 @@ if __name__ == '__main__':
         
         for num_nodes in num_nodes_list:
             print(num_nodes)
-            g = get_rand_er(int(num_nodes), 1)[0]
-            g = get_graph_data(g, 'DFS')[0]
-            [TreeLib.InsertGraph(g)]
+            save_tree = True
+            load_tree = False
+            
+            if save_tree:
+                g = get_rand_er(int(num_nodes), 1)[0]
+                g = get_graph_data(g, 'DFS')
+                with open('temp_graphs', 'wb') as f:
+                    cp.dump(g, f, cp.HIGHEST_PROTOCOL)
+                sys.exit()
+            
+            if load_tree:
+                with open(path, 'rb') as f:
+                    g = cp.load(f)
+            
+            [TreeLib.InsertGraph(g[0])]
+            
+            
             
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
             optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
