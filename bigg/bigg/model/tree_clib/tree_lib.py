@@ -277,6 +277,7 @@ class _tree_lib(object):
         if n == 0:
             return None
         edge_idx = np.empty((n,), dtype=np.int32)
+        print("edge index: ", edge_idx)
         self.lib.GetEdgesOfLevel(lv, ctypes.c_void_p(edge_idx.ctypes.data))
         return edge_idx
 
@@ -285,6 +286,7 @@ class _tree_lib(object):
         lr = np.empty((n,), dtype=np.int32)
         self.lib.GetIsEdgeRch(lv, ctypes.c_void_p(lr.ctypes.data))
         edge_idx = self.GetEdgeOf(lv)
+        print("edge index: ", edge_idx)
         return edge_idx, lr.astype(bool)
 
     def GetTrivialNodes(self):
