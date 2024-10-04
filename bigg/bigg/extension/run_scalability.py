@@ -200,6 +200,7 @@ if __name__ == '__main__':
                 sys.exit()
             
             if load_tree:
+                path = os.path.join(os.getcwd(), 'temp_graphs')
                 with open(path, 'rb') as f:
                     g = cp.load(f)
             
