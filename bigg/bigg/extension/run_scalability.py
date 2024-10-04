@@ -276,7 +276,6 @@ if __name__ == '__main__':
             
             node_feats = None
             edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
-            print(edge_feats.shape)
             
             ###
             if cmd_args.blksize < 0 or num_nodes <= cmd_args.blksize:
