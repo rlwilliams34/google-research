@@ -446,6 +446,8 @@ if __name__ == '__main__':
                 print("Times: ", cur.total_seconds())
     
     print(gen_graphs[0].edges(data=True))
+    print(gen_graphs[1].edges(data=True))
+    print(gen_graphs[2].edges(data=True))
     get_graph_stats(gen_graphs, test_graphs, 'scale_test')
     
     
