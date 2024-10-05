@@ -336,7 +336,7 @@ if __name__ == '__main__':
     
     if cmd_args.num_leaves == 5000:
         num_epochs = 500
-        epoch_plateu = 100
+        epoch_plateu = 400
     
     else:
         num_epochs = 1500
@@ -418,6 +418,12 @@ if __name__ == '__main__':
                 cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
+        
+        if cmd_args.num_leaves == 5000 and epoch % 100 == 0:
+            print('Saving Model')
+            path = os.path.join(os.getcwd(), 'scale_model_5000')
+            checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+            torch.save(checkpoint, path)
     
     path = os.path.join(os.getcwd(), 'temp')
     try:
