@@ -276,9 +276,11 @@ if __name__ == '__main__':
         cano_g = get_graph_data(g, 'BFS')
         ordered_graphs += cano_g
     
-    graphs = None
+    
     train_graphs = ordered_graphs[:num_train]
     test_graphs = ordered_graphs[num_train:]
+    graphs = None
+    ordered_graphs = None
     
     print(train_graphs[0].edges(data=True))
     
@@ -311,7 +313,7 @@ if __name__ == '__main__':
     plateus = []
     prev_loss = np.inf
     
-    for epoch in range(000):
+    for epoch in range(2000):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
