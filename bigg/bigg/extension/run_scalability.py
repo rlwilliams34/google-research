@@ -330,7 +330,7 @@ if __name__ == '__main__':
 #     optimizer.load_state_dict(checkpoint['optimizer'])
 #     cmd_args.learning_rate = 1e-5
     
-    for epoch in range(0, 16000):
+    for epoch in range(0, 000):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
@@ -413,18 +413,18 @@ if __name__ == '__main__':
     except OSError:
         pass
     
-    print('Saving Model')
-    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-    torch.save(checkpoint, path)
+#    print('Saving Model')
+#    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+#    torch.save(checkpoint, path)
 #     
-#     print('Loading Model')
-#     path = os.path.join(os.getcwd(), 'temp')
-#     checkpoint = torch.load(path)
-#     model.load_state_dict(checkpoint['model'])
-#     
-#     print("Evaluation...")
-#     num_node_dist = get_node_dist(train_graphs)
-#     gen_graphs = []
+     print('Loading Model')
+     path = os.path.join(os.getcwd(), 'temp')
+     checkpoint = torch.load(path)
+     model.load_state_dict(checkpoint['model'])
+     
+     print("Evaluation...")
+     num_node_dist = get_node_dist(train_graphs)
+     gen_graphs = []
 #     
     with torch.no_grad():
         model.eval()
