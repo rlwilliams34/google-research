@@ -249,7 +249,7 @@ def spectral_worker(G, weighted):
   else:
     eigs = eigvalsh(nx.normalized_laplacian_matrix(G).todense()) 
    
-  spectral_pmf, _ = np.histogram(eigs, bins=200, range=(-1e-5, 2), density=False)
+  spectral_pmf, _ = np.histogram(eigs, bins=20, range=(-1e-5, 2), density=False)
   spectral_pmf = spectral_pmf / spectral_pmf.sum()
   # from scipy import stats  
   # kernel = stats.gaussian_kde(eigs)
