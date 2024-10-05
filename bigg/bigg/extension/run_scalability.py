@@ -287,7 +287,7 @@ if __name__ == '__main__':
             with open(path, 'wb') as f:
                 cp.dump(ordered_graphs, f, protocol=cp.HIGHEST_PROTOCOL)
     
-    num_train = len(ordered_graphs)
+    num_graphs = len(ordered_graphs)
     num_train = 80
     num_test_gt = num_graphs - num_train
     
