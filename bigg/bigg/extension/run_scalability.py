@@ -385,11 +385,6 @@ if __name__ == '__main__':
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
                 optimizer.step()
                 optimizer.zero_grad()
-            ###
-            
-            #ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
-            #loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
-            #loss.backward()
             
             grad_accum_counter += 1
             
@@ -419,31 +414,16 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
         
-        if cmd_args.num_leaves == 5000 and epoch % 100 == 0:
+        if epoch % 100 == 0:
             print('Saving Model')
-            path = os.path.join(os.getcwd(), 'scale_model_5000')
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+            path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
             torch.save(checkpoint, path)
-    
-    path = os.path.join(os.getcwd(), 'temp')
-    try:
-        os.remove(path)
-    except OSError:
-        pass
-   
-    print('Saving Model')
-    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-    torch.save(checkpoint, path)
-#     
-#     print('Loading Model')
-#     path = os.path.join(os.getcwd(), 'temp')
-#     checkpoint = torch.load(path)
-#     model.load_state_dict(checkpoint['model'])
-    
+        
     print("Evaluation...")
     num_node_dist = get_node_dist(train_graphs)
     gen_graphs = []
-#     
+      
     with torch.no_grad():
         model.eval()
         for i in tqdm(range(20)):
@@ -474,10 +454,7 @@ if __name__ == '__main__':
                 print("Times: ", cur.total_seconds())
     
     print(gen_graphs[0].edges(data=True))
-    print(gen_graphs[1].edges(data=True))
-    print(gen_graphs[2].edges(data=True))
-    print(len(gen_graphs))
-    print(len(test_graphs))
+    
     get_graph_stats(gen_graphs, test_graphs, 'scale_test')
     
     
