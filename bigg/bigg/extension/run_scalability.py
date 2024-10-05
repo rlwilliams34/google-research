@@ -191,7 +191,7 @@ def graph_generator(num_leaves, num_graphs = 100, seed = 34):
 
 
 if __name__ == '__main__':
-    cmd_args.scale = 20
+    cmd_args.scale_loss = 20
     cmd_args.wt_drop = 0.5
     cmd_args.wt_mode = "score"
     cmd_args.has_edge_feats = True
@@ -279,6 +279,8 @@ if __name__ == '__main__':
     graphs = None
     train_graphs = ordered_graphs[:num_train]
     test_graphs = ordered_graphs[num_train:]
+    
+    print(train_graphs[0].edges(data=True))
     
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
