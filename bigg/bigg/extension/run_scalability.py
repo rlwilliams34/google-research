@@ -374,7 +374,7 @@ if __name__ == '__main__':
             
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, loss))
         
-        if cmd_args.learning_rate != 1e-5:
+        if cmd_args.learning_rate != 1e-5 and epoch > 500:
             plateu = int(epoch_loss > prev_loss)
             prev_loss = epoch_loss
             
