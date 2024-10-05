@@ -392,7 +392,7 @@ if __name__ == '__main__':
      
     print('Saving Model')
     checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-    rch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
+    torch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
     
     #print('Loading Model')
     #path = os.path.join(os.getcwd(), 'temp')
