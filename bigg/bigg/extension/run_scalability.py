@@ -339,7 +339,7 @@ if __name__ == '__main__':
         epoch_plateu = 100
     
     else:
-        num_epochs = 10000
+        num_epochs = 1500
         epoch_plateu = 800
     
     for epoch in range(0, num_epochs):
