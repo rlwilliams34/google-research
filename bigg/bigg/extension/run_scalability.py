@@ -383,6 +383,7 @@ if __name__ == '__main__':
                 plateus.append(plateu)
             
             if sum(plateus) > 5:
+                print("Plateu LR")
                 cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
