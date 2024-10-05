@@ -422,13 +422,13 @@ if __name__ == '__main__':
                 pred_g = nx.Graph()
                 pred_g.add_weighted_edges_from(weighted_edges)
                 gen_graphs.append(pred_g)
-                print(pred_g.edges(data=True))
             
             if i == 0:
                 cur = datetime.now() - init
                 print("Num nodes: ", num_nodes)
                 print("Times: ", cur.total_seconds())
     
+    print(gen_graphs[0].edges(data=True))
     get_graph_stats(gen_graphs, test_graphs, 'scale_test')
     
     
