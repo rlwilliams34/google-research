@@ -261,21 +261,31 @@ if __name__ == '__main__':
             
         sys.exit()
     
-    ## CREATE TRAINING GRAPHS HERE    
-    graphs = graph_generator(cmd_args.num_leaves, 100, cmd_args.seed)
+    ## CREATE TRAINING GRAPHS HERE 
+    path = os.path.join(os.getcwd(), 'temp_graphs')
     
-    num_graphs = len(graphs)
-    num_train = 80
-    num_test_gt = num_graphs - num_train
-
-    # npr = np.random.RandomState(cmd_args.seed)
-    # npr.shuffle(graphs)
-    ordered_graphs = []
+    if cmd_args.num_leaves >= 1000 and os.path.isfile(path):
+        with open(path, 'rb') as f:
+            ordered_graphs = cp.load(f) ## List of nx val graphs
     
-    for g in graphs:
-        cano_g = get_graph_data(g, 'BFS')
-        ordered_graphs += cano_g
-    
+    else:   
+        graphs = graph_generator(cmd_args.num_leaves, 100, cmd_args.seed)
+        
+        num_graphs = len(graphs)
+        num_train = 80
+        num_test_gt = num_graphs - num_train
+        
+        # npr = np.random.RandomState(cmd_args.seed)
+        # npr.shuffle(graphs)
+        ordered_graphs = []
+        
+        for g in graphs:
+            cano_g = get_graph_data(g, 'BFS')
+            ordered_graphs += cano_g
+        
+        if cmd_args.num_leaves >= 1000:
+            with open(path, 'wb') as f:
+                cp.dump(ordered_graphs, f, protocol=cp.HIGHEST_PROTOCOL)
     
     train_graphs = ordered_graphs[:num_train]
     test_graphs = ordered_graphs[num_train:]
