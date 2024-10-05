@@ -249,7 +249,7 @@ def spectral_worker(G, weighted):
   else:
     eigs = eigvalsh(nx.normalized_laplacian_matrix(G).todense()) 
    
-  spectral_pmf, _ = np.histogram(eigs, bins=100, range=(-1e-5, 2), density=False)
+  spectral_pmf, _ = np.histogram(eigs, bins=50, range=(-1e-5, 2), density=False)
   spectral_pmf = spectral_pmf / spectral_pmf.sum()
   # from scipy import stats  
   # kernel = stats.gaussian_kde(eigs)
@@ -335,12 +335,12 @@ def mmd_weights_only(sample_graphs, target_graphs, kernel):
   max_ = max(max_a, max_b)
   
   for i in range(len(sample_list)):
-      hist_temp, _ = np.histogram(sample_list[i], range = (-1e-5, max_), bins=100, density=False)
+      hist_temp, _ = np.histogram(sample_list[i], range = (-1e-5, max_), bins=50, density=False)
       hist_temp = hist_temp / hist_temp.sum()
       sample_ref.append(hist_temp)
   
   for i in range(len(target_list)):
-      hist_temp, _ = np.histogram(target_list[i], range = (-1e-5, max_), bins=100, density=False)
+      hist_temp, _ = np.histogram(target_list[i], range = (-1e-5, max_), bins=50, density=False)
       hist_temp = hist_temp / hist_temp.sum()
       sample_pred.append(hist_temp)
   
