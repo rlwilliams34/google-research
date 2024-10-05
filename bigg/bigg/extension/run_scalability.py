@@ -313,7 +313,14 @@ if __name__ == '__main__':
     plateus = []
     prev_loss = np.inf
     
-    for epoch in range(2000):
+    print('Loading Model')
+    path = os.path.join(os.getcwd(), 'temp')
+    checkpoint = torch.load(path)
+    model.load_state_dict(checkpoint['model'])
+    optimizer.load_state_dict(checkpoint['optimizer'])
+    cmd_args.learning_rate = 1e-5
+    
+    for epoch in range(2000, 4000):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
