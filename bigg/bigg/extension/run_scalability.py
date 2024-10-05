@@ -276,6 +276,7 @@ if __name__ == '__main__':
         cano_g = get_graph_data(g, 'DFS')
         ordered_graphs += cano_g
     
+    graphs = None
     train_graphs = ordered_graphs[:num_train]
     test_graphs = ordered_graphs[num_train:]
     
@@ -308,7 +309,7 @@ if __name__ == '__main__':
     plateus = []
     prev_loss = np.inf
     
-    for epoch in range(2000):
+    for epoch in range(000):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
@@ -384,9 +385,14 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
      
-    print('Saving Model')
-    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-    torch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
+    #print('Saving Model')
+    #checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+    #torch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
+    
+    print('Loading Model')
+    path = os.path.join(os.getcwd(), 'temp')
+    checkpoint = torch.load(path)
+    model.load_state_dict(checkpoint['model'])
     
     print("Evaluation...")
     num_node_dist = get_node_dist(train_graphs)
@@ -395,7 +401,7 @@ if __name__ == '__main__':
         model.eval()
         for i in tqdm(range(20)):
             if i == 0:
-                num_nodes = cmd_args.num_nodes
+                num_nodes = 2 * cmd_args.num_leaves - 1
             
             else:
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist))
