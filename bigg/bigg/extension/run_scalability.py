@@ -417,14 +417,14 @@ if __name__ == '__main__':
 #    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
 #    torch.save(checkpoint, path)
 #     
-     print('Loading Model')
-     path = os.path.join(os.getcwd(), 'temp')
-     checkpoint = torch.load(path)
-     model.load_state_dict(checkpoint['model'])
-     
-     print("Evaluation...")
-     num_node_dist = get_node_dist(train_graphs)
-     gen_graphs = []
+    print('Loading Model')
+    path = os.path.join(os.getcwd(), 'temp')
+    checkpoint = torch.load(path)
+    model.load_state_dict(checkpoint['model'])
+    
+    print("Evaluation...")
+    num_node_dist = get_node_dist(train_graphs)
+    gen_graphs = []
 #     
     with torch.no_grad():
         model.eval()
