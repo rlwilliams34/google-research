@@ -407,11 +407,11 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
     
-    path = os.path.join(os.getcwd(), 'temp')
-    try:
-        os.remove(path)
-    except OSError:
-        pass
+#    path = os.path.join(os.getcwd(), 'temp')
+#    try:
+#        os.remove(path)
+#    except OSError:
+#        pass
     
 #    print('Saving Model')
 #    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
