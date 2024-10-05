@@ -501,10 +501,10 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         get_mmd_stats(out_graphs, test_graphs)
     
     elif graph_type == "scale_test":
-        mmd_sepctral_weighted = spectral_stats(out_graphs, test_graphs, True)
+        mmd_sepctral_weighted = spectral_stats(out_graphs, test_graphs, True, cmd_args.num_leaves)
         print("MMD on Specta of L Normalized, Weighted: ", mmd_sepctral_weighted)
         
-        mmd_weights = mmd_weights_only(out_graphs, test_graphs, gaussian_tv)
+        mmd_weights = mmd_weights_only(out_graphs, test_graphs, gaussian_tv, cmd_args.num_leaves)
         print("MMD on Weights Only: ", mmd_weights)
         
         mmd_orbit = orbit_stats_all(out_graphs, test_graphs)

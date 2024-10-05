@@ -241,7 +241,7 @@ def orbit_stats_all(graph_ref_list, graph_pred_list):
 
 
 ## FROM https://github.com/lrjconan/GRAN/blob/master/utils/eval_helper.py
-def spectral_worker(G, weighted):
+def spectral_worker(G, weighted, num_leaves = -1):
   # eigs = nx.laplacian_spectrum(G)
   if not weighted:
     G2 = nx.Graph(G.edges())
@@ -249,7 +249,14 @@ def spectral_worker(G, weighted):
   else:
     eigs = eigvalsh(nx.normalized_laplacian_matrix(G).todense()) 
    
-  spectral_pmf, _ = np.histogram(eigs, bins=50, range=(-1e-5, 2), density=False)
+   
+  if num_leaves > 0:
+      bins = int(num_leaves)
+  
+  else:
+      bins = 200
+  
+  spectral_pmf, _ = np.histogram(eigs, bins=bins, range=(-1e-5, 2), density=False)
   spectral_pmf = spectral_pmf / spectral_pmf.sum()
   # from scipy import stats  
   # kernel = stats.gaussian_kde(eigs)
@@ -259,7 +266,7 @@ def spectral_worker(G, weighted):
   # import pdb; pdb.set_trace()
   return spectral_pmf
 
-def spectral_stats(graph_ref_list, graph_pred_list, weighted, is_parallel=False):
+def spectral_stats(graph_ref_list, graph_pred_list, weighted, num_leaves = -1, is_parallel=False):
   ''' Compute the distance between the degree distributions of two unordered sets of graphs.
     Args:
       graph_ref_list, graph_target_list: two lists of networkx graphs to be evaluated
@@ -288,10 +295,10 @@ def spectral_stats(graph_ref_list, graph_pred_list, weighted, is_parallel=False)
     #     sample_pred.append(spectral_density)
   else:
     for i in range(len(graph_ref_list)):
-      spectral_temp = spectral_worker(graph_ref_list[i], weighted)
+      spectral_temp = spectral_worker(graph_ref_list[i], weighted, num_leaves)
       sample_ref.append(spectral_temp)
     for i in range(len(graph_pred_list_remove_empty)):
-      spectral_temp = spectral_worker(graph_pred_list_remove_empty[i], weighted)
+      spectral_temp = spectral_worker(graph_pred_list_remove_empty[i], weighted, num_leaves)
       sample_pred.append(spectral_temp)
   # print(len(sample_ref), len(sample_pred))
 
@@ -322,7 +329,7 @@ def collect_weights(list_graphs):
             print("WARNING: Empty graph")
     return list_graph_weights, max_wt
 
-def mmd_weights_only(sample_graphs, target_graphs, kernel):
+def mmd_weights_only(sample_graphs, target_graphs, kernel, num_leaves=-1):
   sample_list, max_a = collect_weights(sample_graphs)
   target_list, max_b = collect_weights(target_graphs)
   #print(sample_list)
@@ -334,13 +341,19 @@ def mmd_weights_only(sample_graphs, target_graphs, kernel):
   #max_b = max([max(b) for b in target_list])
   max_ = max(max_a, max_b)
   
+  if num_leaves > 0:
+      bins = int(num_leaves)
+  
+  else:
+      bins = 200
+  
   for i in range(len(sample_list)):
-      hist_temp, _ = np.histogram(sample_list[i], range = (-1e-5, max_), bins=50, density=False)
+      hist_temp, _ = np.histogram(sample_list[i], range = (-1e-5, max_), bins=bins, density=False)
       hist_temp = hist_temp / hist_temp.sum()
       sample_ref.append(hist_temp)
   
   for i in range(len(target_list)):
-      hist_temp, _ = np.histogram(target_list[i], range = (-1e-5, max_), bins=50, density=False)
+      hist_temp, _ = np.histogram(target_list[i], range = (-1e-5, max_), bins=bins, density=False)
       hist_temp = hist_temp / hist_temp.sum()
       sample_pred.append(hist_temp)
   
