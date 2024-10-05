@@ -334,7 +334,15 @@ if __name__ == '__main__':
 #     optimizer.load_state_dict(checkpoint['optimizer'])
 #     cmd_args.learning_rate = 1e-5
     
-    for epoch in range(0, 10000):
+    if cmd_args.num_leaves == 5000:
+        num_epochs = 500
+        epoch_plateu = 100
+    
+    else:
+        num_epochs = 10000
+        epoch_plateu = 800
+    
+    for epoch in range(0, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
@@ -395,7 +403,7 @@ if __name__ == '__main__':
             
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, loss))
         
-        if cmd_args.learning_rate != 1e-5 and epoch > 800:
+        if cmd_args.learning_rate != 1e-5 and epoch > epoch_plateu:
             plateu = int(epoch_loss > prev_loss)
             prev_loss = epoch_loss
             
