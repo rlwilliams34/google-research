@@ -311,7 +311,7 @@ if __name__ == '__main__':
     plateus = []
     prev_loss = np.inf
     
-    for epoch in range(2000):
+    for epoch in range(1000):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
