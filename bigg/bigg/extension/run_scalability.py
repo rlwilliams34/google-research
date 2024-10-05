@@ -390,14 +390,14 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
      
-#     print('Saving Model')
-#     checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-#     rch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
+    print('Saving Model')
+    checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+    rch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
     
-    print('Loading Model')
-    path = os.path.join(os.getcwd(), 'temp')
-    checkpoint = torch.load(path)
-    model.load_state_dict(checkpoint['model'])
+    #print('Loading Model')
+    #path = os.path.join(os.getcwd(), 'temp')
+    #checkpoint = torch.load(path)
+    #model.load_state_dict(checkpoint['model'])
     
     print("Evaluation...")
     num_node_dist = get_node_dist(train_graphs)
