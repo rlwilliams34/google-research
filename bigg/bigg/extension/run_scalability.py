@@ -389,10 +389,16 @@ if __name__ == '__main__':
                 cmd_args.learning_rate = 1e-5
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
-     
+    
+    path = os.path.join(os.getcwd(), 'temp')
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+    
     print('Saving Model')
     checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-    torch.save(checkpoint, os.path.join(os.getcwd(), 'temp'))
+    torch.save(checkpoint, path)
     
     #print('Loading Model')
     #path = os.path.join(os.getcwd(), 'temp')
