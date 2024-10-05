@@ -225,7 +225,7 @@ if __name__ == '__main__':
             
             #if save_tree:
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
-            g = get_graph_data(g[0], 'DFS')
+            g = get_graph_data(g[0], 'BFS')
             g = g[0]
             #    with open('temp_graphs', 'wb') as f:
             #        cp.dump(g, f, cp.HIGHEST_PROTOCOL)
@@ -273,7 +273,7 @@ if __name__ == '__main__':
     ordered_graphs = []
     
     for g in graphs:
-        cano_g = get_graph_data(g, 'DFS')
+        cano_g = get_graph_data(g, 'BFS')
         ordered_graphs += cano_g
     
     graphs = None
