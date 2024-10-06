@@ -264,7 +264,7 @@ if __name__ == '__main__':
     ## CREATE TRAINING GRAPHS HERE 
     path = os.path.join(os.getcwd(), 'temp_graphs')
     
-    if cmd_args.num_leaves >= 1000 and os.path.isfile(path):
+    if cmd_args.num_leaves > 1000 and os.path.isfile(path):
         with open(path, 'rb') as f:
             ordered_graphs = cp.load(f) ## List of nx val graphs
     
@@ -342,7 +342,6 @@ if __name__ == '__main__':
         num_epochs = 1500
         epoch_plateu = 800
     
-    num_epochs = 0
     for epoch in range(0, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
