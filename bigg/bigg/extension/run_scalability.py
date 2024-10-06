@@ -341,7 +341,7 @@ if __name__ == '__main__':
         num_epochs = 1500
         epoch_plateu = 800
     
-    for epoch in range(200, num_epochs):
+    for epoch in range(300, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
