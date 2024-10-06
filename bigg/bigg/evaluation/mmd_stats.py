@@ -342,7 +342,7 @@ def mmd_weights_only(sample_graphs, target_graphs, kernel, num_leaves=-1):
   max_ = max(max_a, max_b)
   
   if num_leaves > 0:
-      bins = int(num_leaves)
+      bins = min(int(num_leaves), 200)
   
   else:
       bins = 200
