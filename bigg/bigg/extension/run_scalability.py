@@ -445,7 +445,7 @@ if __name__ == '__main__':
             
             weighted_edges = []
             
-            if i == 0:
+            if i % 5 == 0:
                 cur = datetime.now() - init
                 print("Num nodes: ", num_nodes)
                 print("Times: ", cur.total_seconds())
