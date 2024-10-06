@@ -438,17 +438,17 @@ if __name__ == '__main__':
             else:
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist))
             
-            if i == 0:
-                init = datetime.now()
+            init = datetime.now()
             
             _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
             
-            weighted_edges = []
             
             if i % 5 == 0:
                 cur = datetime.now() - init
                 print("Num nodes: ", num_nodes)
                 print("Times: ", cur.total_seconds())
+            
+            weighted_edges = []
             
             for e, w in zip(pred_edges, pred_edge_feats):
                 assert e[0] > e[1]
