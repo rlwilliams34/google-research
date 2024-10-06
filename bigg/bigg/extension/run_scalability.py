@@ -327,12 +327,12 @@ if __name__ == '__main__':
     plateus = []
     prev_loss = np.inf
     
-    print('Loading Model')
-    path = os.path.join(os.getcwd(), 'temp500.ckpt')
-    checkpoint = torch.load(path)
-    model.load_state_dict(checkpoint['model'])
-    optimizer.load_state_dict(checkpoint['optimizer'])
-    cmd_args.learning_rate = 1e-5
+#     print('Loading Model')
+#     path = os.path.join(os.getcwd(), 'temp500.ckpt')
+#     checkpoint = torch.load(path)
+#     model.load_state_dict(checkpoint['model'])
+#     optimizer.load_state_dict(checkpoint['optimizer'])
+#     cmd_args.learning_rate = 1e-5
     
     if cmd_args.num_leaves == 5000:
         num_epochs = 500
@@ -415,7 +415,7 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
         
-        if (epoch+1) % 100 == 0:
+        if (epoch+1) % 100 == 0 or epoch == 0:
             print('Saving Model')
             
             #if os.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
