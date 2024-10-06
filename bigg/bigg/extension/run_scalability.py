@@ -327,12 +327,12 @@ if __name__ == '__main__':
     plateus = []
     prev_loss = np.inf
     
-#     print('Loading Model')
-#     path = os.path.join(os.getcwd(), 'temp')
-#     checkpoint = torch.load(path)
-#     model.load_state_dict(checkpoint['model'])
-#     optimizer.load_state_dict(checkpoint['optimizer'])
-#     cmd_args.learning_rate = 1e-5
+    print('Loading Model')
+    path = os.path.join(os.getcwd(), 'temp500.ckpt')
+    checkpoint = torch.load(path)
+    model.load_state_dict(checkpoint['model'])
+    optimizer.load_state_dict(checkpoint['optimizer'])
+    cmd_args.learning_rate = 1e-5
     
     if cmd_args.num_leaves == 5000:
         num_epochs = 500
@@ -342,6 +342,7 @@ if __name__ == '__main__':
         num_epochs = 1500
         epoch_plateu = 800
     
+    num_epochs = 0
     for epoch in range(0, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
@@ -444,6 +445,11 @@ if __name__ == '__main__':
             
             weighted_edges = []
             
+            if i == 0:
+                cur = datetime.now() - init
+                print("Num nodes: ", num_nodes)
+                print("Times: ", cur.total_seconds())
+            
             for e, w in zip(pred_edges, pred_edge_feats):
                 assert e[0] > e[1]
                 weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
@@ -452,10 +458,6 @@ if __name__ == '__main__':
             
             gen_graphs.append(pred_g)
             
-            if i == 0:
-                cur = datetime.now() - init
-                print("Num nodes: ", num_nodes)
-                print("Times: ", cur.total_seconds())
     
     print(gen_graphs[0].edges(data=True))
     

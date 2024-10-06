@@ -504,6 +504,9 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         mmd_sepctral_weighted = spectral_stats(out_graphs, test_graphs, True, cmd_args.num_leaves)
         print("MMD on Specta of L Normalized, Weighted: ", mmd_sepctral_weighted)
         
+        mmd_degree = degree_stats(out_graphs, test_graphs)
+        print("MMD Test on Degree Stats: ", mmd_degree)
+        
         mmd_weights = mmd_weights_only(out_graphs, test_graphs, gaussian_tv, cmd_args.num_leaves)
         print("MMD on Weights Only: ", mmd_weights)
         
