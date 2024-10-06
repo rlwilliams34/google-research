@@ -326,22 +326,32 @@ if __name__ == '__main__':
     plateus = []
     prev_loss = np.inf
     
-    print('Loading Model')
+    
     path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
-    checkpoint = torch.load(path)
-    model.load_state_dict(checkpoint['model'])
-    optimizer.load_state_dict(checkpoint['optimizer'])
-    cmd_args.learning_rate = 1e-5
+    epoch_load = 0
+    
+    if os.path.isfile(path):
+        print('Loading Model')
+        checkpoint = torch.load(path)
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        epoch_load = checkpoint['epoch']
     
     if cmd_args.num_leaves == 5000:
         num_epochs = 500
         epoch_plateu = 400
+        
+        if epoch_load >= 400:
+            cmd_args.learning_rate = 1e-5        
     
     else:
         num_epochs = 1500
         epoch_plateu = 800
+        
+        if epoch_load >= 800:
+            cmd_args.learning_rate = 1e-5
     
-    for epoch in range(0, num_epochs):
+    for epoch in range(epoch_load, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
