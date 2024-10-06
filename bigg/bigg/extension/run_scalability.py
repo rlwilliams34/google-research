@@ -283,7 +283,7 @@ if __name__ == '__main__':
             cano_g = get_graph_data(g, 'BFS')
             ordered_graphs += cano_g
         
-        if cmd_args.num_leaves >= 1000:
+        if cmd_args.num_leaves > 1000:
             with open(path, 'wb') as f:
                 cp.dump(ordered_graphs, f, protocol=cp.HIGHEST_PROTOCOL)
     
