@@ -1,4 +1,3 @@
-# coding=utf-8
 # Copyright 2024 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -327,26 +326,30 @@ if __name__ == '__main__':
     plateus = []
     prev_loss = np.inf
     
-#     print('Loading Model')
-#     path = os.path.join(os.getcwd(), 'temp500.ckpt')
-#     checkpoint = torch.load(path)
-#     model.load_state_dict(checkpoint['model'])
-#     optimizer.load_state_dict(checkpoint['optimizer'])
-#     cmd_args.learning_rate = 1e-5
-
+    print('Loading Model')
+    path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
+    checkpoint = torch.load(path)
+    model.load_state_dict(checkpoint['model'])
+    optimizer.load_state_dict(checkpoint['optimizer'])
+    cmd_args.learning_rate = 1e-5
+    
     if cmd_args.num_leaves == 5000:
-        num_epochs = 1
+        num_epochs = 500
         epoch_plateu = 400
     
     else:
         num_epochs = 1500
         epoch_plateu = 800
     
-    for epoch in range(0, num_epochs):
+    for epoch in range(200, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
-        model.epoch_num += 1
+        if epoch == 0:
+            for i in range(len(list_edge_feats)):
+                edge_feats = list_edge_feats[i]
+                model.update_weight_stats(edge_feats)
+        
         epoch_loss = 0.0
         
         for idx in pbar:
@@ -382,6 +385,15 @@ if __name__ == '__main__':
                 optimizer.step()
                 optimizer.zero_grad()
             
+            grad_accum_counter += 1
+            
+            if grad_accum_counter == cmd_args.accum_grad:
+                if cmd_args.grad_clip > 0:
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
+                
+                optimizer.step()
+                optimizer.zero_grad()
+                grad_accum_counter = 0
             
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, loss))
         
@@ -401,7 +413,7 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
         
-        if (epoch+1) % 5 == 0 or epoch == 0:
+        if (epoch+1) % 100 == 0 or epoch == 0:
             print('Saving Model')
             
             #if os.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
@@ -414,7 +426,7 @@ if __name__ == '__main__':
     print("Evaluation...")
     num_node_dist = get_node_dist(train_graphs)
     gen_graphs = []
-    
+      
     with torch.no_grad():
         model.eval()
         for i in tqdm(range(20)):
@@ -443,11 +455,12 @@ if __name__ == '__main__':
                 pred_g.add_weighted_edges_from(weighted_edges)
             
             gen_graphs.append(pred_g)
+            
     
     print(gen_graphs[0].edges(data=True))
     
     get_graph_stats(gen_graphs, test_graphs, 'scale_test')
-    
+
     
 
         
