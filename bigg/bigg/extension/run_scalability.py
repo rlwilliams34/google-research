@@ -342,7 +342,7 @@ if __name__ == '__main__':
         if epoch_load >= 800:
             cmd_args.learning_rate = 1e-5
     
-    for epoch in range(epoch_load, num_epochs):
+    for epoch in range(0):#epoch_load, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
