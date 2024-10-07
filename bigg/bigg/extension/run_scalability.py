@@ -414,7 +414,7 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
         
-        if (epoch+1) % 50 == 0 or epoch == 0:
+        if (epoch+1) % 20 == 0 or epoch == 0:
             print('Saving Model')
             
             #if os.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
