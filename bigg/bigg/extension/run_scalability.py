@@ -212,8 +212,8 @@ if __name__ == '__main__':
     if cmd_args.training_time:
         print("Getting training times")
         #num_leaves_list = [cmd_args.num_nodes]
-        #num_leaves_list = [50, 100, 200, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
-        num_leaves_list = [50, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
+        num_leaves_list = [50, 100, 200, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
+        #num_leaves_list = [50, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
         times = []
         i = 0
         for num_leaves in num_leaves_list:
