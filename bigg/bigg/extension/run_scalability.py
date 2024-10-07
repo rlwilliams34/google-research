@@ -190,7 +190,11 @@ def graph_generator(num_leaves, num_graphs = 100, seed = 34):
 
 
 if __name__ == '__main__':
-    cmd_args.scale_loss = 20
+    if cmd_args.num_leaves <= 5000:
+        cmd_args.scale_loss = 20
+    
+    else:
+        cmd_args.scale_loss = 1
     cmd_args.wt_drop = 0.5
     cmd_args.wt_mode = "score"
     cmd_args.has_edge_feats = True
