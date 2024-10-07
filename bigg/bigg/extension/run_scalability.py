@@ -219,23 +219,11 @@ if __name__ == '__main__':
             num_leaves = int(num_leaves)
             num_nodes = 2 * int(num_leaves) - 1
             print(num_nodes)
-            #save_tree = False
-            #load_tree = True
             
-            #if save_tree:
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
             g = get_graph_data(g[0], 'BFS')
             g = g[0]
-            #    with open('temp_graphs', 'wb') as f:
-            #        cp.dump(g, f, cp.HIGHEST_PROTOCOL)
-            #    sys.exit()
             
-            #if load_tree:
-            #    path = os.path.join(os.getcwd(), 'temp_graphs')
-            #    with open(path, 'rb') as f:
-            #        g = cp.load(f)
-            
-            #g = g[0]
             [TreeLib.InsertGraph(g)]
             
             edge_feats = torch.from_numpy(get_edge_feats(g)).to(cmd_args.device)
@@ -254,6 +242,8 @@ if __name__ == '__main__':
             cur = datetime.now() - init
             times.append(cur.total_seconds())
             i+=1
+            print(num_leaves)
+            print(cur.total_seconds())
             
         print(num_leaves_list)
         print(times)
