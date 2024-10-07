@@ -369,6 +369,8 @@ if __name__ == '__main__':
                 loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
                 loss.backward()
                 epoch_loss += loss.item() / num_iter
+                print(ll)
+                print(ll_wt)
             
             else:
                 ll = 0.0
