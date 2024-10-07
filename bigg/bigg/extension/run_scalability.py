@@ -259,7 +259,7 @@ if __name__ == '__main__':
     ## CREATE TRAINING GRAPHS HERE 
     path = os.path.join(os.getcwd(), 'temp_graphs')
     
-    if cmd_args.num_leaves == 7500 and os.path.isfile(path):
+    if cmd_args.num_leaves <= 7500 and os.path.isfile(path):
         with open(path, 'rb') as f:
             ordered_graphs = cp.load(f) ## List of nx val graphs
     
