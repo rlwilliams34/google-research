@@ -337,7 +337,7 @@ if __name__ == '__main__':
         optimizer.load_state_dict(checkpoint['optimizer'])
         epoch_load = checkpoint['epoch']
     
-    if cmd_args.num_leaves == 5000:
+    if cmd_args.num_leaves >= 5000:
         num_epochs = 500
         epoch_plateu = 400
         
