@@ -290,7 +290,7 @@ if __name__ == '__main__':
     graphs = None
     ordered_graphs = None
     
-    if len(train_graphs[0]): < 5000
+    if len(train_graphs[0]) < 5000:
         print(train_graphs[0].edges(data=True))
     
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
