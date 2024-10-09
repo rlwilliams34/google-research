@@ -332,10 +332,10 @@ if __name__ == '__main__':
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
-        epoch_load = checkpoint['epoch']
+        epoch_load = checkpoint['epoch'] + 1
     
     if cmd_args.num_leaves >= 5000:
-        num_epochs = 500
+        num_epochs = 800
         epoch_plateu = 400
         
         if epoch_load >= 400:
@@ -430,7 +430,7 @@ if __name__ == '__main__':
             #if os.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
             #    os.remove(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves))
             
-            checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+            checkpoint = {'epoch': epoch+1, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
             torch.save(checkpoint, path)
         
