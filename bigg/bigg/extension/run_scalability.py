@@ -335,7 +335,7 @@ if __name__ == '__main__':
         epoch_load = checkpoint['epoch'] + 1
     
     if cmd_args.num_leaves >= 5000:
-        num_epochs = 1200
+        num_epochs = 1500
         epoch_plateu = 400
         
         if epoch_load >= 400:
