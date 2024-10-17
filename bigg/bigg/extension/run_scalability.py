@@ -313,7 +313,7 @@ if __name__ == '__main__':
     if cmd_args.blksize > 0:
         list_edge_idx = [get_edge_idx(g) for g in train_graphs]
     
-    print('# graphs', len(train_graphs), '# nodes', max_num_nodes)
+    print('# graphs', len(train_graphs), '# nodes', cmd_args.max_num_nodes)
     print("Begin training")
     
     N = len(train_graphs)
