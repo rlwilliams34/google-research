@@ -203,6 +203,7 @@ if __name__ == '__main__':
     cmd_args.bits_compress = 0
     cmd_args.gpu = 0
     cmd_args.rnn_layers = 1
+    cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
     
     random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
@@ -303,8 +304,6 @@ if __name__ == '__main__':
     if len(train_graphs[0]) < 5000:
         print(train_graphs[0].edges(data=True))
     
-    max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
-    cmd_args.max_num_nodes = max_num_nodes
     
     [TreeLib.InsertGraph(g) for g in train_graphs]
     
