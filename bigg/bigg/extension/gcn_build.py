@@ -51,8 +51,8 @@ class GCN(torch.nn.Module):
         self.node_embed_dim = node_embed_dim
         self.out_dim = out_dim
         
-        self.conv1 = conv.GCNConv(in_channels = self.node_embed_dim, out_channels = 2 * self.embed_dim)
-        self.conv2 = conv.GCNConv(in_channels = 2 * self.embed_dim, out_channels = self.out_dim)
+        self.conv1 = conv.GCNConv(in_channels = self.node_embed_dim, out_channels = self.embed_dim)
+        self.conv2 = conv.GCNConv(in_channels = self.embed_dim, out_channels = self.out_dim)
         self.node_embedding = torch.nn.Embedding(self.max_num_nodes, self.node_embed_dim)
     
     def forward(self, feat_idx, edge_list):
@@ -98,7 +98,7 @@ class GCN_Generate(torch.nn.Module):
         self.register_buffer("max_wt", max_wt)
         
         ### Test...
-        self.embed_weight = MLP(1, [2 * self.embed_dim, self.out_dim])
+        self.embed_weight = MLP(1, [2 * self.out_dim, self.out_dim], dropout = args.wt_drop)
         self.GRU = torch.nn.GRU(input_size = self.out_dim, hidden_size = self.embed_dim, num_layers = self.num_layers, batch_first = True, bias = False)
         self.init_h0 = Parameter(torch.Tensor(self.num_layers, self.embed_dim))
         self.init_c0 = Parameter(torch.Tensor(self.num_layers, self.embed_dim))
