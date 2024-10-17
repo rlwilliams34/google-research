@@ -392,6 +392,8 @@ if __name__ == '__main__':
             start = B * idx
             stop = B * (idx + 1)
             batch_indices = indices[start:stop]
+            print(indices)
+            print(np.sort(indices))
             
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
             
