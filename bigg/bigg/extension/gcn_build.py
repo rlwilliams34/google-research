@@ -242,7 +242,7 @@ class GCN_Generate(torch.nn.Module):
         out = None
         for idx in torch.unique(batch_idx):
             b_weights = embedded_weights[batch_idx.flatten() == idx]
-            out, _ = self.GRU(b_weights, (self.init_h0, self.init_c0))
+            out, _ = self.GRU(b_weights, self.init_h0)
             if out is None:
                 GRU_out = out
             
