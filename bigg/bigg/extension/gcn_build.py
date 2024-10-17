@@ -301,7 +301,9 @@ class GCN_Generate(torch.nn.Module):
                 hidden = self.init_h0.data
             
             cur_nodes = nodes[idx]
-            combined = torch.cat(cur_nodes, hidden)
+            print(cur_nodes.shape)
+            print(hidden.shape)
+            combined = torch.cat([cur_nodes, hidden])
             mu_wt = self.hidden_to_mu(combined)
             logvar_wt = self.hidden_to_logvar(combined)
             std_wt = torch.exp(0.5 * logvar_wt)
