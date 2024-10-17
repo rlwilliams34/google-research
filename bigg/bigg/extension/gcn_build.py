@@ -106,6 +106,14 @@ class GCN_Generate(torch.nn.Module):
         
         epoch_num = torch.tensor(0, dtype = int)
         self.register_buffer("epoch_num", epoch_num)
+        
+        self.mode = args.wt_mode
+        
+        self.log_wt = False
+        self.sm_wt = False
+        self.wt_range = 1.0
+        self.wt_scale = 1.0
+        
     
     ## Helper functions from LSTM model that are needed (weight loss, standardizing, ...)
     def compute_ll_w(self, mus, logvars, weights):
