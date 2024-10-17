@@ -277,8 +277,6 @@ if __name__ == '__main__':
             for _ in tqdm(range(cmd_args.num_test_gen)):
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
-                print(pred_edge_feats)
-                print(pred_edges)
                 
                 if cmd_args.model == "BiGG_GCN":
                     fix_edges = []
@@ -288,7 +286,6 @@ if __name__ == '__main__':
                         else:
                             fix_edges.append((e1, e2))
                     pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
-                    print(fix_edges)
                     pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
                     pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
                     
