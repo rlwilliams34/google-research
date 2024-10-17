@@ -298,7 +298,7 @@ class GCN_Generate(torch.nn.Module):
         weights = None
         for idx in range(num_edges):
             if idx == 0:
-                hidden = self.init_h0.data
+                hidden = self.init_h0.data[-1]
             
             cur_nodes = nodes[idx]
             print(cur_nodes.shape)
