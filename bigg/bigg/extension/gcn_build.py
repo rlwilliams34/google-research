@@ -112,7 +112,12 @@ class GCN_Generate(torch.nn.Module):
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]
-        embedded_weights = self.embed_weight(self.standardize_weights(x_cur_it, i_edge).squeeze(-1)).unsqueeze(1)
+        print(weights.shape)
+        
+        if self.epoch_number == 0:
+            self.update_weight_stats(weights)
+        
+        embedded_weights = self.embed_weight(self.standardize_edge_feats(weights).squeeze(-1)).unsqueeze(1)
         
         batch_idx = edge_list[2:3, :].flatten()
         
@@ -211,20 +216,36 @@ class GCN_Generate(torch.nn.Module):
       ll = torch.sum(ll)
       return ll
     
-    def standardize_weights(self, x_adj, x_top, mode = "none", range_ = 1):    
-      if mode == "standardize":
-          x_adj = (x_adj - self.mu_wt) / self.var_wt**0.5
-          x_adj = torch.mul(x_adj, x_top)
-          
-      elif mode == "normalize":
-          if self.min_wt != self.max_wt:
-              x_adj = -1 + 2 * (x_adj - self.min_wt) / (self.max_wt - self.min_wt)
-              x_adj = torch.mul(x_adj, range_ * x_top)
+    def standardize_edge_feats(self, edge_feats): 
+      if self.log_wt:
+        edge_feats = torch.log(edge_feats)
       
-      elif mode == "exp":
-         x_adj = torch.exp(-1/x_adj)
+      elif self.sm_wt:
+        edge_feats = torch.log(torch.special.expm1(edge_feats))
+      
+      if self.mode == "none":
+        return edge_feats
+      
+      if self.epoch_num == 1:
+        self.update_weight_stats(edge_feats)
+      
+      if self.mode == "score":
+        edge_feats = (edge_feats - self.mu_wt) / (self.var_wt**0.5 + 1e-15)
+          
+      elif self.mode == "normalize":
+        edge_feats = -1 + 2 * (edge_feats - self.min_wt) / (self.max_wt - self.min_wt + 1e-15)
+        edge_feats = self.wt_range * edge_feats
+      
+      elif self.mode == "scale":
+        edge_feats = edge_feats * self.wt_scale
+      
+      elif self.mode == "exp":
+        edge_feats = torch.exp(-1/edge_feats)
+      
+      elif self.mode == "exp-log":
+        edge_feats = torch.exp(-1 / torch.log(1 + edge_feats))
         
-      return x_adj
+      return edge_feats
   
     def update_weight_stats(self, weights):
       '''

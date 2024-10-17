@@ -371,9 +371,10 @@ if __name__ == '__main__':
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
-        if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
+        if epoch == 0 and cmd_args.has_edge_feats:
             for i in range(len(list_edge_feats)):
                 edge_feats = list_edge_feats[i]
+                #if cmd_args.model == "BiGG_E":
                 model.update_weight_stats(edge_feats)
         
         if cmd_args.model == "BiGG_GCN":
