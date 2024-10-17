@@ -221,10 +221,9 @@ class GCN_Generate(torch.nn.Module):
         weights = batch_weight_idx[:, 2:3]
         print(weights.shape)
         
-        if self.epoch_number == 0:
-            self.update_weight_stats(weights)
-        
         embedded_weights = self.embed_weight(self.standardize_edge_feats(weights).squeeze(-1)).unsqueeze(1)
+        
+        print(embedded_weights.shape)
         
         batch_idx = edge_list[2:3, :].flatten()
         
