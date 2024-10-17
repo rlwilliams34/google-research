@@ -39,6 +39,30 @@ from bigg.experiments.train_utils import get_node_dist
 from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
+def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
+    batch_g = nx.Graph()
+    feat_idx = torch.Tensor().to(cmd_args.device)
+    batch_weight_idx = []
+    edge_list = []
+    offset = 0
+    
+    for idx in batch_indices:
+        g = train_graphs[idx]
+        n = len(g)
+        feat_idx = torch.cat([feat_idx, torch.arange(n).to(cmd_args.device)])
+        
+        for e1, e2, w in g.edges(data=True):
+            batch_weight_idx.append((int(e1), int(e2), w['weight']))
+            edge_list.append((int(e1) + offset, int(e2) + offset, idx))
+        
+        offset += n
+    
+    edge_idx = torch.Tensor(edge_list).to(cmd_args.device).t()
+    #edge_idx_weighted = list(batch_g.edges(data=True))
+    batch_weight_idx = torch.Tensor(batch_weight_idx).to(cmd_args.device)
+    
+    return feat_idx, edge_idx, batch_weight_idx
+
 def get_node_map(nodelist, shift=0):
     node_map = {}
     for i, x in enumerate(nodelist):
