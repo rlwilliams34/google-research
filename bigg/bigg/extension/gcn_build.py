@@ -78,8 +78,8 @@ class GCN_Generate(torch.nn.Module):
         #self.update_hidden = nn.GRU(node_embed_dim, out_dim)
         
         ### MLPs for mu, logvar, and weight embeddings
-        self.hidden_to_mu = MLP(3 * self.out_dim, [4 * self.out_dim, 1])
-        self.hidden_to_logvar = MLP(3 * self.out_dim, [4 * self.out_dim, 1])
+        self.hidden_to_mu = MLP(2 * self.embed_dim, [4 * self.embed_dim, 1])
+        self.hidden_to_logvar = MLP(2 * self.embed_dim, [4 * self.embed_dim, 1])
         #self.embed_weight = MLP(1, [2 * self.node_embed_dim, self.node_embed_dim])
         
         self.softplus = torch.nn.Softplus()
