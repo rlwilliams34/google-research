@@ -95,20 +95,43 @@ class GCN_Generate(torch.nn.Module):
         self.register_buffer("min_wt", min_wt)
         self.register_buffer("max_wt", max_wt)
         
+        ### Test...
+        self.embed_weight = MLP(1, [2 * self.hidden_dim, self.hidden_dim])
+        self.GRU = nn.GRU(input_size = self.embed_dim, hidden_size = self.hidden_dim, num_layers = self.num_layers, batch_first = True, bias = False)
+        self.init_h0 = Paramter(torch.Tensor(self.num_layers, self.hidden_dim))
+        self.init_c0 = Paramter(torch.Tensor(self.num_layers, self.hidden_dim))
+        
         
         epoch_num = torch.tensor(0, dtype = int)
         self.register_buffer("epoch_num", epoch_num)
     
     def forward(self, feat_idx, edge_list, batch_weight_idx):
-        h = self.GCN_mod.forward(feat_idx, edge_list)
+        h = self.GCN_mod.forward(feat_idx, edge_list[0:2, :])
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]
+        embedded_weights = self.embed_weight(self.standardize_weights(x_cur_it, i_edge).squeeze(-1)).unsqueeze(1)
+        
+        batch_idx = edge_list[2:3, :].flatten()
         
         nodes = h[edges].flatten(1)
+
         
-        mu_wt = self.hidden_to_mu(nodes)
-        logvar_wt = self.hidden_to_logvar(nodes)
+        #b_size = len(torch.unique(batch_idx))
+        out = None
+        for idx in torch.unique(batch_idx):
+            b_weights = embed_weights[batch_idx.flatten() == idx]
+            out, _ = self.GRU(b_weights, (self.init_h0, self.init_c0))
+            if out is None:
+                GRU_out = out
+            
+            else:
+                GRU_out = torch.cat([GRU_out, out], dim = 0)
+        
+        combined = torch.cat([nodes, GRU_out], dim = 0)
+        
+        mu_wt = self.hidden_to_mu(combined)
+        logvar_wt = self.hidden_to_logvar(combined)
         
         ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
         
