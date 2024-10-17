@@ -107,87 +107,6 @@ class GCN_Generate(torch.nn.Module):
         epoch_num = torch.tensor(0, dtype = int)
         self.register_buffer("epoch_num", epoch_num)
     
-    def forward(self, feat_idx, edge_list, batch_weight_idx):
-        h = self.GCN_mod.forward(feat_idx, edge_list[0:2, :])
-        
-        edges = batch_weight_idx[:, 0:2].long()
-        weights = batch_weight_idx[:, 2:3]
-        print(weights.shape)
-        
-        if self.epoch_number == 0:
-            self.update_weight_stats(weights)
-        
-        embedded_weights = self.embed_weight(self.standardize_edge_feats(weights).squeeze(-1)).unsqueeze(1)
-        
-        batch_idx = edge_list[2:3, :].flatten()
-        
-        nodes = h[edges].flatten(1)
-
-        
-        #b_size = len(torch.unique(batch_idx))
-        out = None
-        for idx in torch.unique(batch_idx):
-            b_weights = embed_weights[batch_idx.flatten() == idx]
-            out, _ = self.GRU(b_weights, (self.init_h0, self.init_c0))
-            if out is None:
-                GRU_out = out
-            
-            else:
-                GRU_out = torch.cat([GRU_out, out], dim = 0)
-        
-        print(nodes.shape)
-        print(GRU_out.shape)
-        combined = torch.cat([nodes, GRU_out], dim = 0)
-        
-        mu_wt = self.hidden_to_mu(combined)
-        logvar_wt = self.hidden_to_logvar(combined)
-        
-        ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
-        
-        #for (n1, n2) in edge_list:
-        #    h1 = h[n1] ## Embedding for node 1
-        #    h2 = h[n2] ## Embedding for node 2
-            
-            ## Predict Means and LogVariances
-        #    mu_wt = self.hidden_to_mu(torch.cat([h1, h2], -1))
-        #    logvar_wt = self.hidden_to_logvar(torch.cat([h1, h2], -1))
-            
-            ## Update Loss
-        #    loss = loss + self.compute_loss_w(mu_wt, logvar_wt, weights)
-            
-            ## Embed weights
-            #if self.epoch_num == 1:
-            #    self.update_weight_stats(weights)
-            #w_embedding = self.standardize_weights(weights, mode = self.mode, range_ = self.wt_range)
-            #w_embedding = self.embed_weight(w_embedding.unsqueeze(0)).squeeze(0)
-            
-            ## Update Node States
-            #h1 = self.update_hidden(w_embedding, h1)
-            #h2 = self.update_hidden(w_embedding, h2)
-            
-            #h[n1] = h1
-            #h[n2] = h2
-        
-        return ll_wt
-    
-    def sample(self, num_nodes, edge_list):
-        feat_idx = torch.arange(num_nodes).to(edge_list.device)
-        h = self.GCN_mod.forward(feat_idx, edge_list.t())
-        edges = edge_list.long()
-        
-        nodes = h[edges].flatten(1)
-        
-        mu_wt = self.hidden_to_mu(nodes)
-        logvar_wt = self.hidden_to_logvar(nodes)
-        
-        std_wt = torch.exp(0.5 * logvar_wt)
-        
-        weights = torch.normal(mu_wt, std_wt)
-        weights = self.softplus(weights)
-        weighted_edges = torch.cat([edge_list, weights], dim = -1)
-        
-        return weighted_edges
-    
     ## Helper functions from LSTM model that are needed (weight loss, standardizing, ...)
     def compute_ll_w(self, mus, logvars, weights):
       '''
@@ -294,3 +213,84 @@ class GCN_Generate(torch.nn.Module):
               batch_min = weights.min()
               self.min_wt = torch.min(batch_min, self.min_wt)
               self.max_wt = torch.max(batch_max, self.max_wt)
+    
+    def forward(self, feat_idx, edge_list, batch_weight_idx):
+        h = self.GCN_mod.forward(feat_idx, edge_list[0:2, :])
+        
+        edges = batch_weight_idx[:, 0:2].long()
+        weights = batch_weight_idx[:, 2:3]
+        print(weights.shape)
+        
+        if self.epoch_number == 0:
+            self.update_weight_stats(weights)
+        
+        embedded_weights = self.embed_weight(self.standardize_edge_feats(weights).squeeze(-1)).unsqueeze(1)
+        
+        batch_idx = edge_list[2:3, :].flatten()
+        
+        nodes = h[edges].flatten(1)
+
+        
+        #b_size = len(torch.unique(batch_idx))
+        out = None
+        for idx in torch.unique(batch_idx):
+            b_weights = embed_weights[batch_idx.flatten() == idx]
+            out, _ = self.GRU(b_weights, (self.init_h0, self.init_c0))
+            if out is None:
+                GRU_out = out
+            
+            else:
+                GRU_out = torch.cat([GRU_out, out], dim = 0)
+        
+        print(nodes.shape)
+        print(GRU_out.shape)
+        combined = torch.cat([nodes, GRU_out], dim = 0)
+        
+        mu_wt = self.hidden_to_mu(combined)
+        logvar_wt = self.hidden_to_logvar(combined)
+        
+        ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
+        
+        #for (n1, n2) in edge_list:
+        #    h1 = h[n1] ## Embedding for node 1
+        #    h2 = h[n2] ## Embedding for node 2
+            
+            ## Predict Means and LogVariances
+        #    mu_wt = self.hidden_to_mu(torch.cat([h1, h2], -1))
+        #    logvar_wt = self.hidden_to_logvar(torch.cat([h1, h2], -1))
+            
+            ## Update Loss
+        #    loss = loss + self.compute_loss_w(mu_wt, logvar_wt, weights)
+            
+            ## Embed weights
+            #if self.epoch_num == 1:
+            #    self.update_weight_stats(weights)
+            #w_embedding = self.standardize_weights(weights, mode = self.mode, range_ = self.wt_range)
+            #w_embedding = self.embed_weight(w_embedding.unsqueeze(0)).squeeze(0)
+            
+            ## Update Node States
+            #h1 = self.update_hidden(w_embedding, h1)
+            #h2 = self.update_hidden(w_embedding, h2)
+            
+            #h[n1] = h1
+            #h[n2] = h2
+        
+        return ll_wt
+    
+    def sample(self, num_nodes, edge_list):
+        feat_idx = torch.arange(num_nodes).to(edge_list.device)
+        h = self.GCN_mod.forward(feat_idx, edge_list.t())
+        edges = edge_list.long()
+        
+        nodes = h[edges].flatten(1)
+        
+        mu_wt = self.hidden_to_mu(nodes)
+        logvar_wt = self.hidden_to_logvar(nodes)
+        
+        std_wt = torch.exp(0.5 * logvar_wt)
+        
+        weights = torch.normal(mu_wt, std_wt)
+        weights = self.softplus(weights)
+        weighted_edges = torch.cat([edge_list, weights], dim = -1)
+        
+        return weighted_edges
