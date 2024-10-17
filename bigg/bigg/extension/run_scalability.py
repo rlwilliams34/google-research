@@ -371,7 +371,7 @@ if __name__ == '__main__':
             cmd_args.learning_rate = 1e-5        
     
     else:
-        num_epochs = 1500
+        num_epochs = 150
         epoch_plateu = 800
         
         if epoch_load >= 800:
