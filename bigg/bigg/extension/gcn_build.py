@@ -70,6 +70,7 @@ class GCN_Generate(torch.nn.Module):
         self.embed_dim = args.embed_dim
         self.out_dim = args.out_dim
         self.max_num_nodes = args.max_num_nodes
+        self.num_layers = args.rnn_layers
         
         ### GCN Model and GRU 
         self.GCN_mod = GCN(self.node_embed_dim, self.embed_dim, self.out_dim, self.max_num_nodes)
