@@ -317,9 +317,7 @@ class GCN_Generate(torch.nn.Module):
             embed_w = self.embed_weight(w)
             _, hidden = self.GRU(embed_w.unsqueeze(0), hidden)
         
-        print(edge_list.shape)
-        print(weights.shape)
-        weighted_edges = torch.cat([edge_list, weights], dim = -1)
+        weighted_edges = torch.cat([edge_list, weights.unsqueeze(-1)], dim = -1)
         
         return weighted_edges
 
