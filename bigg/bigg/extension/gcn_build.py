@@ -256,6 +256,8 @@ class GCN_Generate(torch.nn.Module):
         
         #print(nodes.shape)
         #print(GRU_out.shape)
+        print(nodes.shape)
+        print(GRU_out.shape)
         combined = torch.cat([nodes, GRU_out], dim = -1)
         
         mu_wt = self.hidden_to_mu(combined)
