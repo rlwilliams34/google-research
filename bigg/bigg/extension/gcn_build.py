@@ -114,6 +114,8 @@ class GCN_Generate(torch.nn.Module):
         self.wt_range = 1.0
         self.wt_scale = 1.0
         
+        glorot_uniform(self)
+        
     
     ## Helper functions from LSTM model that are needed (weight loss, standardizing, ...)
     def compute_ll_w(self, mus, logvars, weights):
@@ -256,11 +258,6 @@ class GCN_Generate(torch.nn.Module):
         mu_wt = self.hidden_to_mu(combined)
         logvar_wt = self.hidden_to_logvar(combined)
         
-        print(mu_wt.shape)
-        print(logvar_wt.shape)
-        print(weights.shape)
-        print(mu_wt)
-        print(logvar_wt)
         
         ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
         
