@@ -164,6 +164,7 @@ if __name__ == '__main__':
             list_edge_feats = None
         
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
+        print(train_graphs[0].edges())
     
     
     #print(train_graphs[0].edges(data=True))
