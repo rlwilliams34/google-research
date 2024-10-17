@@ -76,9 +76,9 @@ class GCN_Generate(torch.nn.Module):
         #self.update_hidden = nn.GRU(node_embed_dim, out_dim)
         
         ### MLPs for mu, logvar, and weight embeddings
-        self.hidden_to_mu = MLP(2 * self.out_dim, [4 * self.out_dim, 1])
-        self.hidden_to_logvar = MLP(2 * self.out_dim, [4 * self.out_dim, 1])
-        self.embed_weight = MLP(1, [2 * self.node_embed_dim, self.node_embed_dim])
+        self.hidden_to_mu = MLP(3 * self.out_dim, [4 * self.out_dim, 1])
+        self.hidden_to_logvar = MLP(3 * self.out_dim, [4 * self.out_dim, 1])
+        #self.embed_weight = MLP(1, [2 * self.node_embed_dim, self.node_embed_dim])
         
         self.softplus = torch.nn.Softplus()
         
@@ -96,10 +96,10 @@ class GCN_Generate(torch.nn.Module):
         self.register_buffer("max_wt", max_wt)
         
         ### Test...
-        self.embed_weight = MLP(1, [2 * self.hidden_dim, self.hidden_dim])
-        self.GRU = nn.GRU(input_size = self.embed_dim, hidden_size = self.hidden_dim, num_layers = self.num_layers, batch_first = True, bias = False)
-        self.init_h0 = Paramter(torch.Tensor(self.num_layers, self.hidden_dim))
-        self.init_c0 = Paramter(torch.Tensor(self.num_layers, self.hidden_dim))
+        self.embed_weight = MLP(1, [2 * self.embed_dim, self.out_dim])
+        self.GRU = nn.GRU(input_size = self.out_dim, hidden_size = self.hidden_dim, num_layers = self.num_layers, batch_first = True, bias = False)
+        self.init_h0 = Paramter(torch.Tensor(self.num_layers, self.embed_dim))
+        self.init_c0 = Paramter(torch.Tensor(self.num_layers, self.embed_dim))
         
         
         epoch_num = torch.tensor(0, dtype = int)
@@ -128,6 +128,8 @@ class GCN_Generate(torch.nn.Module):
             else:
                 GRU_out = torch.cat([GRU_out, out], dim = 0)
         
+        print(nodes.shape)
+        print(GRU_out.shape)
         combined = torch.cat([nodes, GRU_out], dim = 0)
         
         mu_wt = self.hidden_to_mu(combined)
