@@ -249,10 +249,10 @@ class GCN_Generate(torch.nn.Module):
             out = torch.cat([self.init_h0, out[:-1, :]])
             
             if GRU_out is None:
-                GRU_out = out[-1]
+                GRU_out = out
             
             else:
-                GRU_out = torch.cat([GRU_out, out[-1]], dim = 0)
+                GRU_out = torch.cat([GRU_out, out], dim = 0)
         
         #print(nodes.shape)
         #print(GRU_out.shape)
