@@ -227,9 +227,10 @@ class GCN_Generate(torch.nn.Module):
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]
+        print("weights")
         print(weights.shape)
-        
-        embedded_weights = self.embed_weight(self.standardize_edge_feats(weights).squeeze(-1)).unsqueeze(1)
+        print(self.standardize_edge_feats(weights).shape)
+        embedded_weights = self.embed_weight(self.standardize_edge_feats(weights)).unsqueeze(1)
         
         print(embedded_weights.shape)
         
