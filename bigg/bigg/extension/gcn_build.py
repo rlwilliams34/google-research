@@ -312,7 +312,7 @@ class GCN_Generate(torch.nn.Module):
                 weights = w
             
             else:
-                weights = torch.cat(weights, w)
+                weights = torch.cat([weights, w])
             
             embed_w = self.embed_weight(w)
             _, hidden = self.GRU(embed_w.unsqueeze(0), hidden)
