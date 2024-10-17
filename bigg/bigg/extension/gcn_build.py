@@ -8,6 +8,7 @@
 import numpy as np
 import torch
 import torch.nn.functional as F
+from torch.nn.parameter import Parameter
 import torch_geometric
 from torch_geometric import nn
 from torch_geometric.nn import conv
@@ -99,8 +100,8 @@ class GCN_Generate(torch.nn.Module):
         ### Test...
         self.embed_weight = MLP(1, [2 * self.embed_dim, self.out_dim])
         self.GRU = torch.nn.GRU(input_size = self.out_dim, hidden_size = self.embed_dim, num_layers = self.num_layers, batch_first = True, bias = False)
-        self.init_h0 = Paramter(torch.Tensor(self.num_layers, self.embed_dim))
-        self.init_c0 = Paramter(torch.Tensor(self.num_layers, self.embed_dim))
+        self.init_h0 = Parameter(torch.Tensor(self.num_layers, self.embed_dim))
+        self.init_c0 = Parameter(torch.Tensor(self.num_layers, self.embed_dim))
         
         
         epoch_num = torch.tensor(0, dtype = int)
