@@ -245,11 +245,14 @@ class GCN_Generate(torch.nn.Module):
         for idx in torch.unique(batch_idx):
             b_weights = embedded_weights[batch_idx.flatten() == idx]
             out, _ = self.GRU(b_weights, self.init_h0)
+            
+            out = torch.cat([self.init_h0, out[:-1, :]])
+            
             if GRU_out is None:
-                GRU_out = out
+                GRU_out = out[-1]
             
             else:
-                GRU_out = torch.cat([GRU_out, out], dim = 0)
+                GRU_out = torch.cat([GRU_out, out[-1]], dim = 0)
         
         #print(nodes.shape)
         #print(GRU_out.shape)
@@ -291,16 +294,71 @@ class GCN_Generate(torch.nn.Module):
         feat_idx = torch.arange(num_nodes).to(edge_list.device)
         h = self.GCN_mod.forward(feat_idx, edge_list.t())
         edges = edge_list.long()
+        print(edges.shape)
         
+        num_edges = edges.shape[0]
         nodes = h[edges].flatten(1)
         
-        mu_wt = self.hidden_to_mu(nodes)
-        logvar_wt = self.hidden_to_logvar(nodes)
+        weights = None
+        for idx in range(num_edges):
+            if idx == 0:
+                hidden = self.init_h0
+            
+            cur_nodes = nodes[idx]
+            combined = torch.cat(cur_nodes, hidden)
+            mu_wt = self.hidden_to_mu(combined)
+            logvar_wt = self.hidden_to_logvar(combined)
+            std_wt = torch.exp(0.5 * logvar_wt)
+            weight = torch.normal(mu_wt, std_wt)
+            w = self.softplus(w)
+            
+            if weights is None:
+                weights = w
+            
+            else:
+                weights = torch.cat(weights, w)
+            
+            embed_w = self.embed_weight(w)
+            _, hidden = self.GRU(embed_w, hidden)
         
-        std_wt = torch.exp(0.5 * logvar_wt)
-        
-        weights = torch.normal(mu_wt, std_wt)
-        weights = self.softplus(weights)
         weighted_edges = torch.cat([edge_list, weights], dim = -1)
         
         return weighted_edges
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
