@@ -258,7 +258,9 @@ class GCN_Generate(torch.nn.Module):
         
         print(mu_wt.shape)
         print(logvar_wt.shape)
-        print(weight.shape)
+        print(weights.shape)
+        print(mu_wt)
+        print(logvar_wt)
         
         ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
         
