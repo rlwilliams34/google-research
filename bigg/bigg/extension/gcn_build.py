@@ -253,10 +253,6 @@ class GCN_Generate(torch.nn.Module):
             else:
                 GRU_out = torch.cat([GRU_out, out], dim = 0)
         
-        #print(nodes.shape)
-        #print(GRU_out.shape)
-        print(nodes.shape)
-        print(GRU_out.shape)
         combined = torch.cat([nodes, GRU_out], dim = -1)
         
         mu_wt = self.hidden_to_mu(combined)
@@ -295,7 +291,6 @@ class GCN_Generate(torch.nn.Module):
         feat_idx = torch.arange(num_nodes).to(edge_list.device)
         h = self.GCN_mod.forward(feat_idx, edge_list.t())
         edges = edge_list.long()
-        print(edges.shape)
         
         num_edges = edges.shape[0]
         nodes = h[edges].flatten(1)
