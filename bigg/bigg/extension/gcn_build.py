@@ -247,6 +247,8 @@ class GCN_Generate(torch.nn.Module):
                 GRU_out = out
             
             else:
+                print(out.shape)
+                print(GRU_out.shape)
                 GRU_out = torch.cat([GRU_out, out], dim = 0)
         
         print(nodes.shape)
