@@ -298,7 +298,7 @@ class GCN_Generate(torch.nn.Module):
         weights = None
         for idx in range(num_edges):
             if idx == 0:
-                hidden = self.init_h0
+                hidden = self.init_h0.data
             
             cur_nodes = nodes[idx]
             combined = torch.cat(cur_nodes, hidden)
