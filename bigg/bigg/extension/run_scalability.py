@@ -190,11 +190,12 @@ def graph_generator(num_leaves, num_graphs = 100, seed = 34):
 
 
 if __name__ == '__main__':
-    if cmd_args.num_leaves <= 5000:
+    if cmd_args.num_leaves <= 5000 and cmd_args.model != "BiGG_GCN":
         cmd_args.scale_loss = 20
     
     else:
         cmd_args.scale_loss = 1
+    
     cmd_args.wt_drop = 0.5
     cmd_args.wt_mode = "score"
     cmd_args.has_edge_feats = True
@@ -210,7 +211,15 @@ if __name__ == '__main__':
     setup_treelib(cmd_args)
     #assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
     
-    model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+    #model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+    if cmd_args.model == "BiGG_GCN":
+        cmd_args.has_edge_feats = False
+        cmd_args.has_node_feats = False
+        model = BiggWithGCN(cmd_args).to(cmd_args.device)
+        cmd_args.has_edge_feats = True
+    
+    else:
+        model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     if cmd_args.training_time:
@@ -299,9 +308,6 @@ if __name__ == '__main__':
     
     [TreeLib.InsertGraph(g) for g in train_graphs]
     
-    model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
-    
     list_node_feats = None
     list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
     
@@ -353,10 +359,16 @@ if __name__ == '__main__':
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
-        if epoch == 0:
+        if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
                 edge_feats = list_edge_feats[i]
                 model.update_weight_stats(edge_feats)
+        
+        if cmd_args.model == "BiGG_GCN":
+            model.gcn_mod.epoch_num += 1
+        
+        else:
+            model.epoch_num += 1
         
         epoch_loss = 0.0
         
@@ -372,13 +384,19 @@ if __name__ == '__main__':
             
             ###
             if cmd_args.blksize < 0 or num_nodes <= cmd_args.blksize:
-                ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+                if cmd_args.model == "BiGG_GCN":
+                    feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
+                    ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
+                
+                else:
+                    ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+                
                 loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
                 loss.backward()
                 epoch_loss += loss.item() / num_iter
-                if idx % 40 == 0:
-                    print(ll / num_nodes)
-                    print(ll_wt / num_nodes)
+#                 if idx % 40 == 0:
+#                     print(ll / num_nodes)
+#                     print(ll_wt / num_nodes)
             
             else:
                 ll = 0.0
@@ -441,11 +459,7 @@ if __name__ == '__main__':
     with torch.no_grad():
         model.eval()
         for i in tqdm(range(20)):
-            if i == 0:
-                num_nodes = 2 * cmd_args.num_leaves - 1
-            
-            else:
-                num_nodes = np.argmax(np.random.multinomial(1, num_node_dist))
+            num_nodes = 2 * cmd_args.num_leaves - 1
             
             init = datetime.now()
             
@@ -458,13 +472,32 @@ if __name__ == '__main__':
                 print("Times: ", cur.total_seconds())
             
             weighted_edges = []
+            if cmd_args.model == "BiGG_GCN":
+                    fix_edges = []
+                    for e1, e2 in pred_edges:
+                        if e1 > e2:
+                            fix_edges.append((e2, e1))
+                        else:
+                            fix_edges.append((e1, e2))
+                    
+                    pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+                    pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
+                    pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
+                    
+                    weighted_edges = []
+                    for e1, e2, w in pred_weighted_tensor:
+                        weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
+                    
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
             
-            for e, w in zip(pred_edges, pred_edge_feats):
-                assert e[0] > e[1]
-                weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
-                pred_g = nx.Graph()
-                pred_g.add_weighted_edges_from(weighted_edges)
-            
+            else:
+                for e, w in zip(pred_edges, pred_edge_feats):
+                    assert e[0] > e[1]
+                    weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                
             gen_graphs.append(pred_g)
             
     
