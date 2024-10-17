@@ -247,13 +247,11 @@ class GCN_Generate(torch.nn.Module):
                 GRU_out = out
             
             else:
-                print(out.shape)
-                print(GRU_out.shape)
                 GRU_out = torch.cat([GRU_out, out], dim = 0)
         
         print(nodes.shape)
         print(GRU_out.shape)
-        combined = torch.cat([nodes, GRU_out], dim = 0)
+        combined = torch.cat([nodes, GRU_out], dim = -1)
         
         mu_wt = self.hidden_to_mu(combined)
         logvar_wt = self.hidden_to_logvar(combined)
