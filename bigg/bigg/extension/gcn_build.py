@@ -227,11 +227,11 @@ class GCN_Generate(torch.nn.Module):
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]
-        print("weights")
-        print(weights.shape)
+        #print("weights")
+        #print(weights.shape)
         embedded_weights = self.embed_weight(self.standardize_edge_feats(weights))
         
-        print(embedded_weights.shape)
+        #print(embedded_weights.shape)
         
         batch_idx = edge_list[2:3, :].flatten()
         
@@ -249,12 +249,16 @@ class GCN_Generate(torch.nn.Module):
             else:
                 GRU_out = torch.cat([GRU_out, out], dim = 0)
         
-        print(nodes.shape)
-        print(GRU_out.shape)
+        #print(nodes.shape)
+        #print(GRU_out.shape)
         combined = torch.cat([nodes, GRU_out], dim = -1)
         
         mu_wt = self.hidden_to_mu(combined)
         logvar_wt = self.hidden_to_logvar(combined)
+        
+        print(mu_wt.shape)
+        print(logvar_wt.shape)
+        print(weight.shape)
         
         ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
         
