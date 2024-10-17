@@ -97,7 +97,7 @@ class GCN_Generate(torch.nn.Module):
         
         ### Test...
         self.embed_weight = MLP(1, [2 * self.embed_dim, self.out_dim])
-        self.GRU = torch.nn.GRU(input_size = self.out_dim, hidden_size = self.hidden_dim, num_layers = self.num_layers, batch_first = True, bias = False)
+        self.GRU = torch.nn.GRU(input_size = self.out_dim, hidden_size = self.embed_dim, num_layers = self.num_layers, batch_first = True, bias = False)
         self.init_h0 = Paramter(torch.Tensor(self.num_layers, self.embed_dim))
         self.init_c0 = Paramter(torch.Tensor(self.num_layers, self.embed_dim))
         
