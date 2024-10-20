@@ -512,6 +512,8 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         
         mmd_orbit = orbit_stats_all(out_graphs, test_graphs)
         print("MMD on Orbit: ", mmd_orbit)
+        
+        wt_stats = tree_weight_statistics(out_graphs)
     
     else:
         print("Graph Type not yet implemented")
