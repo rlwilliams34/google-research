@@ -378,6 +378,7 @@ if __name__ == '__main__':
             cmd_args.learning_rate = 1e-5
     
     #num_epochs = epoch_load
+    model.train()
     for epoch in range(epoch_load, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
@@ -399,6 +400,7 @@ if __name__ == '__main__':
             start = B * idx
             stop = B * (idx + 1)
             batch_indices = indices[start:stop]
+            batch_indices = np.sort(batch_indices)
             
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
             
