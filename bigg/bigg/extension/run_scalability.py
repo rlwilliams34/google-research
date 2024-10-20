@@ -332,7 +332,10 @@ if __name__ == '__main__':
     [TreeLib.InsertGraph(g) for g in train_graphs]
     
     list_node_feats = None
-    list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
+    list_edge_feats = None
+    if cmd_args.model == "BiGG_E":
+        list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
+    
     
     if cmd_args.blksize > 0:
         list_edge_idx = [get_edge_idx(g) for g in train_graphs]
@@ -405,7 +408,7 @@ if __name__ == '__main__':
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
             
             node_feats = None
-            edge_feats = torch.cat([list_edge_feats[i] for i in batch_indices], dim=0)
+            edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
             ###
             if cmd_args.blksize < 0 or num_nodes <= cmd_args.blksize:
