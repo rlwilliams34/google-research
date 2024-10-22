@@ -255,6 +255,7 @@ if __name__ == '__main__':
         #num_leaves_list = [5, 10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
         #num_leaves_list = [50, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
         times = []
+        train_graphs = []
         i = 0
         for num_leaves in num_leaves_list:
             num_leaves = int(num_leaves)
@@ -263,15 +264,15 @@ if __name__ == '__main__':
             
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
             g = get_graph_data(g[0], 'BFS')
-            g = g[0]
+            train_graphs += g
             
-            [TreeLib.InsertGraph(g)]
+            [TreeLib.InsertGraph(train_graphs[i])]
             
             if cmd_args.model == "BiGG_GCN":
-                feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs([g], [0], cmd_args)
+                feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, [i], cmd_args)
             
             else:
-                edge_feats = torch.from_numpy(get_edge_feats(g)).to(cmd_args.device)
+                edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
             
             init = datetime.now()
             

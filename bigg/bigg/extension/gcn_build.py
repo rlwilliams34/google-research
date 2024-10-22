@@ -56,8 +56,6 @@ class GCN(torch.nn.Module):
         self.node_embedding = torch.nn.Embedding(self.max_num_nodes, self.node_embed_dim)
     
     def forward(self, feat_idx, edge_list):
-        print(feat_idx.shape)
-        print(edge_list.shape)
         node_embeddings = self.node_embedding.weight[feat_idx.long()]
         h = self.conv1(node_embeddings, edge_list.long())
         h = F.relu(h)
