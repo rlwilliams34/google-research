@@ -60,6 +60,7 @@ def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     edge_idx = torch.Tensor(edge_list).to(cmd_args.device).t()
     #edge_idx_weighted = list(batch_g.edges(data=True))
     batch_weight_idx = torch.Tensor(batch_weight_idx).to(cmd_args.device)
+    print(edge_idx.shape)
     
     return feat_idx, edge_idx, batch_weight_idx
 
@@ -197,7 +198,8 @@ def graph_generator(num_leaves, num_graphs = 100, seed = 34):
     graphs = []
     
     for k in range(num_graphs):
-        print(k)
+        if num_graphs > 1:
+            print(k)
         g = tree_generator(num_leaves)
         mu = np.random.uniform(7, 13)
         weights = np.random.gamma(mu*mu, 1/mu, 2 * num_leaves + 1)
