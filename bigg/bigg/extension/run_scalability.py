@@ -250,8 +250,8 @@ if __name__ == '__main__':
     if cmd_args.training_time:
         print("Getting training times")
         #num_leaves_list = [cmd_args.num_nodes]
-        #num_leaves_list = [50, 100, 200, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
-        num_leaves_list = [5, 10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        num_leaves_list = [50, 100, 200, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
+        #num_leaves_list = [5, 10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
         #num_leaves_list = [50, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
         times = []
         i = 0
@@ -266,10 +266,20 @@ if __name__ == '__main__':
             
             [TreeLib.InsertGraph(g)]
             
-            edge_feats = torch.from_numpy(get_edge_feats(g)).to(cmd_args.device)
+            if cmd_args.model == "BiGG_GCN":
+                feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs([g], [i], cmd_args)
+            
+            else:
+                edge_feats = torch.from_numpy(get_edge_feats(g)).to(cmd_args.device)
             
             init = datetime.now()
-            ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
+            
+            if cmd_args.model == "BiGG_GCN":
+                ll, ll_wt = model.forward_train2([i], feat_idx, edge_list, batch_weight_idx)
+                
+            else:
+                ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
+            
             loss = -(ll + ll_wt) / num_nodes
             loss.backward()
             
