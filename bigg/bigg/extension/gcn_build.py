@@ -57,6 +57,8 @@ class GCN(torch.nn.Module):
     
     def forward(self, feat_idx, edge_list):
         node_embeddings = self.node_embedding.weight[feat_idx.long()]
+        print(edge_list)
+        print(feature_idx)
         h = self.conv1(node_embeddings, edge_list.long())
         h = F.relu(h)
         h = self.conv2(h, edge_list.long())
@@ -225,15 +227,12 @@ class GCN_Generate(torch.nn.Module):
               self.max_wt = torch.max(batch_max, self.max_wt)
     
     def forward(self, feat_idx, edge_list, batch_weight_idx):
-        print(edge_list.shape)
-        print(edge_list[0:2, :].shape)
         h = self.GCN_mod.forward(feat_idx, edge_list[0:2, :])
         
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]
-        #print("weights")
-        #print(weights.shape)
+        
         embedded_weights = self.embed_weight(self.standardize_edge_feats(weights))
         
         #print(embedded_weights.shape)
