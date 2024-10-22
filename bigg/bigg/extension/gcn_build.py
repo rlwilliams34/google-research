@@ -245,6 +245,7 @@ class GCN_Generate(torch.nn.Module):
         for idx in torch.unique(batch_idx):
             b_weights = embedded_weights[batch_idx.flatten() == idx]
             print(b_weights.shape)
+            print(self.init_h0.shape)
             out, _ = self.GRU(b_weights, self.init_h0)
             out = torch.cat([self.init_h0[-1].unsqueeze(0), out[:-1, :]])
             
