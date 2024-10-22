@@ -225,7 +225,10 @@ class GCN_Generate(torch.nn.Module):
               self.max_wt = torch.max(batch_max, self.max_wt)
     
     def forward(self, feat_idx, edge_list, batch_weight_idx):
+        print(edge_list.shape)
+        print(edge_list[0:2, :].shape)
         h = self.GCN_mod.forward(feat_idx, edge_list[0:2, :])
+        
         
         edges = batch_weight_idx[:, 0:2].long()
         weights = batch_weight_idx[:, 2:3]

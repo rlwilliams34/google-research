@@ -60,7 +60,6 @@ def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     edge_idx = torch.Tensor(edge_list).to(cmd_args.device).t()
     #edge_idx_weighted = list(batch_g.edges(data=True))
     batch_weight_idx = torch.Tensor(batch_weight_idx).to(cmd_args.device)
-    print(edge_idx.shape)
     
     return feat_idx, edge_idx, batch_weight_idx
 
