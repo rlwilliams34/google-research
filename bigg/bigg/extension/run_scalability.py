@@ -267,7 +267,7 @@ if __name__ == '__main__':
             [TreeLib.InsertGraph(g)]
             
             if cmd_args.model == "BiGG_GCN":
-                feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs([g], [i], cmd_args)
+                feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs([g], [0], cmd_args)
             
             else:
                 edge_feats = torch.from_numpy(get_edge_feats(g)).to(cmd_args.device)
