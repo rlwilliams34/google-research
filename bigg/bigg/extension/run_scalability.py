@@ -260,7 +260,15 @@ if __name__ == '__main__':
         for num_leaves in num_leaves_list:
             num_leaves = int(num_leaves)
             num_nodes = 2 * int(num_leaves) - 1
-            print(num_nodes)
+            
+            if cmd_args.model == "BiGG_GCN":
+                cmd_args.max_num_nodes = num_nodes
+                cmd_args.has_edge_feats = False
+                cmd_args.has_node_feats = False
+                model = BiggWithGCN(cmd_args).to(cmd_args.device)
+                cmd_args.has_edge_feats = True
+                
+                optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
             
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
             g = get_graph_data(g[0], 'BFS')
