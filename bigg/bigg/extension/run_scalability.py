@@ -266,7 +266,7 @@ if __name__ == '__main__':
                 cmd_args.has_edge_feats = False
                 cmd_args.has_node_feats = False
                 model = BiggWithGCN(cmd_args).to(cmd_args.device)
-                #cmd_args.has_edge_feats = True
+                cmd_args.has_edge_feats = True
                 
                 optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
             
