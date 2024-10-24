@@ -516,7 +516,7 @@ if __name__ == '__main__':
             init = datetime.now()
             
             if cmd_args.model == "BiGG_GCN": 
-                pred_edges, pred_weighted_tensor = model.sample2(node_end = num_nodes, display = cmd_args.display)
+                pred_edges, pred_weighted_tensor = model.sample2(num_nodes = num_nodes, display = cmd_args.display)
             
             else:
                 _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
