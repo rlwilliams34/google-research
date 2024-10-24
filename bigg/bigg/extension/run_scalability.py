@@ -390,19 +390,11 @@ if __name__ == '__main__':
         optimizer.load_state_dict(checkpoint['optimizer'])
         epoch_load = checkpoint['epoch'] + 1
     
-    if cmd_args.num_leaves >= 5000:
-        num_epochs = 1500
-        epoch_plateu = 400
-        
-        if epoch_load >= 400:
-            cmd_args.learning_rate = 1e-5        
+    num_epochs = 1500
+    epoch_plateu = 800
     
-    else:
-        num_epochs = 1500
-        epoch_plateu = 800
-        
-        if epoch_load >= 800:
-            cmd_args.learning_rate = 1e-5
+    if epoch_load > 0:
+        num_epochs = epoch_load    
     
     #num_epochs = epoch_load
     model.train()
