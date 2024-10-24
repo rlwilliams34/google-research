@@ -258,7 +258,6 @@ class GCN_Generate(torch.nn.Module):
         mu_wt = self.hidden_to_mu(combined)
         logvar_wt = self.hidden_to_logvar(combined)
         
-        
         ll_wt = self.compute_ll_w(mu_wt, logvar_wt, weights)
         
         #for (n1, n2) in edge_list:
@@ -298,11 +297,11 @@ class GCN_Generate(torch.nn.Module):
         weights = None
         for idx in range(num_edges):
             if idx == 0:
-                hidden = self.init_h0.data
+                hidden = self.init_h0.data.unsqueeze(1)
             
             cur_nodes = nodes[idx]
             #print(cur_nodes)
-            combined = torch.cat([cur_nodes, hidden[-1]])
+            combined = torch.cat([cur_nodes, hidden[-1].squeeze(1)])
             mu_wt = self.hidden_to_mu(combined)
             logvar_wt = self.hidden_to_logvar(combined)
             std_wt = torch.exp(0.5 * logvar_wt)
@@ -316,7 +315,7 @@ class GCN_Generate(torch.nn.Module):
                 weights = torch.cat([weights, w])
             
             embed_w = self.embed_weight(w)
-            _, hidden = self.GRU(embed_w.unsqueeze(0), hidden)
+            _, hidden = self.GRU(embed_w.reshape(1, 1, self.out_dim), hidden)
         
         weighted_edges = torch.cat([edge_list, weights.unsqueeze(-1)], dim = -1)
         
