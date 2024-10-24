@@ -537,6 +537,8 @@ if __name__ == '__main__':
                     pred_g.add_weighted_edges_from(weighted_edges)
                 
             gen_graphs.append(pred_g)
+            if i == 0:
+                print(g.edges(data=True))
             
     
     print(gen_graphs[0].edges(data=True))
