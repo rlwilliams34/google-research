@@ -266,7 +266,7 @@ if __name__ == '__main__':
                 cmd_args.has_edge_feats = False
                 cmd_args.has_node_feats = False
                 model = BiggWithGCN(cmd_args).to(cmd_args.device)
-                cmd_args.has_edge_feats = True
+                #cmd_args.has_edge_feats = True
                 
                 optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
             
@@ -515,8 +515,11 @@ if __name__ == '__main__':
             
             init = datetime.now()
             
-            _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+            if cmd_args.model == "BiGG_GCN": 
+                pred_edges, pred_weighted_tensor = model.sample2(node_end = num_nodes, display = cmd_args.display)
             
+            else:
+                _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
             
             if i % 5 == 0:
                 cur = datetime.now() - init
@@ -525,15 +528,6 @@ if __name__ == '__main__':
             
             weighted_edges = []
             if cmd_args.model == "BiGG_GCN":
-                    fix_edges = []
-                    for e1, e2 in pred_edges:
-                        if e1 > e2:
-                            fix_edges.append((e2, e1))
-                        else:
-                            fix_edges.append((e1, e2))
-                    
-                    pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
-                    pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
                     pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
                     
                     weighted_edges = []

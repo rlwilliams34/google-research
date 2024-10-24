@@ -320,4 +320,17 @@ class BiggWithGCN(RecurTreeGen):
         ll_wt = self.gcn_mod.forward(feat_idx, edge_list, batch_weight_idx)
         return ll_top, ll_wt
     
+    def sample2(self, num_nodes, display):
+        _, pred_edges, _, _, _ = self.forward(node_end = num_nodes, display=display)
+        fix_edges = []
+        for e1, e2 in pred_edges:
+            if e1 > e2:
+                fix_edges.append((e2, e1))
+            else:
+                fix_edges.append((e1, e2))
+                    
+        pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+        pred_weighted_tensor = self.gcn_mod.sample(num_nodes, pred_edge_tensor)
+        return pred_edges, pred_weighted_tensor
+    
     
