@@ -538,7 +538,7 @@ if __name__ == '__main__':
                 
             gen_graphs.append(pred_g)
             if i == 0:
-                print(g.edges(data=True))
+                print(pred_g.edges(data=True))
             
     
     print(gen_graphs[0].edges(data=True))
