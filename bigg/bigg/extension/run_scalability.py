@@ -272,7 +272,7 @@ if __name__ == '__main__':
             cmd_args.has_edge_feats = True
             
             model_path = os.path.join(path, 'gcn-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
-            if os.path.isfile(path):
+            if os.path.isfile(model_path):
                 print('Loading Model')
                 checkpoint = torch.load(path)
                 model.load_state_dict(checkpoint['model'])
@@ -284,7 +284,7 @@ if __name__ == '__main__':
             
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
             model_path = os.path.join(path, 'bigg-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
-            if os.path.isfile(path):
+            if os.path.isfile(model_path):
                 print('Loading Model')
                 checkpoint = torch.load(path)
                 model.load_state_dict(checkpoint['model'])
