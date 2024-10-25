@@ -321,7 +321,13 @@ class BiggWithGCN(RecurTreeGen):
         return ll_top, ll_wt
     
     def sample2(self, num_nodes, display=None):
+        init = datetime.now()
         _, pred_edges, _, _, _ = self.forward(node_end = num_nodes, display=display)
+        cur = datetime.now() - init
+        print("TOPOLOGY PORTION:")
+        print("Times: ", cur.total_seconds())
+        
+        
         fix_edges = []
         for e1, e2 in pred_edges:
             if e1 > e2:
@@ -329,8 +335,12 @@ class BiggWithGCN(RecurTreeGen):
             else:
                 fix_edges.append((e1, e2))
                     
-        pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+        
         pred_weighted_tensor = self.gcn_mod.sample(num_nodes, pred_edge_tensor)
+        cur = datetime.now() - init
+        print("WEIGHT PORTION:")
+        print("Times: ", cur.total_seconds())
+        print(STOP)
         return pred_edges, pred_weighted_tensor
     
     

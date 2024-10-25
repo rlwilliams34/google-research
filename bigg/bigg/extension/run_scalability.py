@@ -301,6 +301,7 @@ if __name__ == '__main__':
         print("Num leaves: ", num_leaves_list)
         print("BiGG-E times: ", times_bigg_e)
         print("BiGG_GCN times: ", times_bigg_gcn)
+        sys.exit()
     
     if cmd_args.training_time:
         print("Getting training times")
