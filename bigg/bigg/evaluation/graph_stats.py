@@ -378,7 +378,7 @@ def tree_weight_statistics(graphs, transform = False):
     jbar_hi = jbar + 1.96 * js / len(lengths)**0.5
     
     print("Global Estimates")
-    print("Mean length: " jbar)
+    print("Mean length: ", jbar)
     print("SD length: ", js)
     print('95% CI: ', ' (' + str(jbar_lo) + ',' + str(jbar_hi), ')')
     
@@ -387,7 +387,7 @@ def tree_weight_statistics(graphs, transform = False):
     jbar_lo = np.percentile(lbars, 2.5)
     jbar_hi = np.percentile(lbars, 97.5)
     print("Per Tree Estimates")
-    print("Mean length: " jbar)
+    print("Mean length: ", jbar)
     print("SD length: ", js)
     print('Empirical Interval: ', ' (' + str(jbar_lo) + ',' + str(jbar_hi) + ')')
   
