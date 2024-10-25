@@ -145,6 +145,8 @@ if __name__ == '__main__':
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
+    print(train_graphs[0].edges(data=True))
+    
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
     
@@ -202,7 +204,6 @@ if __name__ == '__main__':
         #if cmd_args.g_type == 'tree':
         #    gt_graphs = fix_tree_weights(gt_graphs)
         print('# val graphs', len(val_graphs))
-        print(train_graphs[0].edges(data=True))
         
         gen_graphs = []
         with torch.no_grad():
