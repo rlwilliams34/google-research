@@ -266,33 +266,34 @@ if __name__ == '__main__':
             cmd_args.num_leaves = num_leaves
             cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
             
+            
+            model_bigg = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+            model_path = os.path.join(path, 'bigg-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
+            if os.path.isfile(model_path):
+                print('Loading BiGG-E Model')
+                checkpoint_bigg = torch.load(model_path)
+                model_bigg.load_state_dict(checkpoint_bigg['model'])
+                times_bigg_e.append(get_sample_timing(num_leaves, model_bigg, "BiGG_E"))
+            
+            else:
+                print('MISSING BIGG-E MODEL FOR ', num_leaves, 'LEAVES')
+                times_bigg_e.append(-1)
+            
             cmd_args.has_edge_feats = False
             cmd_args.has_node_feats = False
-            model = BiggWithGCN(cmd_args).to(cmd_args.device)
+            model_gcn = BiggWithGCN(cmd_args).to(cmd_args.device)
             cmd_args.has_edge_feats = True
             
             model_path = os.path.join(path, 'gcn-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
             if os.path.isfile(model_path):
                 print('Loading Model')
-                checkpoint = torch.load(model_path)
-                model.load_state_dict(checkpoint['model'])
-                times_bigg_gcn.append(get_sample_timing(num_leaves, model, "BiGG_GCN"))
+                checkpoint_gcn = torch.load(model_path)
+                model_gcn.load_state_dict(checkpoint_gcn['model'])
+                times_bigg_gcn.append(get_sample_timing(num_leaves, model_gcn, "BiGG_GCN"))
             
             else:
                 print('MISSING BIGG-GCN MODEL FOR ', num_leaves, 'LEAVES')
                 times_bigg_gcn.append(-1)
-            
-            model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-            model_path = os.path.join(path, 'bigg-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
-            if os.path.isfile(model_path):
-                print('Loading Model')
-                checkpoint = torch.load(model_path)
-                model.load_state_dict(checkpoint['model'])
-                times_bigg_e.append(get_sample_timing(num_leaves, model, "BiGG_E"))
-            
-            else:
-                print('MISSING BIGG-E MODEL FOR ', num_leaves, 'LEAVES')
-                times_bigg_e.append(-1)
         
         print("Num leaves: ", num_leaves_list)
         print("BiGG-E times: ", times_bigg_e)

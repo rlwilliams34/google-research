@@ -320,7 +320,7 @@ class BiggWithGCN(RecurTreeGen):
         ll_wt = self.gcn_mod.forward(feat_idx, edge_list, batch_weight_idx)
         return ll_top, ll_wt
     
-    def sample2(self, num_nodes, display):
+    def sample2(self, num_nodes, display=None):
         _, pred_edges, _, _, _ = self.forward(node_end = num_nodes, display=display)
         fix_edges = []
         for e1, e2 in pred_edges:
