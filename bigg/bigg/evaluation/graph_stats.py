@@ -369,7 +369,7 @@ def tree_weight_statistics(graphs, transform = False):
     for g in graphs:
         g_lengths = get_tree_lengths(g)
         lengths += g_lengths
-        lbas.append(np.mean(g_lengths))
+        lbars.append(np.mean(g_lengths))
         
     
     jbar = np.mean(lengths)
