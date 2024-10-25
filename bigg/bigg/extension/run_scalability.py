@@ -306,66 +306,72 @@ if __name__ == '__main__':
     if cmd_args.training_time:
         print("Getting training times")
         #num_leaves_list = [cmd_args.num_nodes]
-        num_leaves_list = [50, 100, 200, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
-        #num_leaves_list = [5, 10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        num_leaves_list = [5, 10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
+        #num_leaves_list = 
         #num_leaves_list = [50, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
-        times = []
+        bigg_times = []
+        gcn_times = []
         train_graphs = []
         i = 0
         for num_leaves in num_leaves_list:
             num_leaves = int(num_leaves)
             num_nodes = 2 * int(num_leaves) - 1
             
-            if cmd_args.model == "BiGG_GCN":
-                cmd_args.max_num_nodes = num_nodes
-                cmd_args.has_edge_feats = False
-                cmd_args.has_node_feats = False
-                model = BiggWithGCN(cmd_args).to(cmd_args.device)
-                cmd_args.has_edge_feats = True
-                
-                optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
-            
-            else:
-                model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-                optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
-            
+            ### DATA
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
             g = get_graph_data(g[0], 'BFS')
             train_graphs += g
             
             [TreeLib.InsertGraph(train_graphs[i])]
             
-            if cmd_args.model == "BiGG_GCN":
-                feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, [i], cmd_args)
+            feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, [i], cmd_args)
+            edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
             
-            else:
-                edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
-            
+            ### FIRST BIGG-GCN
+            cmd_args.max_num_nodes = num_nodes
+            cmd_args.has_edge_feats = False
+            cmd_args.has_node_feats = False
+            model = BiggWithGCN(cmd_args).to(cmd_args.device)
+            cmd_args.has_edge_feats = True
+                
             init = datetime.now()
-            
-            if cmd_args.model == "BiGG_GCN":
-                ll, ll_wt = model.forward_train2([i], feat_idx, edge_list, batch_weight_idx)
-                
-            else:
-                ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
-            
+            ll, ll_wt = model.forward_train2([i], feat_idx, edge_list, batch_weight_idx)
             loss = -(ll + ll_wt) / num_nodes
-            loss.backward()
-            
-            if cmd_args.grad_clip > 0:
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
-                
+            loss.backward()    
             optimizer.step()
             optimizer.zero_grad()
-            
             cur = datetime.now() - init
-            times.append(cur.total_seconds())
+            
+            if i > 2:
+                gcn_times.append(cur.total_seconds())
+                print("BIGG-GCN")
+                print(num_leaves)
+                print(cur.total_seconds())
+            
+            ### BIGG-E
+            
+            model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+            optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+            
+            init = datetime.now()
+            ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
+            loss = -(ll + ll_wt) / num_nodes
+            loss.backward()    
+            optimizer.step()
+            optimizer.zero_grad()
+            cur = datetime.now() - init
+            
+            if i > 2:
+                bigg_times.append(cur.total_seconds())
+                print("BIGG-E")
+                print(num_leaves)
+                print(cur.total_seconds())
+            
             i+=1
-            print(num_leaves)
-            print(cur.total_seconds())
             
         print(num_leaves_list)
-        print(times)
+        print(gcn_times)
+        print(bigg_times)
             
         sys.exit()
     
