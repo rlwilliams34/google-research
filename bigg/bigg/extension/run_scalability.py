@@ -43,12 +43,10 @@ def get_sample_timing(num_leaves, model, mode = "BiGG_E"):
     num_nodes = 2 * num_leaves - 1
     init = datetime.now()
     
-    if cmd_args.model == "BiGG_GCN": 
-        print("BiGG_GCN check")
+    if mode == "BiGG_GCN": 
         pred_edges, pred_weighted_tensor = model.sample2(num_nodes = num_nodes, display = cmd_args.display)
     
     else:
-        print("BIGG_E check")
         _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
     
     cur = datetime.now() - init
