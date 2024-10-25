@@ -393,9 +393,6 @@ if __name__ == '__main__':
     num_epochs = 1500
     epoch_plateu = 800
     
-    if epoch_load > 0:
-        num_epochs = epoch_load    
-    
     #num_epochs = epoch_load
     model.train()
     for epoch in range(epoch_load, num_epochs):
@@ -437,6 +434,7 @@ if __name__ == '__main__':
                 
                 loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
                 loss.backward()
+                
                 epoch_loss += loss.item() / num_iter
 #                 if idx % 40 == 0:
 #                     print(ll / num_nodes)
