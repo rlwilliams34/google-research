@@ -321,7 +321,7 @@ if __name__ == '__main__':
                     pred_g.add_weighted_edges_from(fixed_edges)
                     gen_graphs.append(pred_g)
         
-        if cmd_args.max_num_nodes < 250:
+        if cmd_args.max_num_nodes > -1:
             for idx in range(min(2, cmd_args.num_test_gen)):
                 print("edges:")
                 print(gen_graphs[idx].edges(data=True))
