@@ -366,6 +366,8 @@ def tree_weight_statistics(graphs, transform = False):
   if joint:
     lengths = []
     lbars = []
+    _, graphs = correct_tree_topology_check(graphs)
+    
     for g in graphs:
         g_lengths = get_tree_lengths(g)
         lengths += g_lengths
