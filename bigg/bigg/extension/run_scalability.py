@@ -39,6 +39,24 @@ from bigg.experiments.train_utils import get_node_dist
 from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
+def get_sample_timing(num_leaves, model, mode = "BiGG_E"):
+    num_nodes = 2 * num_leaves - 1
+    init = datetime.now()
+    
+    if cmd_args.model == "BiGG_GCN": 
+        pred_edges, pred_weighted_tensor = model.sample2(num_nodes = num_nodes, display = cmd_args.display)
+    
+    else:
+        _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+    
+    cur = datetime.now() - init
+    print("Model: ", mode)
+    print("Num nodes: ", num_nodes)
+    print("Num edges: ", len(pred_edges))
+    print("Time: ", cur.total_seconds())
+    return cur.total_seconds()
+            
+
 def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     batch_g = nx.Graph()
     feat_idx = torch.Tensor().to(cmd_args.device)
@@ -238,15 +256,47 @@ if __name__ == '__main__':
     #assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
     
     #model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    if cmd_args.model == "BiGG_GCN":
-        cmd_args.has_edge_feats = False
-        cmd_args.has_node_feats = False
-        model = BiggWithGCN(cmd_args).to(cmd_args.device)
-        cmd_args.has_edge_feats = True
-    
-    else:
-        model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    if cmd_args.phase != "train": 
+        num_leaves_list = [50, 250, 500, 1000, 2500, 5000, 7500]
+        times_bigg_e = []
+        times_bigg_gcn = []
+        path = os.getcwd()
+        
+        for num_leaves in num_leaves_list:
+            cmd_args.num_leaves = num_leaves
+            cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
+            
+            cmd_args.has_edge_feats = False
+            cmd_args.has_node_feats = False
+            model = BiggWithGCN(cmd_args).to(cmd_args.device)
+            cmd_args.has_edge_feats = True
+            
+            model_path = os.path.join(path, 'gcn-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
+            if os.path.isfile(path):
+                print('Loading Model')
+                checkpoint = torch.load(path)
+                model.load_state_dict(checkpoint['model'])
+                times_bigg_gcn.append(get_sample_timing(num_leaves, model, "BiGG_GCN"))
+            
+            else:
+                print('MISSING BIGG-GCN MODEL FOR ', num_leaves, 'LEAVES')
+                times_bigg_gcn.append(-1)
+            
+            model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+            model_path = os.path.join(path, 'bigg-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
+            if os.path.isfile(path):
+                print('Loading Model')
+                checkpoint = torch.load(path)
+                model.load_state_dict(checkpoint['model'])
+                times_bigg_e.append(get_sample_timing(num_leaves, model, "BiGG_E"))
+            
+            else:
+                print('MISSING BIGG-E MODEL FOR ', num_leaves, 'LEAVES')
+                times_bigg_e.append(-1)
+        
+        print("Num leaves: ", num_leaves_list)
+        print("BiGG-E times: ", times_bigg_e)
+        print("BiGG_GCN times: ", times_bigg_gcn)
     
     if cmd_args.training_time:
         print("Getting training times")
@@ -313,6 +363,18 @@ if __name__ == '__main__':
         print(times)
             
         sys.exit()
+    
+    
+    ### Set Model
+    if cmd_args.model == "BiGG_GCN":
+        cmd_args.has_edge_feats = False
+        cmd_args.has_node_feats = False
+        model = BiggWithGCN(cmd_args).to(cmd_args.device)
+        cmd_args.has_edge_feats = True
+    
+    else:
+        model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
+    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     ## CREATE TRAINING GRAPHS HERE 
     path = os.path.join(os.getcwd(), 'temp_graphs')
