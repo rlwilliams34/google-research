@@ -353,6 +353,9 @@ if __name__ == '__main__':
             
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
             optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+            model.update_weight_stats(edge_feats)
+            model.epoch_num += 1
+        
             
             init = datetime.now()
             ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
