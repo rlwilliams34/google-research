@@ -336,7 +336,8 @@ class BiggWithGCN(RecurTreeGen):
             else:
                 fix_edges.append((e1, e2))
                     
-        
+        pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+        init = datetime.now()
         pred_weighted_tensor = self.gcn_mod.sample(num_nodes, pred_edge_tensor)
         cur = datetime.now() - init
         print("WEIGHT PORTION:")
