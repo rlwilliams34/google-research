@@ -42,11 +42,14 @@ from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 def get_sample_timing(num_leaves, model, mode = "BiGG_E"):
     num_nodes = 2 * num_leaves - 1
     init = datetime.now()
+    model.eval()
     
     if mode == "BiGG_GCN": 
+        print("BiGG GCN CHECK")
         pred_edges, pred_weighted_tensor = model.sample2(num_nodes = num_nodes, display = cmd_args.display)
     
     else:
+        print("BiGG E CHECK")
         _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
     
     cur = datetime.now() - init
@@ -272,6 +275,7 @@ if __name__ == '__main__':
                 print('Loading BiGG-E Model')
                 checkpoint_bigg = torch.load(model_path)
                 model_bigg.load_state_dict(checkpoint_bigg['model'])
+                
                 times_bigg_e.append(get_sample_timing(num_leaves, model_bigg, "BiGG_E"))
             
             else:
