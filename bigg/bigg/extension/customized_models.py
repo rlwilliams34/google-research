@@ -342,7 +342,6 @@ class BiggWithGCN(RecurTreeGen):
         cur = datetime.now() - init
         print("WEIGHT PORTION:")
         print("Times: ", cur.total_seconds())
-        print(STOP)
         return pred_edges, pred_weighted_tensor
     
     
