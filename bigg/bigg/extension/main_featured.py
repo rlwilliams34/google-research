@@ -202,6 +202,7 @@ if __name__ == '__main__':
         #if cmd_args.g_type == 'tree':
         #    gt_graphs = fix_tree_weights(gt_graphs)
         print('# val graphs', len(val_graphs))
+        print(train_graphs[0].edges(data=True))
         
         gen_graphs = []
         with torch.no_grad():
@@ -397,8 +398,8 @@ if __name__ == '__main__':
             
             num_nodes = sum([len(train_graphs[i]) for i in batch_indices])
             
-            node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if cmd_args.has_node_feats else None)
-            edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if cmd_args.has_edge_feats else None)
+            node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if list_node_feats is not None else None)
+            edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
             if cmd_args.model == "BiGG_GCN":
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
