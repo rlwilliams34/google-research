@@ -274,7 +274,7 @@ if __name__ == '__main__':
             model_path = os.path.join(path, 'gcn-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
             if os.path.isfile(model_path):
                 print('Loading Model')
-                checkpoint = torch.load(path)
+                checkpoint = torch.load(model_path)
                 model.load_state_dict(checkpoint['model'])
                 times_bigg_gcn.append(get_sample_timing(num_leaves, model, "BiGG_GCN"))
             
@@ -286,7 +286,7 @@ if __name__ == '__main__':
             model_path = os.path.join(path, 'bigg-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
             if os.path.isfile(model_path):
                 print('Loading Model')
-                checkpoint = torch.load(path)
+                checkpoint = torch.load(model_path)
                 model.load_state_dict(checkpoint['model'])
                 times_bigg_e.append(get_sample_timing(num_leaves, model, "BiGG_E"))
             
