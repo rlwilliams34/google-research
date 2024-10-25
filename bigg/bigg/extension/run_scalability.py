@@ -333,6 +333,7 @@ if __name__ == '__main__':
             cmd_args.has_node_feats = False
             model = BiggWithGCN(cmd_args).to(cmd_args.device)
             cmd_args.has_edge_feats = True
+            optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
                 
             init = datetime.now()
             ll, ll_wt = model.forward_train2([i], feat_idx, edge_list, batch_weight_idx)
