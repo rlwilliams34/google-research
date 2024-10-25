@@ -14,6 +14,14 @@ from bigg.evaluation.mmd_stats import *
 from bigg.common.configs import cmd_args, set_device
 
 		## Topology Check Functions
+def get_tree_lengths(g):
+  leaves = [l for l in g.nodes() if g.degree(l) == 1]
+  path_lengths = []
+  for leaf in leaves:
+      path_length = nx.dijkstra_path_length(g, 0, leaf)
+      path_lengths.append(path_length)
+  return path_lengths
+
 def correct_tree_topology_check(graphs):
   correct = 0
   true_trees = []
@@ -353,6 +361,36 @@ def tree_weight_statistics(graphs, transform = False):
   print(results_rounded[6])
   print('95% CI: ', ' (' + str(results_rounded[7]) + ',' + str(results_rounded[8]), ')')
   print('Empirical Interval: ', ' (' + str(s_t_lo) + ',' + str(s_t_hi) + ')')
+  
+  joint = True
+  if joint:
+    lengths = []
+    lbars = []
+    for g in graphs:
+        g_lengths = get_tree_lengths(g)
+        lengths += g_lengths
+        lbas.append(np.mean(g_lengths))
+        
+    
+    jbar = np.mean(lengths)
+    js = np.var(lengths, ddof = 1) ** 0.5
+    jbar_lo = jbar - 1.96 * js / len(lengths)**0.5
+    jbar_hi = jbar + 1.96 * js / len(lengths)**0.5
+    
+    print("Global Estimates")
+    print("Mean length: " jbar)
+    print("SD length: ", js)
+    print('95% CI: ', ' (' + str(jbar_lo) + ',' + str(jbar_hi), ')')
+    
+    jbar = np.mean(lbars)
+    js = np.var(lbars, ddof = 1) ** 0.5
+    jbar_lo = np.percentile(lbars, 2.5)
+    jbar_hi = np.percentile(lbars, 97.5)
+    print("Per Tree Estimates")
+    print("Mean length: " jbar)
+    print("SD length: ", js)
+    print('Empirical Interval: ', ' (' + str(jbar_lo) + ',' + str(jbar_hi) + ')')
+  
 
 def get_mmd_stats(out_graphs, test_graphs):
     mmd_degree = degree_stats(out_graphs, test_graphs)
