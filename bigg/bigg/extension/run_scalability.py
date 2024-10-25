@@ -366,6 +366,7 @@ if __name__ == '__main__':
     
     print('# graphs', len(train_graphs), '# nodes', cmd_args.max_num_nodes)
     print("Begin training")
+    print("Train graph size:", len(train_graphs[0]))
     
     N = len(train_graphs)
     B = cmd_args.batch_size
