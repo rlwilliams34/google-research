@@ -39,28 +39,6 @@ from bigg.experiments.train_utils import get_node_dist
 from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
-def get_sample_timing(num_leaves, model, mode = "BiGG_E"):
-    num_nodes = 2 * num_leaves - 1
-    model.eval()
-    init = datetime.now()
-    
-    if mode == "BiGG_GCN": 
-        pred_edges, pred_weighted_tensor = model.sample2(num_nodes = num_nodes, display = cmd_args.display)
-    
-    else:
-        _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
-    
-    cur = datetime.now() - init
-    print("Model: ", mode)
-    print("Num nodes: ", num_nodes)
-    print("Num edges: ", len(pred_edges))
-    print("Time: ", cur.total_seconds())
-    pred_edges = None
-    pred_edge_feats = None
-    pred_weighted_tensor = None
-    return cur.total_seconds()
-            
-
 def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     batch_g = nx.Graph()
     feat_idx = torch.Tensor().to(cmd_args.device)
@@ -277,9 +255,20 @@ if __name__ == '__main__':
                 print('Loading BiGG-E Model')
                 checkpoint_bigg = torch.load(model_path)
                 model_bigg.load_state_dict(checkpoint_bigg['model'])
+                model_bigg.eval()
+                init = datetime.now()
+                _, pred_edges, _, _, pred_edge_feats = model_bigg(node_end = num_nodes, display=cmd_args.display)
+                cur = datetime.now() - init
                 
-                times_bigg_e.append(get_sample_timing(num_leaves, model_bigg, "BiGG_E"))
+                times_bigg_e.append(cur.total_seconds())
+                
+                print("Num nodes: ", num_nodes)
+                print("Num edges: ", len(pred_edges))
+                print("Time: ", cur.total_seconds())
+                
                 del model_bigg
+                pred_edges = None
+                pred_edge_feats = None
             
             else:
                 print('MISSING BIGG-E MODEL FOR ', num_leaves, 'LEAVES')
@@ -295,8 +284,19 @@ if __name__ == '__main__':
                 print('Loading Model')
                 checkpoint_gcn = torch.load(model_path)
                 model_gcn.load_state_dict(checkpoint_gcn['model'])
-                times_bigg_gcn.append(get_sample_timing(num_leaves, model_gcn, "BiGG_GCN"))
+                model_gcn.eval()
+                init = datetime.now()
+                pred_edges, pred_weighted_tensor = model_gcn.sample2(num_nodes = num_nodes, display = cmd_args.display)
+                cur = datetime.now() - init
+                times_bigg_gcn.append(cur.total_seconds())
+                
+                print("Num nodes: ", num_nodes)
+                print("Num edges: ", len(pred_edges))
+                print("Time: ", cur.total_seconds())
+                
                 del model_gcn
+                pred_edges = None
+                pred_weighted_tensor = None
             
             else:
                 print('MISSING BIGG-GCN MODEL FOR ', num_leaves, 'LEAVES')
