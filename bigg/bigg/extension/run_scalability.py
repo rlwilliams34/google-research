@@ -45,11 +45,9 @@ def get_sample_timing(num_leaves, model, mode = "BiGG_E"):
     model.eval()
     
     if mode == "BiGG_GCN": 
-        print("BiGG GCN CHECK")
         pred_edges, pred_weighted_tensor = model.sample2(num_nodes = num_nodes, display = cmd_args.display)
     
     else:
-        print("BiGG E CHECK")
         _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
     
     cur = datetime.now() - init
@@ -263,7 +261,7 @@ if __name__ == '__main__':
     
     #model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     if cmd_args.phase != "train": 
-        num_leaves_list = [2500, 5000, 7500]#[50, 250, 500, 1000, 2500, 5000, 7500]
+        num_leaves_list = [50, 250, 500, 1000, 2500, 5000, 7500]
         times_bigg_e = []
         times_bigg_gcn = []
         path = os.getcwd()
