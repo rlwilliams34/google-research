@@ -267,6 +267,7 @@ if __name__ == '__main__':
         path = os.getcwd()
         
         for num_leaves in num_leaves_list:
+            torch.cuda.mem_get_info()
             cmd_args.num_leaves = num_leaves
             cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
             
