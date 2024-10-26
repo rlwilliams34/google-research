@@ -478,7 +478,7 @@ if __name__ == '__main__':
     
     #num_epochs = epoch_load
     model.train()
-    num_epochs = epoch_load
+    #num_epochs = epoch_load
     for epoch in range(epoch_load, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
