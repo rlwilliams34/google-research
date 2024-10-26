@@ -57,6 +57,9 @@ def get_sample_timing(num_leaves, model, mode = "BiGG_E"):
     print("Num nodes: ", num_nodes)
     print("Num edges: ", len(pred_edges))
     print("Time: ", cur.total_seconds())
+    pred_edges = None
+    pred_edge_feats = None
+    pred_weighted_tensor = None
     return cur.total_seconds()
             
 
@@ -260,7 +263,7 @@ if __name__ == '__main__':
     
     #model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     if cmd_args.phase != "train": 
-        num_leaves_list = [50, 250, 500, 1000, 2500, 5000, 7500]
+        num_leaves_list = [2500, 5000, 7500]#[50, 250, 500, 1000, 2500, 5000, 7500]
         times_bigg_e = []
         times_bigg_gcn = []
         path = os.getcwd()
@@ -277,6 +280,7 @@ if __name__ == '__main__':
                 model_bigg.load_state_dict(checkpoint_bigg['model'])
                 
                 times_bigg_e.append(get_sample_timing(num_leaves, model_bigg, "BiGG_E"))
+                del model_bigg
             
             else:
                 print('MISSING BIGG-E MODEL FOR ', num_leaves, 'LEAVES')
@@ -293,11 +297,13 @@ if __name__ == '__main__':
                 checkpoint_gcn = torch.load(model_path)
                 model_gcn.load_state_dict(checkpoint_gcn['model'])
                 times_bigg_gcn.append(get_sample_timing(num_leaves, model_gcn, "BiGG_GCN"))
+                del model_gcn
             
             else:
                 print('MISSING BIGG-GCN MODEL FOR ', num_leaves, 'LEAVES')
                 times_bigg_gcn.append(-1)
-        
+            
+            torch.cuda.empty_cache()
         print("Num leaves: ", num_leaves_list)
         print("BiGG-E times: ", times_bigg_e)
         print("BiGG_GCN times: ", times_bigg_gcn)
