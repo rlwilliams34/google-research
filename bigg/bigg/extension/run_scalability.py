@@ -516,7 +516,8 @@ if __name__ == '__main__':
                 else:
                     ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
                 
-                loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
+                true_loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
+                loss = true_loss / cmd_args.accum_grad
                 loss.backward()
                 
                 epoch_loss += loss.item() / num_iter
@@ -550,7 +551,7 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
                 grad_accum_counter = 0
             
-            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, loss))
+            pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
         
         if cmd_args.learning_rate != 1e-5 and epoch > epoch_plateu:
             plateu = int(epoch_loss > prev_loss)
