@@ -41,8 +41,8 @@ from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 
 def get_sample_timing(num_leaves, model, mode = "BiGG_E"):
     num_nodes = 2 * num_leaves - 1
-    init = datetime.now()
     model.eval()
+    init = datetime.now()
     
     if mode == "BiGG_GCN": 
         pred_edges, pred_weighted_tensor = model.sample2(num_nodes = num_nodes, display = cmd_args.display)
