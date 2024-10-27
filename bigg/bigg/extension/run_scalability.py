@@ -258,8 +258,8 @@ if __name__ == '__main__':
                 model_bigg.load_state_dict(checkpoint_bigg['model'])
                 model_bigg.eval()
                 init = datetime.now()
-                #with torch.no_grad():
-                _, pred_edges, _, _, pred_edge_feats = model_bigg(node_end = num_nodes, display=cmd_args.display)
+                with torch.no_grad():
+                    _, pred_edges, _, _, pred_edge_feats = model_bigg(node_end = num_nodes, display=cmd_args.display)
                 cur = datetime.now() - init
                 
                 times_bigg_e.append(cur.total_seconds())
@@ -288,8 +288,8 @@ if __name__ == '__main__':
                 model_gcn.load_state_dict(checkpoint_gcn['model'])
                 model_gcn.eval()
                 init = datetime.now()
-                #with torch.no_grad():
-                pred_edges, pred_weighted_tensor = model_gcn.sample2(num_nodes = num_nodes, display = cmd_args.display)
+                with torch.no_grad():
+                    pred_edges, pred_weighted_tensor = model_gcn.sample2(num_nodes = num_nodes, display = cmd_args.display)
                 cur = datetime.now() - init
                 times_bigg_gcn.append(cur.total_seconds())
                 
