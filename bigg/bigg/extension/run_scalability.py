@@ -248,6 +248,7 @@ if __name__ == '__main__':
             torch.cuda.mem_get_info()
             cmd_args.num_leaves = num_leaves
             cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
+            num_nodes = 2 * cmd_args.num_leaves - 1
             
             model_bigg = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
             model_path = os.path.join(path, 'bigg-temp', 'temp%d.ckpt' % cmd_args.num_leaves)
