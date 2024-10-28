@@ -351,6 +351,9 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             cur = datetime.now() - init
             
+            del model
+            del optimizer
+            
             if i > 2:
                 gcn_times.append(cur.total_seconds())
                 print("BIGG-GCN")
@@ -372,6 +375,9 @@ if __name__ == '__main__':
             optimizer.step()
             optimizer.zero_grad()
             cur = datetime.now() - init
+            
+            del model
+            del optimizer
             
             if i > 2:
                 bigg_times.append(cur.total_seconds())
@@ -481,7 +487,7 @@ if __name__ == '__main__':
     
     #num_epochs = epoch_load
     model.train()
-    #num_epochs = epoch_load
+    num_epochs = epoch_load
     for epoch in range(epoch_load, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
