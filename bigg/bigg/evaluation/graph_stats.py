@@ -555,6 +555,17 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         
         wt_stats = tree_weight_statistics(out_graphs)
     
+    elif graph_type == "span":
+        correct = 0
+        for g in out_graphs:
+            if nx.is_tree(g):
+                correct += 1
+        
+        prop = correct / len(out_graphs)
+        print("Number of trees: ", prop)
+        
+        get_mmd_stats(out_graphs, test_graphs)
+    
     else:
         print("Graph Type not yet implemented")
     return 0
