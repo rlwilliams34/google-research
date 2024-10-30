@@ -354,7 +354,7 @@ if __name__ == '__main__':
             del model
             del optimizer
             
-            if i > 2:
+            if i >= 2:
                 gcn_times.append(cur.total_seconds())
                 print("BIGG-GCN")
                 print(num_leaves)
@@ -379,13 +379,15 @@ if __name__ == '__main__':
             del model
             del optimizer
             
-            if i > 2:
+            if i >= 2:
                 bigg_times.append(cur.total_seconds())
                 print("BIGG-E")
                 print(num_leaves)
                 print(cur.total_seconds())
             
             i+=1
+            if i == 2:
+                print(STOP)
             
         print(num_leaves_list)
         print(gcn_times)
