@@ -109,8 +109,9 @@ def get_edge_feats(g):
 
 
 def debug_model(model, graph, node_feats, edge_feats):
-    ll, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
+    ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
+    print(ll_wt)
 
     edges = []
     for e in graph.edges():
@@ -118,8 +119,9 @@ def debug_model(model, graph, node_feats, edge_feats):
             e = (e[1], e[0])
         edges.append(e)
     edges = sorted(edges)
-    ll, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
+    ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
+    print(ll_wt)
     import sys
     sys.exit()
 
