@@ -473,8 +473,6 @@ class RecurTreeGen(nn.Module):
         return p
 
     def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None):
-        print(lb)
-        print(ub)
         assert lb <= ub
         if tree_node.is_root:
             prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0][-1]))
@@ -510,7 +508,7 @@ class RecurTreeGen(nn.Module):
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
-                    ll_w = ll_w + edge_ll
+                    ll_wt = ll_wt + edge_ll
                     edge_embed = self.embed_edge_feats(cur_feats)
                     return ll, ll_wt, edge_embed, 1, cur_feats
                 else:
