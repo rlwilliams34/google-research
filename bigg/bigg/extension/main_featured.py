@@ -345,7 +345,7 @@ if __name__ == '__main__':
     times = []
     loss_times = []
     epoch_list = []
-    lr_scheduler = {'lobster': 100, 'tree': 100 , 'db': 1000, 'er': 250, 'span': 10000}
+    lr_scheduler = {'lobster': 100, 'tree': 100 , 'db': 1000, 'er': 250, 'span': 100}
     epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
     batch_loss = 0.0
     
@@ -363,12 +363,18 @@ if __name__ == '__main__':
         cmd_args.epoch_load = 0
     
     if cmd_args.schedule:
-        cmd_args.scale_loss = 1
+        cmd_args.scale_loss = 20
     
     if cmd_args.model == "BiGG_GCN":
         cmd_args.scale_loss = 1
     
     model.train()
+    
+    #### DEBUG
+    debug_model(model, train_graphs[0], None, list_edge_feats[0])
+    ####
+    
+    
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
         pbar = tqdm(range(num_iter))
