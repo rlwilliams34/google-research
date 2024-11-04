@@ -32,6 +32,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def __init__(self, args):
         super().__init__(args)
+        self.scale_loss = Parameter(torch.Tensor(1))
         self.method = args.method
         
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
