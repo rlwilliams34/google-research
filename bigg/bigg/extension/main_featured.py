@@ -428,6 +428,8 @@ if __name__ == '__main__':
             true_loss = -(ll + ll_wt) / num_nodes
             batch_loss = true_loss.item() / cmd_args.accum_grad + batch_loss
             
+            
+            ll_wt = 0
             loss = -(ll * cmd_args.scale_loss + ll_wt) / (num_nodes)#* cmd_args.accum_grad)
             loss.backward()
             grad_accum_counter += 1
