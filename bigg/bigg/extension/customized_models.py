@@ -32,7 +32,6 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def __init__(self, args):
         super().__init__(args)
-        self.scale_loss = Parameter(torch.Tensor(1))
         self.method = args.method
         
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
@@ -316,14 +315,13 @@ class BiggWithGCN(RecurTreeGen):
     def __init__(self, args):
         super().__init__(args)
         self.gcn_mod = GCN_Generate(args)
-        self.scale_loss = Parameter(torch.Tensor(1))
+        
         
     def forward_train2(self, batch_indices, feat_idx, edge_list, batch_weight_idx):
         ll_top, _, _ = self.forward_train(batch_indices)
         ll_wt = self.gcn_mod.forward(feat_idx, edge_list, batch_weight_idx)
         ll_wt = ll_wt / (torch.square(self.scale_loss) + 1e-6)
-        res = torch.log(self.scale_loss + 1e-6)
-        return ll_top, ll_wt, res
+        return ll_top, ll_wt
     
     def sample2(self, num_nodes, display=None):
         init = datetime.now()
