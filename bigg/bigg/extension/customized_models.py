@@ -320,7 +320,6 @@ class BiggWithGCN(RecurTreeGen):
     def forward_train2(self, batch_indices, feat_idx, edge_list, batch_weight_idx):
         ll_top, _, _ = self.forward_train(batch_indices)
         ll_wt = self.gcn_mod.forward(feat_idx, edge_list, batch_weight_idx)
-        ll_wt = ll_wt / (torch.square(self.scale_loss) + 1e-6)
         return ll_top, ll_wt
     
     def sample2(self, num_nodes, display=None):
