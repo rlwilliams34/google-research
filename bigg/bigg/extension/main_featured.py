@@ -368,7 +368,7 @@ if __name__ == '__main__':
         cmd_args.scale_loss = 20
     
     if cmd_args.model == "BiGG_GCN":
-        cmd_args.scale_loss = 1
+        cmd_args.scale_loss = 20
     
     model.train()
     
