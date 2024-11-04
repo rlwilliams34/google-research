@@ -431,7 +431,7 @@ if __name__ == '__main__':
             
             #ll_wt = 0
             #loss = -(ll * cmd_args.scale_loss + ll_wt) / (num_nodes)#* cmd_args.accum_grad)
-            loss = -ll / num_nodes - ll_wt / (num_nodes * model.scale_loss**2) + torch.log(model.scale_loss*2 + 1e-6)
+            loss = -ll / num_nodes - ll_wt / (num_nodes * model.scale_loss**2) + torch.log(model.scale_loss**2 + 1e-6)
             loss.backward()
             grad_accum_counter += 1
             
