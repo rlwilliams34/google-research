@@ -28,6 +28,36 @@ from datetime import datetime
 ## Check MLP for embeddings
 ## Multi Layers
 
+# class LSTMTest(nn.Module):
+# 
+#     def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
+#         super(LSTMTagger, self).__init__()
+#         self.hidden_dim = hidden_dim
+# 
+#         #self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
+# 
+#         # The LSTM takes word embeddings as inputs, and outputs hidden states
+#         # with dimensionality hidden_dim.
+#         self.lstm = nn.LSTM(embedding_dim, hidden_dim)
+# 
+#         # The linear layer that maps from hidden state space to tag space
+#         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
+#         
+#         self.init_h0 = Parameter(torch.Tensor(1, self.hidden_dim))
+#         self.init_c0 = Parameter(torch.Tensor(1, self.hidden_dim))
+#         self.batch_size = batch_size
+# 
+#     def forward(self, weights):
+#         weights_embed = self.embed_weights(weights)
+#         
+#         lstm_out, _ = self.lstm(weights_embed, (self.init_h0.repeat(self.batch_size, 1), self.init_c0.repeat(self.batch_size, 1)))
+#         tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
+#         tag_scores = F.log_softmax(tag_space, dim=1)
+#         return tag_scores
+
+
+
+
 class BiggWithEdgeLen(RecurTreeGen):
 
     def __init__(self, args):
@@ -261,51 +291,72 @@ class BiggWithEdgeLen(RecurTreeGen):
             ll = -(node_feats - pred_node_len) ** 2
             ll = torch.sum(ll)
         return new_state, ll, node_feats
-
+    
     def predict_edge_feats(self, state, edge_feats=None):
         """
         Args:
             state: tuple of (h=N x embed_dim, c=N x embed_dim), the current state
-            edge_feats: N x feat_dim or None
+            node_feats: N x feat_dim or None
         Returns:
-            likelihood of edge_feats under current state,
-            and, if edge_feats is None, then return the prediction of edge_feats
-            else return the edge_feats as it is
+            new_state,
+            likelihood of node_feats under current state,
+            and, if node_feats is None, then return the prediction of node_feats
+            else return the node_feats as it is
         """
         h, _ = state
-        mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
-        
+        pred_edge_len = self.nodelen_pred(h[-1])
         if edge_feats is None:
             ll = 0
-            pred_mean = mus
-            pred_lvar = lvars
-            pred_sd = torch.exp(0.5 * pred_lvar)
-            edge_feats = torch.normal(pred_mean, pred_sd)
-            #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
-            edge_feats = torch.nn.functional.softplus(edge_feats)
-            
+            edge_feats = pred_edge_len
         else:
-            ### Update log likelihood with weight prediction
-            
-            ### Trying with softplus parameterization...
-            edge_feats_invsp = self.compute_softminus(edge_feats)
-            
-            ### Standardize
-            #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
-            
-            ## MEAN AND VARIANCE OF LOGNORMAL
-            var = torch.exp(lvars) 
-            
-            ## diff_sq = (mu - softminusw)^2
-            diff_sq = torch.square(torch.sub(mus, edge_feats_invsp))
-            
-            ## diff_sq2 = v^-1*diff_sq
-            diff_sq2 = torch.div(diff_sq, var)
-            
-            ## add to ll
-            ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+            ll = -(edge_feats - pred_edge_len) ** 2
             ll = torch.sum(ll)
         return ll, edge_feats
+
+#     def predict_edge_feats(self, state, edge_feats=None):
+#         """
+#         Args:
+#             state: tuple of (h=N x embed_dim, c=N x embed_dim), the current state
+#             edge_feats: N x feat_dim or None
+#         Returns:
+#             likelihood of edge_feats under current state,
+#             and, if edge_feats is None, then return the prediction of edge_feats
+#             else return the edge_feats as it is
+#         """
+#         h, _ = state
+#         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
+#         
+#         if edge_feats is None:
+#             ll = 0
+#             pred_mean = mus
+#             pred_lvar = lvars
+#             pred_sd = torch.exp(0.5 * pred_lvar)
+#             edge_feats = torch.normal(pred_mean, pred_sd)
+#             #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
+#             edge_feats = torch.nn.functional.softplus(edge_feats)
+#             
+#         else:
+#             ### Update log likelihood with weight prediction
+#             
+#             ### Trying with softplus parameterization...
+#             edge_feats_invsp = self.compute_softminus(edge_feats)
+#             
+#             ### Standardize
+#             #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
+#             
+#             ## MEAN AND VARIANCE OF LOGNORMAL
+#             var = torch.exp(lvars) 
+#             
+#             ## diff_sq = (mu - softminusw)^2
+#             diff_sq = torch.square(torch.sub(mus, edge_feats_invsp))
+#             
+#             ## diff_sq2 = v^-1*diff_sq
+#             diff_sq2 = torch.div(diff_sq, var)
+#             
+#             ## add to ll
+#             ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+#             ll = torch.sum(ll)
+#         return ll, edge_feats
     
 #     def predict_edge_feats(self, state, edge_feats=None):
 #         """
@@ -363,7 +414,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 #     
 #     def decode_weight(self, z, h, edge_feats=None):
 #         input_ = torch.cat([z, h], -1)
-#         w_star = 
+#         w_star = self.weight_out(input_)
 #         
 #         if edge_feats is not 
 # 
