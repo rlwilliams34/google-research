@@ -303,11 +303,73 @@ class BiggWithEdgeLen(RecurTreeGen):
             diff_sq2 = torch.div(diff_sq, var)
             
             ## add to ll
-            ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+            ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
             ll = torch.sum(ll)
         return ll, edge_feats
-
-
+    
+#     def predict_edge_feats(self, state, edge_feats=None):
+#         """
+#         Args:
+#             state: tuple of (h=N x embed_dim, c=N x embed_dim), the current state
+#             edge_feats: N x feat_dim or None
+#         Returns:
+#             likelihood of edge_feats under current state,
+#             and, if edge_feats is None, then return the prediction of edge_feats
+#             else return the edge_feats as it is
+#         """
+#         h, _ = state
+#         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
+#         
+#         if edge_feats is None:
+#             ll = 0
+#             pred_mean = mus
+#             pred_lvar = lvars
+#             pred_sd = torch.exp(0.5 * pred_lvar)
+#             edge_feats = torch.normal(pred_mean, pred_sd)
+#             #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
+#             edge_feats = torch.nn.functional.softplus(edge_feats)
+#             
+#         else:
+#             ### Update log likelihood with weight prediction
+#             
+#             ### Trying with softplus parameterization...
+#             edge_feats_invsp = self.compute_softminus(edge_feats)
+#             
+#             ### Standardize
+#             #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
+#             
+#             ## MEAN AND VARIANCE OF LOGNORMAL
+#             var = torch.exp(lvars) 
+#             
+#             ## diff_sq = (mu - softminusw)^2
+#             diff_sq = torch.square(torch.sub(mus, edge_feats_invsp))
+#             
+#             ## diff_sq2 = v^-1*diff_sq
+#             diff_sq2 = torch.div(diff_sq, var)
+#             
+#             ## add to ll
+#             ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+#             ll = torch.sum(ll)
+#         return ll, edge_feats
+    
+#     def encode_weight(self, edge_feats, h):
+#         input_ = torch.cat([weight, h], -1)
+#         mu = self.vae_mu(input_)
+#         logvar = self.vae_sig(input_)
+#         eps = torch.randn_like(mu)
+#         z = mu + torch.exp(0.5 * logvar) * eps
+#         ll_kl = -0.5 * torch.sum(1 + logvar - torch.square(mu) - torch.exp(logvar))
+#         return z, ll_kl
+#     
+#     def decode_weight(self, z, h, edge_feats=None):
+#         input_ = torch.cat([z, h], -1)
+#         w_star = 
+#         
+#         if edge_feats is not 
+# 
+# ~ Encoder: take input as weight + hidden --> output mean and variance of normal of size ZDIM
+# ~ Sample N(0, 1) of size ZDIM and do MU + VAR**0.5 * EPS
+# ~ Pass transformed noise + hidden state through decoder
 
 
 class BiggWithGCN(RecurTreeGen):
