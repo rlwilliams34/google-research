@@ -381,11 +381,11 @@ class RecurTreeGen(nn.Module):
             self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
             self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
             
-            if args.method == "MLP-Leaf":
-                self.empty_h0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
-                self.empty_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
+            #if args.method == "MLP-Leaf":
+            #    self.empty_h0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
+            #    self.empty_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
             
-            else:
+            if True: #else:
                 self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
                 self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
 
@@ -463,7 +463,9 @@ class RecurTreeGen(nn.Module):
             if self.method == "MLP-Leaf":
                     dev = self.empty_h0.device
                     mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
-                    return (mask * self.empty_h0, mask * self.empty_c0)
+                    empty_h0 = torch.cat([self.empty_h0, torch.zeros(args.rnn_layers, 1, args.embed_dim // 2, device = dev)], dim = -1)
+                    empty_c0 = torch.cat([self.empty_h0, torch.zeros(args.rnn_layers, 1, args.embed_dim // 2, device = dev)], dim = -1)
+                    return (empty_h0, empty_c0)
             return (self.empty_h0, self.empty_c0)
 
     def get_prob_fix(self, prob):
