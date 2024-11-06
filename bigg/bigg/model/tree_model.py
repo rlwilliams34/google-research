@@ -149,18 +149,19 @@ class FenwickTree(nn.Module):
         self.has_node_feats = args.has_node_feats
         self.method = args.method
         self.embed_dim = args.embed_dim
+        self.rnn_layers = args.rnn_layers
         
         multiplier = 1.0
         if args.method == "MLP-Leaf":
             multiplier = 1.5
         
-        if args.method == "MLP-Leaf":
-            self.init_h0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
-            self.init_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
+        #if args.method == "MLP-Leaf":
+        #    self.init_h0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
+        #    self.init_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
         
-        else:
-            self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
-            self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+        #else:
+        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
         
         glorot_uniform(self)
         if self.has_node_feats:
@@ -192,8 +193,9 @@ class FenwickTree(nn.Module):
             if len(self.list_states) == 0:
                 if self.method == "MLP-Leaf":
                     dev = self.init_h0.device
-                    mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
-                    return (mask * self.init_h0, mask * self.init_c0)
+                    init_h0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, self.embed_dim // 2, device = dev)], dim = -1)
+                    init_c0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, self.embed_dim // 2, device = dev)], dim = -1)
+                    return (init_h0, init_c0)
                 
                 else:
                     return (self.init_h0, self.init_c0)
@@ -226,8 +228,9 @@ class FenwickTree(nn.Module):
         #print("Done")
         if self.method == "MLP-Leaf":
             dev = self.init_h0.device
-            mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
-            row_embeds = [(mask * self.init_h0, mask * self.init_c0)]
+            init_h0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, self.embed_dim // 2, device = dev)], dim = -1)
+            init_c0 = torch.cat([self.init_c0, torch.zeros(self.rnn_layers, self.embed_dim // 2, device = dev)], dim = -1)
+            row_embeds = [(init_h0, init_c0)]
         
         else:
             row_embeds = [(self.init_h0, self.init_c0)]
@@ -386,9 +389,9 @@ class RecurTreeGen(nn.Module):
             #    self.empty_h0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
             #    self.empty_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
             
-            if True: #else:
-                self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
-                self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+            #if True: #else:
+            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
 
         self.topdown_left_embed = Parameter(torch.Tensor(2,  args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
@@ -657,10 +660,11 @@ class RecurTreeGen(nn.Module):
             
             if self.method == "MLP-Leaf":
                 dev = self.empty_h0.device
-                mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
-                
-                h_bot = torch.cat([mask * self.empty_h0, self.leaf_h0], dim=1)
-                c_bot = torch.cat([mask * self.empty_c0, self.leaf_c0], dim=1)
+                #mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
+                empty_h0 = torch.cat([self.empty_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
+                empty_c0 = torch.cat([self.empty_c0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
+                h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
+                c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
                 
             
             else: 
