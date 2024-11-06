@@ -72,7 +72,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
         if self.method == "MLP-Repeat":
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop, act_last = 'tanh')
             
         if self.method == "MLP-Multi":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = cmd_args.wt_drop)
