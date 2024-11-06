@@ -663,6 +663,8 @@ class RecurTreeGen(nn.Module):
                 #mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
                 empty_h0 = torch.cat([self.empty_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
                 empty_c0 = torch.cat([self.empty_c0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
+                print(empty_h0.shape)
+                print(self.leaf_h0.shape)
                 h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
                 c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
                 
