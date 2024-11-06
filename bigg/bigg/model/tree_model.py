@@ -228,8 +228,8 @@ class FenwickTree(nn.Module):
         #print("Done")
         if self.method == "MLP-Leaf":
             dev = self.init_h0.device
-            init_h0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, self.embed_dim // 2, device = dev)], dim = -1)
-            init_c0 = torch.cat([self.init_c0, torch.zeros(self.rnn_layers, self.embed_dim // 2, device = dev)], dim = -1)
+            init_h0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
+            init_c0 = torch.cat([self.init_c0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
             row_embeds = [(init_h0, init_c0)]
         
         else:
@@ -661,11 +661,11 @@ class RecurTreeGen(nn.Module):
             if self.method == "MLP-Leaf":
                 dev = self.empty_h0.device
                 #mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
-                print(self.empty_h0.shape)
+                #print(self.empty_h0.shape)
                 empty_h0 = torch.cat([self.empty_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
                 empty_c0 = torch.cat([self.empty_c0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
-                print(empty_h0.shape)
-                print(self.leaf_h0.shape)
+                #print(empty_h0.shape)
+                #print(self.leaf_h0.shape)
                 h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
                 c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
                 
