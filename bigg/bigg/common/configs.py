@@ -105,6 +105,7 @@ cmd_opt.add_argument('-weight_embed_dim', default=16, type=int, help='embed size
 
 cmd_opt.add_argument('-training_time', default=False, type=eval, help='computing training times')
 cmd_opt.add_argument('-num_leaves', default=100, type=int, help='for scalability test')
+cmd_opt.add_argument('-sampling_method', default='softplus', type=str, help='for scalability test')
 
 
 

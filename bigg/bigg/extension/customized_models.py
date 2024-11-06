@@ -70,6 +70,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
+        self.sampling_method = cmd_args.sampling_method
+        assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         
         if self.method == "MLP-Repeat":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop, act_last = 'tanh')
@@ -325,12 +327,12 @@ class BiggWithEdgeLen(RecurTreeGen):
         """
         h, _ = state
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
-        method == "gamma"
+        
         
         if edge_feats is None:
             ll = 0
             
-            if method == "softplus": 
+            if self.sampling_method == "softplus": 
                 pred_mean = mus
                 pred_lvar = lvars
                 pred_sd = torch.exp(0.5 * pred_lvar)
@@ -338,7 +340,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
                 edge_feats = torch.nn.functional.softplus(edge_feats)
             
-            elif method == "lognormal":
+            elif self.sampling_method  == "lognormal":
                 pred_mean = mus
                 pred_lvar = lvars
                 pred_sd = torch.exp(0.5 * pred_lvar)
@@ -346,7 +348,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
                 edge_feats = torch.exp(edge_feats)
             
-            elif method == "gamma": 
+            elif self.sampling_method  == "gamma": 
                 loga = mus
                 logb = lvars
                 a = torch.exp(loga)
@@ -355,7 +357,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_feats = torch.distributions.gamma.Gamma(a, b).sample()
                 
         else:
-            if method == "softplus":
+            if self.sampling_method  == "softplus":
                 ### Update log likelihood with weight prediction
                 
                 ### Trying with softplus parameterization...
@@ -377,7 +379,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
                 ll = torch.sum(ll)
             
-            elif method == "lognormal":
+            elif self.sampling_method  == "lognormal":
                 ### Trying with softplus parameterization...
                 log_edge_feats = torch.log(edge_feats)
                 var = torch.exp(lvars) 
@@ -389,7 +391,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ll = -0.5 * ll - log_edge_feats 
                 ll = torch.sum(ll)
             
-            elif method == "gamma":
+            elif self.sampling_method  == "gamma":
                 loga = mus
                 logb = lvars
                 a = torch.exp(loga)
