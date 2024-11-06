@@ -463,8 +463,8 @@ class RecurTreeGen(nn.Module):
             if self.method == "MLP-Leaf":
                     dev = self.empty_h0.device
                     #mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
-                    empty_h0 = torch.cat([self.empty_h0, torch.zeros(args.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
-                    empty_c0 = torch.cat([self.empty_h0, torch.zeros(args.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
+                    empty_h0 = torch.cat([self.empty_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
+                    empty_c0 = torch.cat([self.empty_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
                     return (empty_h0, empty_c0)
             return (self.empty_h0, self.empty_c0)
 
