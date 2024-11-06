@@ -390,8 +390,8 @@ class RecurTreeGen(nn.Module):
             #    self.empty_c0 = torch.cat([Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim)), torch.zeros(args.rnn_layers, 1, args.embed_dim // 2)], dim = -1).to(args.device)
             
             #if True: #else:
-            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
-            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, int(multiplier * args.embed_dim)))
+            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
 
         self.topdown_left_embed = Parameter(torch.Tensor(2,  args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
@@ -661,6 +661,7 @@ class RecurTreeGen(nn.Module):
             if self.method == "MLP-Leaf":
                 dev = self.empty_h0.device
                 #mask = torch.cat([torch.ones(1, self.embed_dim, device = dev), torch.zeros(1, int(self.embed_dim // 2), device = dev)], dim = -1)
+                print(self.empty_h0.shape)
                 empty_h0 = torch.cat([self.empty_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
                 empty_c0 = torch.cat([self.empty_c0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
                 print(empty_h0.shape)
