@@ -373,6 +373,7 @@ class RecurTreeGen(nn.Module):
         self.bits_compress = args.bits_compress
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
+        self.rnn_layers = args.rnn_layers
         if self.has_edge_feats:
             assert self.bits_compress == 0
         self.greedy_frac = args.greedy_frac
