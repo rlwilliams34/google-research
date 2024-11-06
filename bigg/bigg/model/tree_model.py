@@ -193,8 +193,8 @@ class FenwickTree(nn.Module):
             if len(self.list_states) == 0:
                 if self.method == "MLP-Leaf":
                     dev = self.init_h0.device
-                    init_h0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, self.embed_dim // 2, device = dev)], dim = -1)
-                    init_c0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, self.embed_dim // 2, device = dev)], dim = -1)
+                    init_h0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
+                    init_c0 = torch.cat([self.init_h0, torch.zeros(self.rnn_layers, 1, self.embed_dim // 2, device = dev)], dim = -1)
                     return (init_h0, init_c0)
                 
                 else:
