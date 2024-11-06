@@ -325,37 +325,84 @@ class BiggWithEdgeLen(RecurTreeGen):
         """
         h, _ = state
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
+        method == "gamma"
         
         if edge_feats is None:
             ll = 0
-            pred_mean = mus
-            pred_lvar = lvars
-            pred_sd = torch.exp(0.5 * pred_lvar)
-            edge_feats = torch.normal(pred_mean, pred_sd)
-            #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
-            edge_feats = torch.nn.functional.softplus(edge_feats)
             
+            if method == "softplus": 
+                pred_mean = mus
+                pred_lvar = lvars
+                pred_sd = torch.exp(0.5 * pred_lvar)
+                edge_feats = torch.normal(pred_mean, pred_sd)
+                #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
+                edge_feats = torch.nn.functional.softplus(edge_feats)
+            
+            elif method == "lognormal":
+                pred_mean = mus
+                pred_lvar = lvars
+                pred_sd = torch.exp(0.5 * pred_lvar)
+                edge_feats = torch.normal(pred_mean, pred_sd)
+                #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
+                edge_feats = torch.exp(edge_feats)
+            
+            elif method == "gamma": 
+                loga = mus
+                logb = lvars
+                a = torch.exp(loga)
+                b = torch.exp(logb)
+                
+                edge_feats = torch.distributions.gamma.Gamma(a, b).sample()
+                
         else:
-            ### Update log likelihood with weight prediction
+            if method == "softplus":
+                ### Update log likelihood with weight prediction
+                
+                ### Trying with softplus parameterization...
+                edge_feats_invsp = self.compute_softminus(edge_feats)
+                
+                ### Standardize
+                #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
+                
+                ## MEAN AND VARIANCE OF LOGNORMAL
+                var = torch.exp(lvars) 
+                
+                ## diff_sq = (mu - softminusw)^2
+                diff_sq = torch.square(torch.sub(mus, edge_feats_invsp))
+                
+                ## diff_sq2 = v^-1*diff_sq
+                diff_sq2 = torch.div(diff_sq, var)
+                
+                ## add to ll
+                ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+                ll = torch.sum(ll)
             
-            ### Trying with softplus parameterization...
-            edge_feats_invsp = self.compute_softminus(edge_feats)
+            elif method == "lognormal":
+                ### Trying with softplus parameterization...
+                log_edge_feats = torch.log(edge_feats)
+                var = torch.exp(lvars) 
+                
+                ll = torch.sub(log_edge_feats - mus)
+                ll = torch.square(ll)
+                ll = torch.div(ll, var)
+                ll = ll + np.log(2 * np.pi) + lvars
+                ll = -0.5 * ll - log_edge_feats 
+                ll = torch.sum(ll)
             
-            ### Standardize
-            #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
+            elif method == "gamma":
+                loga = mus
+                logb = lvars
+                a = torch.exp(loga)
+                b = torch.exp(logb)
+                log_edge_feats = torch.log(edge_feats)
+                
+                ll = torch.mul(a, logb)
+                ll = ll - torch.lgamma(a)
+                ll = ll + torch.mul(a - 1, log_edge_feats)
+                ll = ll - torch.mul(b, edge_feats)
+                ll = torch.sum(ll)
+                
             
-            ## MEAN AND VARIANCE OF LOGNORMAL
-            var = torch.exp(lvars) 
-            
-            ## diff_sq = (mu - softminusw)^2
-            diff_sq = torch.square(torch.sub(mus, edge_feats_invsp))
-            
-            ## diff_sq2 = v^-1*diff_sq
-            diff_sq2 = torch.div(diff_sq, var)
-            
-            ## add to ll
-            ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
-            ll = torch.sum(ll)
         return ll, edge_feats
     
 #     def predict_edge_feats(self, state, edge_feats=None):
