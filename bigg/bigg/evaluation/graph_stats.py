@@ -426,7 +426,7 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         
         if cmd_args.has_edge_feats:
             print("Weight stats of ALL graphs")
-            test_stats2 = tree_weight_statistics(out_graphs)
+            #test_stats2 = tree_weight_statistics(out_graphs)
         
         if test_graphs is None:
             return prop
