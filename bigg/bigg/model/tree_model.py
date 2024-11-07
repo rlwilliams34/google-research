@@ -750,6 +750,7 @@ class RecurTreeGen(nn.Module):
         lv = 0
         while True:
             #print("Testing")
+            print(lv)
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
