@@ -748,9 +748,9 @@ class RecurTreeGen(nn.Module):
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
 
         lv = 0
+        scale = 1
         while True:
             #print("Testing")
-            print(lv)
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
@@ -765,7 +765,7 @@ class RecurTreeGen(nn.Module):
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
-            ll = ll + left_ll
+            ll = ll + scale * left_ll
 
             cur_states = self.cell_topdown(left_update, cur_states, lv)
 
@@ -795,7 +795,7 @@ class RecurTreeGen(nn.Module):
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
             right_ll = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
-            ll = ll + torch.sum(right_ll)
+            ll = ll + scale * torch.sum(right_ll)
             lr_ids = TreeLib.GetLeftRightSelect(lv, np.sum(has_left), np.sum(has_right))
             new_states = []
             for i in range(2):
@@ -804,6 +804,7 @@ class RecurTreeGen(nn.Module):
                 new_states.append(new_s)
             cur_states = tuple(new_states)
             lv += 1
+            scale = lv * 10
             #print(STOP)
 
         return ll, ll_wt, next_states
