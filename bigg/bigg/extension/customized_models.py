@@ -71,7 +71,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         self.sampling_method = cmd_args.sampling_method
-        assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
+        assert self.sampling_method in ['gamma', 'lognormal', 'softplus', 'vae']
         
         if self.method == "MLP-Repeat":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop, act_last = 'tanh')
@@ -123,6 +123,12 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.wt_scale = 1.0
         
         glorot_uniform(self)
+        
+        if args.sampling_method == "vae":
+            self.embed_wt_vae = MLP(1, [2 * args.embed_dim, args.embed_dim])
+            self.vae_mu = MLP(args.embed_dim, [2 * args.embed_dim, 8])
+            self.vae_sig = MLP(args.embed_dim, [2 * args.embed_dim, 8])
+            self.weight_out = MLP(args.embed_dim + 8, [2 * args.embed_dim + 16, 1])
 
     # to be customized
     
@@ -360,6 +366,10 @@ class BiggWithEdgeLen(RecurTreeGen):
                 b = torch.exp(logb)
                 
                 edge_feats = torch.distributions.gamma.Gamma(a, b).sample()
+            
+            elif self.sampling_method == "vae":
+                z = torch.randn(self.z_dim)
+                edge_feats = self.decode_weight(z, h)
                 
         else:
             if self.sampling_method  == "softplus":
@@ -408,69 +418,33 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ll = ll + torch.mul(a - 1, log_edge_feats)
                 ll = ll - torch.mul(b, edge_feats)
                 ll = torch.sum(ll)
-                
             
+            elif self.sampling_method == "vae":
+                z, ll_kl = self.encode_weight(edge_feats, h)
+                _, ll = self.decode_weight(z, h, edge_feats)
+                ll = ll + ll_kl
         return ll, edge_feats
     
-#     def predict_edge_feats(self, state, edge_feats=None):
-#         """
-#         Args:
-#             state: tuple of (h=N x embed_dim, c=N x embed_dim), the current state
-#             edge_feats: N x feat_dim or None
-#         Returns:
-#             likelihood of edge_feats under current state,
-#             and, if edge_feats is None, then return the prediction of edge_feats
-#             else return the edge_feats as it is
-#         """
-#         h, _ = state
-#         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
-#         
-#         if edge_feats is None:
-#             ll = 0
-#             pred_mean = mus
-#             pred_lvar = lvars
-#             pred_sd = torch.exp(0.5 * pred_lvar)
-#             edge_feats = torch.normal(pred_mean, pred_sd)
-#             #edge_feats = edge_feats * (self.var_wt**0.5 + 1e-15) + self.mu_wt
-#             edge_feats = torch.nn.functional.softplus(edge_feats)
-#             
-#         else:
-#             ### Update log likelihood with weight prediction
-#             
-#             ### Trying with softplus parameterization...
-#             edge_feats_invsp = self.compute_softminus(edge_feats)
-#             
-#             ### Standardize
-#             #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
-#             
-#             ## MEAN AND VARIANCE OF LOGNORMAL
-#             var = torch.exp(lvars) 
-#             
-#             ## diff_sq = (mu - softminusw)^2
-#             diff_sq = torch.square(torch.sub(mus, edge_feats_invsp))
-#             
-#             ## diff_sq2 = v^-1*diff_sq
-#             diff_sq2 = torch.div(diff_sq, var)
-#             
-#             ## add to ll
-#             ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
-#             ll = torch.sum(ll)
-#         return ll, edge_feats
+    def encode_weight(self, edge_feats, h):
+        edge_feats = self.standardize_edge_feats(edge_feats)
+        vae_embed = self.embed_wt_vae(edge_feats)
+        input_ = torch.cat([vae_embed, h], -1)
+        mu = self.vae_mu(input_)
+        logvar = self.vae_sig(input_)
+        eps = torch.randn_like(mu)
+        z = mu + torch.exp(0.5 * logvar) * eps
+        ll_kl = 0.5 * torch.sum(1 + logvar - torch.square(mu) - torch.exp(logvar))
+        return z, ll_kl
     
-#     def encode_weight(self, edge_feats, h):
-#         input_ = torch.cat([weight, h], -1)
-#         mu = self.vae_mu(input_)
-#         logvar = self.vae_sig(input_)
-#         eps = torch.randn_like(mu)
-#         z = mu + torch.exp(0.5 * logvar) * eps
-#         ll_kl = -0.5 * torch.sum(1 + logvar - torch.square(mu) - torch.exp(logvar))
-#         return z, ll_kl
-#     
-#     def decode_weight(self, z, h, edge_feats=None):
-#         input_ = torch.cat([z, h], -1)
-#         w_star = self.weight_out(input_)
-#         
-#         if edge_feats is not 
+    def decode_weight(self, z, h, edge_feats=None):
+        input_ = torch.cat([z, h], -1)
+        w_star = self.weight_out(input_)
+        ll = 0
+        if edge_feats is not None:
+            ll = -torch.square(w_star - edge_feats)
+            ll = torch.sum(ll)
+        return w_star, ll
+
 # 
 # ~ Encoder: take input as weight + hidden --> output mean and variance of normal of size ZDIM
 # ~ Sample N(0, 1) of size ZDIM and do MU + VAR**0.5 * EPS
