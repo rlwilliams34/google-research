@@ -92,7 +92,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             #self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
         
         if self.method == "MLP-Leaf":
-            self.edgelen_encoding = MLP(1, [args.embed_dim, args.embed_dim * args.rnn_layers // 2], dropout = cmd_args.wt_drop, act_last = 'tanh')
+            self.edgelen_encoding = MLP(1, [args.embed_dim, args.embed_dim * args.rnn_layers // 2], dropout = cmd_args.wt_drop)
             self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             
