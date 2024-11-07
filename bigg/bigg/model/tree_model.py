@@ -804,7 +804,7 @@ class RecurTreeGen(nn.Module):
                 new_states.append(new_s)
             cur_states = tuple(new_states)
             lv += 1
-            scale = lv * 10
+            scale = (5 - lv) * 10
             #print(STOP)
 
         return ll, ll_wt, next_states
