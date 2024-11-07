@@ -219,7 +219,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "MLP-Repeat":
             if len(edge_feats.flatten()) > 1:
-                print("Hello")
                 edge_embed = self.edgelen_encoding(edge_feats_normalized + 0.1 * torch.randn_like(edge_feats_normalized))
             
             else:
