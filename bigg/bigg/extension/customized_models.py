@@ -126,8 +126,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if args.sampling_method == "vae":
             self.embed_wt_vae = MLP(1, [2 * args.embed_dim, args.embed_dim])
-            self.vae_mu = MLP(args.embed_dim, [2 * args.embed_dim, 8])
-            self.vae_sig = MLP(args.embed_dim, [2 * args.embed_dim, 8])
+            self.vae_mu = MLP(2 * args.embed_dim, [4 * args.embed_dim, 8])
+            self.vae_sig = MLP(2 * args.embed_dim, [4 * args.embed_dim, 8])
             self.weight_out = MLP(args.embed_dim + 8, [2 * args.embed_dim + 16, 1])
 
     # to be customized
