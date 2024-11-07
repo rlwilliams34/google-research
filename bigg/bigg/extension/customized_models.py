@@ -368,9 +368,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_feats = torch.distributions.gamma.Gamma(a, b).sample()
             
             elif self.sampling_method == "vae":
-                z = torch.randn(8).to(h.device)
-                print(z.shape)
-                print(h.shape)
+                z = torch.randn(1, 8).to(h.device)
                 edge_feats = self.decode_weight(z, h)
                 
         else:
