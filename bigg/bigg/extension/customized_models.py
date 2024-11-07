@@ -217,18 +217,14 @@ class BiggWithEdgeLen(RecurTreeGen):
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
 
-    def embed_edge_feats(self, edge_feats):
+    def embed_edge_feats(self, edge_feats, noise=0.0):
         #edge_feats = self.compute_softminus(edge_feats)
         #if self.epoch_num == 0:
         #    self.update_weight_stats(edge_feats)
-        edge_feats_normalized = self.standardize_edge_feats(edge_feats)
+        edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
         
         if self.method == "MLP-Repeat":
-            if len(edge_feats.flatten()) > 1:
-                edge_embed = self.edgelen_encoding(edge_feats_normalized + 0.1 * torch.randn_like(edge_feats_normalized))
-            
-            else:
-                edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             edge_embed = (edge_embed, edge_embed)
             #print(edge_embed[0])
