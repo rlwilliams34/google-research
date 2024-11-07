@@ -428,7 +428,7 @@ class BiggWithEdgeLen(RecurTreeGen):
     def encode_weight(self, edge_feats, h):
         edge_feats = self.standardize_edge_feats(edge_feats)
         vae_embed = self.embed_wt_vae(edge_feats)
-        input_ = torch.cat([vae_embed, h], -1)
+        input_ = torch.cat([vae_embed, h[-1]], -1)
         mu = self.vae_mu(input_)
         logvar = self.vae_sig(input_)
         eps = torch.randn_like(mu)
@@ -437,7 +437,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         return z, ll_kl
     
     def decode_weight(self, z, h, edge_feats=None):
-        input_ = torch.cat([z, h], -1)
+        input_ = torch.cat([z, h[-1]], -1)
         w_star = self.weight_out(input_)
         ll = 0
         if edge_feats is not None:
