@@ -74,7 +74,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus', 'vae']
         
         if self.method == "MLP-Repeat":
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop, act_last = 'tanh')
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
             
         if self.method == "MLP-Multi":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = cmd_args.wt_drop)
@@ -221,7 +221,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         #edge_feats = self.compute_softminus(edge_feats)
         #if self.epoch_num == 0:
         #    self.update_weight_stats(edge_feats)
-        print(noise)
         edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
         
         if self.method == "MLP-Repeat":
