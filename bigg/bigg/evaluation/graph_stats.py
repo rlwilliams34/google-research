@@ -424,9 +424,9 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         prop2 = correct_tree_topology_check_two(out_graphs)
         print("Alt Proportion Correct Topology: ", prop2)
         
-        if cmd_args.has_edge_feats:
+        if cmd_args.has_edge_feats and prop > 0.1:
             print("Weight stats of ALL graphs")
-            #test_stats2 = tree_weight_statistics(out_graphs)
+            test_stats2 = tree_weight_statistics(out_graphs)
         
         if test_graphs is None:
             return prop
