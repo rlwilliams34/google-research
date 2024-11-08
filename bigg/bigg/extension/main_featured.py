@@ -122,7 +122,7 @@ def debug_model(model, graph, node_feats, edge_feats):
     
     if not torch.is_tensor(edge_feats):
         edge_feats = edge_feats[0]
-    
+    print(edge_feats)
     ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
     print(ll_wt)
