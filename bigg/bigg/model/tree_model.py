@@ -661,13 +661,12 @@ class RecurTreeGen(nn.Module):
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
+        edge_feats_embed=None
         if self.has_edge_feats and edge_feats_embed is None:
             edge_feats = self.embed_edge_feats(edge_feats, noise)
-        
+        print(edge_feats[0].shape)
         else:
             edge_feats = edge_feats_embed
-        print(edge_feats[0].shape)
-        print(STOP)
 
         if not self.bits_compress:
             ### CHANGED HERE
@@ -727,7 +726,7 @@ class RecurTreeGen(nn.Module):
             feat_dict['node'] = (node_feats, is_tree_trivial, t_lch, t_rch)
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
-        return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, edge_feats
+        return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
 
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
                              list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, noise=0.0):
@@ -744,7 +743,7 @@ class RecurTreeGen(nn.Module):
         if self.has_edge_feats:
             noise = 0.0#self.eps * torch.randn_like(edge_feats).to(edge_feats.device)
         
-        hc_bot, fn_hc_bot, h_buf_list, c_buf_list, edge_feats_embed = self.forward_row_trees(graph_ids, node_feats, edge_feats,
+        hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges, noise, edge_feats_embed)
         
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
