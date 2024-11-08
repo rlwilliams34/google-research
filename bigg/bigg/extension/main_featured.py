@@ -410,7 +410,7 @@ if __name__ == '__main__':
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if list_node_feats is not None else None)
             
             if cmd_args.method == "LSTM" and cmd_args.has_edge_feats:
-                edge_feats = [list_edge_feats[i] for i in batch_indices]
+                edge_feats = [torch.cat([list_edge_feats[i]], dim = 0) for i in batch_indices]
                 
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
