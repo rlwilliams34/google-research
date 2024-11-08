@@ -274,6 +274,10 @@ class BiggWithEdgeLen(RecurTreeGen):
                     if not as_list:
                         state_h = torch.cat(states_h, 1)
                         state_c = torch.cat(states_c, 1)
+                    
+                    else:
+                        state_h = states_h
+                        state_c = states_c
                     state = (state_h, state_c)
             
             else:
