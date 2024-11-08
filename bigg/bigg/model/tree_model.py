@@ -666,6 +666,8 @@ class RecurTreeGen(nn.Module):
         
         else:
             edge_feats = edge_feats_embed
+        print(edge_feats[0].shape)
+        print(STOP)
 
         if not self.bits_compress:
             ### CHANGED HERE
@@ -739,7 +741,6 @@ class RecurTreeGen(nn.Module):
         ll = 0.0
         ll_wt = 0.0        
         noise = 0.0
-        print(edge_feats_embed[0].shape)
         if self.has_edge_feats:
             noise = 0.0#self.eps * torch.randn_like(edge_feats).to(edge_feats.device)
         
