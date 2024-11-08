@@ -722,7 +722,7 @@ class RecurTreeGen(nn.Module):
             feat_dict['node'] = (node_feats, is_tree_trivial, t_lch, t_rch)
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
-        return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
+        return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, edge_feats
 
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
                              list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, noise=0.0):
@@ -739,7 +739,7 @@ class RecurTreeGen(nn.Module):
         if self.has_edge_feats:
             noise = 0.0#self.eps * torch.randn_like(edge_feats).to(edge_feats.device)
         
-        hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
+        hc_bot, fn_hc_bot, h_buf_list, c_buf_list, edge_feats_embed = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges, noise)
         
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
@@ -749,7 +749,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
         if self.has_edge_feats:
             #noise = 0.1 * torch.randn_like(edge_feats).to(edge_feats.device)
-            edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
+            #edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
             if self.method == "LSTM":
                 edge_feats = torch.cat(edge_feats, dim = 0)
             
