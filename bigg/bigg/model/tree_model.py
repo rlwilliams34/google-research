@@ -516,7 +516,7 @@ class RecurTreeGen(nn.Module):
                     edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll_wt = ll_wt + edge_ll
                     
-                    if self.method == LSTM:
+                    if self.method == "LSTM":
                         edge_embed, prev_wt_state = self.embed_edge_feats(cur_feats, prev_wt_state)
                     else:
                         edge_embed = self.embed_edge_feats(cur_feats)
@@ -601,7 +601,7 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_wt_state = None
-        if self.has_edge_feats:
+        if self.has_edge_feats and self.method == "LSTM":
             prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
         
         for i in pbar:
