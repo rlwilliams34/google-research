@@ -71,8 +71,11 @@ class MultiLSTMCell(nn.Module):
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers)
 
     def forward(self, x_input, states):
-        x_input = x_input.unsqueeze(1)
         h, c = states
+        
+        if len(x_input.shape) != len(h.shape):
+            x_input = x_input.unsqueeze(0)
+        
         _, new_states = self.lstm(x_input, (h, c))
 
         h, c = new_states
