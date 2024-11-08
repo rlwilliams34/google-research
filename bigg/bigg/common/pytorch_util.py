@@ -72,7 +72,8 @@ class MultiLSTMCell(nn.Module):
 
     def forward(self, x_input, states):
         h, c = states
-        
+        print(x_input.shape)
+        print(h.shape)
         if len(x_input.shape) != len(h.shape):
             x_input = x_input.unsqueeze(0)
         
