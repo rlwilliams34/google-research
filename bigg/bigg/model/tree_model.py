@@ -737,7 +737,7 @@ class RecurTreeGen(nn.Module):
         ll_wt = 0.0        
         noise = 0.0
         if self.has_edge_feats:
-            noise = self.eps * torch.randn_like(edge_feats).to(edge_feats.device)
+            noise = 0.0#self.eps * torch.randn_like(edge_feats).to(edge_feats.device)
         
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges, noise)
