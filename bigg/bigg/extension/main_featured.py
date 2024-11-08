@@ -111,8 +111,8 @@ def get_edge_feats(g):
 def debug_model(model, graph, node_feats, edge_feats):
     model.epoch_num += 2
     #ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
-    print(ll)
-    print(ll_wt)
+    #print(ll)
+    #print(ll_wt)
 
     edges = []
     for e in graph.edges():
