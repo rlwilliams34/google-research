@@ -271,7 +271,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                         cur_state = self.edgeLSTM(edge, cur_state)
                         states_h.append(cur_state[0].unsqueeze(1))
                         states_c.append(cur_state[1].unsqueeze(1))
-                        print(states_h[0].shape))
+                        print(states_h[0].shape)
                     
                     state_h = torch.cat(states_h, 1)
                     state_c = torch.cat(states_c, 1)
