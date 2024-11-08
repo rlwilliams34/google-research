@@ -280,6 +280,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             else:
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 state = self.edgeLSTM(edge_embed, prev_state)
+                print(state[0].shape)
             
             #state = self.edgeLSTM(edge_embed, (self.leaf_h0.repeat(1, edge_embed.shape[0], 1), self.leaf_c0.repeat(1, edge_embed.shape[0],1)))
             return state
