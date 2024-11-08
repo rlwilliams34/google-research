@@ -605,6 +605,7 @@ class RecurTreeGen(nn.Module):
             prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
         
         for i in pbar:
+            print(i)
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
             else:
