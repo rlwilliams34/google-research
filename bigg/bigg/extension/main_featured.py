@@ -110,9 +110,9 @@ def get_edge_feats(g):
 
 def debug_model(model, graph, node_feats, edge_feats):
     model.epoch_num += 2
-    #ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
-    #print(ll)
-    #print(ll_wt)
+    ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
+    print(ll)
+    print(ll_wt)
 
     edges = []
     for e in graph.edges():
@@ -377,11 +377,11 @@ if __name__ == '__main__':
     model.train()
     
     #### DEBUG
-    if cmd_args.method == "LSTM":
-        debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
-    
-    else:
-        debug_model(model, train_graphs[0], None, list_edge_feats[0])
+    #if cmd_args.method == "LSTM":
+    #    debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+    #
+    #else:
+    #    debug_model(model, train_graphs[0], None, list_edge_feats[0])
     ####
     
     
