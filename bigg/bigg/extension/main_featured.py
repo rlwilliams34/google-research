@@ -373,7 +373,11 @@ if __name__ == '__main__':
     model.train()
     
     #### DEBUG
-    debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+    if cmd_args.method == "LSTM":
+        debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+    
+    else:
+        debug_model(model, train_graphs[0], None, list_edge_feats[0])
     ####
     
     
