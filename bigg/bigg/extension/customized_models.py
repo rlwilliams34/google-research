@@ -260,6 +260,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "LSTM":
             print("Hello")
+            print(prev_state)
             if prev_state is None:
                 states_h = []
                 states_c = []
