@@ -601,12 +601,8 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_wt_state = None
-        print(self.method)
-        print(self.has_edge_feats)
         if self.has_edge_feats == 1 and self.method == "LSTM":
-            print("HELLO")
             prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
-        print(prev_wt_state)
         for i in pbar:
             print(i)
             if edge_list is None:
@@ -633,7 +629,9 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
+            print(prev_wt_state)
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
+            print(prev_wt_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             if self.has_node_feats:
