@@ -604,7 +604,7 @@ class RecurTreeGen(nn.Module):
         print(self.method)
         if self.has_edge_feats and self.method == "LSTM":
             prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
-        
+        print(prev_wt_state)
         for i in pbar:
             print(i)
             if edge_list is None:
