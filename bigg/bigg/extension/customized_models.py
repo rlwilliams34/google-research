@@ -225,7 +225,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         #if self.epoch_num == 0:
         #    self.update_weight_stats(edge_feats)
         
-        if self.method == "LSTM": 
+        if not torch.is_tensor(edge_feats): 
             edge_feats_normalized = []
             for edge_feats in edge_feats:
                 edge_feats_normalized_i = self.standardize_edge_feats(edge_feats)
