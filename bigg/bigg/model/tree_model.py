@@ -517,7 +517,11 @@ class RecurTreeGen(nn.Module):
                     ll_wt = ll_wt + edge_ll
                     
                     if self.method == "LSTM":
+                        print("Hello to edge pred")
+                        print(prev_wt_state)
                         edge_embed, prev_wt_state = self.embed_edge_feats(cur_feats, prev_wt_state)
+                        print(prev_wt_state)
+                        print("Goodbye to edge pred")
                     else:
                         edge_embed = self.embed_edge_feats(cur_feats)
                     #return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats
