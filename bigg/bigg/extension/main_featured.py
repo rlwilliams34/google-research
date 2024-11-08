@@ -373,7 +373,7 @@ if __name__ == '__main__':
     model.train()
     
     #### DEBUG
-    debug_model(model, train_graphs[0], None, list_edge_feats[0])
+    debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
     ####
     
     
