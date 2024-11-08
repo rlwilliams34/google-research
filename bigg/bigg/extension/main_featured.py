@@ -407,6 +407,12 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
         
+        if cmd_args.method == "LSTM" and cmd_args.has_edge_feats:
+            list_edge_feats_embed = model.embed_edge_feats(list_edge_feats, as_list = True)
+        
+        else:
+            edge_feats_embed = None
+        
         for idx in pbar:
             start = B * idx
             stop = B * (idx + 1)
@@ -418,7 +424,9 @@ if __name__ == '__main__':
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if list_node_feats is not None else None)
             
             if cmd_args.method == "LSTM" and cmd_args.has_edge_feats:
-                edge_feats = [list_edge_feats[i] for i in batch_indices]
+                edge_feats_embed_h = (torch.cat([list_edge_feats_embed[0][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
+                edge_feats_embed_c = (torch.cat([list_edge_feats_embed[1][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
+                edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
                 
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
@@ -428,7 +436,7 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+                ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, edge_feats_embed = edge_feats_embed)
             
             
             loss_top = -ll / num_nodes

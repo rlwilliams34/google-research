@@ -655,14 +655,17 @@ class RecurTreeGen(nn.Module):
             return -loss, label
         return -loss
 
-    def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None, noise=0.0):
+    def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None, noise=0.0, edge_feats_embed=None):
         TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
         # embed trees
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
-        if self.has_edge_feats:
+        if self.has_edge_feats and edge_feats_embed is None:
             edge_feats = self.embed_edge_feats(edge_feats, noise)
+        
+        else:
+            edge_feats = edge_feats_embed
 
         if not self.bits_compress:
             ### CHANGED HERE
@@ -732,7 +735,7 @@ class RecurTreeGen(nn.Module):
         return row_states, next_states
 
     def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
-                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
+                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, edge_feats_embed=Nnoe):
         ll = 0.0
         ll_wt = 0.0        
         noise = 0.0
@@ -740,7 +743,7 @@ class RecurTreeGen(nn.Module):
             noise = 0.0#self.eps * torch.randn_like(edge_feats).to(edge_feats.device)
         
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list, edge_feats_embed = self.forward_row_trees(graph_ids, node_feats, edge_feats,
-                                                                           list_node_starts, num_nodes, list_col_ranges, noise)
+                                                                           list_node_starts, num_nodes, list_col_ranges, noise, edge_feats_embed)
         
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
         

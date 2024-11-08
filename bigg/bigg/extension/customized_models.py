@@ -220,7 +220,7 @@ class BiggWithEdgeLen(RecurTreeGen):
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
 
-    def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None):
+    def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False):
         #edge_feats = self.compute_softminus(edge_feats)
         #if self.epoch_num == 0:
         #    self.update_weight_stats(edge_feats)
@@ -271,8 +271,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                         states_c.append(cur_state[1].unsqueeze(1))
                         #print(states_h[0].shape)
                     
-                    state_h = torch.cat(states_h, 1)
-                    state_c = torch.cat(states_c, 1)
+                    if not as_list:
+                        state_h = torch.cat(states_h, 1)
+                        state_c = torch.cat(states_c, 1)
                     state = (state_h, state_c)
             
             else:
