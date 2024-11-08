@@ -224,7 +224,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         #edge_feats = self.compute_softminus(edge_feats)
         #if self.epoch_num == 0:
         #    self.update_weight_stats(edge_feats)
-        
+        noise = 0.0
         if not torch.is_tensor(edge_feats): 
             edge_feats_normalized = []
             for edge_feats in edge_feats:
