@@ -259,6 +259,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             return edge_embed
         
         if self.method == "LSTM":
+            print("Hello")
             if prev_state is None:
                 states_h = []
                 states_c = []
