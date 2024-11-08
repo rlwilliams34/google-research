@@ -119,6 +119,10 @@ def debug_model(model, graph, node_feats, edge_feats):
             e = (e[1], e[0])
         edges.append(e)
     edges = sorted(edges)
+    
+    if not torch.is_tensor(edge_feats):
+        edge_feats = edge_feats[0]
+    
     ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
     print(ll_wt)
