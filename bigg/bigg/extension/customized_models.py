@@ -261,12 +261,14 @@ class BiggWithEdgeLen(RecurTreeGen):
                 states_h = []
                 states_c = []
                 #print(edge_feats_normalized)
-                print("LEAF:", self.leaf_h0_wt.shape)
+                #print("LEAF:", self.leaf_h0_wt.shape)
                 edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
-                edge_embed = self.edgelen_encoding(list_edge)
+                edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 print(edge_embed.shape)
-                #cur_state = (self.leaf_h0_wt.repeat(1, self.batch_size, 1), self.leaf_c0_wt.squeeze(1))
+                cur_state = (self.leaf_h0_wt.repeat(1, self.batch_size, 1), self.leaf_c0_wt.repeat(1, self.batch_size, 1))
                 
+                
+                print(STOP)
                 for list_edge in edge_feats_normalized:
                     #print(edge_feats_normalized)
                     edge_embed = self.edgelen_encoding(list_edge)
