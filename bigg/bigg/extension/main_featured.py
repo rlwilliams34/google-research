@@ -377,15 +377,15 @@ if __name__ == '__main__':
     model.train()
     
     #### DEBUG
-    if cmd_args.method == "LSTM":
-        if cmd_args.has_edge_feats:
-            debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
-        debug_model(model, train_graphs[0], None, None)
-    
-    else:
-        if cmd_args.has_edge_feats:
-            debug_model(model, train_graphs[0], None, list_edge_feats[0])
-        debug_model(model, train_graphs[0], None, None)
+    # if cmd_args.method == "LSTM":
+#         if cmd_args.has_edge_feats:
+#             debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+#         debug_model(model, train_graphs[0], None, None)
+#     
+#     else:
+#         if cmd_args.has_edge_feats:
+#             debug_model(model, train_graphs[0], None, list_edge_feats[0])
+#         debug_model(model, train_graphs[0], None, None)
     ####
     
     
@@ -393,6 +393,18 @@ if __name__ == '__main__':
         tot_loss = 0.0
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
+        
+#         if epoch % 10 == 0:
+#             if cmd_args.method == "LSTM":
+#                 if cmd_args.has_edge_feats:
+#                     debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+#             debug_model(model, train_graphs[0], None, None)
+#         
+#             else:
+#                 if cmd_args.has_edge_feats:
+#                     debug_model(model, train_graphs[0], None, list_edge_feats[0])
+#                 debug_model(model, train_graphs[0], None, None)
+        
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
@@ -411,11 +423,11 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = 1e-5
         
-        if cmd_args.method == "LSTM" and cmd_args.has_edge_feats:
-            list_edge_feats_embed = model.embed_edge_feats(list_edge_feats, as_list = True)
+        #if cmd_args.method == "LSTM" and cmd_args.has_edge_feats:
+        #    list_edge_feats_embed = model.embed_edge_feats(list_edge_feats, as_list = True)
         
-        else:
-            edge_feats_embed = None
+        #else:
+        edge_feats_embed = None
         
         for idx in pbar:
             start = B * idx
@@ -428,9 +440,9 @@ if __name__ == '__main__':
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if list_node_feats is not None else None)
             
             if cmd_args.method == "LSTM" and cmd_args.has_edge_feats:
-                edge_feats_embed_h = (torch.cat([list_edge_feats_embed[0][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
-                edge_feats_embed_c = (torch.cat([list_edge_feats_embed[1][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
-                edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
+                #edge_feats_embed_h = (torch.cat([list_edge_feats_embed[0][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
+                #edge_feats_embed_c = (torch.cat([list_edge_feats_embed[1][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
+                #edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
                 edge_feats = [list_edge_feats[i] for i in batch_indices]
                 
             else:
