@@ -89,6 +89,9 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            
+            self.edgelen_mean = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
+        self.edgelen_lvar = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
             #self.edgelen_encoding = MLP(1, [32, 16])
             
             #self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
@@ -283,11 +286,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                     states_c.append(cur_state[1])       
                 state_h = torch.cat(states_h, 1)
                 state_c = torch.cat(states_c, 1) 
-                prev_h = torch.cat(prev_states_h, dim = -1).view(1, state_h.shape[1], state_h.shape[2])
-                
-                print(prev_h.shape)
-                print(STOP)
+                prev_h = torch.cat(prev_states_h, dim = -1).view(state_h.shape[1], state_h.shape[2])
                 state = (state_h, state_c) 
+                return state, prev_h
                 
                 
             else:
@@ -411,6 +412,10 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
+        
+        if prev_state is not None:
+            h = torch.cat([h, prev_state], dim = -1)
+        
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         

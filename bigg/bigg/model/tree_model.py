@@ -514,7 +514,7 @@ class RecurTreeGen(nn.Module):
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     #print(cur_feats)
-                    edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats, prev_state)
+                    edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats, prev_wt_state)
                     ll_wt = ll_wt + edge_ll
                     
                     edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_wt_state)
@@ -759,7 +759,7 @@ class RecurTreeGen(nn.Module):
             #noise = 0.1 * torch.randn_like(edge_feats).to(edge_feats.device)
             
             if self.method == "LSTM":
-                edge_feats_embed, edge_feats_prior = self.embed_edge_feats(edge_feats, noise)
+                edge_feats_embed, state_h_prior = self.embed_edge_feats(edge_feats, noise)
                 edge_feats = torch.cat(edge_feats, dim = 0)
                 #print(edge_feats_embed[0].shape)
             
@@ -780,7 +780,8 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
-                edge_ll, _ = self.predict_edge_feats(edge_state, target_feats)
+                prior_h_target = state_h_prior[edge_of_lv, :]
+                edge_ll, _ = self.predict_edge_feats(edge_state, target_feats, prior_h_target)
                 ll_wt = ll_wt + edge_ll #/ len(edge_feats.flatten())
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
