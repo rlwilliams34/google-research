@@ -394,16 +394,16 @@ if __name__ == '__main__':
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
-#         if epoch % 10 == 0:
-#             if cmd_args.method == "LSTM":
-#                 if cmd_args.has_edge_feats:
-#                     debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
-#             debug_model(model, train_graphs[0], None, None)
-#         
-#             else:
-#                 if cmd_args.has_edge_feats:
-#                     debug_model(model, train_graphs[0], None, list_edge_feats[0])
-#                 debug_model(model, train_graphs[0], None, None)
+        if epoch % 10 == 0:
+            if cmd_args.method == "LSTM":
+                if cmd_args.has_edge_feats:
+                    debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+            debug_model(model, train_graphs[0], None, None)
+        
+            else:
+                if cmd_args.has_edge_feats:
+                    debug_model(model, train_graphs[0], None, list_edge_feats[0])
+                debug_model(model, train_graphs[0], None, None)
         
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
