@@ -412,11 +412,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
+        h = h[-1]
         
         if prev_state is not None:
             h = torch.cat([h, prev_state], dim = -1)
         
-        mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
+        mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
         
         if edge_feats is None:
