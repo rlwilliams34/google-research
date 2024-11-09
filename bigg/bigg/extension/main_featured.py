@@ -394,7 +394,7 @@ if __name__ == '__main__':
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
-        if (epoch) % 10 == 0:
+        if False:
             if cmd_args.method == "LSTM":
                 if cmd_args.has_edge_feats:
                     debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
