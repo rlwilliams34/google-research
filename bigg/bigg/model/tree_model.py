@@ -531,6 +531,7 @@ class RecurTreeGen(nn.Module):
                     return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None
         else:
             tree_node.split()
+            "tree_node.lch.is_leaf"
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
             left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
@@ -558,6 +559,11 @@ class RecurTreeGen(nn.Module):
 
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
+            
+            if False and has_left and tree_node.lch.is_leaf:
+                ### NEED EDGE EMBEDDING!!!
+                topdown_state = self.weight_update(left_edge_embed, topdown_state)
+            
             rlb = max(0, lb - num_left)
             rub = min(tree_node.rch.n_cols, ub - num_left)
             if not has_left:
@@ -588,6 +594,9 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.lr2p_cell(left_state, right_state)
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
+                if False and has_right and tree_node.rch.is_leaf:
+                ### NEED EDGE EMBEDDING!!!
+                    summary_state = self.weight_update(right_edge_embed, summary_state)
             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_wt_state
 
     def forward(self, node_end, edge_list=None, node_feats=None, edge_feats=None, node_start=0, list_states=[], lb_list=None, ub_list=None, col_range=None, num_nodes=None, display=False):
@@ -812,13 +821,31 @@ class RecurTreeGen(nn.Module):
                 left_ids = tuple([None] + list(left_ids[1:]))
 
             left_subtree_states = tree_state_select(h_bot, c_bot,
-                                                    h_next_buf, c_next_buf,
+                                          h_next_buf, c_next_buf,
                                                     lambda: left_ids)
 
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
+            ### UPDATE HERE
+            # IDEA: GET NUM LEFT ONE LEVEL DEEPER IN THE MODEL. IF NUM LEFT == 1 WE WOULD UPDATE THESE WITH THAT EDGE FEAT
+            # ...BUT HOW DO WE GET THE EDGES ONE LEVEL DEEPER ...
+            # edge_of_lv = TreeLib.GetEdgeOf(lv) <- is there a way to augment this...
+            # Move below chunk over here; change to be an LSTM updating the correct topdown states!
+#             if self.has_edge_feats:
+#                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
+#                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
+#                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
+#                 h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
+#                 left_ids = tuple([None] + list(left_ids[1:]))
+            ###
+            print(has_left)
+            print(num_left)
+            has_left, num_left = TreeLib.GetChLabel(-1, lv + 1)
+            print(has_left)
+            print(num_left)
+            print(STOP)
 
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
@@ -832,6 +859,7 @@ class RecurTreeGen(nn.Module):
                                             cur_states[i], topdown_state[i])
                 new_states.append(new_s)
             cur_states = tuple(new_states)
+            ### UPDATE HERE
             lv += 1
             #scale = (5 - lv) * 10
             #print(STOP)
