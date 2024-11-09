@@ -281,7 +281,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                         state_h = states_h
                         state_c = states_c
                     
-                    #print(state_h)
+                    print(state_h)
                     state = (state_h, state_c)
             
             else:
