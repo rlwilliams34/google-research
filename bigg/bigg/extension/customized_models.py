@@ -265,9 +265,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 #print(edge_feats_normalized)
                 #print("LEAF:", self.leaf_h0_wt.shape)
                 edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
-                print(edge_feats_normalized.shape)
+                
                 edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
-                print(edge_embed.shape)
+                
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
                 for edge in edge_embed:
@@ -277,28 +277,27 @@ class BiggWithEdgeLen(RecurTreeGen):
                 state_h = torch.cat(states_h, 1)
                 state_c = torch.cat(states_c, 1)         
                 
-                print(STOP)
-                for list_edge in edge_feats_normalized:
-                    #print(edge_feats_normalized)
-                    edge_embed = self.edgelen_encoding(list_edge)
-                    cur_state = (self.leaf_h0_wt.squeeze(1), self.leaf_c0_wt.squeeze(1))
-                    #print(edge_embed.shape)
-                    #print(edge_embed.shape)
-                    for edge in edge_embed:
-                        cur_state = self.edgeLSTM(edge, cur_state)
-                        states_h.append(cur_state[0].unsqueeze(1))
-                        states_c.append(cur_state[1].unsqueeze(1))
-                        #print(states_h[0].shape)
-                    
-                    if not as_list:
-                        state_h = torch.cat(states_h, 1)
-                        state_c = torch.cat(states_c, 1)
-                    
-                    else:
-                        state_h = states_h
-                        state_c = states_c
-                    
-                    #print(state_h)
+#                 for list_edge in edge_feats_normalized:
+#                     #print(edge_feats_normalized)
+#                     edge_embed = self.edgelen_encoding(list_edge)
+#                     cur_state = (self.leaf_h0_wt.squeeze(1), self.leaf_c0_wt.squeeze(1))
+#                     #print(edge_embed.shape)
+#                     #print(edge_embed.shape)
+#                     for edge in edge_embed:
+#                         cur_state = self.edgeLSTM(edge, cur_state)
+#                         states_h.append(cur_state[0].unsqueeze(1))
+#                         states_c.append(cur_state[1].unsqueeze(1))
+#                         #print(states_h[0].shape)
+#                     
+#                     if not as_list:
+#                         state_h = torch.cat(states_h, 1)
+#                         state_c = torch.cat(states_c, 1)
+#                     
+#                     else:
+#                         state_h = states_h
+#                         state_c = states_c
+#                     
+#                     #print(state_h)
                     state = (state_h, state_c)
             
             else:
