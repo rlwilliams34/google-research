@@ -235,6 +235,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
         
         if self.method == "MLP-Repeat":
+            print(edge_feats_normalized.shape)
+            print(STOP)
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             edge_embed = (edge_embed, edge_embed)
@@ -263,6 +265,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 #print(edge_feats_normalized)
                 #print("LEAF:", self.leaf_h0_wt.shape)
                 edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
+                print(edge_feats_normalized.shape)
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 print(edge_embed.shape)
                 cur_state = (self.leaf_h0_wt.repeat(1, self.batch_size, 1), self.leaf_c0_wt.repeat(1, self.batch_size, 1))
