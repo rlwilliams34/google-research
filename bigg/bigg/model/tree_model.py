@@ -523,7 +523,7 @@ class RecurTreeGen(nn.Module):
                     #else:
                     #    edge_embed = self.embed_edge_feats(cur_feats)
                     #return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats
-                    return ll, ll_wt, edge_embed, 1, cur_feats, prev_wt_state
+                    return ll, ll_wt, edge_embed, 1, cur_feats, edge_embed
                 else:
                     return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None
         else:
