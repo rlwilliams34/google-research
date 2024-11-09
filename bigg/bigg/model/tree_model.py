@@ -839,13 +839,20 @@ class RecurTreeGen(nn.Module):
 #                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
 #                 h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
 #                 left_ids = tuple([None] + list(left_ids[1:]))
+#			right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
+#             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
+#             
+#             if False and has_left and tree_node.lch.is_leaf:
+#                 ### NEED EDGE EMBEDDING!!!
+#                 topdown_state = self.weight_update(left_edge_embed, topdown_state)
+#             
             ###
-            print(has_left)
-            print(num_left)
-            has_left, num_left = TreeLib.GetChLabel(-1, lv + 1)
-            print(has_left)
-            print(num_left)
-            print(STOP)
+#             print(has_left)
+#             print(num_left)
+#             has_left, num_left = TreeLib.GetChLabel(-1, lv + 1)
+#             print(has_left)
+#             print(num_left)
+#             print(STOP)
 
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
