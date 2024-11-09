@@ -753,9 +753,12 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
         if self.has_edge_feats:
             #noise = 0.1 * torch.randn_like(edge_feats).to(edge_feats.device)
-            #edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
+            
             if self.method == "LSTM":
                 edge_feats = torch.cat(edge_feats, dim = 0)
+            
+            else:
+                edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
             
         
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
