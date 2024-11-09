@@ -513,6 +513,7 @@ class RecurTreeGen(nn.Module):
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
+                    print(cur_feats)
                     edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll_wt = ll_wt + edge_ll
                     
@@ -762,7 +763,7 @@ class RecurTreeGen(nn.Module):
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
             
-        
+        print(edge_feats)
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
         ll = ll + self.binary_ll(logit_has_edge, has_ch)
