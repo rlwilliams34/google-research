@@ -95,8 +95,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     
     for i in range(2):
         leaf_check = is_leaf[i]
+        print("prior: ", leaf_check)
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-        print(local_hbot)
+        print("local hbot shape: ", local_hbot.shape)
         #if edge_feats is not None:
         #    local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
@@ -105,17 +106,17 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     ### ADD EDGE FEAT UPDATES HERE!!!!
-    print(h_list[0])
-    print(c_list[0])
-    print(h_list[1])
-    print(c_list[1])
+    print("list shape: ", h_list[0].shape)
+    #print(c_list[0])
+    #print(h_list[1])
+    #print(c_list[1])
     summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
     
     for i in range(2):
         leaf_check = list(map(bool, is_leaf[i]))
         #print("leaf check: ", leaf_check)
         if printit:
-            print(leaf_check)
+            print("after: ", leaf_check)
         if sum(leaf_check) == 0 or wt_update is None:
             continue
         #print("summary_state: ", summary_state[0])
