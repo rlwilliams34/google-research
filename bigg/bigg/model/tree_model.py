@@ -537,7 +537,7 @@ class RecurTreeGen(nn.Module):
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     if prev_wt_state is None:
-                        edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats, prev_wt_state)
+                        edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     else:
                         edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats, prev_wt_state[0][-1])
                     ll_wt = ll_wt + edge_ll
@@ -680,6 +680,10 @@ class RecurTreeGen(nn.Module):
             ub = cur_row.root.n_cols if ub_list is None else ub_list[i]
             cur_pos_embed = self.row_tree.pos_enc([num_nodes - i])
             controller_state = [x + cur_pos_embed for x in controller_state]
+            
+            print("i", i)
+            print("state: ", controller_state)
+            
             if self.has_node_feats:
                 target_node_feats = None if node_feats is None else node_feats[[i]]
                 controller_state, ll_node, target_node_feats = self.predict_node_feats(controller_state, target_node_feats)
@@ -819,6 +823,8 @@ class RecurTreeGen(nn.Module):
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges, noise, edge_feats_embed)
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states,  wt_update=self.update_wt, method=self.method)
+        
+        print(row_states)
         #print("Row States: ", row_states)
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
