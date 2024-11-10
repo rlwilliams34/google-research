@@ -244,8 +244,8 @@ class FenwickTree(nn.Module):
         self.list_states[level].append(state)
 
     def forward(self, new_state=None):
-        print("new_state: ", new_state)
-        print("prior list states: ", self.list_states)
+        #print("new_state: ", new_state)
+        #print("prior list states: ", self.list_states)
         if new_state is None:
             if len(self.list_states) == 0:
                 if self.method == "MLP-Leaf":
@@ -259,32 +259,32 @@ class FenwickTree(nn.Module):
         else:
             self.append_state(new_state, 0)
         pos = 0
-        print("after list states: ", self.list_states)
+        #print("after list states: ", self.list_states)
         while pos < len(self.list_states):
-            print("pos: ", pos)
+            #print("pos: ", pos)
             if len(self.list_states[pos]) >= 2:
                 lch_state, rch_state = self.list_states[pos]  # assert the length is 2
-                print("lch rch")
-                print(lch_state, rch_state)
+                #print("lch rch")
+                #print(lch_state, rch_state)
                 new_state = self.merge_cell(lch_state, rch_state)
-                print("new state: ", new_state)
+                #print("new state: ", new_state)
                 self.list_states[pos] = []
                 self.append_state(new_state, pos + 1)
             pos += 1
         state = None
         for pos in range(len(self.list_states)):
-            print("pos: ", pos)
+            #print("pos: ", pos)
             if len(self.list_states[pos]) == 0:
                 continue
             cur_state = self.list_states[pos][0]
             if state is None:
                 state = cur_state
             else:
-                print("state cur state")
-                print(state)
-                print(cur_state)
+                #print("state cur state")
+                #print(state)
+                #print(cur_state)
                 state = self.summary_cell(state, cur_state)
-                print("new state: ", state)
+                #print("new state: ", state)
         return state
 
     def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, wt_update):
@@ -674,29 +674,29 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
                 if has_left and tree_node.lch.is_leaf:
-                    print("==========================================")
-                    print("HAS LEFT")
+                    #print("==========================================")
+                    #print("HAS LEFT")
                     left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
-                    print(left_edge_feats)
-                    print("left state: ", left_state)
-                    print("right state: ", right_state)
+                    #print(left_edge_feats)
+                    #print("left state: ", left_state)
+                    #print("right state: ", right_state)
                     #print(left_edge_embed)
-                    print("Summary before: ", summary_state)
+                    #print("Summary before: ", summary_state)
                     summary_state = self.update_wt(left_edge_embed, summary_state)
                     #print("After: ", summary_state)
-                    print("==========================================")
+                    #print("==========================================")
                 if has_right and tree_node.rch.is_leaf:
-                    print("==========================================")
-                    print("HAS RIGHT")
+                    #print("==========================================")
+                    #print("HAS RIGHT")
                     right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
-                    print(right_edge_feats)
-                    print("left state: ", left_state)
-                    print("right state: ", right_state)
+                    #print(right_edge_feats)
+                    #print("left state: ", left_state)
+                    #print("right state: ", right_state)
                     #print(right_edge_embed)
-                    print("Summary before: ", summary_state)
+                    #print("Summary before: ", summary_state)
                     summary_state = self.update_wt(right_edge_embed, summary_state)
                     #print("AFter: ", summary_state)
-                    print("==========================================")
+                    #print("==========================================")
             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_wt_state
 
     def forward(self, node_end, edge_list=None, node_feats=None, edge_feats=None, node_start=0, list_states=[], lb_list=None, ub_list=None, col_range=None, num_nodes=None, display=False):
@@ -742,11 +742,11 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            print(i)
-            print("Before: ", controller_state)
+            #print(i)
+            #print("Before: ", controller_state)
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
-            print("i: ", i)
-            print("Returned state: ", cur_state[0])
+            #print("i: ", i)
+            #print("Returned state: ", cur_state[0])
 #             if i == 1 and target_edge_feats is not None:
 #                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
 #                 cur_state = self.update_wt(edge_embed, cur_state)
@@ -763,13 +763,13 @@ class RecurTreeGen(nn.Module):
             controller_state = self.row_tree(cur_state)
             if cur_row.root.is_leaf and target_edge_feats is not None:
                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
-                print("HERE HERE HERE")
-                print(controller_state)
+                #print("HERE HERE HERE")
+                #print(controller_state)
                 controller_state = self.update_wt(edge_embed, controller_state)
-                print(self.row_tree.list_states)
-                print(self.row_tree.list_states[1])
+                #print(self.row_tree.list_states)
+                #print(self.row_tree.list_states[1])
                 self.row_tree.list_states[1] = [controller_state]
-                print(self.row_tree.list_states)
+                #print(self.row_tree.list_states)
                 # THIS IS GOOD...
                 #print("i: ", i)
                 #print("CONTROLLER STATE: ", controller_state)
