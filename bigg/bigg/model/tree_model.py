@@ -617,11 +617,11 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
                 if has_left and tree_node.lch.is_leaf:
-                    print(left_edge_feats)
+                    #print(left_edge_feats)
                     left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
                     summary_state = self.update_wt(left_edge_embed, summary_state)
                 if has_right and tree_node.rch.is_leaf:
-                    print(right_edge_feats)
+                    #print(right_edge_feats)
                     right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
                     summary_state = self.update_wt(right_edge_embed, summary_state)
             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_wt_state
@@ -670,6 +670,8 @@ class RecurTreeGen(nn.Module):
             else:
                 target_edge_feats = None
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
+            print(target_edge_feats)
+            
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             if self.has_node_feats:
