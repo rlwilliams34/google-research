@@ -858,7 +858,7 @@ class RecurTreeGen(nn.Module):
                 print("Hello!")
                 print(left_wt_ids)
                 print(topdown_state[0])
-                leaf_topdown_states = (topdown_state[0][left_wt_ids], topdown_state[1][left_wt_ids])
+                leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
                 left_feats = left_feats[0]
                 print(left_feats.shape)
                 leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
