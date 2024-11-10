@@ -74,6 +74,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus', 'vae']
         self.update_wt = MultiLSTMCell(args.wt_embed_dim, args.embed_dim, args.rnn_layers)
         
+        
+        
         if self.method == "Test":
             self.edgelen_encoding = MLP(1, [2 * args.wt_embed_dim, args.wt_embed_dim], dropout = cmd_args.wt_drop)
         
