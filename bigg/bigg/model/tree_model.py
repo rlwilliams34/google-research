@@ -862,7 +862,7 @@ class RecurTreeGen(nn.Module):
                 left_feats = left_feats[0]
                 print(left_feats.shape)
                 leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
-                topdown_h, topdown_c = selective_update_hc_2(topdown_state[0], topdown_state[1], left_wt_ids, leaf_topdown_states)
+                topdown_h, topdown_c = selective_update_hc(topdown_state[0], topdown_state[1], left_wt_ids, leaf_topdown_states)
                 topdown_state = (topdown_h, topdown_c)
                 # leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
                 # Need the topdown states that correspond to a left tree
