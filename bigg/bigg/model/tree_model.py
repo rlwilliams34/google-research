@@ -637,11 +637,13 @@ class RecurTreeGen(nn.Module):
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
                 if has_left and tree_node.lch.is_leaf:
                     left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
+                    print(left_edge_feats)
                     print(left_edge_embed)
                     print(summary_state)
                     summary_state = self.update_wt(left_edge_embed, summary_state)
                 if has_right and tree_node.rch.is_leaf:
                     right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
+                    print(right_edge_feats)
                     print(right_edge_embed)
                     print(summary_state)
                     summary_state = self.update_wt(right_edge_embed, summary_state)
@@ -663,8 +665,8 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_wt_state = None
-        print(self.leaf_h0)
-        print(self.empty_h0)
+        #print(self.leaf_h0)
+        #print(self.empty_h0)
         if self.has_edge_feats == 1 and self.method == "LSTM":
             prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
         for i in pbar:
@@ -843,8 +845,8 @@ class RecurTreeGen(nn.Module):
             
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
-                print(edge_feats)
-                print(edge_feats_embed)
+                #print(edge_feats)
+                # print(edge_feats_embed)
         
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
