@@ -376,16 +376,16 @@ if __name__ == '__main__':
     
     model.train()
     
-    #### DEBUG
-    # if cmd_args.method == "LSTM":
-#         if cmd_args.has_edge_feats:
-#             debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
-#         debug_model(model, train_graphs[0], None, None)
-#     
-#     else:
-#         if cmd_args.has_edge_feats:
-#             debug_model(model, train_graphs[0], None, list_edge_feats[0])
-#         debug_model(model, train_graphs[0], None, None)
+    ### DEBUG
+    if cmd_args.method == "LSTM":
+        if cmd_args.has_edge_feats:
+            debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+        debug_model(model, train_graphs[0], None, None)
+    
+    else:
+        if cmd_args.has_edge_feats:
+            debug_model(model, train_graphs[0], None, list_edge_feats[0])
+        debug_model(model, train_graphs[0], None, None)
     ####
     
     
