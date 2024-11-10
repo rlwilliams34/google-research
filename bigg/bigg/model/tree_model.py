@@ -832,7 +832,7 @@ class RecurTreeGen(nn.Module):
                 print(h_bot)
                 print("left ids: ", left_ids[0])
                 print("All ids: ", left_ids[1:])
-                h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats) #Remove this line?
+                #h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats) #Remove this line?
                 print("update: ", h_bot.shape)
                 left_ids = tuple([None] + list(left_ids[1:]))
 
