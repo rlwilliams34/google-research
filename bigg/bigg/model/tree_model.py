@@ -345,11 +345,12 @@ class FenwickTree(nn.Module):
 
             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
             sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
-            #print("Next input: ", next_input)
-            #print("Sub state: ", sub_state)
+            print("============================")
+            print("Next input: ", next_input)
+            print("Sub state: ", sub_state)
             cur_state = self.summary_cell(sub_state, next_input)
-            #print("New i: ", i)
-            #print(cur_state)
+            print("Updated State: ", cur_state)
+            print("============================")
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
         hist_tos.append(last_tos)
