@@ -248,7 +248,7 @@ class FenwickTree(nn.Module):
                 state = self.summary_cell(state, cur_state)
         return state
 
-    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, wt_update, method, prev_rowsum_h, prrev_rowsum_c):
+    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, wt_update, method):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         
@@ -285,7 +285,7 @@ class FenwickTree(nn.Module):
                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
             if i == 0:
                 if self.has_edge_feats or self.has_node_feats:
-                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, wt_update=wt_update, method=method)
+                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, wt_update=wt_update)
                 else:
                     new_states = lstm_func(h_bot, c_bot)
             else:
@@ -810,7 +810,7 @@ class RecurTreeGen(nn.Module):
         
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges, noise, edge_feats_embed)
-        row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], wt_update=self.update_wt, method=self.method, *prev_rowsum_states)
+        row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states,  wt_update=self.update_wt, method=self.method)
         #print("Row States: ", row_states)
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
