@@ -291,7 +291,6 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
-        print("Row embeds before for loop: ", row_embeds)
 
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
@@ -311,7 +310,6 @@ class FenwickTree(nn.Module):
             
             row_embeds.append(new_states)
         
-        print("After for loop: ", row_embeds)
         h_list, c_list = zip(*row_embeds)
         #print(h_list)
         #for i in range(len(h_list)):
@@ -347,11 +345,11 @@ class FenwickTree(nn.Module):
 
             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
             sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
-            print("Next input: ", next_input)
-            print("Sub state: ", sub_state)
+            #print("Next input: ", next_input)
+            #print("Sub state: ", sub_state)
             cur_state = self.summary_cell(sub_state, next_input)
-            print("New i: ", i)
-            print(cur_state)
+            #print("New i: ", i)
+            #print(cur_state)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
         hist_tos.append(last_tos)
@@ -714,9 +712,10 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            print(i)
-            print("Before: ", controller_state)
+            #print(i)
+            #print("Before: ", controller_state)
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
+            print("Returned state: ", cur_state)
 #             if i == 1 and target_edge_feats is not None:
 #                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
 #                 cur_state = self.update_wt(edge_embed, cur_state)
@@ -864,7 +863,7 @@ class RecurTreeGen(nn.Module):
         #print(c_buf_list)
         #print("============================================")
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], wt_update=self.update_wt, *prev_rowsum_states)
-        print("Row States: ", row_states)
+        #print("Row States: ", row_states)
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
             ll = ll + ll_node_feats
