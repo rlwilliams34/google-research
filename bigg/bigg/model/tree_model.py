@@ -110,13 +110,12 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         leaf_check = is_leaf[i]
         print(leaf_check)
         print(edge_feats[i])
-        if printit:
-            print(leaf_check)
-        if sum(leaf_check) == 0 or wt_update is None:
+        #if printit:
+        #    print(leaf_check)
+        if sum(leaf_check) == 0:
             continue
         cur_summary = (summary_state[0][:, leaf_check], summary_state[1][:, leaf_check])
         cur_edge_feats = edge_feats[i]
-        print(cur_edge_feats)
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         summary_state[0][:, leaf_check] = cur_summary[0]
         summary_state[1][:, leaf_check] = cur_summary[0]
