@@ -684,9 +684,6 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_wt_state = None
-        print("PARAMETERS")
-        print(self.leaf_h0)
-        print(self.empty_h0)
         if self.has_edge_feats == 1 and self.method == "LSTM":
             prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
         for i in pbar:
@@ -863,7 +860,7 @@ class RecurTreeGen(nn.Module):
         #print(h_buf_list)
         #print(c_buf_list)
         #print("============================================")
-        row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, wt_update=self.update_wt)
+        row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], wt_update=self.update_wt, *prev_rowsum_states)
         print("Row States: ", row_states)
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
