@@ -691,7 +691,7 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
             controller_state = self.row_tree(cur_state)
-            if i == 1 and target_edge_feats is not None:
+            if cur_row.root.is_leaf and target_edge_feats is not None:
                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
                 controller_state = self.update_wt(edge_embed, controller_state)
             edges += [(i, x) for x in col_sm.indices]
