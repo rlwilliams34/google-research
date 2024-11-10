@@ -129,8 +129,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         cur_summary = (local_hbot, local_cbot)
         cur_edge_feats = edge_feats[i]
         #print("==========================================")
-        #print("CURRENT EDGE FEATS AND SUMMARY TO BE UPDATED")
-        #print(cur_edge_feats)
+        print("CURRENT EDGE FEATS AND SUMMARY TO BE UPDATED")
+        print(i)
+        print(cur_edge_feats)
         #print("Before: ", cur_summary)
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         #print("After: ", cur_summary)
