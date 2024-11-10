@@ -836,7 +836,9 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = tree_state_select(h_bot, c_bot,
                                           h_next_buf, c_next_buf,
                                                     lambda: left_ids)
-
+            print(left_substree_states[0])
+            print(left_substree_states[0].shape)
+            print(STOP)
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
