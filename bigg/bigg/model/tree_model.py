@@ -86,7 +86,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     new_ids[0][0] = new_ids[1][0] = None
     is_leaf = [lch_isleaf, rch_isleaf]
     if edge_feats is not None:
-        edge_feats = [(edge_feats[0][:, ~is_rch], edge_feats[1][:, ~is_rch]), (edge_feats[0][:, is_rch], edge_feats[1][:, is_rch])]
+        edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
+        #edge_feats = [(edge_feats[0][:, ~is_rch], edge_feats[1][:, ~is_rch]), (edge_feats[0][:, is_rch], edge_feats[1][:, is_rch])]
         assert np.sum(is_rch) == np.sum(rch_isleaf)
     node_feats = [t_lch, t_rch]
     h_list = []
@@ -110,7 +111,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         if sum(leaf_check) == 0 or wt_update is None:
             continue
         cur_summary = (summary_state[0][:, leaf_check], summary_state[1][:, leaf_check])
-        cur_edge_feats = edge_feats[i][0]
+        cur_edge_feats = edge_feats[i]
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         summary_state[0][:, leaf_check] = cur_summary[0]
         summary_state[1][:, leaf_check] = cur_summary[0]
