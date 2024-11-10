@@ -128,9 +128,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         #print("summary_state: ", summary_state[0])
         cur_summary = (local_hbot, local_cbot)
         cur_edge_feats = edge_feats[i]
-        print("CURRENT EDGE FEATS AND SUMMARY TO BE UPDATED")
-        print(cur_edge_feats)
-        print(cur_summary)
+        #print("CURRENT EDGE FEATS AND SUMMARY TO BE UPDATED")
+        #print(cur_edge_feats)
+        #print(cur_summary)
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         #print("CURRENT SUMMARY: ", cur_summary)
         
@@ -552,7 +552,7 @@ class RecurTreeGen(nn.Module):
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
-                    print("current feats: ", cur_feats)
+                    #print("current feats: ", cur_feats)
                     #print(cur_feats)
                     if prev_wt_state is None:
                         edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats, prev_wt_state)
@@ -639,15 +639,15 @@ class RecurTreeGen(nn.Module):
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
                 if has_left and tree_node.lch.is_leaf:
                     left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
-                    print(left_edge_feats)
-                    print(left_edge_embed)
-                    print(summary_state)
+                    #print(left_edge_feats)
+                    #print(left_edge_embed)
+                    #print(summary_state)
                     summary_state = self.update_wt(left_edge_embed, summary_state)
                 if has_right and tree_node.rch.is_leaf:
                     right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
-                    print(right_edge_feats)
-                    print(right_edge_embed)
-                    print(summary_state)
+                    #print(right_edge_feats)
+                    #print(right_edge_embed)
+                    #print(summary_state)
                     summary_state = self.update_wt(right_edge_embed, summary_state)
             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_wt_state
 
