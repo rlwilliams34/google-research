@@ -113,6 +113,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         c_list.append(c_vecs)
     ### ADD EDGE FEAT UPDATES HERE!!!!
     print("==========================================")
+    print("Edge Feats: ", edge_feats)
     print("Before summary_state: ")
     #print("list shape: ", h_list[0].shape)
     print(h_list[0])
