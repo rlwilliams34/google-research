@@ -73,6 +73,10 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.sampling_method = cmd_args.sampling_method
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus', 'vae']
         self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        self.update_left = args.update_left
+        
+        if self.update_left:
+            self.topdown_update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
         
         

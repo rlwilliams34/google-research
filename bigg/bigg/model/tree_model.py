@@ -641,7 +641,10 @@ class RecurTreeGen(nn.Module):
             
             if tree_node.lch.is_leaf and has_left:
                 left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
-                topdown_state = self.update_wt(left_edge_embed, topdown_state)
+                if self.update_left:
+                    topdown_state = self.topdown_update_wt(left_edge_embed, topdown_state)
+                else:
+                    topdown_state = self.update_wt(left_edge_embed, topdown_state)
             
             rlb = max(0, lb - num_left)
             rub = min(tree_node.rch.n_cols, ub - num_left)
@@ -977,7 +980,11 @@ class RecurTreeGen(nn.Module):
                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
                 #left_feats = left_feats[0] #Can be removed once remaining is fixed up.
                 
-                leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
+                if self.left_update:
+                    leaf_topdown_states = self.topdown_update_wt(left_feats, leaf_topdown_states)
+                
+                else:
+                    leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
                         
