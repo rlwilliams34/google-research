@@ -118,10 +118,10 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     
     for i in range(2):
         leaf_check = list(map(bool, is_leaf[i]))
-        local_idx = new_ids[i][1]
-        print(leaf_check)
-        print(local_idx)
-        print(wt_update)
+        local_idx = new_ids[i][1][leaf_check]
+        
+        
+        
         local_hbot, local_cbot = summary_state[0][:, local_idx], summary_state[1][:, local_idx]
         #print("leaf check: ", leaf_check)
         #if printit:
@@ -129,10 +129,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         if len(leaf_check) == 0 or wt_update is None:
             continue
         #print("summary_state: ", summary_state[0])
-        print("Hello")
-        print(leaf_check)
-        print(local_idx)
-        print(local_hbot.shape)
         cur_summary = (local_hbot[:, leaf_check], local_cbot[1][:, leaf_check])
         cur_edge_feats = edge_feats[i]
         cur_summary = wt_update(cur_edge_feats, cur_summary)
