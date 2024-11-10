@@ -317,10 +317,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "MLP-Leaf":
             if prev_state is None:
                 states_h = []
-                #prev_states_h = []
                 states_c = []
-                #print(edge_feats_normalized)
-                #print("LEAF:", self.leaf_h0_wt.shape)
+                
                 edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
                 
                 edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
@@ -338,6 +336,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                 state_c = torch.cat(states_c, 1) 
                 #prev_h = torch.cat(prev_states_h, dim = -1).view(state_h.shape[1], state_h.shape[2])
                 out = (state_h, state_c) 
+                
+                print(out[0].shape)
                 
                 out_h = torch.cat([self.leaf_h0_2.repeat(1, edge_feats.shape[0], 1), out[0]], dim = -1)
                 out_c = torch.cat([self.leaf_c0_2.repeat(1, edge_feats.shape[0], 1), out[1]], dim = -1)
