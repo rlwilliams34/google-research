@@ -545,12 +545,17 @@ class RecurTreeGen(nn.Module):
                     if self.method == "Test":
                         return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_wt_state
                     
-                    edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_wt_state)
+                    elif self.method == "MLP-Leaf":
+                        edge_embed, prev_wt_state = self.embed_edge_feats(cur_feats, prev_state=prev_wt_state)
+                        return ll, ll_wt, edge_embed, 1, cur_feats, prev_wt_state
                     
-                    if prev_wt_state is not None:
+                    elif self.method == "LSTM":
+                        edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_wt_state)
                         prev_wt_state = edge_embed
+                        return ll, ll_wt, edge_embed, 1, cur_feats, prev_wt_state
                     
-                    return ll, ll_wt, edge_embed, 1, cur_feats, prev_wt_state
+                    edge_embed = self.embed_edge_feats(cur_feats)
+                    return ll, ll_wt, edge_embed, 1, cur_feats, None
                 else:
                     return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None
         else:
