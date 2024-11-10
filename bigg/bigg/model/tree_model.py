@@ -551,7 +551,7 @@ class RecurTreeGen(nn.Module):
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
-                    print(cur_feats)
+                    print("current feats: ", cur_feats)
                     #print(cur_feats)
                     if prev_wt_state is None:
                         edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats, prev_wt_state)
