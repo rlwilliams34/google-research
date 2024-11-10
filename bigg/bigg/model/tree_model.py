@@ -104,6 +104,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
         
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
+        print("I: ", i)
+        print("Hvecs: ", h_vecs)
         #print(local_hbot)
         #print(h_vecs)
         #print(new_ids[i])
