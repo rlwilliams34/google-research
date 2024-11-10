@@ -819,7 +819,9 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
-                prior_h_target = state_h_prior[edge_of_lv, :]
+                prior_h_target = None
+                if self.method == "LSTM": 
+                    prior_h_target = state_h_prior[edge_of_lv, :]
                 edge_ll, _ = self.predict_edge_feats(edge_state, target_feats, prior_h_target)
                 ll_wt = ll_wt + edge_ll #/ len(edge_feats.flatten())
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
