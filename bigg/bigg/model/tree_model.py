@@ -721,6 +721,9 @@ class RecurTreeGen(nn.Module):
             node_feats = torch.cat(list_pred_node_feats, dim=0)
         if self.has_edge_feats:
             edge_feats = torch.cat(list_pred_edge_feats, dim=0)
+        print("END")
+        print(edges)
+        print(edge_feats)
         return total_ll, total_ll_wt, edges, self.row_tree.list_states, node_feats, edge_feats
 
     def binary_ll(self, pred_logits, np_label, need_label=False, reduction='sum'):
