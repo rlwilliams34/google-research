@@ -108,6 +108,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     
     for i in range(2):
         leaf_check = is_leaf[i]
+        print(leaf_check)
         if printit:
             print(leaf_check)
         if sum(leaf_check) == 0 or wt_update is None:
