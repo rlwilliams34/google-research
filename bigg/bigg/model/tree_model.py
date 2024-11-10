@@ -128,9 +128,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         #print("summary_state: ", summary_state[0])
         cur_summary = (local_hbot, local_cbot)
         cur_edge_feats = edge_feats[i]
-        print("CURRENT EDGE FEATS AND SUMMARY TO BE UPDATED")
-        print(cur_edge_feats)
-        print(cur_summary)
+        #print("CURRENT EDGE FEATS AND SUMMARY TO BE UPDATED")
+        #print(cur_edge_feats)
+        #print(cur_summary)
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         #print("CURRENT SUMMARY: ", cur_summary)
         
@@ -710,6 +710,8 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
             controller_state = self.row_tree(cur_state)
+            print(i)
+            print(controller_state)
             if cur_row.root.is_leaf and target_edge_feats is not None:
                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
                 controller_state = self.update_wt(edge_embed, controller_state)
@@ -836,7 +838,7 @@ class RecurTreeGen(nn.Module):
                                                                            list_node_starts, num_nodes, list_col_ranges, noise, edge_feats_embed)
         
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, wt_update=self.update_wt)
-        
+        print(row_states)
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
             ll = ll + ll_node_feats
