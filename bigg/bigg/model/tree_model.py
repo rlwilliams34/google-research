@@ -839,16 +839,16 @@ class RecurTreeGen(nn.Module):
                                                     lambda: left_ids)
             print(left_subtree_states[0])
             print(left_subtree_states[0].shape)
-            print(STOP)
+            #print(STOP)
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             # Left feats
-            #if self.has_edge_feats and torch.sum(1 - is_rch) > 0:
-            #    edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-            #    left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]]) #edge_feats_embed[edge_idx[~is_rch]]
-                # leaf_topdown_states = (topdown_state[0][...], topdown_state[1][...])
+#             if self.has_edge_feats and torch.sum(1 - is_rch) > 0:
+#                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
+#                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]]) #edge_feats_embed[edge_idx[~is_rch]]
+#                 leaf_topdown_states = (topdown_state[0][left_ids[1]], topdown_state[1][left_ids[1]])
                 # leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
                 # Need the topdown states that correspond to a left tree
                 # topdown_h, topdown_c = selective_update_hc_2(topdown_state[0], topdown_state[1], [INDEX FOR STATES WE WANT HERE], UPDATED SATES HERE) ??
