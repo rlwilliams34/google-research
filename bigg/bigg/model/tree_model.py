@@ -293,6 +293,7 @@ class FenwickTree(nn.Module):
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
             print("i: ", i)
+            print(all_ids)
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
                 lstm_func = featured_batch_tree_lstm3
             
