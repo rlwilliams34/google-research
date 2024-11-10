@@ -128,9 +128,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         #print("summary_state: ", summary_state[0])
         cur_summary = (local_hbot, local_cbot)
         cur_edge_feats = edge_feats[i]
-        print(cur_edge_feats)
+        #print(cur_edge_feats)
         cur_summary = wt_update(cur_edge_feats, cur_summary)
-        print("CURRENT SUMMARY: ", cur_summary)
+        #print("CURRENT SUMMARY: ", cur_summary)
         
         summary_state[0][:, local_idx] = cur_summary[0]
         summary_state[1][:, local_idx] = cur_summary[1]
@@ -699,8 +699,9 @@ class RecurTreeGen(nn.Module):
             if cur_row.root.is_leaf and target_edge_feats is not None:
                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
                 controller_state = self.update_wt(edge_embed, controller_state)
-                print("i: ", i)
-                print("CONTROLLER STATE: ", controller_state)
+                # THIS IS GOOD...
+                #print("i: ", i)
+                #print("CONTROLLER STATE: ", controller_state)
             edges += [(i, x) for x in col_sm.indices]
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
