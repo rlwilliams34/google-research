@@ -115,7 +115,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     #print(h_list[1])
     #print(c_list[1])
     summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
-    
+    print(cell)
     for i in range(2):
         leaf_check = list(map(bool, is_leaf[i]))
         local_idx = new_ids[i][1][leaf_check]
