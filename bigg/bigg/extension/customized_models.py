@@ -239,9 +239,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         return self.nodelen_encoding(node_feats)
 
     def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False):
-        #edge_feats = self.compute_softminus(edge_feats)
-        #if self.epoch_num == 0:
-        #    self.update_weight_stats(edge_feats)
         noise = 0.0
         if not torch.is_tensor(edge_feats): 
             edge_feats_normalized = []
@@ -257,11 +254,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             return edge_embed
         
         if self.method == "MLP-Repeat":
-            #print(edge_feats_normalized.shape)
-            #print(STOP)
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
-            #print(edge_embed.shape)
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
@@ -284,21 +278,15 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "LSTM":
             if prev_state is None:
                 states_h = []
-                #prev_states_h = []
                 states_c = []
-                #print(edge_feats_normalized)
-                #print("LEAF:", self.leaf_h0_wt.shape)
                 edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
                 
                 edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
                 
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
-                #print(cur_state[0])
                 prev_states_h = []
-                #print(prev_states_h)
                 for edge in edge_embed:
-                    #print("a", cur_state[0])
                     prev_states_h.append(cur_state[0][-1])
                     cur_state = self.edgeLSTM(edge, cur_state)
                     states_h.append(cur_state[0])
@@ -325,16 +313,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.wt_h0.repeat(1, B, 1), self.wt_c0.repeat(1, B, 1))
-                #prev_states_h = []
                 for edge in edge_embed:
-                    #print("a", cur_state[0])
-                    #prev_states_h.append(cur_state[0][-1])
                     cur_state = self.edgeLSTM(edge, cur_state)
                     states_h.append(cur_state[0])
                     states_c.append(cur_state[1])       
                 state_h = torch.cat(states_h, 1)
                 state_c = torch.cat(states_c, 1) 
-                #prev_h = torch.cat(prev_states_h, dim = -1).view(state_h.shape[1], state_h.shape[2])
                 out = (state_h, state_c) 
                 
                 out_h = torch.cat([self.leaf_h0_2.repeat(1, state_h.shape[1], 1), out[0]], dim = -1)

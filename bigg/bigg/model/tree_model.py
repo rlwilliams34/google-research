@@ -641,6 +641,8 @@ class RecurTreeGen(nn.Module):
                     right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
                     summary_state = self.update_wt(right_edge_embed, summary_state)
             
+            else:
+                edge_feats = torch.cat(pred_edge_feats, dim=0)
             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_wt_state
 
     def forward(self, node_end, edge_list=None, node_feats=None, edge_feats=None, node_start=0, list_states=[], lb_list=None, ub_list=None, col_range=None, num_nodes=None, display=False):
