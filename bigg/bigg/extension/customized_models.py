@@ -107,10 +107,15 @@ class BiggWithEdgeLen(RecurTreeGen):
             #self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
             #self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
         
+        
         if self.method == "MLP-Leaf":
-            self.edgelen_encoding = MLP(1, [args.embed_dim, args.embed_dim * args.rnn_layers // 2], dropout = cmd_args.wt_drop)
-            self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
+            self.wt_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
+            self.wt_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim // 2))
+            self.leaf_h0_2 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_c0_2 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            
+            self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim // 2, args.rnn_layers)#, dropout = cmd_args.wt_drop)
             
             self.edgelen_mean = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
             self.edgelen_lvar = MLP(int(1.5 * args.embed_dim), [2 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
@@ -304,51 +309,43 @@ class BiggWithEdgeLen(RecurTreeGen):
                 state = (state_h, state_c) 
                 return state, prev_h
                 
-                
             else:
                  edge_embed = self.edgelen_encoding(edge_feats_normalized)
                  state = self.edgeLSTM(edge_embed, prev_state)   
-                
-#                 for list_edge in edge_feats_normalized:
-#                     #print(edge_feats_normalized)
-#                     edge_embed = self.edgelen_encoding(list_edge)
-#                     cur_state = (self.leaf_h0_wt.squeeze(1), self.leaf_c0_wt.squeeze(1))
-#                     #print(edge_embed.shape)
-#                     #print(edge_embed.shape)
-#                     for edge in edge_embed:
-#                         cur_state = self.edgeLSTM(edge, cur_state)
-#                         states_h.append(cur_state[0].unsqueeze(1))
-#                         states_c.append(cur_state[1].unsqueeze(1))
-#                         #print(states_h[0].shape)
-#                     
-#                     if not as_list:
-#                         state_h = torch.cat(states_h, 1)
-#                         state_c = torch.cat(states_c, 1)
-#                     
-#                     else:
-#                         state_h = states_h
-#                         state_c = states_c
-#                     
-#                     #print(state_h)
-#      
-#             
-#             else:
-#                 #print("HELLO")
-#                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
-#                 state = self.edgeLSTM(edge_embed, prev_state)
-#                 #print(state[0])
-                
-                
-                #state = (state[0].squeeze(1), state[0].squeeze(1))
-            
-            #state = self.edgeLSTM(edge_embed, (self.leaf_h0.repeat(1, edge_embed.shape[0], 1), self.leaf_c0.repeat(1, edge_embed.shape[0],1))))
-            return state
+                 return state
         
         if self.method == "MLP-Leaf":
-            edge_embed = self.edgelen_encoding(edge_feats_normalized)
-            out = edge_embed.reshape(edge_feats.shape[0], self.num_layers, self.embed_dim // 2).movedim(0, 1)
-            out_h = torch.cat([self.leaf_h0_wt.repeat(1, edge_feats.shape[0], 1), out], dim = -1)
-            out_c = torch.cat([self.leaf_c0_wt.repeat(1, edge_feats.shape[0], 1), out], dim = -1)
+            if prev_state is None:
+                states_h = []
+                #prev_states_h = []
+                states_c = []
+                #print(edge_feats_normalized)
+                #print("LEAF:", self.leaf_h0_wt.shape)
+                edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
+                
+                edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
+                
+                B = edge_feats_normalized.shape[1]
+                cur_state = (self.wt_h0.repeat(1, B, 1), self.wt_c0.repeat(1, B, 1))
+                #prev_states_h = []
+                for edge in edge_embed:
+                    #print("a", cur_state[0])
+                    #prev_states_h.append(cur_state[0][-1])
+                    cur_state = self.edgeLSTM(edge, cur_state)
+                    states_h.append(cur_state[0])
+                    states_c.append(cur_state[1])       
+                state_h = torch.cat(states_h, 1)
+                state_c = torch.cat(states_c, 1) 
+                #prev_h = torch.cat(prev_states_h, dim = -1).view(state_h.shape[1], state_h.shape[2])
+                out = (state_h, state_c) 
+                
+            else:
+                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
+                 out = self.edgeLSTM(edge_embed, prev_state)   
+                 
+            
+            out_h = torch.cat([self.leaf_h0_2.repeat(1, edge_feats.shape[0], 1), out[0]], dim = -1)
+            out_c = torch.cat([self.leaf_c0_2.repeat(1, edge_feats.shape[0], 1), out[1]], dim = -1)
             return (out_h, out_c) 
             
     
