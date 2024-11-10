@@ -115,7 +115,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     #print(h_list[1])
     #print(c_list[1])
     summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
-    print(cell)
+    
     for i in range(2):
         leaf_check = list(map(bool, is_leaf[i]))
         local_idx = new_ids[i][1][leaf_check]
@@ -164,10 +164,12 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
+        print("Hello 1")
         return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, wt_update, printit = True)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
     elif h_buf is None:
+        print("Hello 2")
         return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, wt_update, printit = True)
     else:
         raise NotImplementedError  #TODO: handle model parallelism with features
