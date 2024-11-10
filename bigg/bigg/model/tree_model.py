@@ -128,9 +128,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         #print("summary_state: ", summary_state[0])
         cur_summary = (local_hbot, local_cbot)
         cur_edge_feats = edge_feats[i]
-        #print("CURRENT EDGE FEATS AND SUMMARY TO BE UPDATED")
-        #print(cur_edge_feats)
-        #print(cur_summary)
+        print("CURRENT EDGE FEATS AND SUMMARY TO BE UPDATED")
+        print(cur_edge_feats)
+        print(cur_summary)
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         #print("CURRENT SUMMARY: ", cur_summary)
         
@@ -700,9 +700,9 @@ class RecurTreeGen(nn.Module):
 #             if i == 1 and target_edge_feats is not None:
 #                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
 #                 cur_state = self.update_wt(edge_embed, cur_state)
-            if cur_row.root.is_leaf and target_edge_feats is not None:
-                edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
-                controller_state = self.update_wt(edge_embed, controller_state)
+#             if cur_row.root.is_leaf and target_edge_feats is not None:
+#                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
+#                 controller_state = self.update_wt(edge_embed, controller_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             if self.has_node_feats:
@@ -710,9 +710,9 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
             controller_state = self.row_tree(cur_state)
-#             if cur_row.root.is_leaf and target_edge_feats is not None:
-#                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
-#                 controller_state = self.update_wt(edge_embed, controller_state)
+            if cur_row.root.is_leaf and target_edge_feats is not None:
+                edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
+                controller_state = self.update_wt(edge_embed, controller_state)
                 # THIS IS GOOD...
                 #print("i: ", i)
                 #print("CONTROLLER STATE: ", controller_state)
@@ -850,8 +850,8 @@ class RecurTreeGen(nn.Module):
             
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
-                print(edge_feats)
-                print(edge_feats_embed)
+                #print(edge_feats)
+                #print(edge_feats_embed)
         
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
