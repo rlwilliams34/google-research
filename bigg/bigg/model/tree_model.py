@@ -654,8 +654,11 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_wt_state = None
-        if self.has_edge_feats == 1 and self.method in ["LSTM", "MLP-Leaf"]:
+        if self.has_edge_feats and self.method == "LSTM":
             prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
+        
+        if self.has_edge_feats and self.method == "MLP-Leaf"
+            prev_wt_state = (self.wt_h0, self.wt_c0)
         for i in pbar:
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
