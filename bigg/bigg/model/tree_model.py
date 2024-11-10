@@ -768,7 +768,7 @@ class RecurTreeGen(nn.Module):
                 controller_state = self.update_wt(edge_embed, controller_state)
                 print(self.row_tree.list_states)
                 print(self.row_tree.list_states[1])
-                self.row_tree.list_states[1] = controller_state
+                self.row_tree.list_states[1] = [controller_state]
                 print(self.row_tree.list_states)
                 # THIS IS GOOD...
                 #print("i: ", i)
