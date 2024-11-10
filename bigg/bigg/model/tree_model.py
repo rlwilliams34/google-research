@@ -638,12 +638,14 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
                 if has_left and tree_node.lch.is_leaf:
+                    print("HAS LEFT")
                     left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
                     #print(left_edge_feats)
                     #print(left_edge_embed)
                     #print(summary_state)
                     summary_state = self.update_wt(left_edge_embed, summary_state)
                 if has_right and tree_node.rch.is_leaf:
+                    print("HAS RIGHT")
                     right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
                     #print(right_edge_feats)
                     #print(right_edge_embed)
