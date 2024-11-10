@@ -121,6 +121,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         local_idx = new_ids[i][1]
         print(leaf_check)
         print(local_idx)
+        print(wt_update)
         local_hbot, local_cbot = summary_state[0][:, local_idx], summary_state[1][:, local_idx]
         #print("leaf check: ", leaf_check)
         #if printit:
