@@ -243,9 +243,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         else:
             edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
         
-         if self.method == "Test":
-             edge_embed = self.edgelen_encoding(edge_feats_normalized)
-             return edge_embed
+        if self.method == "Test":
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            return edge_embed
         
         if self.method == "MLP-Repeat":
             #print(edge_feats_normalized.shape)
