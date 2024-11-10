@@ -820,9 +820,11 @@ class RecurTreeGen(nn.Module):
                 h_next_buf = c_next_buf = None
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
+                print("START OF NEW LEVEL")
                 print("edge_idx: ", edge_idx)
                 print("is_rch: ", is_rch)
                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
+                print("left feats: ", left_feats)
                 print("Before: ", h_bot.shape)
                 print(h_bot)
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
