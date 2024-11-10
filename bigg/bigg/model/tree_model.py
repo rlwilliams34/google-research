@@ -104,6 +104,10 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     ### ADD EDGE FEAT UPDATES HERE!!!!
+    print(h_list[0])
+    print(c_list[0])
+    print(h_list[1])
+    print(c_list[1])
     summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
     
     for i in range(2):
