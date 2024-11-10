@@ -292,8 +292,6 @@ class FenwickTree(nn.Module):
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
-            print("i: ", i)
-            print(all_ids)
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
                 lstm_func = featured_batch_tree_lstm3
             
@@ -708,8 +706,8 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            #print(i)
-            #print(controller_state)
+            print(i)
+            print(controller_state)
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
 #             if i == 1 and target_edge_feats is not None:
 #                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
@@ -850,7 +848,7 @@ class RecurTreeGen(nn.Module):
                                                                            list_node_starts, num_nodes, list_col_ranges, noise, edge_feats_embed)
         
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, wt_update=self.update_wt)
-        #print(row_states)
+        print("Row States: ", row_states)
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
             ll = ll + ll_node_feats
