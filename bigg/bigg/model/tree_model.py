@@ -741,7 +741,10 @@ class RecurTreeGen(nn.Module):
             h_bot, c_bot = fn_hc_bot(d + 1)
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
-                local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
+                if self.method == "Test":
+                    local_edge_feats = edge_feats[edge_idx]
+                else:
+                    local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, self.update_wt)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
@@ -751,7 +754,10 @@ class RecurTreeGen(nn.Module):
         feat_dict = {}
         if self.has_edge_feats:
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(0)
-            local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
+            if self.method == "Test":
+                local_edge_feats = edge_feats[edge_idx]
+            else:
+                local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
             feat_dict['edge'] = (local_edge_feats, is_rch)
         if self.has_node_feats:
             is_tree_trivial = TreeLib.GetIsTreeTrivial()
