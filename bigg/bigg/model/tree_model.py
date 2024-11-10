@@ -804,7 +804,8 @@ class RecurTreeGen(nn.Module):
                     local_edge_feats = edge_feats[edge_idx]
                 else:
                     local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
-                print("d: ", d)
+                #print("d: ", d)
+                print(local_edge_feats)
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
@@ -863,8 +864,8 @@ class RecurTreeGen(nn.Module):
             
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
-                #print(edge_feats)
-                #print(edge_feats_embed)
+                print(edge_feats)
+                print(edge_feats_embed)
         
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
