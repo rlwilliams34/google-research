@@ -352,6 +352,7 @@ class FenwickTree(nn.Module):
             print("Updated State: ", cur_state)
             print("============================")
         hist_rnn_states.append(cur_state)
+        print(hist_rnn_states)
         hist_froms.append(None)
         hist_tos.append(last_tos)
         hist_h_list, hist_c_list = zip(*hist_rnn_states)
