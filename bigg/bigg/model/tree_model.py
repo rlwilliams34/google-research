@@ -123,8 +123,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         #print("leaf check: ", leaf_check)
         #if printit:
         #    print("after: ", leaf_check)
-        if len(leaf_check) == 0 or wt_update is None:
-            continue
+        #if len(leaf_check) == 0 or wt_update is None:
+        #    continue
         #print("summary_state: ", summary_state[0])
         cur_summary = (local_hbot, local_cbot)
         cur_edge_feats = edge_feats[i]
