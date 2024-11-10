@@ -311,7 +311,7 @@ class FenwickTree(nn.Module):
             
             row_embeds.append(new_states)
         
-        print("After for loop: ", row_embds)
+        print("After for loop: ", row_embeds)
         h_list, c_list = zip(*row_embeds)
         #print(h_list)
         #for i in range(len(h_list)):
