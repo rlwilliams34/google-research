@@ -530,7 +530,7 @@ class RecurTreeGen(nn.Module):
                     edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats, prev_wt_state[0][-1])
                     ll_wt = ll_wt + edge_ll
                     
-                    edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_wt_state)
+                    #edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_wt_state)
                     #if self.method == "LSTM":
                     
                     if prev_wt_state is not None:
@@ -539,7 +539,8 @@ class RecurTreeGen(nn.Module):
                     #else:
                     #    edge_embed = self.embed_edge_feats(cur_feats)
                     #return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats
-                    return ll, ll_wt, edge_embed, 1, cur_feats, prev_wt_state
+                    #return ll, ll_wt, edge_embed, 1, cur_feats, prev_wt_state
+                    return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_wt_state
                 else:
                     return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None
         else:
@@ -573,8 +574,9 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
-            if False and tree_node.lch.is_leaf and has_left:
+            if tree_node.lch.is_leaf and has_left:
                 ### NEED EDGE EMBEDDING!!!
+                left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
                 topdown_state = self.weight_update(left_edge_embed, topdown_state)
             
             rlb = max(0, lb - num_left)
@@ -607,10 +609,12 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.lr2p_cell(left_state, right_state)
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
-                if False and has_left and tree_node.lch.is_leaf:
+                if has_left and tree_node.lch.is_leaf:
+                    left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
                     summary_state = self.weight_update(left_edge_embed, summary_state)
-                if False and has_right and tree_node.rch.is_leaf:
+                if has_right and tree_node.rch.is_leaf:
                 ### NEED EDGE EMBEDDING!!!
+                    right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
                     summary_state = self.weight_update(right_edge_embed, summary_state)
             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_wt_state
 
@@ -830,7 +834,10 @@ class RecurTreeGen(nn.Module):
                 h_next_buf = c_next_buf = None
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-                left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
+                if self.method == "Test": 
+                    left_feats = edge_feats_embed[edge_idx[~is_rch]]
+                else:
+                    left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
                 #h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats) #Remove this line?
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
@@ -847,7 +854,7 @@ class RecurTreeGen(nn.Module):
             
             if self.has_edge_feats and len(left_wt_ids) > 0:
                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
-                left_feats = left_feats[0] #Can be removed once remaining is fixed up.
+                #left_feats = left_feats[0] #Can be removed once remaining is fixed up.
                 
                 leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
