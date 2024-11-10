@@ -834,6 +834,7 @@ class RecurTreeGen(nn.Module):
                 print("All ids: ", left_ids[1:])
                 #h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats) #Remove this line?
                 print("update: ", h_bot.shape)
+                left_wt_ids = left_ids[1][map(bool, left_ids[0])]
                 left_ids = tuple([None] + list(left_ids[1:]))
             print("----------------------------------------------")
             print("UPDATED H BOT: ", h_bot)
@@ -850,10 +851,16 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             # Left feats
-#             if self.has_edge_feats and torch.sum(1 - is_rch) > 0:
-#                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-#                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]]) #edge_feats_embed[edge_idx[~is_rch]]
-#                 leaf_topdown_states = (topdown_state[0][left_ids[1]], topdown_state[1][left_ids[1]])
+            #left_ids[1][list(map(bool, left_ids))]
+            
+            if self.has_edge_feats and len(left_wt_ids) > 0:
+                #left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]]) #edge_feats_embed[edge_idx[~is_rch]]
+                leaf_topdown_states = (topdown_state[0][left_wt_ids], topdown_state[1][left_wt_ids])
+                left_feats = left_feats[0]
+                print(left_feats.shape)
+                leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
+                topdown_h, topdown_c = selective_update_hc_2(topdown_state[0], topdown_state[1], left_wt_ids, leaf_topdown_states)
+                topdown_state = (topdown_h, topdown_c)
                 # leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
                 # Need the topdown states that correspond to a left tree
                 # topdown_h, topdown_c = selective_update_hc_2(topdown_state[0], topdown_state[1], [INDEX FOR STATES WE WANT HERE], UPDATED SATES HERE) ??
