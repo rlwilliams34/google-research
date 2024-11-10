@@ -283,6 +283,7 @@ class FenwickTree(nn.Module):
                 print(state)
                 print(cur_state)
                 state = self.summary_cell(state, cur_state)
+                print("new state: ", state)
         return state
 
     def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, wt_update):
