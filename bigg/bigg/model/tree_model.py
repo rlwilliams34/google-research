@@ -128,8 +128,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         #print("summary_state: ", summary_state[0])
         cur_summary = (local_hbot, local_cbot)
         cur_edge_feats = edge_feats[i]
-        #print(cur_edge_feats)
-        #print(cur_summary)
+        print(cur_edge_feats)
+        print(cur_summary)
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         #print("CURRENT SUMMARY: ", cur_summary)
         
@@ -680,7 +680,6 @@ class RecurTreeGen(nn.Module):
                     pos += 1
                 indices.sort()
                 col_sm = ColAutomata(supervised=True, indices=indices)
-            print("Index: ", i)
 
             cur_row = AdjRow(i, self.directed, self.self_loop, col_range=col_range)
             lb = 0 if lb_list is None else lb_list[i]
@@ -721,9 +720,6 @@ class RecurTreeGen(nn.Module):
             node_feats = torch.cat(list_pred_node_feats, dim=0)
         if self.has_edge_feats:
             edge_feats = torch.cat(list_pred_edge_feats, dim=0)
-        print("END")
-        print(edges)
-        print(edge_feats)
         return total_ll, total_ll_wt, edges, self.row_tree.list_states, node_feats, edge_feats
 
     def binary_ll(self, pred_logits, np_label, need_label=False, reduction='sum'):
