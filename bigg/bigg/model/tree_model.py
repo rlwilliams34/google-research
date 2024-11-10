@@ -111,7 +111,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         print("leaf check: ", leaf_check)
         #if printit:
         #    print(leaf_check)
-        if sum(leaf_check) == 0:
+        if sum(leaf_check) == 0 or wt_update is None:
             continue
         print("summary_state: ", summary_state[0])
         cur_summary = (summary_state[0][:, leaf_check], summary_state[1][:, leaf_check])
@@ -618,14 +618,14 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.lr2p_cell(left_state, right_state)
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
-                if has_left and tree_node.lch.is_leaf:
-                    #print(left_edge_feats)
-                    left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
-                    summary_state = self.update_wt(left_edge_embed, summary_state)
-                if has_right and tree_node.rch.is_leaf:
-                    #print(right_edge_feats)
-                    right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
-                    summary_state = self.update_wt(right_edge_embed, summary_state)
+#                 if has_left and tree_node.lch.is_leaf:
+#                     #print(left_edge_feats)
+#                     left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
+#                     summary_state = self.update_wt(left_edge_embed, summary_state)
+#                 if has_right and tree_node.rch.is_leaf:
+#                     #print(right_edge_feats)
+#                     right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
+#                     summary_state = self.update_wt(right_edge_embed, summary_state)
             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_wt_state
 
     def forward(self, node_end, edge_list=None, node_feats=None, edge_feats=None, node_start=0, list_states=[], lb_list=None, ub_list=None, col_range=None, num_nodes=None, display=False):
@@ -672,9 +672,9 @@ class RecurTreeGen(nn.Module):
             else:
                 target_edge_feats = None
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
-            if i == 1 and target_edge_feats is not None:
-                edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
-                cur_state = self.update_wt(edge_embed, cur_state)
+#             if i == 1 and target_edge_feats is not None:
+#                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
+#                 cur_state = self.update_wt(edge_embed, cur_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             if self.has_node_feats:
@@ -761,7 +761,7 @@ class RecurTreeGen(nn.Module):
                     local_edge_feats = edge_feats[edge_idx]
                 else:
                     local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
-                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update = self.update_wt)
+                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =None)#self.update_wt)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
             h_buf_list[d] = new_h
@@ -804,7 +804,7 @@ class RecurTreeGen(nn.Module):
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
                                                                            list_node_starts, num_nodes, list_col_ranges, noise, edge_feats_embed)
         
-        row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, wt_update=self.update_wt)
+        row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, wt_update=None) #self.update_wt)
         
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
