@@ -112,19 +112,19 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     ### ADD EDGE FEAT UPDATES HERE!!!!
-    print("==========================================")
-    print("Edge Feats: ", edge_feats)
-    print("Before summary_state: ")
+#     print("==========================================")
+#     print("Edge Feats: ", edge_feats)
+#     print("Before summary_state: ")
     #print("list shape: ", h_list[0].shape)
-    print(h_list[0])
-    print(h_list[1])
+#     print(h_list[0])
+#     print(h_list[1])
     #print(c_list[0])
     #print(h_list[1])
     #print(c_list[1])
     summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
-    print("After Summary state: ")
-    print(summary_state)
-    print("==========================================")
+#     print("After Summary state: ")
+#     print(summary_state)
+#     print("==========================================")
     
     for i in range(2):
         leaf_check = list(map(bool, is_leaf[i]))
@@ -146,14 +146,12 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         #print("After: ", cur_summary)
         #print("==========================================")
-        print("++++++++++++++++++++++++++++++++++++++++")
-        print("CHECKING")
-        print(cur_edge_feats)
-        print(summary_state)
+#         print("++++++++++++++++++++++++++++++++++++++++")
+#         print("CHECKING")
+#         print(cur_edge_feats)
+#         print(summary_state)
         summary_state[0][:, local_idx] = cur_summary[0]
         summary_state[1][:, local_idx] = cur_summary[1]
-        print(summary_state)
-        print("++++++++++++++++++++++++++++++++++++++++")
         
     return summary_state
 
@@ -732,8 +730,8 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            #print(i)
-            #print("Before: ", controller_state)
+            print(i)
+            print("Before: ", controller_state)
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
             print("i: ", i)
             print("Returned state: ", cur_state[0])
