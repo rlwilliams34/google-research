@@ -862,8 +862,8 @@ class RecurTreeGen(nn.Module):
             
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
-                #print(edge_feats)
-                #print(edge_feats_embed)
+                print(edge_feats)
+                print(edge_feats_embed)
         
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
