@@ -101,7 +101,10 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
         h_list.append(h_vecs)
         c_list.append(c_vecs)
-    return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
+    ### ADD EDGE FEAT UPDATES HERE!!!!
+    summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
+    ### Here, I need to use the weight LSTM to update weights from left and right children. Issue --> need to know which states to update with which weights...
+    return summary_state
 
 
 def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell):
@@ -560,7 +563,7 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
-            if False and has_left and tree_node.lch.is_leaf:
+            if False and tree_node.lch.is_leaf and has_left:
                 ### NEED EDGE EMBEDDING!!!
                 topdown_state = self.weight_update(left_edge_embed, topdown_state)
             
@@ -594,6 +597,8 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.lr2p_cell(left_state, right_state)
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
+                if False and has_left and tree_node.lch.is_leaf:
+                    summary_state = self.weight_update(left_edge_embed, summary_state)
                 if False and has_right and tree_node.rch.is_leaf:
                 ### NEED EDGE EMBEDDING!!!
                     summary_state = self.weight_update(right_edge_embed, summary_state)
@@ -815,9 +820,15 @@ class RecurTreeGen(nn.Module):
                 h_next_buf = c_next_buf = None
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
+                print("edge_idx: ", edge_idx)
+                print("is_rch: ", is_rch)
                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
+                print("Before: ", h_bot.shape)
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
-                h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
+                print("after: ", h_bot.shape)
+                print("left ids: ", left_idx[0])
+                h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats) #Remove this line?
+                print("update: ", h_bot.shape)
                 left_ids = tuple([None] + list(left_ids[1:]))
 
             left_subtree_states = tree_state_select(h_bot, c_bot,
@@ -828,6 +839,18 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
+            # Left feats
+            #if self.has_edge_feats:
+            #    edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
+            #    left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]]) #edge_feats_embed[edge_idx[~is_rch]]
+                # leaf_topdown_states = (topdown_state[0][...], topdown_state[1][...])
+                # leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
+                # Need the topdown states that correspond to a left tree
+                # topdown_h, topdown_c = selective_update_hc_2(topdown_state[0], topdown_state[1], [INDEX FOR STATES WE WANT HERE], UPDATED SATES HERE) ??
+            
+            # Challenge: need to only update topdown states corresponding to a LEAF.
+            
+            
             ### UPDATE HERE
             # IDEA: GET NUM LEFT ONE LEVEL DEEPER IN THE MODEL. IF NUM LEFT == 1 WE WOULD UPDATE THESE WITH THAT EDGE FEAT
             # ...BUT HOW DO WE GET THE EDGES ONE LEVEL DEEPER ...
@@ -853,6 +876,7 @@ class RecurTreeGen(nn.Module):
 #             print(has_left)
 #             print(num_left)
 #             print(STOP)
+            
 
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
