@@ -536,7 +536,7 @@ class RecurTreeGen(nn.Module):
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
-                    if prev_wt_state is None:
+                    if self.method != "LSTM":
                         edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     else:
                         edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats, prev_wt_state[0][-1])
