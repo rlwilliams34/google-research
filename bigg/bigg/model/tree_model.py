@@ -835,12 +835,15 @@ class RecurTreeGen(nn.Module):
                 #h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats) #Remove this line?
                 print("update: ", h_bot.shape)
                 left_ids = tuple([None] + list(left_ids[1:]))
+            print("----------------------------------------------")
+            print("UPDATED H BOT: ", h_bot)
 
             left_subtree_states = tree_state_select(h_bot, c_bot,
                                           h_next_buf, c_next_buf,
                                                     lambda: left_ids)
-            print(left_subtree_states[0])
+            print("LEFT SUBTREE: ", left_subtree_states[0])
             print(left_subtree_states[0].shape)
+            print("----------------------------------------------")
             #print(STOP)
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
