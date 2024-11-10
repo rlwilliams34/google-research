@@ -130,6 +130,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         cur_edge_feats = edge_feats[i]
         print(cur_edge_feats)
         cur_summary = wt_update(cur_edge_feats, cur_summary)
+        print("CURRENT SUMMARY: ", cur_summary)
+        
         summary_state[0][:, local_idx] = cur_summary[0]
         summary_state[1][:, local_idx] = cur_summary[1]
     return summary_state
@@ -165,6 +167,7 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
         print("Hello 1")
+        ## This one is for updating state 0...
         return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, wt_update, printit = True)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
@@ -686,6 +689,7 @@ class RecurTreeGen(nn.Module):
             if cur_row.root.is_leaf and target_edge_feats is not None:
                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
                 controller_state = self.update_wt(edge_embed, controller_state)
+                print(controller_state)
 #             if i == 1 and target_edge_feats is not None:
 #                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
 #                 cur_state = self.update_wt(edge_embed, cur_state)
