@@ -94,19 +94,22 @@ def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
 #     return feat_idx, edge_idx, batch_weight_idx
 
 
-def get_node_feats(g):
-    length = []
-    for i, (idx, feat) in enumerate(g.nodes(data=True)):
-        assert i == idx
-        length.append(feat['length'])
-    return np.expand_dims(np.array(length, dtype=np.float32), axis=1)
+# def get_node_feats(g):
+#     length = []
+#     for i, (idx, feat) in enumerate(g.nodes(data=True)):
+#         assert i == idx
+#         length.append(feat['length'])
+#     return np.expand_dims(np.array(length, dtype=np.float32), axis=1)
 
 
 def get_edge_feats(g):
-    edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
+    edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
     weights = [x[2]['weight'] for x in edges]
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
 
+def get_edge_feats(g):
+    edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
+    
 
 def debug_model(model, graph, node_feats, edge_feats):
     model.epoch_num += 2
