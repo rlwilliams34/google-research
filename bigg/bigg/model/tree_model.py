@@ -91,7 +91,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     node_feats = [t_lch, t_rch]
     h_list = []
     c_list = []
-    print("Is leaf: ", is_leaf)
+    
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
@@ -104,10 +104,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         c_list.append(c_vecs)
     ### ADD EDGE FEAT UPDATES HERE!!!!
     summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
-    ### Here, I need to use the weight LSTM to update weights from left and right children. Issue --> need to know which states to update with which weights...
-    print("summary state: ", summary_state)
-    print("edge_feats: ", edge_feats)
-    #print(STOP)
+    
     for i in range(2):
         leaf_check = is_leaf[i]
         if sum(leaf_check) == 0 or wt_update is None:
@@ -117,7 +114,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         cur_summary = wt_update(cur_edge_feats, cur_summary)
         summary_state[0][:, leaf_check] = cur_summary[0]
         summary_state[1][:, leaf_check] = cur_summary[0]
-    print(STOP)
     return summary_state
 
 
