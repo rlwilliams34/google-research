@@ -855,6 +855,9 @@ class RecurTreeGen(nn.Module):
             
             if self.has_edge_feats and len(left_wt_ids) > 0:
                 #left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]]) #edge_feats_embed[edge_idx[~is_rch]]
+                print("Hello!")
+                print(left_wt_ids)
+                print(topdown_state[0])
                 leaf_topdown_states = (topdown_state[0][left_wt_ids], topdown_state[1][left_wt_ids])
                 left_feats = left_feats[0]
                 print(left_feats.shape)
