@@ -291,6 +291,7 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
+        print("Row embeds before for loop: ", row_embeds)
 
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
@@ -309,6 +310,8 @@ class FenwickTree(nn.Module):
                 new_states = lstm_func(None, None)
             
             row_embeds.append(new_states)
+        
+        print("After for loop: ", row_embds)
         h_list, c_list = zip(*row_embeds)
         #print(h_list)
         #for i in range(len(h_list)):
