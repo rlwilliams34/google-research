@@ -107,7 +107,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         print(local_hbot)
         print(h_vecs)
         print(new_ids[i])
-        print(STOP)
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     ### ADD EDGE FEAT UPDATES HERE!!!!
