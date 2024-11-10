@@ -107,9 +107,7 @@ def get_edge_feats(g):
     weights = [x[2]['weight'] for x in edges]
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
 
-def get_edge_feats(g):
-    edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
-    
+
 
 def debug_model(model, graph, node_feats, edge_feats):
     model.epoch_num += 2
