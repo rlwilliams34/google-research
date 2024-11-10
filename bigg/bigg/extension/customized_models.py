@@ -337,10 +337,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                 #prev_h = torch.cat(prev_states_h, dim = -1).view(state_h.shape[1], state_h.shape[2])
                 out = (state_h, state_c) 
                 
-                print(out[0].shape)
-                print(edge_feats_normalized.shape)
-                out_h = torch.cat([self.leaf_h0_2.repeat(1, edge_feats_normalized.shape[0], 1), out[0]], dim = -1)
-                out_c = torch.cat([self.leaf_c0_2.repeat(1, edge_feats_normalized.shape[0], 1), out[1]], dim = -1)
+                out_h = torch.cat([self.leaf_h0_2.repeat(1, state_h.shape[1], 1), out[0]], dim = -1)
+                out_c = torch.cat([self.leaf_c0_2.repeat(1, state_h.shape[1], 1), out[1]], dim = -1)
                 return (out_h, out_c)
                 
             else:
