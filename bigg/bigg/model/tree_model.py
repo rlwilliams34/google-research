@@ -344,7 +344,11 @@ class FenwickTree(nn.Module):
 
             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
             sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
+            print("Next input: ", next_input)
+            print("Sub state: ", sub_state)
             cur_state = self.summary_cell(sub_state, next_input)
+            print("New i: ", i)
+            print(cur_state)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
         hist_tos.append(last_tos)
@@ -710,7 +714,7 @@ class RecurTreeGen(nn.Module):
             else:
                 target_edge_feats = None
             print(i)
-            print(controller_state)
+            print("Before: ", controller_state)
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
 #             if i == 1 and target_edge_feats is not None:
 #                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
@@ -723,6 +727,7 @@ class RecurTreeGen(nn.Module):
             if self.has_node_feats:
                 target_feat_embed = self.embed_node_feats(target_node_feats)
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
+            print("Returned State: ", cur_state)
             assert lb <= len(col_sm.indices) <= ub
             controller_state = self.row_tree(cur_state)
             if cur_row.root.is_leaf and target_edge_feats is not None:
