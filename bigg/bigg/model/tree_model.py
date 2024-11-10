@@ -244,8 +244,8 @@ class FenwickTree(nn.Module):
         self.list_states[level].append(state)
 
     def forward(self, new_state=None):
-        print(new_state)
-        print(self.list_states)
+        print("new_state: ", new_state)
+        print("prior list states: ", self.list_states)
         if new_state is None:
             if len(self.list_states) == 0:
                 if self.method == "MLP-Leaf":
@@ -259,11 +259,12 @@ class FenwickTree(nn.Module):
         else:
             self.append_state(new_state, 0)
         pos = 0
-        print(self.list_states)
+        print("after list states: ", self.list_states)
         while pos < len(self.list_states):
             print("pos: ", pos)
             if len(self.list_states[pos]) >= 2:
                 lch_state, rch_state = self.list_states[pos]  # assert the length is 2
+                print("lch rch")
                 print(lch_state, rch_state)
                 new_state = self.merge_cell(lch_state, rch_state)
                 self.list_states[pos] = []
@@ -278,6 +279,7 @@ class FenwickTree(nn.Module):
             if state is None:
                 state = cur_state
             else:
+                print("state cur state")
                 print(state)
                 print(cur_state)
                 state = self.summary_cell(state, cur_state)
