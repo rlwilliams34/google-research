@@ -715,7 +715,8 @@ class RecurTreeGen(nn.Module):
             #print(i)
             #print("Before: ", controller_state)
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
-            print("Returned state: ", cur_state)
+            print("i: ", i)
+            print("Returned state: ", cur_state[0])
 #             if i == 1 and target_edge_feats is not None:
 #                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
 #                 cur_state = self.update_wt(edge_embed, cur_state)
