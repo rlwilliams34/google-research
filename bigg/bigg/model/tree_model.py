@@ -739,6 +739,7 @@ class RecurTreeGen(nn.Module):
     def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
                       list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
         ll = 0.0
+        noise = 0.0
         if self.has_edge_feats:
             if self.method == "LSTM":
                 edge_feats_embed, state_h_prior = self.embed_edge_feats(edge_feats, noise)
