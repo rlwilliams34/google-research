@@ -475,13 +475,13 @@ if __name__ == '__main__':
             
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
-            top_losses.append(loss_top.item())
+            #top_losses.append(loss_top.item())
             
             #if cmd_args.has_edge_feats or cmd_args.model == "BiGG_GCN":
             #    wt_losses.append(loss_wt.item())
             
             true_loss = -(ll + ll_wt) / num_nodes
-            batch_loss = true_loss.item() / cmd_args.accum_grad + batch_loss
+            #batch_loss = true_loss.item() / cmd_args.accum_grad + batch_loss
             
             
             #ll_wt = 0
@@ -498,11 +498,11 @@ if __name__ == '__main__':
 #                 torch.save(model.state_dict(), os.path.join(cmd_args.save_dir, 'best-model'))
 
             if grad_accum_counter == cmd_args.accum_grad:
-                cur = datetime.now() - prev
-                times.append(cur.total_seconds())
-                loss_times.append(batch_loss)
-                epoch_list.append(epoch)
-                batch_loss = 0.0
+                #cur = datetime.now() - prev
+                #times.append(cur.total_seconds())
+                #loss_times.append(batch_loss)
+                #epoch_list.append(epoch)
+                #batch_loss = 0.0
                 
                 if cmd_args.grad_clip > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
@@ -511,10 +511,10 @@ if __name__ == '__main__':
                 grad_accum_counter = 0
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
             
-        time_data = {'times': times, 'loss_times': loss_times, 'epoch_list': epoch_list}
+        #time_data = {'times': times, 'loss_times': loss_times, 'epoch_list': epoch_list}
     
-        with open('%s-' % cmd_args.model + '%s-time-data.pkl' % cmd_args.g_type, 'wb') as f:
-            cp.dump(time_data, f, protocol=cp.HIGHEST_PROTOCOL)
+        #with open('%s-' % cmd_args.model + '%s-time-data.pkl' % cmd_args.g_type, 'wb') as f:
+        #    cp.dump(time_data, f, protocol=cp.HIGHEST_PROTOCOL)
         
         print('epoch complete')
         cur = epoch + 1
