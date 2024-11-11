@@ -379,7 +379,7 @@ if __name__ == '__main__':
     
     ### DEBUG
     print(train_graphs[0].edges(data=True))
-    if has_edge_feats:
+    if self.has_edge_feats:
         print(list_edge_feats[0])
     if cmd_args.method in ["LSTM", "MLP-Leaf"]:
         if cmd_args.has_edge_feats:
