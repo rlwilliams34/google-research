@@ -379,8 +379,18 @@ class BiggWithEdgeLen(RecurTreeGen):
         if prev_state is not None:
             h = torch.cat([h, prev_state], dim = -1)
         
-        mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
+        #mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
+        
+        h, _ = state
+        pred_edge_len = self.edgelen_mean(h)
+        if edge_feats is None:
+            ll = 0
+            edge_feats = pred_edge_len
+        else:
+            ll = -(edge_feats - pred_edge_len) ** 2
+            ll = torch.sum(ll) / 10.0  # need to balance the likelihood between graph structures and features
+        return ll, edge_feats
         
         if edge_feats is None:
             ll = 0
