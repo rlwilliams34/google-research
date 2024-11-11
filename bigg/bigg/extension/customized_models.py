@@ -379,7 +379,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         if prev_state is not None:
             h = torch.cat([h, prev_state], dim = -1)
         
-        #mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
+        mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
         
 #         h, _ = state
