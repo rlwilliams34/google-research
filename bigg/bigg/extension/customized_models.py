@@ -68,8 +68,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             #self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
             self.edgeLSTM = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
             
-            self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_h0_wt = Parameter(torch.Tensor(1, args.embed_dim))
+            self.leaf_c0_wt = Parameter(torch.Tensor(1, args.embed_dim))
             
             self.edgelen_mean = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
             self.edgelen_lvar = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
@@ -250,7 +250,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
                 
                 B = edge_feats_normalized.shape[1]
-                cur_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
+                cur_state = (self.leaf_h0_wt.repeat(B, 1), self.leaf_c0_wt.repeat(B, 1))
                 prev_states_h = []
                 for edge in edge_embed:
                     prev_states_h.append(cur_state[0][-1])
