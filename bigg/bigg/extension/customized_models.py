@@ -116,90 +116,88 @@ class BiggWithEdgeLen(RecurTreeGen):
 #             self.vae_mu = MLP(2 * args.embed_dim, [4 * args.embed_dim, 8])
 #             self.vae_sig = MLP(2 * args.embed_dim, [4 * args.embed_dim, 8])
 #             self.weight_out = MLP(args.embed_dim + 8, [2 * args.embed_dim + 16, 1])
-    
-    
-     def standardize_edge_feats(self, edge_feats): 
-       return edge_feats ## Not doing currently...
-       if self.log_wt:
-         edge_feats = torch.log(edge_feats)
-       
-       elif self.sm_wt:
-         edge_feats = torch.log(torch.special.expm1(edge_feats))
-       
-       if self.mode == "none":
-         return edge_feats
-       
-       if self.epoch_num == 1:
-         self.update_weight_stats(edge_feats)
-       
-       if self.mode == "score":
-         edge_feats = (edge_feats - self.mu_wt) / (self.var_wt**0.5 + 1e-15)
-           
-       elif self.mode == "normalize":
-         edge_feats = -1 + 2 * (edge_feats - self.min_wt) / (self.max_wt - self.min_wt + 1e-15)
-         edge_feats = self.wt_range * edge_feats
-       
-       elif self.mode == "scale":
-         edge_feats = edge_feats * self.wt_scale
-       
-       elif self.mode == "exp":
-         edge_feats = torch.exp(-1/edge_feats)
-       
-       elif self.mode == "exp-log":
-         edge_feats = torch.exp(-1 / torch.log(1 + edge_feats))
-         
-       return edge_feats
-   
-     def update_weight_stats(self, edge_feats):
-       '''
-       Updates necessary global statistics (mean, variance, min, max) of edge_feats per batch
-       if standardizing edge_feats prior to MLP embedding. Only performed during the
-       first epoch of training.
-       
-       Args Used:
-         edge_feats: edge_feats from current iteration batch
-       '''
-       
-       ## Current training weight statistics
-       with torch.no_grad():
-         if self.mode == "score":
-           mu_n = self.mu_wt
-           var_n = self.var_wt
-           n = self.n_obs
-           
-           ## New weight statistics
-           m = len(edge_feats)
-           
-           if m > 1:
-             var_m = torch.var(edge_feats)
-           else:
-             var_m = 0.0
-             
-           mu_m = torch.mean(edge_feats)
-           tot = n + m
-           
-           if tot == 1:
-             self.mu_wt = mu_m
-             self.n_obs = tot
+
+    def standardize_edge_feats(self, edge_feats): 
+      if self.log_wt:
+        edge_feats = torch.log(edge_feats)
+      
+      elif self.sm_wt:
+        edge_feats = torch.log(torch.special.expm1(edge_feats))
+      
+      if self.mode == "none":
+        return edge_feats
+      
+      if self.epoch_num == 1:
+        self.update_weight_stats(edge_feats)
+      
+      if self.mode == "score":
+        edge_feats = (edge_feats - self.mu_wt) / (self.var_wt**0.5 + 1e-15)
           
-           else:
-             ## Update weight statistics
-             new_mu = (n * mu_n + m * mu_m) / tot
-             
-             new_var_avg = (max(n - 1, 0) * var_n + (m - 1) * var_m)/(tot - 1)
-             new_var_resid = n * m * (mu_n - mu_m)**2 / (tot * (tot - 1))
-             new_var = new_var_avg + new_var_resid
-             
-             ## Save
-             self.mu_wt = new_mu
-             self.var_wt = new_var
-             self.n_obs += m
+      elif self.mode == "normalize":
+        edge_feats = -1 + 2 * (edge_feats - self.min_wt) / (self.max_wt - self.min_wt + 1e-15)
+        edge_feats = self.wt_range * edge_feats
+      
+      elif self.mode == "scale":
+        edge_feats = edge_feats * self.wt_scale
+      
+      elif self.mode == "exp":
+        edge_feats = torch.exp(-1/edge_feats)
+      
+      elif self.mode == "exp-log":
+        edge_feats = torch.exp(-1 / torch.log(1 + edge_feats))
+        
+      return edge_feats
+  
+    def update_weight_stats(self, edge_feats):
+      '''
+      Updates necessary global statistics (mean, variance, min, max) of edge_feats per batch
+      if standardizing edge_feats prior to MLP embedding. Only performed during the
+      first epoch of training.
+      
+      Args Used:
+        edge_feats: edge_feats from current iteration batch
+      '''
+      
+      ## Current training weight statistics
+      with torch.no_grad():
+        if self.mode == "score":
+          mu_n = self.mu_wt
+          var_n = self.var_wt
+          n = self.n_obs
+          
+          ## New weight statistics
+          m = len(edge_feats)
+          
+          if m > 1:
+            var_m = torch.var(edge_feats)
+          else:
+            var_m = 0.0
+            
+          mu_m = torch.mean(edge_feats)
+          tot = n + m
+          
+          if tot == 1:
+            self.mu_wt = mu_m
+            self.n_obs = tot
          
-         elif self.mode == "normalize":
-           batch_max = edge_feats.max()
-           batch_min = edge_feats.min()
-           self.min_wt = torch.min(batch_min, self.min_wt)
-           self.max_wt = torch.max(batch_max, self.max_wt)
+          else:
+            ## Update weight statistics
+            new_mu = (n * mu_n + m * mu_m) / tot
+            
+            new_var_avg = (max(n - 1, 0) * var_n + (m - 1) * var_m)/(tot - 1)
+            new_var_resid = n * m * (mu_n - mu_m)**2 / (tot * (tot - 1))
+            new_var = new_var_avg + new_var_resid
+            
+            ## Save
+            self.mu_wt = new_mu
+            self.var_wt = new_var
+            self.n_obs += m
+        
+        elif self.mode == "normalize":
+          batch_max = edge_feats.max()
+          batch_min = edge_feats.min()
+          self.min_wt = torch.min(batch_min, self.min_wt)
+          self.max_wt = torch.max(batch_max, self.max_wt)
     
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
