@@ -81,10 +81,10 @@ def selective_update_hc(h, c, zero_one, feats):
     #num_layers = h.shape[0]
     #embed_dim = h.shape[2]
     #feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
-    print(h.shape)
-    print(feats[0].shape)
-    local_edge_feats_h = scatter(feats[0], nz_idx, dim=0, dim_size=h.shape[1])
-    local_edge_feats_c = scatter(feats[1], nz_idx, dim=0, dim_size=h.shape[1])
+    #print(h.shape)
+    #print(feats[0].shape)
+    local_edge_feats_h = scatter(feats[0], nz_idx, dim=0, dim_size=h.shape[0])
+    local_edge_feats_c = scatter(feats[1], nz_idx, dim=0, dim_size=h.shape[0])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
     h = torch.where(zero_one, local_edge_feats_h, h)
     c = torch.where(zero_one, local_edge_feats_c, c)
