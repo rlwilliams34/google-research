@@ -470,7 +470,7 @@ if __name__ == '__main__':
             else:
                 ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)#, edge_feats_embed = edge_feats_embed)
                 #ll, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)#, edge_feats_embed = edge_feats_embed)
-                ll_wt = 0.0
+                #ll_wt = 0.0
             
             
             loss_top = -ll / num_nodes
