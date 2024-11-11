@@ -416,7 +416,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         else:
             if self.sampling_method  == "softplus":
                 ### Update log likelihood with weight prediction
-                
+                print("Hi")
                 ### Trying with softplus parameterization...
                 edge_feats_invsp = self.compute_softminus(edge_feats)
                 
