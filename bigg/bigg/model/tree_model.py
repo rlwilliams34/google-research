@@ -495,6 +495,7 @@ class RecurTreeGen(nn.Module):
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
+                    #print(prev_wt_state)
                     if self.method != "LSTM":
                         edge_ll, cur_feats = self.predict_edge_feats(state, cur_feats)
                     else:
@@ -536,7 +537,7 @@ class RecurTreeGen(nn.Module):
             if has_left:
                 lub = min(tree_node.lch.n_cols, ub)
                 llb = max(0, lb - tree_node.rch.n_cols)
-                ll, left_state, num_left, left_edge_feats, prev_wt_state = self.gen_row(ll, state, tree_node.lch, col_sm, llb, lub, edge_feats)
+                ll, left_state, num_left, left_edge_feats, prev_wt_state = self.gen_row(ll, state, tree_node.lch, col_sm, llb, lub, edge_feats, prev_wt_state)
                 pred_edge_feats.append(left_edge_feats)
             else:
                 left_state = self.get_empty_state()
@@ -573,7 +574,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.cell_topright(self.topdown_right_embed[[int(has_right)]], topdown_state, tree_node.depth)
 
             if has_right:  # has edge in right child
-                ll, right_state, num_right, right_edge_feats, prev_wt_state = self.gen_row(ll, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats)
+                ll, right_state, num_right, right_edge_feats, prev_wt_state = self.gen_row(ll, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, prev_wt_state)
                 pred_edge_feats.append(right_edge_feats)
             else:
                 right_state = self.get_empty_state()
@@ -638,6 +639,7 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
+            #print(prev_wt_state)
             ll, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
