@@ -586,7 +586,7 @@ class RecurTreeGen(nn.Module):
                 if self.method == "Test":
                     if has_left and tree_node.lch.is_leaf:
                         left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
-                        summary_state = self.update_wt(left_edge_embed, summary_state
+                        summary_state = self.update_wt(left_edge_embed, summary_state)
                     
                     if has_right and tree_node.rch.is_leaf:
                         right_edge_embed = self.embed_edge_feats(right_edge_feats, prev_state=prev_wt_state)
