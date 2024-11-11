@@ -465,7 +465,9 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, edge_feats_embed = edge_feats_embed)
+                #ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)#, edge_feats_embed = edge_feats_embed)
+                ll, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)#, edge_feats_embed = edge_feats_embed)
+                ll_wt = 0.0
             
             
             loss_top = -ll / num_nodes
