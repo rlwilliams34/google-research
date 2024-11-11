@@ -256,6 +256,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "MLP-Repeat":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
+            return edge_embed
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
