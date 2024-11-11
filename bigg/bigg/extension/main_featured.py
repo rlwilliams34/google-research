@@ -31,7 +31,7 @@ import torch
 import torch.optim as optim
 from collections import OrderedDict
 from bigg.common.configs import cmd_args, set_device
-from bigg.extension.customized_models import BiggWithEdgeLen, BiggWithGCN
+from bigg.extension.customized_models import BiggWithEdgeLen#, BiggWithGCN
 from bigg.model.tree_clib.tree_lib import setup_treelib, TreeLib
 from bigg.evaluation.graph_stats import *
 from bigg.evaluation.mmd import *
