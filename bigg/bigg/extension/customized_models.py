@@ -416,7 +416,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         else:
             if self.sampling_method  == "softplus":
                 ### Update log likelihood with weight prediction
-                print("Hi")
+                #print("Hi")
                 ### Trying with softplus parameterization...
                 edge_feats_invsp = self.compute_softminus(edge_feats)
                 
@@ -433,7 +433,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 diff_sq2 = torch.div(diff_sq, var)
                 
                 ## add to ll
-                ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+                ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
                 ll = torch.sum(ll)
             
             elif self.sampling_method  == "lognormal":
