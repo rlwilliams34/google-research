@@ -386,18 +386,18 @@ if __name__ == '__main__':
     model.train()
     
     ### DEBUG
-    print(train_graphs[0].edges(data=True))
-    if cmd_args.has_edge_feats:
-        print(list_edge_feats[0])
-    if cmd_args.method in ["LSTM", "MLP-Leaf"]:
-        if cmd_args.has_edge_feats:
-            debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
-        debug_model(model, train_graphs[0], None, None)
-    
-    else:
-        if cmd_args.has_edge_feats:
-            debug_model(model, train_graphs[0], None, list_edge_feats[0])
-        debug_model(model, train_graphs[0], None, None)
+#     print(train_graphs[0].edges(data=True))
+#     if cmd_args.has_edge_feats:
+#         print(list_edge_feats[0])
+#     if cmd_args.method in ["LSTM", "MLP-Leaf"]:
+#         if cmd_args.has_edge_feats:
+#             debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+#         debug_model(model, train_graphs[0], None, None)
+#     
+#     else:
+#         if cmd_args.has_edge_feats:
+#             debug_model(model, train_graphs[0], None, list_edge_feats[0])
+#         debug_model(model, train_graphs[0], None, None)
     ####
     
     
@@ -406,7 +406,7 @@ if __name__ == '__main__':
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
-        if False:
+        if epoch == 9:
             if cmd_args.method in ["LSTM", "MLP-Leaf"]:
                 if cmd_args.has_edge_feats:
                     debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
@@ -418,16 +418,16 @@ if __name__ == '__main__':
                 debug_model(model, train_graphs[0], None, None)
         
         
-        if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
-            for i in range(len(list_edge_feats)):
-                edge_feats = list_edge_feats[i]
-                model.update_weight_stats(edge_feats)
-        
-        if cmd_args.model == "BiGG_GCN":
-            model.gcn_mod.epoch_num += 1
-        
-        else:
-            model.epoch_num += 1
+#         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
+#             for i in range(len(list_edge_feats)):
+#                 edge_feats = list_edge_feats[i]
+#                 model.update_weight_stats(edge_feats)
+#         
+#         if cmd_args.model == "BiGG_GCN":
+#             model.gcn_mod.epoch_num += 1
+#         
+#         else:
+#             model.epoch_num += 1
         
         if cmd_args.schedule:
             if epoch >= epoch_lr_decrease and cmd_args.learning_rate != 1e-5:
