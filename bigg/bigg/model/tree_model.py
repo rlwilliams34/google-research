@@ -734,9 +734,9 @@ class RecurTreeGen(nn.Module):
         #    
         #    else:
         #        edge_feats = self.embed_edge_feats(edge_feats, noise)
-        
-        else:
-            edge_feats = edge_feats_embed
+        #
+        #else:
+        #    edge_feats = edge_feats_embed
         
         if not self.bits_compress:
             ### CHANGED HERE
