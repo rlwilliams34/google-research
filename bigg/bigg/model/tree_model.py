@@ -81,7 +81,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     lch_isleaf, rch_isleaf = new_ids[0][0], new_ids[1][0]
     new_ids[0][0] = new_ids[1][0] = None
     is_leaf = [lch_isleaf, rch_isleaf]
-    print("Method: ", method)
+    
     if edge_feats is not None:
         if method == "Test":
             edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
@@ -811,15 +811,15 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
             if self.has_edge_feats and self.method == "Test" and len(left_wt_ids) > 0:
-                leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
+                leaf_topdown_states = (topdown_state[0][left_wt_ids], topdown_state[1][left_wt_ids])
                 
                 if self.update_left:
                     leaf_topdown_states = self.topdown_update_wt(left_feats, leaf_topdown_states)
                 
                 else:
                     leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
-                topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
-                topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
+                topdown_state[0][left_wt_ids] = leaf_topdown_states[0]
+                topdown_state[1][left_wt_ids] = leaf_topdown_states[1]
             
             right_logits = self.pred_has_right(topdown_state[0], lv)
             right_update = self.topdown_right_embed[has_right]
