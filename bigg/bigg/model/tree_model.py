@@ -484,7 +484,7 @@ class RecurTreeGen(nn.Module):
             tree_node.has_edge = True
 
         if not tree_node.has_edge:  # an empty tree
-            return ll, self.get_empty_state(), 0, None
+            return ll, self.get_empty_state(), 0, None, prev_wt_state
 
         if tree_node.is_leaf:
             tree_node.bits_rep = [0]
