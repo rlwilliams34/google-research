@@ -67,22 +67,8 @@ def batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell):
         c_list.append(c_vecs)
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
-
-# def selective_update_hc(h, c, zero_one, feats):
-#     nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
-#     local_edge_feats = scatter(feats, nz_idx, dim=0, dim_size=h.shape[0])
-#     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
-#     h = torch.where(zero_one, local_edge_feats, h)
-#     c = torch.where(zero_one, local_edge_feats, c)
-#     return h, c
-
 def selective_update_hc(h, c, zero_one, feats):
     nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
-    #num_layers = h.shape[0]
-    #embed_dim = h.shape[2]
-    #feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
-    #print(h.shape)
-    #print(feats[0].shape)
     local_edge_feats_h = scatter(feats[0], nz_idx, dim=0, dim_size=h.shape[0])
     local_edge_feats_c = scatter(feats[1], nz_idx, dim=0, dim_size=h.shape[0])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
@@ -90,29 +76,76 @@ def selective_update_hc(h, c, zero_one, feats):
     c = torch.where(zero_one, local_edge_feats_c, c)
     return h, c
 
-def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None):
+def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None, wt_update=None, method=None):
     new_ids = [list(fn_all_ids(0)), list(fn_all_ids(1))]
     lch_isleaf, rch_isleaf = new_ids[0][0], new_ids[1][0]
     new_ids[0][0] = new_ids[1][0] = None
     is_leaf = [lch_isleaf, rch_isleaf]
     if edge_feats is not None:
-        #edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
-        edge_feats = [(edge_feats[0][~is_rch], edge_feats[1][~is_rch]), (edge_feats[0][is_rch], edge_feats[1][is_rch])]
+        if method == "Test":
+            edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
+        
+        else:
+            edge_feats = [(edge_feats[0][~is_rch], edge_feats[1][~is_rch]), (edge_feats[0][is_rch], edge_feats[1][is_rch])]
         assert np.sum(is_rch) == np.sum(rch_isleaf)
     node_feats = [t_lch, t_rch]
     h_list = []
     c_list = []
+    
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[leaf_check], c_bot[leaf_check]
-        if edge_feats is not None:
+        if edge_feats is not None and method != "Test":
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
+        
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
         h_list.append(h_vecs)
         c_list.append(c_vecs)
-    return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
+    
+    summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
+    
+    if method != "Test" or edge_feats is None:
+        return summary_state
+    
+    for i in range(2):
+        leaf_check = list(map(bool, is_leaf[i]))
+        local_idx = new_ids[i][1][leaf_check]
+        local_hbot, local_cbot = summary_state[0][local_idx], summary_state[1][local_idx]
+        cur_summary = (local_hbot, local_cbot)
+        cur_edge_feats = edge_feats[i]
+        cur_summary = wt_update(cur_edge_feats, cur_summary)
+        summary_state[0][local_idx] = cur_summary[0]
+        summary_state[1][local_idx] = cur_summary[1]
+        
+    return summary_state
+
+
+
+# def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None):
+#     new_ids = [list(fn_all_ids(0)), list(fn_all_ids(1))]
+#     lch_isleaf, rch_isleaf = new_ids[0][0], new_ids[1][0]
+#     new_ids[0][0] = new_ids[1][0] = None
+#     is_leaf = [lch_isleaf, rch_isleaf]
+#     if edge_feats is not None:
+#         #edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
+#         edge_feats = [(edge_feats[0][~is_rch], edge_feats[1][~is_rch]), (edge_feats[0][is_rch], edge_feats[1][is_rch])]
+#         assert np.sum(is_rch) == np.sum(rch_isleaf)
+#     node_feats = [t_lch, t_rch]
+#     h_list = []
+#     c_list = []
+#     for i in range(2):
+#         leaf_check = is_leaf[i]
+#         local_hbot, local_cbot = h_bot[leaf_check], c_bot[leaf_check]
+#         if edge_feats is not None:
+#             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
+#         if cell_node is not None:
+#             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
+#         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
+#         h_list.append(h_vecs)
+#         c_list.append(c_vecs)
+#     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
 def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell):
@@ -136,7 +169,7 @@ def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cel
         return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
-def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node):
+def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node, method):
     edge_feats = is_rch = None
     t_lch = t_rch = None
     if 'edge' in feat_dict:
@@ -144,11 +177,11 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, method)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
     elif h_buf is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, method)
     else:
         raise NotImplementedError  #TODO: handle model parallelism with features
 
@@ -156,6 +189,7 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
 class FenwickTree(nn.Module):
     def __init__(self, args):
         super(FenwickTree, self).__init__()
+        self.method = args.method
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
         self.init_h0 = Parameter(torch.Tensor(1, args.embed_dim))
@@ -234,7 +268,7 @@ class FenwickTree(nn.Module):
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
                 lstm_func = featured_batch_tree_lstm3
             lstm_func = partial(lstm_func, h_buf=row_embeds[-1][0], c_buf=row_embeds[-1][1],
-                                h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
+                                h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell, method=self.method)
             if i == 0:
                 if self.has_edge_feats or self.has_node_feats:
                     new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update)
@@ -622,7 +656,7 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
-                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
+                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, self.method)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
             h_buf_list[d] = new_h
