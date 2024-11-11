@@ -112,11 +112,12 @@ def get_edge_feats(g):
 
 def debug_model(model, graph, node_feats, edge_feats):
     #model.epoch_num += 2
-    #ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
-    ll, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
+    ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
+    #ll, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
-    ll_1 = ll.item()
-    #print(ll_wt)
+    ll_t1 = ll.item()
+    ll_w1 = ll_wt.item()
+    print(ll_wt)
 
     edges = []
     for e in graph.edges():
@@ -127,14 +128,16 @@ def debug_model(model, graph, node_feats, edge_feats):
     
     if not torch.is_tensor(edge_feats) and edge_feats is not None:
         edge_feats = edge_feats[0]
-    #ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
-    ll, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
+    ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
+    #ll, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
-    #print(ll_wt)
-    ll_2 = ll.item()
-    diff = abs(ll_1 - ll_2)
-    print("diff: ", diff)
-    
+    print(ll_wt)
+    ll_t2 = ll.item()
+    ll_w2 = ll_wt.item()
+    diff_t = abs(ll_t1 - ll_t2)
+    diff_w = abs(ll_w1 - ll_w2)
+    print("diff top: ", diff_t)
+    print("diff weight: ", diff_w)
     import sys
     sys.exit()
 
@@ -465,8 +468,8 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                #ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)#, edge_feats_embed = edge_feats_embed)
-                ll, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)#, edge_feats_embed = edge_feats_embed)
+                ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)#, edge_feats_embed = edge_feats_embed)
+                #ll, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)#, edge_feats_embed = edge_feats_embed)
                 ll_wt = 0.0
             
             
