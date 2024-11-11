@@ -418,7 +418,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ### Update log likelihood with weight prediction
                 #print("Hi")
                 ### Trying with softplus parameterization...
-                edge_feats_invsp = self.compute_softminus(edge_feats)
+                edge_feats_invsp = edge_feats #self.compute_softminus(edge_feats)
                 
                 ### Standardize
                 #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
