@@ -726,14 +726,14 @@ class RecurTreeGen(nn.Module):
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
-        edge_feats_embed=None
-        if self.has_edge_feats and edge_feats_embed is None:
-            if self.method == "LSTM":
-                #edge_feats, _ = self.embed_edge_feats(edge_feats, noise)
-                edge_feats = edge_feats_embed
-            
-            else:
-                edge_feats = self.embed_edge_feats(edge_feats, noise)
+        
+        #if self.has_edge_feats:
+        #    if self.method == "LSTM":
+        #        #edge_feats, _ = self.embed_edge_feats(edge_feats, noise)
+        #        edge_feats = edge_feats_embed
+        #    
+        #    else:
+        #        edge_feats = self.embed_edge_feats(edge_feats, noise)
         
         else:
             edge_feats = edge_feats_embed
@@ -828,8 +828,8 @@ class RecurTreeGen(nn.Module):
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, noise)
         
-        hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
-                                                                           list_node_starts, num_nodes, list_col_ranges, noise, edge_feats_embed)
+        hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed,
+                                                                           list_node_starts, num_nodes, list_col_ranges, noise)
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states,  wt_update=self.update_wt, method=self.method)
         
         #print(row_states)
