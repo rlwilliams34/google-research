@@ -115,6 +115,7 @@ def debug_model(model, graph, node_feats, edge_feats):
     #ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
     ll, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
+    ll_1 = ll.item()
     #print(ll_wt)
 
     edges = []
@@ -130,6 +131,10 @@ def debug_model(model, graph, node_feats, edge_feats):
     ll, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
     #print(ll_wt)
+    ll_2 = ll.item()
+    diff = abs(ll_1 - ll_2)
+    print("diff: ", diff)
+    
     import sys
     sys.exit()
 
