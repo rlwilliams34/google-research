@@ -253,7 +253,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 cur_state = (self.leaf_h0_wt.repeat(B, 1), self.leaf_c0_wt.repeat(B, 1))
                 prev_states_h = []
                 for edge in edge_embed:
-                    prev_states_h.append(cur_state[0][-1])
+                    prev_states_h.append(cur_state[0])
                     cur_state = self.edgeLSTM(edge, cur_state)
                     states_h.append(cur_state[0])
                     states_c.append(cur_state[1])       
