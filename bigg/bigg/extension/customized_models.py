@@ -54,7 +54,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
         
         if self.method == "MLP-Repeat":
-            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])#, dropout = cmd_args.wt_drop)
             
         if self.method == "MLP-Multi":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = cmd_args.wt_drop)
