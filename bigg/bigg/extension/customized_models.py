@@ -292,19 +292,19 @@ class BiggWithEdgeLen(RecurTreeGen):
                     states_h.append(cur_state[0])
                     states_c.append(cur_state[1])
                 
-                if B == 1:
-                    prev_h = torch.cat(prev_states_h, dim = 0)
-                    state_h = torch.cat(states_h, dim = 0)
-                    state_c = torch.cat(states_c, dim = 0)
-                    print("Null")
-                    print(prev_h)
-                    print(state_h)
-                    print(state_c)
-                    t1 = prev_h
-                    t2 = state_h
-                    t3 = state_c
-                    #state = (state_h, state_c)
-                    #return state, prev_h
+#                 if B == 1:
+#                     prev_h = torch.cat(prev_states_h, dim = 0)
+#                     state_h = torch.cat(states_h, dim = 0)
+#                     state_c = torch.cat(states_c, dim = 0)
+#                     print("Null")
+#                     print(prev_h)
+#                     print(state_h)
+#                     print(state_c)
+#                     t1 = prev_h
+#                     t2 = state_h
+#                     t3 = state_c
+#                     #state = (state_h, state_c)
+#                     #return state, prev_h
                 
                 idx = torch.isfinite(edge_feats_normalized)
                 idx = torch.cat(torch.split(idx, 1, dim = 1), dim = 0).flatten()
@@ -318,22 +318,22 @@ class BiggWithEdgeLen(RecurTreeGen):
                 state_h = state_h.reshape(state_h.shape[0] * K, self.embed_dim)
                 
                 state_c = torch.cat(states_c, dim = 1)
-                state_c = state_h.reshape(state_c.shape[0] * K, self.embed_dim)
+                state_c = state_c.reshape(state_c.shape[0] * K, self.embed_dim)
                 
                 prev_h = prev_h[idx]
                 state_h = state_h[idx]
                 state_c = state_c[idx]
                 state = (state_h, state_c)
                 
-                print("After")
-                print(prev_h)
-                print(state_h)
-                print(state_c)
-                
-                print("Test")
-                print((prev_h == t1))
-                print((state_h == t2))
-                print((state_c == t3))
+#                 print("After")
+#                 print(prev_h)
+#                 print(state_h)
+#                 print(state_c)
+#                 
+#                 print("Test")
+#                 print((prev_h == t1))
+#                 print((state_h == t2))
+#                 print((state_c == t3))
                 return state, prev_h
                 
             else:
