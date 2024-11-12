@@ -279,6 +279,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
                 
                 print(edge_feats_normalized)
+                print(edge_feats_normalized.shape)
                 
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0_wt.repeat(B, 1), self.leaf_c0_wt.repeat(B, 1))
