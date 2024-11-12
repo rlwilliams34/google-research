@@ -455,7 +455,12 @@ if __name__ == '__main__':
     
     print(train_graphs[0].edges(data=True))
     print(train_graphs[1].edges(data=True))
-    debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True)
+    
+    if cmd_args.method == "LSTM":
+        debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True)
+    
+    else:
+        debug_model(model, [train_graphs[0], train_graphs[1]], None, (torch.cat([list_edge_feats[i] for i in [0,1]], dim=0), True)
     
     ####
     
