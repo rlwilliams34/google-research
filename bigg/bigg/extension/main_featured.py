@@ -139,7 +139,7 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             for e in g.edges():
                 if e[1] > e[0]:
                     e = (e[1], e[0])
-                    edges.append(e)
+                edges.append(e)
             edges = sorted(edges)
             
             if not torch.is_tensor(edge_feats_i):
