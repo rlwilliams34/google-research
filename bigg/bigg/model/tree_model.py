@@ -764,10 +764,10 @@ class RecurTreeGen(nn.Module):
         if self.has_edge_feats:
             if self.method == "LSTM":
                 edge_feats_embed, state_h_prior = self.embed_edge_feats(edge_feats, noise)
-                print(edge_feats)
+                #print(edge_feats)
                 edge_feats = torch.cat(edge_feats, dim = 0)
-                print(edge_feats)
-                print(STOP)
+                #print(edge_feats)
+                #print(STOP)
             
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats)

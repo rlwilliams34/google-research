@@ -223,8 +223,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         noise = 0.0
         self.mu_wt = 0 * self.mu_wt
         self.var_wt = self.var_wt / self.var_wt
-        print(self.mu_wt)
-        print(self.var_wt)
+        #print(self.mu_wt)
+        #print(self.var_wt)
         self.epoch_num = 0 * self.epoch_num
         if not torch.is_tensor(edge_feats): 
             edge_feats_normalized = []
@@ -279,7 +279,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 states_c = []
                 
                 edge_feats_normalized = LSTM_pad(edge_feats_normalized)
-                print(edge_feats_normalized)
+                #print(edge_feats_normalized)
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0_wt.repeat(B, 1), self.leaf_c0_wt.repeat(B, 1))
                 prev_states_h = []
