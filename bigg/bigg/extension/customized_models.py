@@ -318,7 +318,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                         state_idx = idx[prev_idx]
                         prev_idx = idx
                     
-                    cur_idx = edge_feat_idx[i][torch.isfinite(edge_feat_idx[i])]
+                    cur_idx = edge_feats_idx[i][torch.isfinite(edge_feats_idx[i])]
                     prev_states_h[cur_idx.long()] = cur_state[0][state_idx]
                     #prev_states_h.append(cur_state[0][state_idx])
                     
