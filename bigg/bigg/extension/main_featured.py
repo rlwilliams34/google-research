@@ -135,19 +135,18 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
             #print(g)
             #print(e)
             g = graph[i]
-            e = edge_feats[i]
+            edge_feats_i = edge_feats[i]
             edges = []
             for e in g.edges():
                 if e[1] > e[0]:
                     e = (e[1], e[0])
                     edges.append(e)
             edges = sorted(edges)
-            print(e)
-            print(torch.is_tensor(e))
-            if not torch.is_tensor(e):
-                e = e[0]
-            print(e)
-            ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=e)
+            
+            if not torch.is_tensor(edge_feats_i):
+                edge_feats_i = edge_feats_i[0]
+            
+            ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
             ll_t2 = ll + ll_t2
             ll_w2 = ll_wt + ll_w2
             i += 1
