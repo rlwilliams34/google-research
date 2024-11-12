@@ -295,9 +295,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
                 edge_feats_idx = torch.zeros(edge_feats_normalized.shape).to(edge_feats_normalized.device)
                 i = 0
-                for k in range(edge_feats.shape[1]):
-                    for idx in range(edge_feats.shape[0]):
-                        if torch.isfinite(edge_feats[:, k][idx]): 
+                for k in range(edge_feats_normalized.shape[1]):
+                    for idx in range(edge_feats_normalized.shape[0]):
+                        if torch.isfinite(edge_feats_normalized[:, k][idx]): 
                             edge_feats_idx[:, k][idx] = i
                             i = i + 1
                         else:
