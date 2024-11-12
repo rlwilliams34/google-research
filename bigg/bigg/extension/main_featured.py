@@ -124,10 +124,13 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
         ll_t2 = 0
         ll_w2 = 0
         i = 0
+        
+        ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
+        
         for g, e in zip(graph, edge_feats):
-            ll, ll_wt, _ = model.forward_train([i], node_feats=node_feats, edge_feats=edge_feats)
-            ll_t1 = ll + ll_t1
-            ll_w1 = ll_wt + ll_w1
+            #ll, ll_wt, _ = model.forward_train([i], node_feats=node_feats, edge_feats=edge_feats)
+            #ll_t1 = ll + ll_t1
+            #ll_w1 = ll_wt + ll_w1
             
             edges = []
             for e in g.edges():
