@@ -21,7 +21,7 @@
 from bigg.model.tree_model import RecurTreeGen
 from bigg.extension.gcn_build import *
 import torch
-from bigg.common.pytorch_util import glorot_uniform, MLP, MultiLSTMCell
+from bigg.common.pytorch_util import glorot_uniform, MLP, MultiLSTMCell, BinaryTreeLSTMCell
 import torch.nn as nn
 import numpy 
 from torch.nn.parameter import Parameter
@@ -56,6 +56,11 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "MLP-Repeat":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])#, dropout = cmd_args.wt_drop)
             
+        if self.method == "MLP-2":
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])#, dropout = cmd_args.wt_drop)
+            self.leaf_h0_top = Parameter(torch.Tensor(1, args.embed_dim))
+            self.leaf_c0_top = Parameter(torch.Tensor(1, args.embed_dim))
+        
         if self.method == "MLP-Multi":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim * args.rnn_layers], dropout = cmd_args.wt_drop)
         
@@ -74,6 +79,17 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.edgelen_mean = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
             self.edgelen_lvar = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         
+        if self.method == "LSTM2":
+            self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
+            #self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+            self.edgeLSTM = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
+            
+            self.leaf_h0_wt = Parameter(torch.Tensor(1, args.embed_dim))
+            self.leaf_c0_wt = Parameter(torch.Tensor(1, args.embed_dim))
+            
+            self.edgelen_mean = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
+            self.edgelen_lvar = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
+            
         
         if self.method == "MLP-Leaf":
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
@@ -219,7 +235,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             #print(edge_embed.shape)
             return edge_embed
         
-        if self.method == "MLP-Repeat":
+        if self.method == "MLP-Repeat" or self.method == "MLP-2":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             #edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             edge_embed = (edge_embed, edge_embed)
@@ -268,6 +284,13 @@ class BiggWithEdgeLen(RecurTreeGen):
                  edge_embed = self.edgelen_encoding(edge_feats_normalized)
                  state = self.edgeLSTM(edge_embed, prev_state)   
                  return state
+        
+        if self.method == "LSTM2":
+            edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            edge_embed = self.edgeLSTM(edge_embed, (self.leaf_h0_wt.repeat(edge_embed.shape[1], 1), self.leaf_c0_wt.repeat(edge_embed.shape[1], 1)))
+            return edge_embed
+            
         
         if self.method == "MLP-Leaf":
             if prev_state is None:
@@ -351,8 +374,14 @@ class BiggWithEdgeLen(RecurTreeGen):
             and, if edge_feats is None, then return the prediction of edge_feats
             else return the edge_feats as it is
         """
-        h, _ = state
         #h = h[-1]
+        
+        if self.method == "MLP-2":
+            B = state[0].shape[0]
+            h, _ = self.l2r_cell(state, (self.leaf_h0_top.repeat(B, 1), self.leaf_c0_top.repeat(B, 1)))
+        
+        else:
+            h, _ = state
         
         if prev_state is not None:
             h = torch.cat([h, prev_state], dim = -1)

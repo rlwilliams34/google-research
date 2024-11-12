@@ -204,6 +204,9 @@ class FenwickTree(nn.Module):
             self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
         else:
             self.pos_enc = lambda x: 0
+        
+        if self.method == "LSTM2":
+            self.merge_top_wt = BinaryTreeLSTMCell(args.embed_dim, args.embed_dim)
 
     def reset(self, list_states=[]):
         self.list_states = []
@@ -304,6 +307,10 @@ class FenwickTree(nn.Module):
             hist_froms.append(done_from)
             hist_tos.append(done_to)
             hist_rnn_states.append(cur_state)
+            
+#             ### Put topology updates here
+#             if self.method == "LSTM2":
+#                 ### UPDATE ROW STATE W EDGE EMBED
 
             next_input = joint_h[proceed_input], joint_c[proceed_input]
             sub_state = cur_state[0][proceed_from], cur_state[1][proceed_from]
@@ -436,7 +443,7 @@ class RecurTreeGen(nn.Module):
         cell = self.m_cell_topright if self.share_param else self.cell_topright_modules[lv]
         return cell(x, y)
 
-    def l2r_cell(self, x, y, lv):
+    def l2r_cell(self, x, y, lv=-1):
         cell = self.m_l2r_cell if self.share_param else self.l2r_modules[lv]
         return cell(x, y)
 
@@ -511,6 +518,10 @@ class RecurTreeGen(nn.Module):
                         prev_wt_state = edge_embed
                         return ll, ll_wt, edge_embed, 1, cur_feats, prev_wt_state
                     
+                    elif self.method == "MLP-2":
+                        #edge_embed = self.embed_edge_feats(cur_feats)
+                        return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, None
+                    
                     edge_embed = self.embed_edge_feats(cur_feats)
                     return ll, ll_wt, edge_embed, 1, cur_feats, None
                     
@@ -546,7 +557,7 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
-            if self.has_edge_feats and self.method == "Test" and tree_node.lch.is_leaf and has_left:
+            if self.has_edge_feats and self.method in ["Test", "LSTM2"] and tree_node.lch.is_leaf and has_left:
                 left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
                 if self.update_left:
                     topdown_state = self.topdown_update_wt(left_edge_embed, topdown_state)
@@ -648,6 +659,10 @@ class RecurTreeGen(nn.Module):
                 target_feat_embed = self.embed_node_feats(target_node_feats)
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
+            
+            if self.method == "LSTM2":
+                cur_state = self.merge_top_wt(cur_state, prev_wt_state)
+            
             controller_state = self.row_tree(cur_state)
             
             if self.method == "Test" and cur_row.root.is_leaf and target_edge_feats is not None:
@@ -816,7 +831,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            if self.has_edge_feats and self.method == "Test" and len(left_wt_ids) > 0:
+            if self.has_edge_feats and self.method in ["Test", "LSTM2"] and len(left_wt_ids) > 0:
                 leaf_topdown_states = (topdown_state[0][left_wt_ids], topdown_state[1][left_wt_ids])
                 
                 if self.update_left:

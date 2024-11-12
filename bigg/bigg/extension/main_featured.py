@@ -101,10 +101,16 @@ def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
 #         length.append(feat['length'])
 #     return np.expand_dims(np.array(length, dtype=np.float32), axis=1)
 
+def t(n1, n2):
+    r = max(n1, n2)
+    c = min(n1, n2)
+    t = r * (r - 1) / 2 + c
+    return int(t)
+
 
 def get_edge_feats(g):
-    edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
-    #edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
+    #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
+    edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
     weights = [x[2]['weight'] for x in edges]
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
 
