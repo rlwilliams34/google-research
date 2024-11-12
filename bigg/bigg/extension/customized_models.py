@@ -287,7 +287,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 for edge in edge_feats_normalized:
                     prev_states_h.append(cur_state[0])
                     idx = torch.isfinite(edge)
-                    if prev_idx is None:
+                    if state_idx is None:
                         state_idx = idx
                     else:
                         state_idx = state_idx[idx]
