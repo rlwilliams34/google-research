@@ -272,7 +272,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             if prev_state is None:
                 states_h = []
                 states_c = []
-                print(edge_feats_normalized)
+                print(torch.cat(edge_feats_normalized, dim = 0))
                 #edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
                 edge_feats_normalized = LSTM_pad(edge_feats_normalized)
                 #edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
