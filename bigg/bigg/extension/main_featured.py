@@ -127,19 +127,23 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
         
         ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
         
-        for g, e in zip(graph, edge_feats):
+        #for g, e in zip(graph, edge_feats):
+        for i in range(0, 2):
             #ll, ll_wt, _ = model.forward_train([i], node_feats=node_feats, edge_feats=edge_feats)
             #ll_t1 = ll + ll_t1
             #ll_w1 = ll_wt + ll_w1
             #print(g)
             #print(e)
+            g = graph[i]
+            e = edge_feats[i]
             edges = []
             for e in g.edges():
                 if e[1] > e[0]:
                     e = (e[1], e[0])
                     edges.append(e)
             edges = sorted(edges)
-            
+            print(e)
+            print(torch.is_tensor(e))
             if not torch.is_tensor(e):
                 e = e[0]
             print(e)
