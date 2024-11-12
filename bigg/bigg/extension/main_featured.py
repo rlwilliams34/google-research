@@ -147,7 +147,7 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
             ll_t2 = ll + ll_t2
             ll_w2 = ll_wt + ll_w2
-            i += 1
+            
         
         if cat:
             edge_feats = torch.cat(edge_feats, dim = 0)
@@ -444,18 +444,18 @@ if __name__ == '__main__':
     model.train()
     
     ### DEBUG
-    print(train_graphs[0].edges(data=True))
-    if cmd_args.has_edge_feats:
-        print(list_edge_feats[0])
-    if cmd_args.method in ["LSTM", "MLP-Leaf"]:
-        if cmd_args.has_edge_feats:
-            debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
-        debug_model(model, train_graphs[0], None, None)
-    
-    else:
-        if cmd_args.has_edge_feats:
-            debug_model(model, train_graphs[0], None, list_edge_feats[0])
-        debug_model(model, train_graphs[0], None, None)
+#     print(train_graphs[0].edges(data=True))
+#     if cmd_args.has_edge_feats:
+#         print(list_edge_feats[0])
+#     if cmd_args.method in ["LSTM", "MLP-Leaf"]:
+#         if cmd_args.has_edge_feats:
+#             debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
+#         debug_model(model, train_graphs[0], None, None)
+#     
+#     else:
+#         if cmd_args.has_edge_feats:
+#             debug_model(model, train_graphs[0], None, list_edge_feats[0])
+#         debug_model(model, train_graphs[0], None, None)
     
     print(train_graphs[0].edges(data=True))
     print(train_graphs[1].edges(data=True))
