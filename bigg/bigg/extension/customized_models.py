@@ -292,6 +292,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                         state_idx = idx
                     else:
                         state_idx = idx[prev_idx]
+                        prev_idx = idx
                     edge = edge[idx]
                     edge = self.edgelen_encoding(edge.unsqueeze(-1))
                     cur_state = self.edgeLSTM(edge, (cur_state[0][state_idx], cur_state[1][state_idx]))
