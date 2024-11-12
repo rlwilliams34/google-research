@@ -286,7 +286,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 for edge in edge_feats_normalized:
                     prev_states_h.append(cur_state[0])
                     edge = edge[torch.isfinite(edge)]
-                    edge = self.edgelen_ecoding(edge)
+                    edge = self.edgelen_encoding(edge)
                     cur_state = self.edgeLSTM(edge, cur_state)
                     states_h.append(cur_state[0])
                     states_c.append(cur_state[1])       
