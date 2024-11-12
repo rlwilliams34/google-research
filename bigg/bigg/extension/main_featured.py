@@ -116,8 +116,46 @@ def get_edge_feats(g):
 
 
 
-def debug_model(model, graph, node_feats, edge_feats):
+def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
     #model.epoch_num += 2
+    if two_graphs:
+        ll_t1 = 0
+        ll_w1 = 0
+        ll_t2 = 0
+        ll_w2 = 0
+        i = 0
+        for g, e in zip(graph, edge_feats):
+            ll, ll_wt, _ = model.forward_train([i], node_feats=node_feats, edge_feats=edge_feats)
+            ll_t1 = ll + ll_t1
+            ll_w1 = ll_wt + ll_w1
+            
+            edges = []
+            for e in g.edges():
+                if e[1] > e[0]:
+                    e = (e[1], e[0])
+                    edges.append(e)
+            edges = sorted(edges)
+            
+            if not torch.is_tensor(edge_feats):
+                edge_feats = edge_feats[0]
+            
+            ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
+            ll_t2 = ll + ll_t2
+            ll_w2 = ll_wt + ll_w2
+            i += 1
+        
+        print(ll_t1)
+        print(ll_w1)
+        print(ll_t2)
+        print(ll_w2)
+        
+        diff1 = abs(ll_t1 - ll_t2)
+        diff2 = abs(ll_w1 - ll_w2)
+        print("diff top: ", diff_t)
+        print("diff weight: ", diff_w)
+        import sys
+        sys.exit()
+    
     ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
     #ll, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
     print(ll)
@@ -407,6 +445,11 @@ if __name__ == '__main__':
 #         if cmd_args.has_edge_feats:
 #             debug_model(model, train_graphs[0], None, list_edge_feats[0])
 #         debug_model(model, train_graphs[0], None, None)
+    
+    print(train_graphs[0].edges(data=True))
+    print(train_graphs[1].edges(data=True))
+    debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[0], list_edge_feats[1]], True)
+    
     ####
     
     
