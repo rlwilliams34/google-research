@@ -293,8 +293,27 @@ class BiggWithEdgeLen(RecurTreeGen):
                 prev_states_h = []
                 prev_idx = None
                 
-                for edge in edge_feats_normalized:
-                    prev_states_h.append(cur_state[0])
+                edge_feat_idx = torch.zeros(edge_feats_normalized.shape).to(edge_feats_normalized.device)
+                i = 0
+                for k in range(edge_feats.shape[1]):
+                    for idx in range(edge_feats.shape[0]):
+                        if torch.isfinite(edge_feats[:, k][idx]): 
+                            edge_feats_idx[:, k][idx] = i
+                            i = i + 1
+                        else:
+                            edge_feats_idx[:, k][idx] = np.inf
+                
+                L = torch.sum(torch.isfinite(edge_feats_normalized))
+                
+                prev_states_h = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
+                states_h = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
+                states_c = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
+                
+#cur_idx = edge_feat_idx[4][torch.isfinite(edge_feat_idx[4])]
+#test[cur_idx.long()] = cur_state
+
+                
+                for i, edge in enumerate(edge_feats_normalized):
                     idx = torch.isfinite(edge)
                     if prev_idx is None:
                         prev_idx = idx
@@ -302,14 +321,24 @@ class BiggWithEdgeLen(RecurTreeGen):
                     else:
                         state_idx = idx[prev_idx]
                         prev_idx = idx
-
+                    
+                    cur_idx = edge_feat_idx[i][torch.isfinite(edge_feat_idx[i])]
+                    prev_states_h[cur_idx.long()] = cur_state[0][state_idx]
+                    #prev_states_h.append(cur_state[0][state_idx])
+                    
+                    
+                    
                     edge = edge[idx]
                     edge = self.edgelen_encoding(edge.unsqueeze(-1))
                     cur_state = self.edgeLSTM(edge, (cur_state[0][state_idx], cur_state[1][state_idx]))
+                    
+                    states_h[cur_idx.long()] = cur_state[0]
+                    states_c[cur_idx.long()] = cur_state[1]
+                    
                     #cur_state = self.edgeLSTM(edge, (cur_state[0], cur_state[1]))
-                    states_h.append(cur_state[0])
+                    #states_h.append(cur_state[0])
                     #print(cur_state[0].shape)
-                    states_c.append(cur_state[1])
+                    #states_c.append(cur_state[1])
                 
 #                 for edge in edge_feats_normalized:
 #                     prev_states_h.append(cur_state[0])
@@ -321,23 +350,23 @@ class BiggWithEdgeLen(RecurTreeGen):
 #                     states_h.append(cur_state[0])
 #                     states_c.append(cur_state[1])
                 
-                if B == 1:
-                    prev_h = torch.cat(prev_states_h, dim = 0)
-                    state_h = torch.cat(states_h, dim = 0)
-                    state_c = torch.cat(states_c, dim = 0)
-#                     print("Null")
-#                     print(prev_h)
-#                     print(state_h)
-#                     print(state_c)
-                    t1 = prev_h
-                    t2 = state_h
-                    t3 = state_c
-                    #state = (state_h, state_c)
-                    #return state, prev_h
-                idx = torch.isfinite(edge_feats_normalized)
-                prev_h = reorder(prev_states_h, idx)
-                state_h = reorder(states_h, idx)
-                state_c = reorder(states_c, idx)
+#                 if B == 1:
+#                     prev_h = torch.cat(prev_states_h, dim = 0)
+#                     state_h = torch.cat(states_h, dim = 0)
+#                     state_c = torch.cat(states_c, dim = 0)
+# #                     print("Null")
+# #                     print(prev_h)
+# #                     print(state_h)
+# #                     print(state_c)
+#                     t1 = prev_h
+#                     t2 = state_h
+#                     t3 = state_c
+#                     #state = (state_h, state_c)
+#                     #return state, prev_h
+#                 idx = torch.isfinite(edge_feats_normalized)
+#                 prev_h = reorder(prev_states_h, idx)
+#                 state_h = reorder(states_h, idx)
+#                 state_c = reorder(states_c, idx)
                 state = (state_h, state_c)
                 #print(torch.sum(t1 != prev_h))
                 #print(torch.sum(t2 != state_h))
@@ -480,9 +509,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             h, _ = state
         
         if prev_state is not None:
-            #h = torch.cat([h, prev_state], dim = -1)
-            x = torch.zeros(prev_state.shape).to(prev_state.device)
-            h = torch.cat([h, x], dim = -1)
+            h = torch.cat([h, prev_state], dim = -1)
         
         mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
