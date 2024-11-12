@@ -278,9 +278,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 #edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
                 
                 
-                print(edge_feats_normalized)
-                print(edge_feats_normalized.shape)
-                
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0_wt.repeat(B, 1), self.leaf_c0_wt.repeat(B, 1))
                 #prev_states_h = [[] for _ in range(B)]
@@ -298,17 +295,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                         state_idx = idx[prev_idx]
                         prev_idx = idx
                     
-                    if torch.sum(idx) != B:
-                        print(idx)
-                        print(prev_idx)
-                        print(state_idx)
-                    
                     edge = edge[idx]
-                    if torch.sum(idx) != B:
-                        print(edge)
                     edge = self.edgelen_encoding(edge.unsqueeze(-1))
-                    if torch.sum(idx) != B:
-                        print(edge)
                     cur_state = self.edgeLSTM(edge, (cur_state[0][state_idx], cur_state[1][state_idx]))
                     states_h.append(cur_state[0])
                     #print(cur_state[0].shape)
@@ -321,16 +309,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
                 state_c = [torch.cat([h[i].unsqueeze(0) for h in states_c if h.shape[0] > i], dim = 0) for i in range(0, B)]
                 state_c = torch.cat(state_c, dim = 0)
-                #print(prev_states_h)
-                #print(prev_states_h[0].shape)
-                #print(prev_states_h[-1].shape)
-                #state_h = torch.cat(states_h, 0)
-                #state_c = torch.cat(states_c, 0)
-                #print(state_h.shape)
-                #prev_h = torch.cat(prev_states_h, dim = 0)#.view(state_h.shape[0], state_h.shape[1])
-                #print(prev_h.shape)
                 state = (state_h, state_c) 
-                print(STOP)
                 return state, prev_h
                 
             else:
