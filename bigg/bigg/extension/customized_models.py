@@ -346,7 +346,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 print("after")
                 print(prev_h)
                 print((prev_h == t1))
-                print(torch.sum((prev_h == t1)))
+                print(torch.sum((prev_h != t1)))
                 state_h = reorder(states_h, idx)
                 state_c = reorder(states_c, idx)
                 state = (state_h, state_c)
