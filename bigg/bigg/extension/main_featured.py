@@ -460,7 +460,7 @@ if __name__ == '__main__':
         debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True)
     
     else:
-        debug_model(model, [train_graphs[0], train_graphs[1]], None, (torch.cat([list_edge_feats[i] for i in [0,1]], dim=0), True)
+        debug_model(model, [train_graphs[0], train_graphs[1]], None, [torch.cat([list_edge_feats[i] for i in [0,1]], dim=0)], True)
     
     ####
     
