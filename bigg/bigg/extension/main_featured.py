@@ -415,7 +415,7 @@ if __name__ == '__main__':
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
         
-        if False: #epoch == 9:
+        if epoch == 9:
             if cmd_args.method in ["LSTM", "MLP-Leaf"]:
                 if cmd_args.has_edge_feats:
                     debug_model(model, train_graphs[0], None, [list_edge_feats[0]])
