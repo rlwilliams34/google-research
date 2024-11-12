@@ -132,6 +132,7 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             #ll_w1 = ll_wt + ll_w1
             #print(g)
             #print(e)
+            print(i)
             g = graph[i]
             edge_feats_i = edge_feats[i]
             edges = []
@@ -145,6 +146,7 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
                 edge_feats_i = edge_feats_i[0]
             
             ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
+            print("Graph: ", i)
             print(ll)
             print(ll_wt)
             ll_t2 = ll + ll_t2
