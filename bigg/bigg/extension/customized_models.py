@@ -222,7 +222,9 @@ class BiggWithEdgeLen(RecurTreeGen):
     def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False):
         noise = 0.0
         self.mu_wt = 0 * self.mu_wt
-        self.var = self.var_wt / self.var_wt
+        self.var_wt = self.var_wt / self.var_wt
+        print(self.mu_wt)
+        print(self.var_wt)
         self.epoch_num = 0 * self.epoch_num
         if not torch.is_tensor(edge_feats): 
             edge_feats_normalized = []
