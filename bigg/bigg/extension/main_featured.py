@@ -131,8 +131,8 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
             #ll, ll_wt, _ = model.forward_train([i], node_feats=node_feats, edge_feats=edge_feats)
             #ll_t1 = ll + ll_t1
             #ll_w1 = ll_wt + ll_w1
-            print(g)
-            print(e)
+            #print(g)
+            #print(e)
             edges = []
             for e in g.edges():
                 if e[1] > e[0]:
@@ -142,7 +142,7 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
             
             if not torch.is_tensor(e):
                 e = e[0]
-            
+            print(e)
             ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=e)
             ll_t2 = ll + ll_t2
             ll_w2 = ll_wt + ll_w2
