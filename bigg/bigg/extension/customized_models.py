@@ -271,7 +271,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             edge_feats_normalized = torch.cat(edge_feats_normalized_pad, dim = -1)
             return edge_feats_normalized
-            
+        
+        def reorder(T, idx):
+            count_ = torch.sum(idx, dim = 0)
+            T = [ torch.cat([T[i][idx:idx+1] for i in range(0, count_[idx])], dim = 0) for idx in range(len(count_))]
+            T = torch.cat(T, dim = 0)
+            return T
         
         if self.method == "LSTM":
             if prev_state is None:
@@ -302,9 +307,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                     states_h.append(cur_state[0])
                     #print(cur_state[0].shape)
                     states_c.append(cur_state[1])
-                print(prev_states_h)
-                print(torch.isfinite(edge_feats_normalized).shape)
-                print(STOP)
                 
 #                 for edge in edge_feats_normalized:
 #                     prev_states_h.append(cur_state[0])
@@ -329,28 +331,32 @@ class BiggWithEdgeLen(RecurTreeGen):
 #                     t3 = state_c
 #                     #state = (state_h, state_c)
 #                     #return state, prev_h
-                
                 idx = torch.isfinite(edge_feats_normalized)
-                idx = torch.cat(torch.split(idx, 1, dim = 1), dim = 0).flatten()
-                prev_h = torch.cat(prev_states_h, dim = 1)
+                prev_h = reorder(prev_states_h, idx)
+                state_h = reorder(states_h, idx)
+                state_c = reorder(states_c, idx)
                 
-                K = prev_h.shape[1] // self.embed_dim
-                prev_h = prev_h.reshape(prev_h.shape[0] * K, self.embed_dim)
-                test = torch.cat(prev_states_h, dim = 0)
-                
-                state_h = torch.cat(states_h, dim = 1)
-                state_h = state_h.reshape(state_h.shape[0] * K, self.embed_dim)
-                
-                state_c = torch.cat(states_c, dim = 1)
-                state_c = state_c.reshape(state_c.shape[0] * K, self.embed_dim)
-                
-                prev_h = prev_h[idx]
-                state_h = state_h[idx]
-                state_c = state_c[idx]
-                state = (state_h, state_c)
-                print(prev_h)
-                print(state_h)
-                print(state_c)
+#                 idx = torch.isfinite(edge_feats_normalized)
+#                 idx = torch.cat(torch.split(idx, 1, dim = 1), dim = 0).flatten()
+#                 prev_h = torch.cat(prev_states_h, dim = 1)
+#                 
+#                 K = prev_h.shape[1] // self.embed_dim
+#                 prev_h = prev_h.reshape(prev_h.shape[0] * K, self.embed_dim)
+#                 test = torch.cat(prev_states_h, dim = 0)
+#                 
+#                 state_h = torch.cat(states_h, dim = 1)
+#                 state_h = state_h.reshape(state_h.shape[0] * K, self.embed_dim)
+#                 
+#                 state_c = torch.cat(states_c, dim = 1)
+#                 state_c = state_c.reshape(state_c.shape[0] * K, self.embed_dim)
+#                 
+#                 prev_h = prev_h[idx]
+#                 state_h = state_h[idx]
+#                 state_c = state_c[idx]
+#                 state = (state_h, state_c)
+#                 print(prev_h)
+#                 print(state_h)
+#                 print(state_c)
                 
 #                 print("After")
 #                 print(prev_h)
