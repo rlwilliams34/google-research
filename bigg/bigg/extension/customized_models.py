@@ -274,7 +274,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 states_c = []
                 
                 edge_feats_normalized = LSTM_pad(edge_feats_normalized)
-                
+                print(edge_feats_normalized)
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0_wt.repeat(B, 1), self.leaf_c0_wt.repeat(B, 1))
                 prev_states_h = []
