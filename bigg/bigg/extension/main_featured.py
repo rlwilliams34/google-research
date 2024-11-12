@@ -154,8 +154,8 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
         
         diff1 = abs(ll_t1 - ll_t2)
         diff2 = abs(ll_w1 - ll_w2)
-        print("diff top: ", diff_t)
-        print("diff weight: ", diff_w)
+        print("diff top: ", diff1)
+        print("diff weight: ", diff2)
         import sys
         sys.exit()
     
