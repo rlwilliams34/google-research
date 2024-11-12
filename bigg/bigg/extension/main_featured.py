@@ -131,7 +131,8 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
             #ll, ll_wt, _ = model.forward_train([i], node_feats=node_feats, edge_feats=edge_feats)
             #ll_t1 = ll + ll_t1
             #ll_w1 = ll_wt + ll_w1
-            
+            print(g)
+            print(e)
             edges = []
             for e in g.edges():
                 if e[1] > e[0]:
@@ -451,7 +452,7 @@ if __name__ == '__main__':
     
     print(train_graphs[0].edges(data=True))
     print(train_graphs[1].edges(data=True))
-    debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[0], list_edge_feats[1]], True)
+    debug_model(model, [train_graphs[0], train_graphs[1]], None, [[list_edge_feats[0]], [list_edge_feats[1]]], True)
     
     ####
     
