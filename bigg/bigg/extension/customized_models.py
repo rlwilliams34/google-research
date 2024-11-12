@@ -221,6 +221,8 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False):
         noise = 0.0
+        self.mu_wt = 0 * self.mu_wt
+        self.var = self.var_wt / self.var_wt
         if not torch.is_tensor(edge_feats): 
             edge_feats_normalized = []
             for edge_feats in edge_feats:
