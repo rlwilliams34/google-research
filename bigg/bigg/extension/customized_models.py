@@ -275,7 +275,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         def reorder(T, idx):
             count_ = torch.sum(idx, dim = 0)
             X = []
-            placement = [torch.sum(idx[:, :k+1], dim = 1)[idx[:, k] - 1] for k in range(0, idx.shape[1])]
+            placement = [torch.sum(idx[:, :k+1], dim = 1)[idx[:, k]] for k in range(0, idx.shape[1])]
             placement = [p - 1 for p in placement]
             T = [ torch.cat([T[i][placement[k][i]:placement[k][i]+1] for i in range(0, count_[k].int())], dim = 0) for k in range(len(count_))]
             T = torch.cat(T, dim = 0)
