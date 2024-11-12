@@ -116,7 +116,7 @@ def get_edge_feats(g):
 
 
 
-def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
+def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=False):
     #model.epoch_num += 2
     if two_graphs:
         ll_t1 = 0
@@ -124,8 +124,6 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
         ll_t2 = 0
         ll_w2 = 0
         i = 0
-        
-        ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
         
         #for g, e in zip(graph, edge_feats):
         for i in range(0, 2):
@@ -150,6 +148,12 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False):
             ll_t2 = ll + ll_t2
             ll_w2 = ll_wt + ll_w2
             i += 1
+        
+        if cat:
+            edge_feats = torch.cat(edge_feats, dim = 0)
+        
+        
+        ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
         
         print(ll_t1)
         print(ll_w1)
@@ -460,7 +464,7 @@ if __name__ == '__main__':
         debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True)
     
     else:
-        debug_model(model, [train_graphs[0], train_graphs[1]], None, [torch.cat([list_edge_feats[i] for i in [0,1]], dim=0)], True)
+        debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True, True)
     
     ####
     
