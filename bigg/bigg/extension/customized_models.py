@@ -313,21 +313,21 @@ class BiggWithEdgeLen(RecurTreeGen):
                     states_h.append(cur_state[0])
                     #print(cur_state[0].shape)
                     states_c.append(cur_state[1])
-                print(prev_states_h[0].shape)
-                print(prev_states_h[0][0].shape)
                 prev_states_h = [torch.cat([h[i].unsqueeze(0) for h in prev_states_h if h.shape[0] > i], dim = 0) for i in range(0, B)]
-                print(prev_states_h[0].shape)
-                print(prev_states_h[-1].shape)
-                prev_states_h = torch.cat(prev_states_h, dim = 0)
+                prev_h = torch.cat(prev_states_h, dim = 0)
                 
+                state_h = [torch.cat([h[i].unsqueeze(0) for h in states_h if h.shape[0] > i], dim = 0) for i in range(0, B)]
+                state_h = torch.cat(state_h, dim = 0)
                 
+                state_c = [torch.cat([h[i].unsqueeze(0) for h in states_c if h.shape[0] > i], dim = 0) for i in range(0, B)]
+                state_c = torch.cat(state_c, dim = 0)
                 #print(prev_states_h)
                 #print(prev_states_h[0].shape)
                 #print(prev_states_h[-1].shape)
-                state_h = torch.cat(states_h, 0)
-                state_c = torch.cat(states_c, 0)
+                #state_h = torch.cat(states_h, 0)
+                #state_c = torch.cat(states_c, 0)
                 #print(state_h.shape)
-                prev_h = torch.cat(prev_states_h, dim = 0)#.view(state_h.shape[0], state_h.shape[1])
+                #prev_h = torch.cat(prev_states_h, dim = 0)#.view(state_h.shape[0], state_h.shape[1])
                 #print(prev_h.shape)
                 state = (state_h, state_c) 
                 print(STOP)
