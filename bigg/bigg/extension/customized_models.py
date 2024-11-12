@@ -307,18 +307,20 @@ class BiggWithEdgeLen(RecurTreeGen):
                 idx = torch.cat(torch.split(idx, 1, dim = 1), dim = 0).flatten()
                 print(prev_states_h[0].shape)
                 #prev_states_h = [torch.cat([h[i].unsqueeze(0) for h in prev_states_h if h.shape[0] > i], dim = 0) for i in range(0, B)]
-                prev_h = torch.cat(prev_states_h, dim = 0)
-                prev_h = torch.cat(torch.split(prev_h, 1, dim = 1), dim = 0)
+                prev_h = torch.cat(prev_states_h, dim = 1)
+                prev_h = prev_h.reshape(prev_h.shape[0] * B, self.hidden_dim)
                 #prev_h = torch.cat(prev_states_h, dim = 0)
                 
                 #state_h = [torch.cat([h[i].unsqueeze(0) for h in states_h if h.shape[0] > i], dim = 0) for i in range(0, B)]
-                state_h = torch.cat(states_h, dim = 0)
-                state_h = torch.cat(torch.split(state_h, 1, dim = 1), dim = 0)
+                state_h = torch.cat(states_h, dim = 1)
+                state_h = state_h.reshape(state_h.shape[0] * B, self.hidden_dim)
+                #state_h = torch.cat(torch.split(state_h, 1, dim = 1), dim = 0)
                 #state_h = torch.cat(states_h, dim = 0)
                 
                 #state_c = [torch.cat([h[i].unsqueeze(0) for h in states_c if h.shape[0] > i], dim = 0) for i in range(0, B)]
-                state_c = torch.cat(states_c, dim = 0)
-                state_c = torch.cat(torch.split(state_c, 1, dim = 1), dim = 0)
+                state_c = torch.cat(states_c, dim = 1)
+                #state_c = torch.cat(torch.split(state_c, 1, dim = 1), dim = 0)
+                state_c = state_h.reshape(state_c.shape[0] * B, self.hidden_dim)
                 #state_c = torch.cat(states_c, dim = 0)
                 
                 #print(idx)
