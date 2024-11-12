@@ -335,7 +335,18 @@ class BiggWithEdgeLen(RecurTreeGen):
 #                     #state = (state_h, state_c)
 #                     #return state, prev_h
                 idx = torch.isfinite(edge_feats_normalized)
+                if B == 1:
+                    prev_h = torch.cat(prev_states_h, dim = 0)
+                    print("null")
+                    print(prev_h)
+                    t1 = prev_h
+                
                 prev_h = reorder(prev_states_h, idx)
+                
+                print("after")
+                print(prev_h)
+                print((prev_h == t1))
+                print(torch.sum((prev_h == t1)))
                 state_h = reorder(states_h, idx)
                 state_c = reorder(states_c, idx)
                 state = (state_h, state_c)
