@@ -293,7 +293,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 prev_states_h = []
                 prev_idx = None
                 
-                edge_feat_idx = torch.zeros(edge_feats_normalized.shape).to(edge_feats_normalized.device)
+                edge_feats_idx = torch.zeros(edge_feats_normalized.shape).to(edge_feats_normalized.device)
                 i = 0
                 for k in range(edge_feats.shape[1]):
                     for idx in range(edge_feats.shape[0]):
@@ -308,10 +308,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 prev_states_h = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
                 states_h = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
                 states_c = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
-                
-#cur_idx = edge_feat_idx[4][torch.isfinite(edge_feat_idx[4])]
-#test[cur_idx.long()] = cur_state
-
                 
                 for i, edge in enumerate(edge_feats_normalized):
                     idx = torch.isfinite(edge)
