@@ -760,6 +760,7 @@ class RecurTreeGen(nn.Module):
         ll = 0.0
         ll_wt = 0.0
         noise = 0.0
+        edge_feats_embed = None
         if self.has_edge_feats:
             if self.method == "LSTM":
                 edge_feats_embed, state_h_prior = self.embed_edge_feats(edge_feats, noise)
