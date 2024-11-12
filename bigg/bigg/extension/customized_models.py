@@ -257,19 +257,36 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_embed = (edge_embed_h, edge_embed_c)
             return edge_embed
         
+        def LSTM_pad(edge_feats_normalized):
+            lens = [len(x) for x in edge_feats_normalized]
+            max_len = max(lens)
+            edge_feats_normalized_pad = []
+            for i, edge in enumerate(edge_feats_normalized):
+                edge_feats_normalized_pad.append(torch.nn.functional.pad(edge, (0, 0, 0, max_len - lens[i]), value = np.inf))
+            
+            edge_feats_normalized = torch.cat(edge_feats_normalized_pad, dim = -1)
+            return edge_feats_normalized
+            
+        
         if self.method == "LSTM":
             if prev_state is None:
                 states_h = []
                 states_c = []
-                edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
                 
-                edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
+                #edge_feats_normalized = torch.cat(edge_feats_normalized, dim = -1)
+                edge_feats_normalized = LSTM_pad(edge_feats_normalized)
+                #edge_embed = self.edgelen_encoding(edge_feats_normalized.unsqueeze(-1))
+                
+                
+                
                 
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0_wt.repeat(B, 1), self.leaf_c0_wt.repeat(B, 1))
                 prev_states_h = []
-                for edge in edge_embed:
+                for edge in edge_feats_normalized:
                     prev_states_h.append(cur_state[0])
+                    edge = edge[torch.isfinite(edge)]
+                    edge = self.edgelen_ecoding(edge)
                     cur_state = self.edgeLSTM(edge, cur_state)
                     states_h.append(cur_state[0])
                     states_c.append(cur_state[1])       
@@ -493,6 +510,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 #             ll = -torch.square(w_star - edge_feats)
 #             ll = torch.sum(ll)
 #         return w_star, ll
+
 
  
 class BiggWithGCN(RecurTreeGen):
