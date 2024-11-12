@@ -274,8 +274,12 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         def reorder(T, idx):
             count_ = torch.sum(idx, dim = 0)
+            print(T)
+            print(idx)
+            print(count_)
             T = [ torch.cat([T[i][idx:idx+1] for i in range(0, count_[idx])], dim = 0) for idx in range(len(count_))]
             T = torch.cat(T, dim = 0)
+            print(T.shape)
             return T
         
         if self.method == "LSTM":
