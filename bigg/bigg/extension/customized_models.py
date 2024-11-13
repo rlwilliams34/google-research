@@ -50,7 +50,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.topdown_update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
         #self.topdown_update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
-        if self.method == "Test":
+        if self.method in ["Test", "Test2"]:
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
         
         if self.method == "MLP-Repeat":
@@ -235,7 +235,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         else:
             edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
         
-        if self.method == "Test":
+        if self.method in ["Test", "Test2"]:
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             #print(edge_embed.shape)
             return edge_embed
