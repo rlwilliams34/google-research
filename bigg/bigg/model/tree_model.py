@@ -709,7 +709,7 @@ class RecurTreeGen(nn.Module):
             
             if self.method == "Test4":
                 print("=================================================================")
-                print("i": i)
+                print("i:", i)
                 print("cur state: ", cur_state)
                 print("wt state: ", prev_wt_state)
                 print("=================================================================")
