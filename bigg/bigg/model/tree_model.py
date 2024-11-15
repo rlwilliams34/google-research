@@ -595,8 +595,13 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
-            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2"] and tree_node.lch.is_leaf and has_left:
-                left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
+            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4"] and tree_node.lch.is_leaf and has_left:
+                if self.method == "Test4":
+                    left_edge_embed = self.standardize_edge_feats(left_edge_feats)
+                    left_edge_embed = self.edgelen_encoding(left_edge_feats)
+                
+                else:
+                    left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
                 if self.update_left:
                     topdown_state = self.topdown_update_wt(left_edge_embed, topdown_state)
                     #left_state = self.update_wt(left_edge_embed, left_state)
