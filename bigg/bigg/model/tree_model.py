@@ -310,7 +310,9 @@ class FenwickTree(nn.Module):
             else:
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
-            print("row embeds: ", row_embeds)
+        
+        
+        print("row embeds: ", row_embeds)
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=0)
         joint_c = torch.cat(c_list, dim=0)
