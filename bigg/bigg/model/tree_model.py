@@ -32,6 +32,35 @@ from bigg.model.tree_clib.tree_lib import TreeLib
 from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
 
+def f(idx_list, y):    
+    if len(idx_list) == 2:
+        if y == idx_list[0]:
+            return 'L'
+        else:
+            return 'R'
+    
+    else:
+        midpoint = len(idx_list) // 2
+        left_idx_list = idx_list[:midpoint]
+                
+        if y in left_idx_list:
+            if len(left_idx_list) == 1:
+                return 'L'
+            return 'L' + f(left_idx_list, y)
+        
+        else:
+            right_idx_list = idx_list[midpoint:]
+            return 'R' + f(right_idx_list, y)
+
+def get_lr_seq(row, col):
+    assert col < row
+    idx_list = list(range(row))
+    return f(idx_list, col)
+
+
+
+
+
 
 def hc_multi_select(ids_from, ids_to, h_froms, c_froms):
     h_vecs = multi_index_select(ids_from,
@@ -801,6 +830,8 @@ class RecurTreeGen(nn.Module):
             cur_states = (cur_states[0][is_nonleaf], cur_states[1][is_nonleaf])
             left_logits = self.pred_has_left(cur_states[0], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
+            print(has_left)
+            print(STOP)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
             ll = ll + left_ll

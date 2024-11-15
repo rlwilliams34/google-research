@@ -112,7 +112,58 @@ def get_edge_feats(g):
     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
     weights = [x[2]['weight'] for x in edges]
+    
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
+
+
+#mydict = {'L': 0, 'R': 1}
+#TO GET: list(map(mydict.get, mykeys))
+
+
+
+def f(idx_list, y):    
+    if len(idx_list) == 1:
+        return ''
+    
+    if len(idx_list) == 2:
+        if y == idx_list[0]:
+            return 'L'
+        else:
+            return 'R'
+    
+    else:
+        midpoint = len(idx_list) // 2
+        left_idx_list = idx_list[:midpoint]
+                
+        if y in left_idx_list:
+            if len(left_idx_list) == 1:
+                return 'L'
+            return 'L' + f(left_idx_list, y)
+        
+        else:
+            right_idx_list = idx_list[midpoint:]
+            return 'R' + f(right_idx_list, y)
+
+def get_lr_seq(row_, col_):
+    mydict = {'L': 0, 'R': 1}
+    row = max(row_, col_)
+    col = min(row_, col_)
+    idx_list = list(range(row))
+    lr_seq = f(idx_list, col)
+    bin_lr_seq = list(map(mydict.get, lr_seq))
+    return bin_lr_seq #f(idx_list, col)
+
+
+
+def get_edge_feats_2(g):
+    #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
+    edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
+    weights = [x[2]['weight'] for x in edges]
+    
+    lr_seq = [get_lr_seq(x[0], x[1]) for x in edges]
+    max_len = max(len(x) for x in lr_seq)
+    lr_seq = [x + [-1] * (max_len - len(x)) for x in lr_seq]
+    return np.expand_dims(np.array(weights, dtype=np.float32), axis=1), np.expand_dims(np.array(lr_seq), axis=1)
 
 
 
