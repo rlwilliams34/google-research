@@ -169,7 +169,7 @@ def get_edge_feats_2(g, device):
 
 
 
-def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=False):
+def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=False, method=None):
     #model.epoch_num += 2
     if two_graphs:
         ll_t1 = 0
@@ -220,6 +220,35 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
         print("diff weight: ", diff2)
         import sys
         sys.exit()
+    
+    if method=="Test4":
+        ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
+        print(ll)
+        ll_t1 = ll.item()
+        ll_w1 = ll_wt.item()
+        print(ll_wt)
+        
+        edges = []
+        for e in graph.edges():
+            if e[1] > e[0]:
+                e = (e[1], e[0])
+            edges.append(e)
+        edges = sorted(edges)
+        
+        if not torch.is_tensor(edge_feats) and edge_feats is not None:
+            edge_feats = edge_feats[0]
+        ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
+        print(ll)
+        print(ll_wt)
+        ll_t2 = ll.item()
+        ll_w2 = ll_wt.item()
+        diff_t = abs(ll_t1 - ll_t2)
+        diff_w = abs(ll_w1 - ll_w2)
+        print("diff top: ", diff_t)
+        print("diff weight: ", diff_w)
+        import sys
+        sys.exit()
+    
     
     ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
     #ll, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)

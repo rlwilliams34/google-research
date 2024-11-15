@@ -343,6 +343,8 @@ class FenwickTree(nn.Module):
 
             next_input = joint_h[proceed_input], joint_c[proceed_input]
             sub_state = cur_state[0][proceed_from], cur_state[1][proceed_from]
+            print(sub_state)
+            print(next_input)
             cur_state = self.summary_cell(sub_state, next_input)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
@@ -543,6 +545,10 @@ class RecurTreeGen(nn.Module):
                     if self.method in ["Test", "Test2", "Test3"]:
                         return ll, ll_wt,  (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_wt_state
                     
+                    elif self.method == "Test4":
+                        prev_wt_state = self.embed_edge_feats(cur_feats, prev_state=prev_wt_state)
+                        return ll, ll_wt,  (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_wt_state
+                    
                     elif self.method == "LSTM":
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_wt_state)
                         prev_wt_state = edge_embed
@@ -576,6 +582,8 @@ class RecurTreeGen(nn.Module):
             state = self.cell_topdown(self.topdown_left_embed[[int(has_left)]] + left_pos, state, tree_node.depth)
             pred_edge_feats = []
             if has_left:
+                if self.method == "Test4":
+                    prev_wt_state = self.edgeLSTM(self.topdown_left_embed[[int(has_left)]], prev_wt_state)
                 lub = min(tree_node.lch.n_cols, ub)
                 llb = max(0, lb - tree_node.rch.n_cols)
                 ll, ll_wt, left_state, num_left, left_edge_feats, prev_wt_state = self.gen_row(ll, ll_wt, state, tree_node.lch, col_sm, llb, lub, edge_feats, prev_wt_state)
@@ -615,6 +623,8 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.cell_topright(self.topdown_right_embed[[int(has_right)]], topdown_state, tree_node.depth)
 
             if has_right:  # has edge in right child
+                if self.method == "Test4":
+                    prev_wt_state = self.edgeLSTM(self.topdown_right_embed[[int(has_right)]], prev_wt_state)
                 ll, ll_wt, right_state, num_right, right_edge_feats, prev_wt_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, prev_wt_state)
                 pred_edge_feats.append(right_edge_feats)
             else:
@@ -653,7 +663,7 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_wt_state = None
-        if self.has_edge_feats and self.method == "LSTM":
+        if self.has_edge_feats and self.method in ["LSTM", "Test4"]:
             prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
         
         for i in pbar:
@@ -682,6 +692,10 @@ class RecurTreeGen(nn.Module):
             else:
                 target_edge_feats = None
             #print(prev_wt_state)
+            
+            if self.method = "Test4":
+                prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
+            
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
@@ -691,6 +705,14 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "LSTM2":
+                cur_state = self.merge_top_wt(cur_state, prev_wt_state)
+            
+            if self.method == "Test4":
+                print("=================================================================")
+                print("i": i)
+                print("cur state: ", cur_state)
+                print("wt state: ", prev_wt_state)
+                print("=================================================================")
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
             controller_state = self.row_tree(cur_state)
@@ -835,8 +857,6 @@ class RecurTreeGen(nn.Module):
             cur_states = (cur_states[0][is_nonleaf], cur_states[1][is_nonleaf])
             left_logits = self.pred_has_left(cur_states[0], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
-            print(has_left)
-            print(STOP)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
             ll = ll + left_ll
@@ -853,12 +873,17 @@ class RecurTreeGen(nn.Module):
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                 if self.method in ["Test", "Test2", "Test3"]: 
                     left_feats = edge_feats_embed[edge_idx[~is_rch]]
+                
+                elif self.method == "Test4":
+                    left_feats = edge_feats[edge_idx[~is_rch]]
+                    left_feats = self.standardize_edge_feats(left_feats)
+                    left_feats = self.edgelen_ecoding(left_feats)
                 else:
                     left_feats = (edge_feats_embed[0][edge_idx[~is_rch]], edge_feats_embed[1][edge_idx[~is_rch]])
                 
                 h_bot, c_bot = h_bot[left_ids[0]], c_bot[left_ids[0]]
                 
-                if self.method not in ["Test", "Test2", "Test3"]:
+                if self.method not in ["Test", "Test2", "Test3", "Test4"]:
                     h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
                 left_ids = tuple([None] + list(left_ids[1:]))
@@ -872,7 +897,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2"] and len(left_wt_ids) > 0:
+            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4"] and len(left_wt_ids) > 0:
                 leaf_topdown_states = (topdown_state[0][left_wt_ids], topdown_state[1][left_wt_ids])
                 
                 if self.update_left:
