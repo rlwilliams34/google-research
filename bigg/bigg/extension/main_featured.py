@@ -155,15 +155,17 @@ def get_lr_seq(row_, col_):
 
 
 
-def get_edge_feats_2(g):
+def get_edge_feats_2(g, device):
     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
     weights = [x[2]['weight'] for x in edges]
+    weights = np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
+    weights = torch.from_numpy(weights).to(device)
     
     lr_seq = [get_lr_seq(x[0], x[1]) for x in edges]
     max_len = max(len(x) for x in lr_seq)
     lr_seq = [x + [-1] * (max_len - len(x)) for x in lr_seq]
-    return np.expand_dims(np.array(weights, dtype=np.float32), axis=1), np.expand_dims(np.array(lr_seq), axis=1)
+    return weights, np.transpose(np.array(lr_seq))
 
 
 
@@ -285,7 +287,11 @@ if __name__ == '__main__':
            list_node_feats = None
         
         if cmd_args.has_edge_feats:
-            list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
+            if cmd_args.method == "Test4":
+                list_edge_feats = [get_edge_feats_2(g, cmd_args.device) for g in train_graphs]
+            
+            else:
+                list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
         
         else:
             list_edge_feats = None
@@ -541,7 +547,10 @@ if __name__ == '__main__':
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
-                edge_feats = list_edge_feats[i]
+                if self.method == "Test4":
+                    edge_feats = list_edge_feats[i][0]
+                else:
+                    edge_feats = list_edge_feats[i]
                 model.update_weight_stats(edge_feats)
         
         if cmd_args.model == "BiGG_GCN":
@@ -578,6 +587,11 @@ if __name__ == '__main__':
                 #edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
                 edge_feats = [list_edge_feats[i] for i in batch_indices]
                 
+            elif cmd_args.method == "Test4":
+                edge_feats = [list_edge_feats[i] for i in batch_indices]
+                edge_feats, lr = zip(*edge_feats)
+                edge_feats = (torch.cat(edge_feats, dim = 0), np.concatenate(lr, dim = 1))
+            
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
