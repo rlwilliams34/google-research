@@ -268,6 +268,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             weights_MLP = self.edgelen_encoding(edge_feats_normalized)
             weight_embeddings = self.edgeLSTM(weights_MLP, weight_embeddings)
+            print("EDGE FESTS: ", edge_feats)
             print("WEIGHT EMBEDDINGS: ", weight_embeddings)
             return weight_embeddings
         

@@ -708,11 +708,11 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
             if self.method == "Test4":
-                print("=================================================================")
-                print("i:", i)
-                print("cur state: ", cur_state)
-                print("wt state: ", prev_wt_state)
-                print("=================================================================")
+                #print("=================================================================")
+                #print("i:", i)
+                #print("cur state: ", cur_state)
+                #print("wt state: ", prev_wt_state)
+                #print("=================================================================")
                 #cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
             controller_state = self.row_tree(cur_state)
