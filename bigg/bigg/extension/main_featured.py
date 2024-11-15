@@ -138,11 +138,11 @@ def lr_gen(idx_list, y):
         if y in left_idx_list:
             if len(left_idx_list) == 1:
                 return 'L'
-            return 'L' + f(left_idx_list, y)
+            return 'L' + lr_gen(left_idx_list, y)
         
         else:
             right_idx_list = idx_list[midpoint:]
-            return 'R' + f(right_idx_list, y)
+            return 'R' + lr_gen(right_idx_list, y)
 
 def get_lr_seq(row_, col_):
     mydict = {'L': 0, 'R': 1}
