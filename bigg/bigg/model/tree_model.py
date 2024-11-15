@@ -343,12 +343,22 @@ class FenwickTree(nn.Module):
             hist_tos.append(done_to)
             hist_rnn_states.append(cur_state)
             
+            print(done_from)
+            print(done_to)
+            print(proceed_from)
+            print(proceed_input)
+            
+            
 #             ### Put topology updates here
 #             if self.method == "LSTM2":
 #                 ### UPDATE ROW STATE W EDGE EMBED
 
             next_input = joint_h[proceed_input], joint_c[proceed_input]
             sub_state = cur_state[0][proceed_from], cur_state[1][proceed_from]
+            
+            print(next_input)
+            print(sub_state)
+            
             cur_state = self.summary_cell(sub_state, next_input)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
