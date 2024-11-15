@@ -244,7 +244,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "Test4":
             embeds = torch.cat([self.topdown_left_embed[1:], self.topdown_right_embed[1:]], dim = 0)
             weight_embeddings = (self.leaf_h0_wt.repeat(edge_feats.shape[0], 1), self.leaf_c0_wt.repeat(edge_feats.shape[0], 1))
-            print(weight_embeddings[0].shape)
             
             for i, lr in enumerate(lr_seq):
                 idx = (lr != -1)
@@ -256,10 +255,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 weight_embeddings[1][idx] = cur_weight_embeddings[1]
             
             weights_MLP = self.edgelen_encoding(edge_feats_normalized)
-            print(edge_feats_normalized.shape)
-            print(weights_MLP.shape)
-            print(weight_embeddings[0].shape)
-            weight_embeddings = self.edgeLSTM(weights_MLP, cur_weight_embeddings)
+            weight_embeddings = self.edgeLSTM(weights_MLP, weight_embeddings)
             return weight_embeddings
         
         if self.method in ["Test", "Test2", "Test3"]:
