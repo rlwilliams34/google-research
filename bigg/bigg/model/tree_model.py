@@ -823,6 +823,8 @@ class RecurTreeGen(nn.Module):
             
             elif self.method == "Test4":
                 edge_feats, lr = edge_feats
+                print(edge_feats)
+                print(lr)
                 edge_feats_embed = self.embed_edge_feats(edge_feats, lr_seq=lr)
                 #print(STOP)
             
