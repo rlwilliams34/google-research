@@ -693,7 +693,7 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None
             #print(prev_wt_state)
             
-            if self.method = "Test4":
+            if self.method == "Test4":
                 prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
             
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
