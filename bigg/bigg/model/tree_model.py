@@ -707,7 +707,7 @@ class RecurTreeGen(nn.Module):
             if self.method == "LSTM2":
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
-            if self.method == "Test4":
+            #if self.method == "Test4":
                 #print("=================================================================")
                 #print("i:", i)
                 #print("cur state: ", cur_state)
