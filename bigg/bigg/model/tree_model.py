@@ -310,19 +310,20 @@ class FenwickTree(nn.Module):
             else:
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
+            print("row embeds: ", row_embeds)
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=0)
         joint_c = torch.cat(c_list, dim=0)
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-        print("init select: ", init_select)
-        print("all ids: ", all_ids)
-        print("last tos: ", last_tos)
-        print("next ids: ", next_ids)
-        print("pos_info: ", pos_info)
+        #print("init select: ", init_select)
+        #print("all ids: ", all_ids)
+        #print("last tos: ", last_tos)
+        #print("next ids: ", next_ids)
+        #print("pos_info: ", pos_info)
         cur_state = (joint_h[init_select], joint_c[init_select])
-        print(cur_state)
+        #print(cur_state)
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
             if len(base_nodes):
@@ -343,10 +344,10 @@ class FenwickTree(nn.Module):
             hist_tos.append(done_to)
             hist_rnn_states.append(cur_state)
             
-            print(done_from)
-            print(done_to)
-            print(proceed_from)
-            print(proceed_input)
+            #print(done_from)
+            #print(done_to)
+            #print(proceed_from)
+            #print(proceed_input)
             
             
 #             ### Put topology updates here
@@ -356,8 +357,8 @@ class FenwickTree(nn.Module):
             next_input = joint_h[proceed_input], joint_c[proceed_input]
             sub_state = cur_state[0][proceed_from], cur_state[1][proceed_from]
             
-            print(next_input)
-            print(sub_state)
+            #print(next_input)
+            #print(sub_state)
             
             cur_state = self.summary_cell(sub_state, next_input)
         hist_rnn_states.append(cur_state)
