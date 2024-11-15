@@ -770,7 +770,7 @@ class RecurTreeGen(nn.Module):
             h_bot, c_bot = fn_hc_bot(d + 1)
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
-                if self.method in ["Test", "Test2", "Test3", "Test4"]:
+                if self.method in ["Test", "Test2", "Test3"]:
                     local_edge_feats = edge_feats[edge_idx]
                 else:
                     local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
@@ -784,7 +784,7 @@ class RecurTreeGen(nn.Module):
         feat_dict = {}
         if self.has_edge_feats:
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(0)
-            if self.method in ["Test", "Test2", "Test3", "Test4"]:
+            if self.method in ["Test", "Test2", "Test3"]:
                 local_edge_feats = edge_feats[edge_idx]
             else:
                 local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
@@ -823,8 +823,6 @@ class RecurTreeGen(nn.Module):
             
             elif self.method == "Test4":
                 edge_feats, lr = edge_feats
-                print(edge_feats)
-                print(lr)
                 edge_feats_embed = self.embed_edge_feats(edge_feats, lr_seq=lr)
                 #print(STOP)
             
