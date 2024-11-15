@@ -312,11 +312,11 @@ class FenwickTree(nn.Module):
             row_embeds.append(new_states)
         
         
-        print("row embeds: ", row_embeds)
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=0)
         joint_c = torch.cat(c_list, dim=0)
-
+        print(joint_h)
+        print(joint_c)
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         #print("init select: ", init_select)
