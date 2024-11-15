@@ -37,7 +37,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.update_left = args.update_left
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus', 'vae']
-        assert self.method in ['Test', 'MLP-Repeat', 'MLP-Multi', 'MLP-Double', 'LSTM', 'MLP-Leaf', 'Test2', 'Test3']
+        assert self.method in ['Test', 'MLP-Repeat', 'MLP-Multi', 'MLP-Double', 'LSTM', 'MLP-Leaf', 'Test2', 'Test3', 'Test4']
         
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
@@ -49,6 +49,10 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
         self.topdown_update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
         #self.topdown_update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        
+        if self.method == "Test4":
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
+            self.edgeLSTM = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
         if self.method in ["Test", "Test2", "Test3"]:
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
@@ -219,7 +223,7 @@ class BiggWithEdgeLen(RecurTreeGen):
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
 
-    def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False):
+    def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False, lr_seq=None):
         noise = 0.0
 #         self.mu_wt = 0 * self.mu_wt
 #         self.var_wt = self.var_wt / self.var_wt
@@ -234,6 +238,24 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         else:
             edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
+        
+        if self.method == "Test4":
+            embeds = torch.cat([self.topdown_left_embed[1:], self.topdown_right_embed[1:]], dim = 0)
+            weight_embeddings = (self.leaf_h0_wt.repeat(edge_feats.shape[0], 1), self.leaf_c0_wt.repeat(edge_feats.shape[0], 1))
+            
+            for i, lr in enumerate(lr_seq.permute(1, 0)):
+                idx = (lr != -1)
+                cur_lr = lr[idx]
+                cur_lr = embeds[cur_lr]
+                cur_weight_embeddings = self.UPDATELSTM(cur_lr, (weight_embeddings[0][idx], weight_embedings[1][idx])
+                
+                weight_embeddings[0][idx] = cur_weight_embeddings[0]
+                weight_embeddings[1][idx] = cur_weight_embeddings[1]
+            
+            weights_MLP = self.edgelen_encoding(edge_feats_normalized)
+            
+            weight_embeddings = self.UPDATELSTM(edge_feats_normalized, cur_weight_embeddings)
+            return weight_embeddings
         
         if self.method in ["Test", "Test2", "Test3"]:
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
