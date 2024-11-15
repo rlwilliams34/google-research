@@ -249,7 +249,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 idx = (lr != -1)
                 cur_lr = lr[idx]
                 cur_lr = embeds[cur_lr]
-                cur_weight_embeddings = self.edgeLSTM(cur_lr, (weight_embeddings[0][idx], weight_embedings[1][idx]))
+                cur_weight_embeddings = self.edgeLSTM(cur_lr, (weight_embeddings[0][idx], weight_embeddings[1][idx]))
                 
                 weight_embeddings[0][idx] = cur_weight_embeddings[0]
                 weight_embeddings[1][idx] = cur_weight_embeddings[1]
