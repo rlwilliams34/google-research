@@ -245,7 +245,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             embeds = torch.cat([self.topdown_left_embed[1:], self.topdown_right_embed[1:]], dim = 0)
             weight_embeddings = (self.leaf_h0_wt.repeat(edge_feats.shape[0], 1), self.leaf_c0_wt.repeat(edge_feats.shape[0], 1))
             
-            for i, lr in enumerate(lr_seq.permute(1, 0)):
+            for i, lr in enumerate(lr_seq):
                 idx = (lr != -1)
                 cur_lr = lr[idx]
                 cur_lr = embeds[cur_lr]
