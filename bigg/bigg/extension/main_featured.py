@@ -547,7 +547,7 @@ if __name__ == '__main__':
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
-                if self.method == "Test4":
+                if cmd_args.method == "Test4":
                     edge_feats = list_edge_feats[i][0]
                 else:
                     edge_feats = list_edge_feats[i]
