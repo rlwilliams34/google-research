@@ -878,6 +878,7 @@ class RecurTreeGen(nn.Module):
                     left_feats = edge_feats[edge_idx[~is_rch]]
                     left_feats = self.standardize_edge_feats(left_feats)
                     left_feats = self.edgelen_encoding(left_feats)
+                    print(left_feats.shape)
                 else:
                     left_feats = (edge_feats_embed[0][edge_idx[~is_rch]], edge_feats_embed[1][edge_idx[~is_rch]])
                 
