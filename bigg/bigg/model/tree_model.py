@@ -316,6 +316,12 @@ class FenwickTree(nn.Module):
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
+        print("init select: ", init_select)
+        print("all ids: ", all_ids)
+        print("last tos: ", last_tos)
+        print("next ids: ", next_ids)
+        print("pos_info: ", pos_info)
+        print(STOP)
         cur_state = (joint_h[init_select], joint_c[init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
@@ -343,8 +349,6 @@ class FenwickTree(nn.Module):
 
             next_input = joint_h[proceed_input], joint_c[proceed_input]
             sub_state = cur_state[0][proceed_from], cur_state[1][proceed_from]
-            print(sub_state)
-            print(next_input)
             cur_state = self.summary_cell(sub_state, next_input)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
