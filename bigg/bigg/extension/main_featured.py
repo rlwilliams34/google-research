@@ -121,7 +121,7 @@ def get_edge_feats(g):
 
 
 
-def f(idx_list, y):    
+def lr_gen(idx_list, y):    
     if len(idx_list) == 1:
         return ''
     
@@ -152,7 +152,7 @@ def get_lr_seq(row_, col_):
     print(row_)
     print(col_)
     print(idx_list)
-    lr_seq = f(idx_list, col)
+    lr_seq = lr_gen(idx_list, col)
     bin_lr_seq = list(map(mydict.get, lr_seq))
     return bin_lr_seq #f(idx_list, col)
 
