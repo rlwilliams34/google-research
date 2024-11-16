@@ -823,6 +823,14 @@ class RecurTreeGen(nn.Module):
             print("new h: ", new_h)
             print("length: ", len(new_h))
             print(new_h.shape)
+            
+            m = len(new_h) + 1
+            b = edge_feats.shape[0] // m
+            idx = np.array([[False] + [True]*n]*b)
+            print(m)
+            print(b)
+            print(idx)
+            print(STOP)
             # WHen D = 0, we get states of nodes 2 --> on
  #            if self.method == "Test4" and d == 0:
 #                 cur_edge_embeds = edge_feats_embed
