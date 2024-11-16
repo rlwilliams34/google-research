@@ -826,7 +826,8 @@ class RecurTreeGen(nn.Module):
                 b = edge_feats[0].shape[0] // (m+1)
                 print(m)
                 print(b)
-                idx = np.array(([False] + [True]*m)*b)
+                idx = ([False] + [True]*m)*b
+                idx = np.array(idx)
                 print(idx)
                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
                 new_h, new_c = self.merge_top_wt((new_h, new_c), edge_embed_cur)
