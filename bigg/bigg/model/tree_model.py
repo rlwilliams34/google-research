@@ -818,6 +818,8 @@ class RecurTreeGen(nn.Module):
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt, method = self.method)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
+            print("D: ", d)
+            print("new h: ", new_h)
             h_buf_list[d] = new_h
             c_buf_list[d] = new_c
         hc_bot = fn_hc_bot(0)
@@ -838,11 +840,11 @@ class RecurTreeGen(nn.Module):
             feat_dict['node'] = (node_feats, is_tree_trivial, t_lch, t_rch)
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
-        print("HELLO")
-        print(hc_bot)
-        print(fn_hc_bot)
-        print(h_buf_list)
-        print(c_buf_list)
+#         print("HELLO")
+#         print(hc_bot)
+#         print(fn_hc_bot)
+#         print(h_buf_list)
+#         print(c_buf_list)
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
 
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
