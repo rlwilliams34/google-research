@@ -854,7 +854,6 @@ class RecurTreeGen(nn.Module):
 #         print(fn_hc_bot)
 #         print(h_buf_list)
 #         print(c_buf_list)
-        if self
         print(hc_bot)
         print(h_buf_list[0])
         if self.method == "Test4":
