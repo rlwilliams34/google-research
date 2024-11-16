@@ -894,7 +894,6 @@ class RecurTreeGen(nn.Module):
             elif self.method == "Test4":
                 edge_feats, lr = edge_feats
                 edge_feats_embed, weights_MLP = self.embed_edge_feats(edge_feats, lr_seq=lr)
-                print(edge_feats_embed)
                 #print(STOP)
             
             else:
@@ -991,7 +990,6 @@ class RecurTreeGen(nn.Module):
                 new_states.append(new_s)
             cur_states = tuple(new_states)
             lv += 1
-        print(STOP)
         return ll, ll_wt, next_states
 
 
