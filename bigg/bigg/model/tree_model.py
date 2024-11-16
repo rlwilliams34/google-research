@@ -821,7 +821,7 @@ class RecurTreeGen(nn.Module):
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt, method = self.method)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
-            if d == 0:
+            if self.method == "Test4" and d == 0:
                 b = self.batch_size
                 m = edge_feats[0].shape[0] // b 
                 print(m)
@@ -860,13 +860,13 @@ class RecurTreeGen(nn.Module):
         print(h_buf_list)
         print(
         print(hc_bot[0])
-        if self.method == "Test4":
-            cur_edge_embed_h = torch.cat([self.leaf_h0_wt, edge_feats[0][0:1]], dim = 0)
-            cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
-            top = hc_bot[0]
-            #print(cur_edge_embed_h)
-            #print(h_bot)
-            top = self.merge_top_wt(top, (cur_edge_embed_h, cur_edge_embed_c))
+#         if self.method == "Test4":
+#             cur_edge_embed_h = torch.cat([self.leaf_h0_wt, edge_feats[0][0:1]], dim = 0)
+#             cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
+#             top = hc_bot[0]
+#             #print(cur_edge_embed_h)
+#             #print(h_bot)
+#             top = self.merge_top_wt(top, (cur_edge_embed_h, cur_edge_embed_c))
             hc_bot = (top, hc_bot[1])
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
 
