@@ -948,6 +948,7 @@ class RecurTreeGen(nn.Module):
                     left_feats = edge_feats[edge_idx[~is_rch]]
                     left_feats = self.standardize_edge_feats(left_feats)
                     left_feats = self.edgelen_encoding(left_feats)
+                    print(left_feats)
                 else:
                     left_feats = (edge_feats_embed[0][edge_idx[~is_rch]], edge_feats_embed[1][edge_idx[~is_rch]])
                 
@@ -967,16 +968,16 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-#             if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4"] and len(left_wt_ids) > 0:
-#                 leaf_topdown_states = (topdown_state[0][left_wt_ids], topdown_state[1][left_wt_ids])
-#                 
-#                 if self.update_left:
-#                     leaf_topdown_states = self.topdown_update_wt(left_feats, leaf_topdown_states)
-#                 
-#                 else:
-#                     leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
-#                 topdown_state[0][left_wt_ids] = leaf_topdown_states[0]
-#                 topdown_state[1][left_wt_ids] = leaf_topdown_states[1]
+            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4"] and len(left_wt_ids) > 0:
+                leaf_topdown_states = (topdown_state[0][left_wt_ids], topdown_state[1][left_wt_ids])
+                
+                if self.update_left:
+                    leaf_topdown_states = self.topdown_update_wt(left_feats, leaf_topdown_states)
+                
+                else:
+                    leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
+                topdown_state[0][left_wt_ids] = leaf_topdown_states[0]
+                topdown_state[1][left_wt_ids] = leaf_topdown_states[1]
             
             right_logits = self.pred_has_right(topdown_state[0], lv)
             right_update = self.topdown_right_embed[has_right]
