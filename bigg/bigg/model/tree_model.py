@@ -203,16 +203,20 @@ def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cel
 def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node, wt_update, method):
     edge_feats = is_rch = None
     t_lch = t_rch = None
+    if method == "Test4":
+        lv = 0
+    else:
+        lv = -1
     if 'edge' in feat_dict:
         edge_feats, is_rch = feat_dict['edge']
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, wt_update, method, lv=0)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, wt_update, method, lv=lv)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
     elif h_buf is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, wt_update, method, lv=0)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, wt_update, method, lv=lv)
     else:
         raise NotImplementedError  #TODO: handle model parallelism with features
 
@@ -750,14 +754,14 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
             if self.method == "Test4" and i > 0:
-                print("=================================================================")
-                print("i:", i)
-                print("top state: ", cur_state)
-                print("wt state: ", prev_wt_state)
+                #print("=================================================================")
+                #print("i:", i)
+                #print("top state: ", cur_state)
+                #print("wt state: ", prev_wt_state)
                 #print("=================================================================")# 
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
-                print("Updated Staet: ", cur_state)
-                print("=================================================================")
+                #print("Updated Staet: ", cur_state)
+                #print("=================================================================")
             
             controller_state = self.row_tree(cur_state)
             
