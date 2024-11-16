@@ -825,9 +825,10 @@ class RecurTreeGen(nn.Module):
             print(new_h.shape)
             
             if d == 0:
-                m = len(new_h) + 1
-                b = edge_feats[0].shape[0] // m
+                m = len(new_h)
+                b = edge_feats[0].shape[0] // (m+1)
                 idx = np.array(([False] + [True]*m)*b)
+                edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
                 print(edge_feats[0].shape)
                 print(m)
                 print(b)
