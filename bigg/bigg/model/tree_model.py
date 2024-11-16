@@ -799,6 +799,8 @@ class RecurTreeGen(nn.Module):
         max_level = len(all_ids) - 1
         h_buf_list = [None] * (len(all_ids) + 1)
         c_buf_list = [None] * (len(all_ids) + 1)
+        print(h_bot)
+        print(c_bot)
 
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]
@@ -825,13 +827,7 @@ class RecurTreeGen(nn.Module):
                 idx = np.array(([False] + [True]*m)*b)
                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
                 new_h, new_c = self.merge_top_wt(edge_embed_cur, (new_h, new_c))
-                print("Complete")
-                print(STOP)
-            # WHen D = 0, we get states of nodes 2 --> on
- #            if self.method == "Test4" and d == 0:
-#                 cur_edge_embeds = edge_feats_embed
-#                 # Need to get 2 -> N for each graph... 
-            print("--------------------------")
+            
             h_buf_list[d] = new_h
             c_buf_list[d] = new_c
         hc_bot = fn_hc_bot(0)
