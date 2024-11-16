@@ -859,15 +859,15 @@ class RecurTreeGen(nn.Module):
 #         print(fn_hc_bot)
 #         print(h_buf_list)
 #         print(
-        print(hc_bot[0])
-        if self.method == "Test4":
-            cur_edge_embed_h = torch.cat([self.leaf_h0_wt, edge_feats[0][0:1]], dim = 0)
-            cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
-            top = hc_bot[0]
-            #print(cur_edge_embed_h)
-            #print(h_bot)
-            top = self.merge_top_wt(top, (cur_edge_embed_h, cur_edge_embed_c))
-            hc_bot = (top, hc_bot[1])
+#         print(hc_bot[0])
+#         if self.method == "Test4":
+#             cur_edge_embed_h = torch.cat([self.leaf_h0_wt, edge_feats[0][0:1]], dim = 0)
+#             cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
+#             top = hc_bot[0]
+#             #print(cur_edge_embed_h)
+#             #print(h_bot)
+#             top = self.merge_top_wt(top, (cur_edge_embed_h, cur_edge_embed_c))
+#             hc_bot = (top, hc_bot[1])
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
 
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
