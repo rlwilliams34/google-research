@@ -205,11 +205,9 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             
         
         if cat:
-            if torch.istensor(edge_feats):
-                edge_feats = torch.cat(edge_feats, dim = 0)
-            else:
-                edge_feats, lr = zip(*edge_feats)
-                edge_feats = (torch.cat(edge_feats, dim = 0), np.concatenate(lr, axis = 1))
+            #edge_feats = torch.cat(edge_feats, dim = 0)
+            edge_feats, lr = zip(*edge_feats)
+            edge_feats = (torch.cat(edge_feats, dim = 0), np.concatenate(lr, axis = 1))
         
         ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
         
