@@ -854,6 +854,7 @@ class RecurTreeGen(nn.Module):
 #         print(fn_hc_bot)
 #         print(h_buf_list)
 #         print(
+        print(hc_bot[0])
         if self.method == "Test4":
             cur_edge_embed_h = torch.cat([self.leaf_h0_wt, edge_feats[0][0:1]], dim = 0)
             cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
