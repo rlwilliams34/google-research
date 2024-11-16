@@ -296,8 +296,6 @@ class FenwickTree(nn.Module):
             row_embeds.append((h_buf0, c_buf0))
         
         print(row_embeds)
-        print(prev_rowsum_h)
-        print(prrev_rowsum_c)
 
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
@@ -316,7 +314,7 @@ class FenwickTree(nn.Module):
             row_embeds.append(new_states)
             print("========================")
             print("i: ", i)
-            print(new_states)
+            print("New States: ", new_states)
             print("========================")
         
         for r in row_embeds:
