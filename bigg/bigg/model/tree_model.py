@@ -855,12 +855,6 @@ class RecurTreeGen(nn.Module):
             feat_dict['node'] = (node_feats, is_tree_trivial, t_lch, t_rch)
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
-#         print("HELLO")
-#         print(hc_bot)
-#         print(fn_hc_bot)
-#        print(h_buf_list)
-        print(hc_bot[0])
-        print(STOP)
 #         if self.method == "Test4":
 #             cur_edge_embed_h = torch.cat([self.leaf_h0_wt, edge_feats[0][0:1]], dim = 0)
 #             cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
