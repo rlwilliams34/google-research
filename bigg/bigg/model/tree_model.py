@@ -827,6 +827,7 @@ class RecurTreeGen(nn.Module):
                 print(m)
                 print(b)
                 idx = ([False] + [True]*m)*b
+                print(idx)
                 idx = np.array(idx)
                 print(idx)
                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
