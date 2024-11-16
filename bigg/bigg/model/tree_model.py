@@ -208,11 +208,11 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, wt_update, method, lv=-1)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, wt_update, method, lv=0)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
     elif h_buf is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, wt_update, method, lv=-1)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, wt_update, method, lv=0)
     else:
         raise NotImplementedError  #TODO: handle model parallelism with features
 
@@ -828,12 +828,12 @@ class RecurTreeGen(nn.Module):
                 idx = ([False] + [True]*(m-1))*b
                 idx = np.array(idx)
                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
-                print("+++++++++++++++++++++++++++++++++++++++++++++++")
-                print("Top Before: ", new_h)
-                print("Weight: ", edge_embed_cur[0])
+#                 print("+++++++++++++++++++++++++++++++++++++++++++++++")
+#                 print("Top Before: ", new_h)
+#                 print("Weight: ", edge_embed_cur[0])
                 new_h, new_c = self.merge_top_wt((new_h, new_c), edge_embed_cur)
-                print("Top After: ", new_h)
-                print("+++++++++++++++++++++++++++++++++++++++++++++++")
+#                 print("Top After: ", new_h)
+#                 print("+++++++++++++++++++++++++++++++++++++++++++++++")
                 #print("new_h: ", new_h)
             
             h_buf_list[d] = new_h
@@ -846,14 +846,14 @@ class RecurTreeGen(nn.Module):
                 local_edge_feats = edge_feats[edge_idx]
             elif self.method == "Test4":
                 local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
-                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-                print(edge_idx)
-                print("wt state: ", local_edge_feats)
+#                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+#                 print(edge_idx)
+#                 print("wt state: ", local_edge_feats)
                 init_state = (self.leaf_h0.repeat(len(edge_idx), 1), self.leaf_c0.repeat(len(edge_idx), 1))
-                print("top state: ", init_state)
+#                 print("top state: ", init_state)
                 local_edge_feats = self.merge_top_wt(init_state, local_edge_feats)
-                print("updated state: ", slocal_edge_feats)
-                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+#                 print("updated state: ", local_edge_feats)
+#                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             else:
                 local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
             feat_dict['edge'] = (local_edge_feats, is_rch)
@@ -867,7 +867,7 @@ class RecurTreeGen(nn.Module):
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
         
-        print(h_buf_list)
+#         print(h_buf_list)
 #         if self.method == "Test4":
 #             cur_edge_embed_h = torch.cat([self.leaf_h0_wt, edge_feats[0][0:1]], dim = 0)
 #             cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
