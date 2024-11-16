@@ -750,10 +750,12 @@ class RecurTreeGen(nn.Module):
             if self.method == "Test4":
                 print("=================================================================")
                 print("i:", i)
-                print("cur state: ", cur_state)
+                print("top state: ", cur_state)
                 print("wt state: ", prev_wt_state)
-                print("=================================================================")
+                #print("=================================================================")
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
+                print("Updated Staet: ", cur_state)
+                print("=================================================================")
             
             controller_state = self.row_tree(cur_state)
             
@@ -832,9 +834,7 @@ class RecurTreeGen(nn.Module):
                 b = edge_feats[0].shape[0] // (m+1)
                 idx = np.array(([False] + [True]*m)*b)
                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
-                print("new h: ", new_h)
                 new_h, new_c = self.merge_top_wt((new_h, new_c), edge_embed_cur)
-                print("edge embed: ", edge_embed_cur[0])
                 #print("new_h: ", new_h)
             
             h_buf_list[d] = new_h
@@ -862,7 +862,9 @@ class RecurTreeGen(nn.Module):
 #         print(fn_hc_bot)
 #         print(h_buf_list)
 #         print(c_buf_list)
+        
         print(hc_bot)
+        print(h_buf_list[0])
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
 
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
