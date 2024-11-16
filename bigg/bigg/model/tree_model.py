@@ -445,7 +445,7 @@ class RecurTreeGen(nn.Module):
         super(RecurTreeGen, self).__init__()
 
         self.directed = args.directed
-        self.batch_size = cmd_args.batch_size
+        self.batch_size = args.batch_size
         self.self_loop = args.self_loop
         self.bits_compress = args.bits_compress
         self.has_edge_feats = args.has_edge_feats
