@@ -821,18 +821,18 @@ class RecurTreeGen(nn.Module):
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
             
-            if d == 0:
-                m = len(new_h)
-                b = edge_feats[0].shape[0] // (m+1)
-                print(m)
-                print(b)
-                idx = ([False] + [True]*m)*b
-                print(idx)
-                idx = np.array(idx)
-                print(idx)
-                edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
-                new_h, new_c = self.merge_top_wt((new_h, new_c), edge_embed_cur)
-                #print("new_h: ", new_h)
+#             if d == 0:
+#                 m = len(new_h)
+#                 b = edge_feats[0].shape[0] // (m+1)
+#                 print(m)
+#                 print(b)
+#                 idx = ([False] + [True]*m)*b
+#                 print(idx)
+#                 idx = np.array(idx)
+#                 print(idx)
+#                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
+#                 new_h, new_c = self.merge_top_wt((new_h, new_c), edge_embed_cur)
+#                 #print("new_h: ", new_h)
             
             h_buf_list[d] = new_h
             c_buf_list[d] = new_c
