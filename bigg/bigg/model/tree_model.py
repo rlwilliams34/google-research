@@ -310,6 +310,11 @@ class FenwickTree(nn.Module):
             else:
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
+            
+        for r in row_embeds:
+            print("+++++++++++++++++++++")
+            print(r)
+            print("+++++++++++++++++++++")
         
         
         h_list, c_list = zip(*row_embeds)
@@ -317,6 +322,10 @@ class FenwickTree(nn.Module):
         joint_c = torch.cat(c_list, dim=0)
         print(joint_h)
         print(joint_c)
+        if self.method == "Test4":
+            num_nodes = None
+            joint_h = joint_h[1:n+1, :]
+            joint_c = joint_c[1:n+1, :]
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         #print("init select: ", init_select)
