@@ -894,6 +894,8 @@ class RecurTreeGen(nn.Module):
             elif self.method == "Test4":
                 edge_feats, lr = edge_feats
                 edge_feats_embed = self.embed_edge_feats(edge_feats, lr_seq=lr)
+                print(edge_feats_embed)
+                print(STOP)
                 #print(STOP)
             
             else:
@@ -948,7 +950,6 @@ class RecurTreeGen(nn.Module):
                     left_feats = edge_feats[edge_idx[~is_rch]]
                     left_feats = self.standardize_edge_feats(left_feats)
                     left_feats = self.edgelen_encoding(left_feats)
-                    print(left_feats)
                 else:
                     left_feats = (edge_feats_embed[0][edge_idx[~is_rch]], edge_feats_embed[1][edge_idx[~is_rch]])
                 
