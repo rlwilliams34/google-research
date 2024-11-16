@@ -805,7 +805,7 @@ class RecurTreeGen(nn.Module):
             cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
             #print(cur_edge_embed_h)
             #print(h_bot)
-            h_bot, c_bot = self.merge_top_wt((h_bot, c_bot), (cur_edge_embed_h, cur_edge_embed_c))
+            #h_bot, c_bot = self.merge_top_wt((h_bot, c_bot), (cur_edge_embed_h, cur_edge_embed_c))
         
 
         for d in range(len(all_ids) - 1, -1, -1):
