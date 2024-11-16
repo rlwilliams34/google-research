@@ -947,7 +947,9 @@ class RecurTreeGen(nn.Module):
                 
                 elif self.method == "Test4":
                     left_feats = edge_feats[edge_idx[~is_rch]]
+                    print(left_feats)
                     left_feats = self.standardize_edge_feats(left_feats)
+                    print(left_feats)
                     left_feats = self.edgelen_encoding(left_feats)
                     print(left_feats)
                     
