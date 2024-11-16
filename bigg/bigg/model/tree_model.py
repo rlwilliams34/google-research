@@ -313,6 +313,7 @@ class FenwickTree(nn.Module):
             
         for r in row_embeds:
             print("+++++++++++++++++++++")
+            print("i: ", i)
             print(r)
             print("+++++++++++++++++++++")
         
