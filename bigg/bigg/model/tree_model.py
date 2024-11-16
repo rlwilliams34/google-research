@@ -824,12 +824,8 @@ class RecurTreeGen(nn.Module):
             if self.method == "Test4" and d == 0:
                 b = self.batch_size
                 m = edge_feats[0].shape[0] // b 
-                print(m)
-                print(b)
                 idx = ([False] + [True]*(m-1))*b
-                print(idx)
                 idx = np.array(idx)
-                print(idx)
                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
                 new_h, new_c = self.merge_top_wt((new_h, new_c), edge_embed_cur)
                 #print("new_h: ", new_h)
@@ -844,6 +840,7 @@ class RecurTreeGen(nn.Module):
                 local_edge_feats = edge_feats[edge_idx]
             else:
                 local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
+            print(edge_idx)
             feat_dict['edge'] = (local_edge_feats, is_rch)
         if self.has_node_feats:
             is_tree_trivial = TreeLib.GetIsTreeTrivial()
@@ -854,11 +851,12 @@ class RecurTreeGen(nn.Module):
             feat_dict['node'] = (node_feats, is_tree_trivial, t_lch, t_rch)
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
-        print("HELLO")
-        print(hc_bot)
-        print(fn_hc_bot)
-        print(h_buf_list)
+#         print("HELLO")
+#         print(hc_bot)
+#         print(fn_hc_bot)
+#        print(h_buf_list)
         print(hc_bot[0])
+        print(STOP)
 #         if self.method == "Test4":
 #             cur_edge_embed_h = torch.cat([self.leaf_h0_wt, edge_feats[0][0:1]], dim = 0)
 #             cur_edge_embed_c = torch.cat([self.leaf_c0_wt, edge_feats[1][0:1]], dim = 0)
