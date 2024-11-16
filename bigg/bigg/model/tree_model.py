@@ -821,6 +821,12 @@ class RecurTreeGen(nn.Module):
             print("--------------------------")
             print("D: ", d)
             print("new h: ", new_h)
+            print("length: ", len(new_h))
+            print(new_h.shape)
+            # WHen D = 0, we get states of nodes 2 --> on
+ #            if self.method == "Test4" and d == 0:
+#                 cur_edge_embeds = edge_feats_embed
+#                 # Need to get 2 -> N for each graph... 
             print("--------------------------")
             h_buf_list[d] = new_h
             c_buf_list[d] = new_c
