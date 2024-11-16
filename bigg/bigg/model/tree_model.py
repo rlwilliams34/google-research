@@ -822,18 +822,18 @@ class RecurTreeGen(nn.Module):
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt, method = self.method)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
-             if self.method == "Test4" and d == 0:
-                 b = self.batch_size
-                 m = edge_feats[0].shape[0] // b 
-                 idx = ([False] + [True]*(m-1))*b
-                 idx = np.array(idx)
-                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
-                 print("+++++++++++++++++++++++++++++++++++++++++++++++")
-                 print("Top Before: ", new_h)
-                 print("Weight: ", edge_embed_cur[0])
-                 new_h, new_c = self.merge_top_wt((new_h, new_c), edge_embed_cur)
-                 print("Top After: ", new_h)
-                 print("+++++++++++++++++++++++++++++++++++++++++++++++")
+            if self.method == "Test4" and d == 0:
+                b = self.batch_size
+                m = edge_feats[0].shape[0] // b 
+                idx = ([False] + [True]*(m-1))*b
+                idx = np.array(idx)
+                edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
+                print("+++++++++++++++++++++++++++++++++++++++++++++++")
+                print("Top Before: ", new_h)
+                print("Weight: ", edge_embed_cur[0])
+                new_h, new_c = self.merge_top_wt((new_h, new_c), edge_embed_cur)
+                print("Top After: ", new_h)
+                print("+++++++++++++++++++++++++++++++++++++++++++++++")
                 #print("new_h: ", new_h)
             
             h_buf_list[d] = new_h
