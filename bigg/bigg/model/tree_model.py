@@ -105,7 +105,7 @@ def selective_update_hc(h, c, zero_one, feats):
     c = torch.where(zero_one, local_edge_feats_c, c)
     return h, c
 
-def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None, wt_update=None, method=None):
+def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None, wt_update=None, method=None, lv=-1):
     new_ids = [list(fn_all_ids(0)), list(fn_all_ids(1))]
     lch_isleaf, rch_isleaf = new_ids[0][0], new_ids[1][0]
     new_ids[0][0] = new_ids[1][0] = None
@@ -125,8 +125,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[leaf_check], c_bot[leaf_check]
-        if edge_feats is not None and method not in ["Test", "Test2", "Test3", "Test4"]:
-            local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
+        if edge_feats is not None and method not in ["Test", "Test2", "Test3"]:
+            if self.method != "Test4" or lv == 0:
+                local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
         
@@ -207,11 +208,11 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, wt_update, method)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, wt_update, method, lv=0)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
     elif h_buf is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, wt_update, method)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, wt_update, method, lv=0)
     else:
         raise NotImplementedError  #TODO: handle model parallelism with features
 
@@ -748,7 +749,7 @@ class RecurTreeGen(nn.Module):
             if self.method == "LSTM2":
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
-            if self.method == "Test4":
+            if self.method == "Test4" and i > 0:
                 print("=================================================================")
                 print("i:", i)
                 print("top state: ", cur_state)
@@ -838,9 +839,12 @@ class RecurTreeGen(nn.Module):
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(0)
             if self.method in ["Test", "Test2", "Test3"]:
                 local_edge_feats = edge_feats[edge_idx]
+            elif self.method == "Test4":
+                local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
+                init_state = (self.leaf_h0_wt.repeat(len(edge_idx), 1), self.leaf_c0_wt.repeat(len(edge_idx), 1))
+                local_edge_feats = self.merge_top_wt(init_state, local_edge_feats)
             else:
                 local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
-            print(edge_idx)
             feat_dict['edge'] = (local_edge_feats, is_rch)
         if self.has_node_feats:
             is_tree_trivial = TreeLib.GetIsTreeTrivial()
