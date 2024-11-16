@@ -849,7 +849,7 @@ class RecurTreeGen(nn.Module):
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 print(edge_idx)
                 print("wt state: ", local_edge_feats)
-                init_state = (self.leaf_h0_wt.repeat(len(edge_idx), 1), self.leaf_c0_wt.repeat(len(edge_idx), 1))
+                init_state = (self.leaf_h0.repeat(len(edge_idx), 1), self.leaf_c0.repeat(len(edge_idx), 1))
                 print("top state: ", init_state)
                 local_edge_feats = self.merge_top_wt(init_state, local_edge_feats)
                 print("updated state: ", slocal_edge_feats)
