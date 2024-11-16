@@ -818,21 +818,14 @@ class RecurTreeGen(nn.Module):
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt, method = self.method)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
-            print("--------------------------")
-            print("D: ", d)
-            print("new h: ", new_h)
-            print("length: ", len(new_h))
-            print(new_h.shape)
             
             if d == 0:
                 m = len(new_h)
                 b = edge_feats[0].shape[0] // (m+1)
                 idx = np.array(([False] + [True]*m)*b)
                 edge_embed_cur = (edge_feats[0][idx], edge_feats[1][idx])
-                print(edge_feats[0].shape)
-                print(m)
-                print(b)
-                print(idx)
+                new_h, new_c = self.merge_top_wt(edge_embed_cur, (new_h, new_c))
+                print("Complete")
                 print(STOP)
             # WHen D = 0, we get states of nodes 2 --> on
  #            if self.method == "Test4" and d == 0:
