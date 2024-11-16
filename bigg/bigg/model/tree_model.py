@@ -838,6 +838,11 @@ class RecurTreeGen(nn.Module):
             feat_dict['node'] = (node_feats, is_tree_trivial, t_lch, t_rch)
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
+        print("HELLO")
+        print(hc_bot)
+        print(fn_hc_bot)
+        print(h_buf_list)
+        print(c_buf_list)
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
 
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
