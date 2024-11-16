@@ -281,9 +281,9 @@ class FenwickTree(nn.Module):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
-        print(h_bot)
-        print(c_bot)
-        print(h_buf0)
+#         print(h_bot)
+#         print(c_bot)
+#         print(h_buf0)
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
             if 'node' in feat_dict:
@@ -314,27 +314,27 @@ class FenwickTree(nn.Module):
             else:
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
-            print("========================")
-            print("i: ", i)
-            print("New States: ", new_states)
-            print("========================")
-        
-        for r in row_embeds:
-            print("+++++++++++++++++++++")
-            print("i: ", i)
-            print(r)
-            print("+++++++++++++++++++++")
+#             print("========================")
+#             print("i: ", i)
+#             print("New States: ", new_states)
+#             print("========================")
+#         
+#         for r in row_embeds:
+#             print("+++++++++++++++++++++")
+#             print("i: ", i)
+#             print(r)
+#             print("+++++++++++++++++++++")
         
         
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=0)
         joint_c = torch.cat(c_list, dim=0)
-        print(joint_h)
-        print(joint_c)
-        if self.method == "Test4":
-            num_nodes = None
-            joint_h = joint_h[1:n+1, :]
-            joint_c = joint_c[1:n+1, :]
+#         print(joint_h)
+#         print(joint_c)
+#         if self.method == "Test4":
+#             num_nodes = None
+#             joint_h = joint_h[1:n+1, :]
+#             joint_c = joint_c[1:n+1, :]
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         #print("init select: ", init_select)
@@ -753,7 +753,7 @@ class RecurTreeGen(nn.Module):
                 print("cur state: ", cur_state)
                 print("wt state: ", prev_wt_state)
                 print("=================================================================")
-                #cur_state = self.merge_top_wt(cur_state, prev_wt_state)
+                cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
             controller_state = self.row_tree(cur_state)
             
