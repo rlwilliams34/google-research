@@ -846,9 +846,13 @@ class RecurTreeGen(nn.Module):
                 local_edge_feats = edge_feats[edge_idx]
             elif self.method == "Test4":
                 local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                print(edge_idx)
+                print(local_edge_feats)
                 init_state = (self.leaf_h0_wt.repeat(len(edge_idx), 1), self.leaf_c0_wt.repeat(len(edge_idx), 1))
                 local_edge_feats = self.merge_top_wt(init_state, local_edge_feats)
                 print(local_edge_feats)
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             else:
                 local_edge_feats = (edge_feats[0][edge_idx], edge_feats[1][edge_idx])
             feat_dict['edge'] = (local_edge_feats, is_rch)
