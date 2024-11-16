@@ -861,7 +861,7 @@ class RecurTreeGen(nn.Module):
             #print(cur_edge_embed_h)
             #print(h_bot)
             top = self.merge_top_wt(top, (cur_edge_embed_h, cur_edge_embed_c))
-            hc_bot[0] = top
+            hc_bot = (top, hc_bot[1])
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
 
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
