@@ -862,6 +862,7 @@ class RecurTreeGen(nn.Module):
 #         print(fn_hc_bot)
 #         print(h_buf_list)
 #         print(c_buf_list)
+        print(hc_bot)
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
 
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
