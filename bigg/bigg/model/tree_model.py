@@ -755,7 +755,7 @@ class RecurTreeGen(nn.Module):
                 print("top state: ", cur_state)
                 print("wt state: ", prev_wt_state)
                 #print("=================================================================")# 
-#                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
+                cur_state = self.merge_top_wt(cur_state, prev_wt_state)
                 print("Updated Staet: ", cur_state)
                 print("=================================================================")
             
