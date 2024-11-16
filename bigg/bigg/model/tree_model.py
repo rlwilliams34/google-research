@@ -820,7 +820,7 @@ class RecurTreeGen(nn.Module):
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt, method = self.method)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
-            
+            print(cmd_args.batch_size)
 #             if d == 0:
 #                 m = len(new_h)
 #                 b = edge_feats[0].shape[0] // (m+1)
