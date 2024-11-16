@@ -827,7 +827,7 @@ class RecurTreeGen(nn.Module):
             if d == 0:
                 m = len(new_h) + 1
                 b = edge_feats[0].shape[0] // m
-                idx = np.array([[False] + [True]*n]*b)
+                idx = np.array([[False] + [True]*m]*b)
                 print(m)
                 print(b)
                 print(idx)
