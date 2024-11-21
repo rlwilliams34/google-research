@@ -321,7 +321,16 @@ def tree_weight_statistics(graphs, transform = False):
       weights.append(t)
     tree_vars.append(np.var(T_weights, ddof = 1))
     tree_means.append(np.mean(T_weights))
-
+  
+  print("#################################################")
+  print("Tree Variances: ", tree_vars)
+  print("#################################################")
+  
+  print("+++++++++++++++++++++++++++++++++++++++++++++++++")
+  print("Weights: ")
+  print(weights)
+  print("+++++++++++++++++++++++++++++++++++++++++++++++++")
+  
   xbar = np.mean(weights)
   s = np.std(weights, ddof = 1)
   n = len(weights)
