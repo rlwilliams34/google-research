@@ -56,7 +56,7 @@ ifeq ($(USE_GPU), 1)
     NVCCFLAGS += -std=c++11 --use_fast_math --compiler-options '-fPIC'
     cu_files = $(shell $(FIND) src/lib -name "*.cu" -printf "%P\n")
     cu_obj_files = $(subst .cu,.o,$(cu_files))
-    objs += $(addprefix $(obj_build_root)/cuda/,$(cu_obj_files))
+    objs += $(addprefix $(obj_build_root)/cuda-10.2/,$(cu_obj_files))
 endif
 
 
@@ -66,7 +66,6 @@ DEPS = $(objs:.o=.d)
 target = $(build_root)/dll/libtree.so
 target_dep = $(addsuffix .d,$(target))
 
-$(info target = $(target))
 
 .PRECIOUS: $(build_root)/lib/%.o
 
