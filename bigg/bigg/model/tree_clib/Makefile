@@ -83,20 +83,16 @@ $(obj_build_root)/cuda/%.o: src/lib/%.cu
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -c $< -o $@
 endif
 
-$(info Test = $(TEST))
 
 $(obj_build_root)/cxx/%.o: src/lib/%.cpp
 	$(dir_guard)
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $(filter %.cpp, $^) $(FOMP)
-	
-$(info Test = $(TEST))
 
 
 
 clean:
 	rm -rf $(build_root)
 
-$(info Test = $(TEST))
-
-
 -include $(DEPS)
+
+$(info Test = $(TEST))
