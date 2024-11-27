@@ -95,5 +95,5 @@ clean:
 
 -include $(DEPS)
 
-TEST := "hello"
+TEST := "hello235436"
 $(info Test = $(TEST))
