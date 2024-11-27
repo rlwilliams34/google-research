@@ -11,8 +11,7 @@ CUDA_HOME := /usr/local/cuda
 NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
 
-@echo $(CUDA_HOME)
-
+$(info Cuda home = $(CUDA_HOME))
 ifeq ($(UNAME), Darwin)
     USE_GPU = 0
     FOMP := 
