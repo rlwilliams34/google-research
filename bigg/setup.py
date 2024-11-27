@@ -31,15 +31,19 @@ BASEPATH = os.path.dirname(os.path.abspath(__file__))
 class custom_develop(develop):
     def run(self):
         original_cwd = os.getcwd()
+        print("Hello 1")
 
         folders = [
             os.path.join(BASEPATH, 'bigg/model/tree_clib'),
         ]
         for folder in folders:
             os.chdir(folder)
+            print("Hello 2")
             subprocess.check_call(['make'])
+            print("Hello 3")
 
         os.chdir(original_cwd)
+        print("Hello 4")
 
         super().run()
 
