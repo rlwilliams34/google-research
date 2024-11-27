@@ -28,6 +28,9 @@ ifeq ($(USE_GPU), 1)
     LDFLAGS += -L$(CUDA_HOME)/lib64 -lcudart -lcublas -lcurand
 endif
 
+$(info Test = $(TEST))
+
+
 CUDA_ARCH := -gencode arch=compute_60,code=sm_60 -gencode arch=compute_70,code=sm_70
 
 build_root = build
@@ -38,6 +41,8 @@ else
 	include_dirs = ./include	
 endif
 
+
+$(info Test = $(TEST))
 
 CXXFLAGS += $(addprefix -I,$(include_dirs)) -Wno-unused-local-typedef
 CXXFLAGS += -fPIC
@@ -56,6 +61,8 @@ ifeq ($(USE_GPU), 1)
     cu_obj_files = $(subst .cu,.o,$(cu_files))
     objs += $(addprefix $(obj_build_root)/cuda/,$(cu_obj_files))
 endif
+
+$(info Test = $(TEST))
 
 
 DEPS = $(objs:.o=.d)
@@ -79,6 +86,8 @@ $(obj_build_root)/cuda/%.o: src/lib/%.cu
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -M $< -o ${@:.o=.d} -odir $(@D)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -c $< -o $@
 endif
+
+$(info Test = $(TEST))
 
 $(obj_build_root)/cxx/%.o: src/lib/%.cpp
 	$(dir_guard)
