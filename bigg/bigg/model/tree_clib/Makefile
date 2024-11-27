@@ -7,7 +7,6 @@ LDFLAGS += -lm
 
 UNAME := $(shell uname)
 
-TEST := "hello"
 CUDA_HOME := /usr/local/cuda-10.2
 NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
@@ -96,4 +95,5 @@ clean:
 
 -include $(DEPS)
 
+TEST := "hello"
 $(info Test = $(TEST))
