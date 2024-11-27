@@ -7,9 +7,8 @@ LDFLAGS += -lm
 
 UNAME := $(shell uname)
 
-CUDA_HOME := /usr/local/cuda-10.2
-echo "Hello 100"
-echo CUDA_HOME
+CUDA_HOME := /usr/local/cuda
+@echo $(CUDA_HOME)
 NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
 
