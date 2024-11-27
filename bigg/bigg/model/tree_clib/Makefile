@@ -13,7 +13,6 @@ NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
 
 $(info Cuda home = $(CUDA_HOME))
-$(info Test = $(TEST))
 
 ifeq ($(UNAME), Darwin)
     USE_GPU = 0
@@ -28,7 +27,6 @@ ifeq ($(USE_GPU), 1)
     LDFLAGS += -L$(CUDA_HOME)/lib64 -lcudart -lcublas -lcurand
 endif
 
-$(info Test = $(TEST))
 
 
 CUDA_ARCH := -gencode arch=compute_60,code=sm_60 -gencode arch=compute_70,code=sm_70
@@ -42,7 +40,6 @@ else
 endif
 
 
-$(info Test = $(TEST))
 
 CXXFLAGS += $(addprefix -I,$(include_dirs)) -Wno-unused-local-typedef
 CXXFLAGS += -fPIC
@@ -62,7 +59,6 @@ ifeq ($(USE_GPU), 1)
     objs += $(addprefix $(obj_build_root)/cuda/,$(cu_obj_files))
 endif
 
-$(info Test = $(TEST))
 
 
 DEPS = $(objs:.o=.d)
@@ -92,8 +88,15 @@ $(info Test = $(TEST))
 $(obj_build_root)/cxx/%.o: src/lib/%.cpp
 	$(dir_guard)
 	$(CXX) $(CXXFLAGS) -MMD -c -o $@ $(filter %.cpp, $^) $(FOMP)
+	
+$(info Test = $(TEST))
+
+
 
 clean:
 	rm -rf $(build_root)
+
+$(info Test = $(TEST))
+
 
 -include $(DEPS)
