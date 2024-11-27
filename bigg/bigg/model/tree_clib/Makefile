@@ -7,11 +7,14 @@ LDFLAGS += -lm
 
 UNAME := $(shell uname)
 
+TEST := "hello"
 CUDA_HOME := /usr/local/cuda-10.2
 NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
 
 $(info Cuda home = $(CUDA_HOME))
+$(info Test = $(TEST))
+
 ifeq ($(UNAME), Darwin)
     USE_GPU = 0
     FOMP := 
