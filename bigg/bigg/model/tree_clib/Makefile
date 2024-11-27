@@ -66,6 +66,8 @@ DEPS = $(objs:.o=.d)
 target = $(build_root)/dll/libtree.so
 target_dep = $(addsuffix .d,$(target))
 
+$(info target = $(target))
+
 .PRECIOUS: $(build_root)/lib/%.o
 
 all: $(target)
@@ -95,5 +97,4 @@ clean:
 
 -include $(DEPS)
 
-TEST := "hello235436"
-$(info Test = $(TEST))
+
