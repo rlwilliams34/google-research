@@ -13,6 +13,7 @@ NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
 
 $(info Cuda home = $(CUDA_HOME))
+$(info Use GPU = $(USE_GPU))
 
 ifeq ($(UNAME), Darwin)
     USE_GPU = 0
