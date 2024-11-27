@@ -78,7 +78,7 @@ $(target) : src/tree_main.cpp $(objs)
 DEPS += $(target_dep)
 
 ifeq ($(USE_GPU), 1)
-$(obj_build_root)/cuda/%.o: src/lib/%.cu
+$(obj_build_root)/cuda-10.2/%.o: src/lib/%.cu
 	$(dir_guard)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -M $< -o ${@:.o=.d} -odir $(@D)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -c $< -o $@
