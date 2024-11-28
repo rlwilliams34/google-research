@@ -73,7 +73,7 @@ $(info target dep = $(target_dep))
 
 .PRECIOUS: $(build_root)/lib/%.o
 
-$(info dir_guard = $(dir_guard)
+$(info dir_guard = $(dir_guard))
 
 all: $(target)
 
