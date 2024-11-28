@@ -7,7 +7,7 @@ LDFLAGS += -lm
 
 UNAME := $(shell uname)
 
-CUDA_HOME := /usr/local/cuda
+CUDA_HOME := /usr/local/cuda-10.2
 NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
 
@@ -71,8 +71,9 @@ target_dep = $(addsuffix .d,$(target))
 $(info target = $(target))
 $(info target dep = $(target_dep))
 
-
 .PRECIOUS: $(build_root)/lib/%.o
+
+$(info test = $($(build_root)/lib/%.o))
 
 all: $(target)
 
