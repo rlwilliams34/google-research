@@ -7,7 +7,7 @@ LDFLAGS += -lm
 
 UNAME := $(shell uname)
 
-CUDA_HOME := /usr/local/cuda-10.2
+CUDA_HOME := /usr/local/cuda
 NVCC := $(CUDA_HOME)/bin/nvcc
 USE_GPU = 1
 
@@ -85,7 +85,7 @@ DEPS += $(target_dep)
 $(info obj build root = $(obj_build_root))
 
 ifeq ($(USE_GPU), 1)
-$(obj_build_root)/cuda-10.2/%.o: src/lib/%.cu
+$(obj_build_root)/cuda/%.o: src/lib/%.cu
 	$(dir_guard)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -M $< -o ${@:.o=.d} -odir $(@D)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -c $< -o $@
