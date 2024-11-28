@@ -57,7 +57,7 @@ ifeq ($(USE_GPU), 1)
     NVCCFLAGS += -std=c++11 --use_fast_math --compiler-options '-fPIC'
     cu_files = $(shell $(FIND) src/lib -name "*.cu" -printf "%P\n")
     cu_obj_files = $(subst .cu,.o,$(cu_files))
-    objs += $(addprefix $(obj_build_root)/cuda-10.2/,$(cu_obj_files))
+    objs += $(addprefix $(obj_build_root)/cuda/,$(cu_obj_files))
 endif
 
 $(info objs = $(objs))
