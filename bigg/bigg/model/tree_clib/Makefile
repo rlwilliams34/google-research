@@ -60,6 +60,7 @@ ifeq ($(USE_GPU), 1)
     objs += $(addprefix $(obj_build_root)/cuda-10.2/,$(cu_obj_files))
 endif
 
+$(info objs = $(objs))
 
 
 DEPS = $(objs:.o=.d)
@@ -84,7 +85,7 @@ DEPS += $(target_dep)
 $(info obj build root = $(obj_build_root))
 
 ifeq ($(USE_GPU), 1)
-$(obj_build_root)/cuda/%.o: src/lib/%.cu
+$(obj_build_root)/cuda-10.2/%.o: src/lib/%.cu
 	$(dir_guard)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -M $< -o ${@:.o=.d} -odir $(@D)
 	$(NVCC) $(NVCCFLAGS) $(CUDA_ARCH) -c $< -o $@
