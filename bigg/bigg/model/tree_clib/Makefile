@@ -39,6 +39,7 @@ else
 	include_dirs = ./include	
 endif
 
+$(info include_dirs = $(include_dirs))
 
 
 CXXFLAGS += $(addprefix -I,$(include_dirs)) -Wno-unused-local-typedef
@@ -65,6 +66,9 @@ DEPS = $(objs:.o=.d)
 
 target = $(build_root)/dll/libtree.so
 target_dep = $(addsuffix .d,$(target))
+
+$(info target = $(target))
+$(info target dep = $(target_dep))
 
 
 .PRECIOUS: $(build_root)/lib/%.o
