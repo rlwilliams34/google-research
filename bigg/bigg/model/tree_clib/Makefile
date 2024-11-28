@@ -31,8 +31,6 @@ endif
 
 CUDA_ARCH := -gencode arch=compute_60,code=sm_60 -gencode arch=compute_70,code=sm_70
 
-$(info Cuda Arch = $(CUDA_ARCH))
-
 build_root = build
 
 ifeq ($(USE_GPU), 1)    
@@ -78,6 +76,8 @@ $(target) : src/tree_main.cpp $(objs)
 	$(CXX) -shared $(CXXFLAGS) -MMD -o $@ $(filter %.cpp %.o, $^) $(LDFLAGS)
 
 DEPS += $(target_dep)
+
+$(info obj build root = $(obj_build_root))
 
 ifeq ($(USE_GPU), 1)
 $(obj_build_root)/cuda-10.2/%.o: src/lib/%.cu
