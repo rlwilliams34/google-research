@@ -39,6 +39,7 @@ class custom_develop(develop):
         for folder in folders:
             os.chdir(folder)
             print("Hello 2")
+            print(folder)
             subprocess.check_call(['make'])
             print("Hello 3")
 
