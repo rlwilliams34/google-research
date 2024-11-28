@@ -48,8 +48,10 @@ cxx_obj_files = $(subst .cpp,.o,$(cpp_files))
 obj_build_root = $(build_root)/objs
 objs = $(addprefix $(obj_build_root)/cxx/,$(cxx_obj_files))
 
-$(info Object Build Root = $(obj_build_root))
-$(info Build Root = $(build_root))
+$(info CXX FLAGS = $(CXXFLAGS))
+$(info CPP Files = $(cpp_files))
+$(info CXX OBJ Files = $(cxx_obj_files))
+$(info Obs = $(objs))
 
 
 ifeq ($(USE_GPU), 1)
