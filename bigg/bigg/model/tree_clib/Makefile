@@ -31,6 +31,8 @@ endif
 
 CUDA_ARCH := -gencode arch=compute_60,code=sm_60 -gencode arch=compute_70,code=sm_70
 
+$(info Cuda Arch = $(CUDA_ARCH))
+
 build_root = build
 
 ifeq ($(USE_GPU), 1)    
@@ -47,11 +49,6 @@ cpp_files = $(shell $(FIND) src/lib -name "*.cpp" -print | rev | cut -d"/" -f1 |
 cxx_obj_files = $(subst .cpp,.o,$(cpp_files))
 obj_build_root = $(build_root)/objs
 objs = $(addprefix $(obj_build_root)/cxx/,$(cxx_obj_files))
-
-$(info CXX FLAGS = $(CXXFLAGS))
-$(info CPP Files = $(cpp_files))
-$(info CXX OBJ Files = $(cxx_obj_files))
-$(info Obs = $(objs))
 
 
 ifeq ($(USE_GPU), 1)
