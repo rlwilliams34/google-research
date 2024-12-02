@@ -359,7 +359,7 @@ if __name__ == '__main__':
             val_graphs = cp.load(f)
         print('# val graphs', len(val_graphs))
         
-        out_graphs = gen_graphs(model, cmd_args.num_test_gen, cmd_args.num_node_dist, cmd_args.display, cmd_args.model, cmd_args.device, cmd_args.has_edge_feats)
+        out_graphs = gen_graphs(model, cmd_args.num_test_gen, num_node_dist, cmd_args.display, cmd_args.model, cmd_args.device, cmd_args.has_edge_feats)
         
         print("Generating Graph Validation Stats")
         get_graph_stats(out_graphs, val_graphs, cmd_args.g_type)
