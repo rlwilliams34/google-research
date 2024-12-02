@@ -934,6 +934,7 @@ class RecurTreeGen(nn.Module):
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
         ll = ll + self.binary_ll(logit_has_edge, has_ch)
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
+        print(cur_states[0].shape)
 
         lv = 0
         while True:
@@ -989,8 +990,6 @@ class RecurTreeGen(nn.Module):
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
-            print(cur_states[0].shape)
-            print(left_subtree_states[0].shape)
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
             if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4"] and len(left_wt_ids) > 0:
