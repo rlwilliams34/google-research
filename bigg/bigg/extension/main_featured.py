@@ -186,7 +186,8 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             #print(e)
             print(i)
             g = graph[i]
-            edge_feats_i = edge_feats[0][i]
+            #edge_feats_i = edge_feats[0][i]
+            edge_feats_i = edge_feats[i]
 #             print(edge_feats)
 #             print(edge_feats_i)
             edges = []
