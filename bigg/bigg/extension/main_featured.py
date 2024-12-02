@@ -178,113 +178,9 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
     
     import sys
     sys.exit()
-#     
-#     if method=="Test4":
-#         ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
-#         print(ll)
-#         ll_t1 = ll.item()
-#         ll_w1 = ll_wt.item()
-#         print(ll_wt)
-#         
-#         edges = []
-#         for e in graph.edges():
-#             if e[1] > e[0]:
-#                 e = (e[1], e[0])
-#             edges.append(e)
-#         edges = sorted(edges)
-#         
-#         if not torch.is_tensor(edge_feats) and edge_feats is not None:
-#             edge_feats = edge_feats[0]
-#         ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
-#         print(ll)
-#         print(ll_wt)
-#         ll_t2 = ll.item()
-#         ll_w2 = ll_wt.item()
-#         diff_t = abs(ll_t1 - ll_t2)
-#         diff_w = abs(ll_w1 - ll_w2)
-#         print("diff top: ", diff_t)
-#         print("diff weight: ", diff_w)
-#         import sys
-#         sys.exit()
-#     
-#     
-#     ll, ll_wt, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
-#     #ll, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats)
-#     print(ll)
-#     ll_t1 = ll.item()
-#     ll_w1 = ll_wt.item()
-#     print(ll_wt)
-# 
-#     edges = []
-#     for e in graph.edges():
-#         if e[1] > e[0]:
-#             e = (e[1], e[0])
-#         edges.append(e)
-#     edges = sorted(edges)
-#     
-#     if not torch.is_tensor(edge_feats) and edge_feats is not None:
-#         edge_feats = edge_feats[0]
-#     ll, ll_wt, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
-#     #ll, _, _, _, _ = model(len(graph), edges, node_feats=node_feats, edge_feats=edge_feats)
-#     print(ll)
-#     print(ll_wt)
-#     ll_t2 = ll.item()
-#     ll_w2 = ll_wt.item()
-#     diff_t = abs(ll_t1 - ll_t2)
-#     diff_w = abs(ll_w1 - ll_w2)
-#     print("diff top: ", diff_t)
-#     print("diff weight: ", diff_w)
-#     import sys
-#     sys.exit()
 
-def gen_graphs(model, num_test_gen, num_node_dist, display, model_type, device, has_edge_feats):
-    out_graphs = []
-    with torch.no_grad():
-        model.eval()
-        for _ in tqdm(range(num_test_gen)):
-            num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
-            _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=display)
-            
-            if model_type == "BiGG_GCN":
-                fix_edges = []
-                for e1, e2 in pred_edges:
-                    if e1 > e2:
-                        fix_edges.append((e2, e1))
-                    else:
-                        fix_edges.append((e1, e2))
-                pred_edge_tensor = torch.tensor(fix_edges).to(device)
-                pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
-                pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
-                
-                weighted_edges = []
-                for e1, e2, w in pred_weighted_tensor:
-                    weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
-                
-                pred_g = nx.Graph()
-                pred_g.add_weighted_edges_from(weighted_edges)
-            
-            elif has_edge_feats:
-                weighted_edges = []
-                for e, w in zip(pred_edges, pred_edge_feats):
-                    assert e[0] > e[1]
-                    weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
-                pred_g = nx.Graph()
-                pred_g.add_weighted_edges_from(weighted_edges)
-            
-            else:
-                pred_g = nx.Graph()
-                fixed_edges = []
-                for e in pred_edges:
-                    w = 1.0
-                    if e[0] < e[1]:
-                        edge = (e[0], e[1], w)
-                    else:
-                        edge = (e[1], e[0], w)
-                    fixed_edges.append(edge)
-                pred_g.add_weighted_edges_from(fixed_edges)
-            
-            out_graphs.append(pred_g)
-    return out_graphs
+
+
 
 
 if __name__ == '__main__':
@@ -359,10 +255,57 @@ if __name__ == '__main__':
             val_graphs = cp.load(f)
         print('# val graphs', len(val_graphs))
         
-        out_graphs = gen_graphs(model, cmd_args.num_test_gen, num_node_dist, cmd_args.display, cmd_args.model, cmd_args.device, cmd_args.has_edge_feats)
+        gen_graphs = []
+        with torch.no_grad():
+            model.eval()
+            for _ in tqdm(range(cmd_args.num_test_gen)):
+                num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
+                _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+                
+                if cmd_args.model == "BiGG_GCN":
+                    fix_edges = []
+                    for e1, e2 in pred_edges:
+                        if e1 > e2:
+                            fix_edges.append((e2, e1))
+                        else:
+                            fix_edges.append((e1, e2))
+                    pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+                    pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
+                    pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
+                    
+                    weighted_edges = []
+                    for e1, e2, w in pred_weighted_tensor:
+                        weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
+                    
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
+                
+                elif cmd_args.has_edge_feats:
+                    weighted_edges = []
+                    for e, w in zip(pred_edges, pred_edge_feats):
+                        assert e[0] > e[1]
+                        weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
+                
+                else:
+                    pred_g = nx.Graph()
+                    fixed_edges = []
+                    for e in pred_edges:
+                        w = 1.0
+                        if e[0] < e[1]:
+                            edge = (e[0], e[1], w)
+                        else:
+                            edge = (e[1], e[0], w)
+                        fixed_edges.append(edge)
+                    pred_g.add_weighted_edges_from(fixed_edges)
+                    gen_graphs.append(pred_g)
         
         print("Generating Graph Validation Stats")
-        get_graph_stats(out_graphs, val_graphs, cmd_args.g_type)
+        get_graph_stats(gen_graphs, val_graphs, cmd_args.g_type)
+        
         sys.exit()
         
     
@@ -374,18 +317,69 @@ if __name__ == '__main__':
         with open(path, 'rb') as f:
             gt_graphs = cp.load(f)
         print('# gt graphs', len(gt_graphs))
-        out_graphs = gen_graphs(model, cmd_args.num_test_gen, num_node_dist, cmd_args.display, cmd_args.model, cmd_args.device, cmd_args.has_edge_feats)
+        
+        gen_graphs = []
+        with torch.no_grad():
+            model.eval()
+            for _ in tqdm(range(cmd_args.num_test_gen)):
+                num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
+                _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+                
+                if cmd_args.model == "BiGG_GCN":
+                    fix_edges = []
+                    for e1, e2 in pred_edges:
+                        if e1 > e2:
+                            fix_edges.append((e2, e1))
+                        else:
+                            fix_edges.append((e1, e2))
+                    pred_edge_tensor = torch.tensor(fix_edges).to(cmd_args.device)
+                    pred_weighted_tensor = model.gcn_mod.sample(num_nodes, pred_edge_tensor)
+                    pred_weighted_tensor = pred_weighted_tensor.cpu().detach().numpy()
+                    
+                    weighted_edges = []
+                    for e1, e2, w in pred_weighted_tensor:
+                        weighted_edges.append((int(e1), int(e2), np.round(w.item(), 4)))
+                    
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
+                
+                elif cmd_args.has_edge_feats:
+                    weighted_edges = []
+                    for e, w in zip(pred_edges, pred_edge_feats):
+                        assert e[0] > e[1]
+                        weighted_edges.append((e[1], e[0], np.round(w.item(), 4)))
+                    pred_g = nx.Graph()
+                    pred_g.add_weighted_edges_from(weighted_edges)
+                    gen_graphs.append(pred_g)
+                
+                else:
+                    pred_g = nx.Graph()
+                    fixed_edges = []
+                    for e in pred_edges:
+                        w = 1.0
+                        if e[0] < e[1]:
+                            edge = (e[0], e[1], w)
+                        else:
+                            edge = (e[1], e[0], w)
+                        fixed_edges.append(edge)
+                    pred_g.add_weighted_edges_from(fixed_edges)
+                    gen_graphs.append(pred_g)
+        
         if cmd_args.max_num_nodes > -1:
             for idx in range(min(2, cmd_args.num_test_gen)):
                 print("edges:")
-                print(out_graphs[idx].edges(data=True))
+                print(gen_graphs[idx].edges(data=True))
+        
         print(cmd_args.g_type)
         print("Generating Graph Stats")
-        get_graph_stats(out_graphs, gt_graphs, cmd_args.g_type)
+        get_graph_stats(gen_graphs, gt_graphs, cmd_args.g_type)
+        
         print('saving graphs')
         with open(cmd_args.model_dump + '.graphs-%s' % str(cmd_args.greedy_frac), 'wb') as f:
-            cp.dump(out_graphs, f, cp.HIGHEST_PROTOCOL)
+            cp.dump(gen_graphs, f, cp.HIGHEST_PROTOCOL)
         print('graph generation complete')
+        
         sys.exit()
     #########################################################################################################
     
