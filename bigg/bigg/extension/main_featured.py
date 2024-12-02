@@ -199,7 +199,7 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
         if cat:
             print("Need to implement")
         
-        elif isintance(edge_feats, list):   
+        elif isinstance(edge_feats, list):   
             edge_feats = torch.cat(edge_feats, dim = 0)
         
         ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
