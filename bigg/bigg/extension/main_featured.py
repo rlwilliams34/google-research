@@ -536,6 +536,7 @@ if __name__ == '__main__':
     model.train()
     
     ### DEBUG
+    # debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=False, method=None)
     if cmd_args.debug:
 #         print(train_graphs[0].edges(data=True))
 #         if cmd_args.has_edge_feats:
@@ -563,7 +564,7 @@ if __name__ == '__main__':
             debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, True)
         
         else:
-            debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
+            debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True)
     
 #     ####
     
