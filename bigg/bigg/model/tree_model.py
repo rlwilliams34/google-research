@@ -962,6 +962,9 @@ class RecurTreeGen(nn.Module):
             print(cur_states[0].shape)
 
             cur_states = self.cell_topdown(left_update, cur_states, lv)
+            
+            print("C")
+            print(cur_states[0].shape)
 
             left_ids = TreeLib.GetLeftRootStates(lv)
             h_bot, c_bot = fn_hc_bot(lv + 1)
