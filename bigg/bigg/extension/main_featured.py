@@ -184,11 +184,9 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             #ll_w1 = ll_wt + ll_w1
             #print(g)
             #print(e)
-            print(i)
             g = graph[i]
             #edge_feats_i = edge_feats[0][i]
             edge_feats_i = edge_feats[i]
-            print(edge_feats_i)
 #             print(edge_feats)
 #             print(edge_feats_i)
             edges = []
@@ -211,8 +209,9 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             #edge_feats, lr = zip(*edge_feats)
             #print(edge_feats)
             #print(lr)
-            edge_feats, lr = edge_feats
-            edge_feats = (torch.cat(edge_feats, dim = 0), np.concatenate(lr, axis = 1))
+            edge_feats = torch.cat(edge_feats, dim = 0)
+            #edge_feats, lr = edge_feats
+            #edge_feats = (torch.cat(edge_feats, dim = 0), np.concatenate(lr, axis = 1))
         #print(edge_feats)
         ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
         
