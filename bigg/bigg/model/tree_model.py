@@ -107,8 +107,6 @@ def batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell):
 
 def selective_update_hc(h, c, zero_one, feats):
     nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
-    print(h)
-    print(h.shape)
     num_layers = h.shape[0]
     embed_dim = h.shape[2]
     #feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
@@ -975,7 +973,7 @@ class RecurTreeGen(nn.Module):
                     left_feats = weights_MLP[edge_idx[~is_rch]]
                     
                 else:
-                    left_feats = (edge_feats_embed[0][edge_idx[:, ~is_rch]], edge_feats_embed[1][edge_idx[:, ~is_rch]])
+                    left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
                 
