@@ -937,7 +937,6 @@ class RecurTreeGen(nn.Module):
 
         lv = 0
         while True:
-            print("lv: ", lv)
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
@@ -950,21 +949,14 @@ class RecurTreeGen(nn.Module):
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
-            print("A")
-            print(cur_states[0].shape)
             cur_states = (cur_states[0][:, is_nonleaf], cur_states[1][:, is_nonleaf])
             left_logits = self.pred_has_left(cur_states[0][-1], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
             ll = ll + left_ll
-            print("B")
-            print(cur_states[0].shape)
 
             cur_states = self.cell_topdown(left_update, cur_states, lv)
-            
-            print("C")
-            print(cur_states[0].shape)
 
             left_ids = TreeLib.GetLeftRootStates(lv)
             h_bot, c_bot = fn_hc_bot(lv + 1)
@@ -997,8 +989,6 @@ class RecurTreeGen(nn.Module):
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
-            print(cur_states[0].shape)
-            print(left_subtree_states[0].shape)
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
             if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4"] and len(left_wt_ids) > 0:
