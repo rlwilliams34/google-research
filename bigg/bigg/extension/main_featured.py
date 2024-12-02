@@ -554,7 +554,7 @@ if __name__ == '__main__':
         print(train_graphs[1].edges(data=True))
         
         if cmd_args.method == "LSTM":
-            debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True)
+            debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
         elif cmd_args.method == "Test4":
             edge_feats = [list_edge_feats[i][0] for i in [0,1]]
@@ -563,7 +563,7 @@ if __name__ == '__main__':
             debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, True)
         
         else:
-            debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True, True)
+            debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
     
 #     ####
     
