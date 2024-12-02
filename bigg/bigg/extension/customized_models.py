@@ -46,17 +46,16 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         #self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
-        #self.update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
-        #self.topdown_update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
         self.topdown_update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
         if self.method == "Test4":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
             self.edgeLSTM = nn.LSTMCell(args.embed_dim, args.embed_dim)
-            self.leaf_h0_wt = Parameter(torch.Tensor(1, args.embed_dim))
-            self.leaf_c0_wt = Parameter(torch.Tensor(1, args.embed_dim))
+            self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.merge_top_wt = BinaryTreeLSTMCell(args.embed_dim)
-            self.update_wt = nn.LSTMCell(args.embed_dim, args.embed_dim)
+            #self.update_wt = nn.LSTMCell(args.embed_dim, args.embed_dim)
+            self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
         if self.method in ["Test", "Test2", "Test3"]:
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
@@ -78,8 +77,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "LSTM":
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
-            #self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
-            self.edgeLSTM = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
+            self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+            #self.edgeLSTM = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
             
             self.leaf_h0_wt = Parameter(torch.Tensor(1, args.embed_dim))
             self.leaf_c0_wt = Parameter(torch.Tensor(1, args.embed_dim))
@@ -89,8 +88,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "LSTM2":
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
-            #self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
-            self.edgeLSTM = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
+            self.edgeLSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+            #self.edgeLSTM = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
             
             self.leaf_h0_wt = Parameter(torch.Tensor(1, args.embed_dim))
             self.leaf_c0_wt = Parameter(torch.Tensor(1, args.embed_dim))
@@ -229,11 +228,6 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False, lr_seq=None):
         noise = 0.0
-#         self.mu_wt = 0 * self.mu_wt
-#         self.var_wt = self.var_wt / self.var_wt
-        #print(self.mu_wt)
-        #print(self.var_wt)
-#         self.epoch_num = 0 * self.epoch_num
         if not torch.is_tensor(edge_feats): 
             edge_feats_normalized = []
             for edge_feats in edge_feats:
@@ -247,11 +241,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             if prev_state is not None:
                 weights_MLP = self.edgelen_encoding(edge_feats_normalized)
                 weight_embedding = self.edgeLSTM(weights_MLP, prev_state)
-#                 print("+++++++++++++++++++++++++++++++++++++++++++++++")
-#                 print(edge_feats)
-#                 print(edge_feats_normalized)
-#                 print(weight_embedding)
-#                 print("+++++++++++++++++++++++++++++++++++++++++++++++")
                 return weight_embedding
                 
             embeds = torch.cat([self.topdown_left_embed[1:], self.topdown_right_embed[1:]], dim = 0)
@@ -268,13 +257,10 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             weights_MLP = self.edgelen_encoding(edge_feats_normalized)
             weight_embeddings = self.edgeLSTM(weights_MLP, weight_embeddings)
-#             print("EDGE FESTS: ", edge_feats)
-#             print("WEIGHT EMBEDDINGS: ", weight_embeddings)
             return weight_embeddings, weights_MLP
         
         if self.method in ["Test", "Test2", "Test3"]:
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
-            #print(edge_embed.shape)
             return edge_embed
         
         if self.method == "MLP-Repeat" or self.method == "MLP-2":
@@ -308,15 +294,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             edge_feats_normalized = torch.cat(edge_feats_normalized_pad, dim = -1)
             return edge_feats_normalized
-        
-#         def reorder(T, idx):
-#             count_ = torch.sum(idx, dim = 0)
-#             X = []
-#             placement = [torch.sum(idx[:, :k+1], dim = 1)[idx[:, k]] for k in range(0, idx.shape[1])]
-#             placement = [p - 1 for p in placement]
-#             T = [ torch.cat([T[i][placement[k][i]:placement[k][i]+1] for i in range(0, count_[k].int())], dim = 0) for k in range(len(count_))]
-#             T = torch.cat(T, dim = 0)
-#             return T
         
         if self.method == "LSTM":
             if prev_state is None:
@@ -510,7 +487,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         else:
             if self.sampling_method  == "softplus":
                 ### Update log likelihood with weight prediction
-                #print("Hi")
                 ### Trying with softplus parameterization...
                 edge_feats_invsp = edge_feats #self.compute_softminus(edge_feats)
                 
