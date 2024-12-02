@@ -179,16 +179,8 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
         i = 0
         
         for i in range(0, 2):
-            #ll, ll_wt, _ = model.forward_train([i], node_feats=node_feats, edge_feats=edge_feats)
-            #ll_t1 = ll + ll_t1
-            #ll_w1 = ll_wt + ll_w1
-            #print(g)
-            #print(e)
             g = graph[i]
-            #edge_feats_i = edge_feats[0][i]
             edge_feats_i = edge_feats[i]
-#             print(edge_feats)
-#             print(edge_feats_i)
             edges = []
             for e in g.edges():
                 if e[1] > e[0]:
@@ -205,14 +197,11 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             
         
         if cat:
-            #edge_feats = torch.cat(edge_feats, dim = 0)
-            #edge_feats, lr = zip(*edge_feats)
-            #print(edge_feats)
-            #print(lr)
             edge_feats = torch.cat(edge_feats, dim = 0)
-            #edge_feats, lr = edge_feats
-            #edge_feats = (torch.cat(edge_feats, dim = 0), np.concatenate(lr, axis = 1))
-        #print(edge_feats)
+        
+        print(cat)
+        print(edge_feats)
+        print(edge_feats.shape)
         ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
         
         print(ll_t1)
