@@ -344,8 +344,8 @@ class FenwickTree(nn.Module):
         
         
         h_list, c_list = zip(*row_embeds)
-        joint_h = torch.cat(h_list, dim=0)
-        joint_c = torch.cat(c_list, dim=0)
+        joint_h = torch.cat(h_list, dim=1)
+        joint_c = torch.cat(c_list, dim=1)
 #         print(joint_h)
 #         print(joint_c)
 #         if self.method == "Test4":
@@ -810,8 +810,8 @@ class RecurTreeGen(nn.Module):
         #    edge_feats = self.embed_edge_feats(edge_feats)
 
         if not self.bits_compress:
-            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=0)
-            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=0)
+            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
+            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
             fn_hc_bot = lambda d: (h_bot, c_bot)
         else:
             binary_embeds, base_feat = TreeLib.PrepareBinary()
