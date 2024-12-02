@@ -374,7 +374,7 @@ if __name__ == '__main__':
         with open(path, 'rb') as f:
             gt_graphs = cp.load(f)
         print('# gt graphs', len(gt_graphs))
-        out_graphs = gen_graphs(model, cmd_args.num_test_gen, cmd_args.num_node_dist, cmd_args.display, cmd_args.model, cmd_args.device, cmd_args.has_edge_feats)
+        out_graphs = gen_graphs(model, cmd_args.num_test_gen, num_node_dist, cmd_args.display, cmd_args.model, cmd_args.device, cmd_args.has_edge_feats)
         if cmd_args.max_num_nodes > -1:
             for idx in range(min(2, cmd_args.num_test_gen)):
                 print("edges:")
