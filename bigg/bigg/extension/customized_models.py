@@ -44,11 +44,11 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
-        self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
-        #self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
-        self.update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
-        self.topdown_update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
-        #self.topdown_update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        #self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
+        self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        #self.update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
+        #self.topdown_update_wt = nn.LSTMCell(args.weight_embed_dim, args.embed_dim)
+        self.topdown_update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
         if self.method == "Test4":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)

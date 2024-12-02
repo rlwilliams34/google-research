@@ -194,9 +194,12 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
             ll_t2 = ll + ll_t2
             ll_w2 = ll_wt + ll_w2
-            
-        cat = True
+         
+         
         if cat:
+            print("Need to implement")
+        
+        elif isintance(edge_feats, list):   
             edge_feats = torch.cat(edge_feats, dim = 0)
         
         ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
