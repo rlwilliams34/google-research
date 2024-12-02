@@ -195,13 +195,10 @@ def debug_model(model, graph, node_feats, edge_feats, two_graphs=False, cat=Fals
             ll_t2 = ll + ll_t2
             ll_w2 = ll_wt + ll_w2
             
-        
+        cat = True
         if cat:
             edge_feats = torch.cat(edge_feats, dim = 0)
         
-        print(cat)
-        print(edge_feats)
-        print(edge_feats.shape)
         ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
         
         print(ll_t1)
