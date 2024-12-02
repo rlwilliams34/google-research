@@ -107,6 +107,8 @@ def batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell):
 
 def selective_update_hc(h, c, zero_one, feats):
     nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
+    print(h)
+    print(h.shape)
     num_layers = h.shape[0]
     embed_dim = h.shape[2]
     #feats = feats.reshape(feats.shape[0], num_layers, embed_dim).movedim(0, 1)
