@@ -279,7 +279,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "MLP-Repeat" or self.method == "MLP-2":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
-            #edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
+            edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
         
@@ -474,7 +474,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         if prev_state is not None:
             h = torch.cat([h, prev_state], dim = -1)
         
-        mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
+        mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         if edge_feats is None:
             ll = 0
