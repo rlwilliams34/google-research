@@ -883,7 +883,8 @@ class RecurTreeGen(nn.Module):
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
-            right_ll, _ = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
+            right_ll, _ = self.binary_ll(right_logits, has_right, reduction='none')
+            right_ll = right_ll * float_has_left
             ll = ll + torch.sum(right_ll)
             
             if batch_idx is not None:
