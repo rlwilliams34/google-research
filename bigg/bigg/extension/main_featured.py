@@ -422,6 +422,7 @@ if __name__ == '__main__':
         random.shuffle(indices)
         epoch_losses_t = []
         epoch_losses_w = []
+        batch_idx = None
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
@@ -469,12 +470,17 @@ if __name__ == '__main__':
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
+            if cmd_args.sigma:
+                batch_idx = np.concatenate([np.repeat(i, len(list_edge_feats[i])) for i in batch_indices])
+            
             if cmd_args.model == "BiGG_GCN":
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx)
+                print(ll_batch)
+                print(ll_batch_wt)
             
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
@@ -484,6 +490,7 @@ if __name__ == '__main__':
                 epoch_losses_t.append(-ll.item())
                 epoch_losses_w.append(-ll_wt.item())
                 loss = -ll / sigma_t**0.5 - ll_wt / sigma_w**0.5
+                loss = loss / B
             
             else:
                 loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes)#* cmd_args.accum_grad)

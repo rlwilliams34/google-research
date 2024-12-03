@@ -429,7 +429,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             ll = torch.sum(ll)
         return new_state, ll, node_feats
 
-    def predict_edge_feats(self, state, edge_feats=None,prev_state=None):
+    def predict_edge_feats(self, state, edge_feats=None,prev_state=None,batch_idx=None,ll_batch_wt=None):
         """
         Args:
             state: tuple of (h=N x embed_dim, c=N x embed_dim), the current state
@@ -480,9 +480,11 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
                 edge_feats = torch.distributions.gamma.Gamma(a, b).sample()
             
-            elif self.sampling_method == "vae":
-                z = torch.randn(1, 8).to(h.device)
-                edge_feats, _ = self.decode_weight(z, h)
+            return ll, edge_feats
+            
+#             elif self.sampling_method == "vae":
+#                 z = torch.randn(1, 8).to(h.device)
+#                 edge_feats, _ = self.decode_weight(z, h)
                 
         else:
             if self.sampling_method  == "softplus":
@@ -504,7 +506,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
                 ## add to ll
                 ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
-                ll = torch.sum(ll)
             
             elif self.sampling_method  == "lognormal":
                 ### Trying with softplus parameterization...
@@ -516,7 +517,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ll = torch.div(ll, var)
                 ll = ll + np.log(2 * np.pi) + lvars
                 ll = -0.5 * ll - log_edge_feats 
-                ll = torch.sum(ll)
                 #ll = torch.mean(ll)
             
             elif self.sampling_method  == "gamma":
@@ -530,13 +530,19 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ll = ll - torch.lgamma(a)
                 ll = ll + torch.mul(a - 1, log_edge_feats)
                 ll = ll - torch.mul(b, edge_feats)
-                ll = torch.sum(ll)
+            
+            if batch_idx is not None:
+                i = 0
+                for B in np.unique(batch_idx):
+                    ll_batch_wt[i] = ll_batch_wt[i] + torch.sum(ll[batch_idx == B])
+            
+            ll = torch.sum(ll)
             
 #             elif self.sampling_method == "vae":
 #                 z, ll_kl = self.encode_weight(edge_feats, h)
 #                 _, ll = self.decode_weight(z, h, edge_feats)
 #                 ll = ll + ll_kl
-        return ll, edge_feats
+        return ll, edge_feats, ll_batch_wt
     
 #     def encode_weight(self, edge_feats, h):
 #         edge_feats = self.standardize_edge_feats(edge_feats)

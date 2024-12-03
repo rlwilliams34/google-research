@@ -360,6 +360,7 @@ class RecurTreeGen(nn.Module):
         super(RecurTreeGen, self).__init__()
 
         self.directed = args.directed
+        self.sigma = args.sigma
         self.batch_size = args.batch_size
         self.self_loop = args.self_loop
         self.bits_compress = args.bits_compress
@@ -683,13 +684,21 @@ class RecurTreeGen(nn.Module):
             edge_feats = torch.cat(list_pred_edge_feats, dim=0)
         return total_ll, total_ll_wt, edges, self.row_tree.list_states, node_feats, edge_feats
 
-    def binary_ll(self, pred_logits, np_label, need_label=False, reduction='sum'):
+    def binary_ll(self, pred_logits, np_label, need_label=False, reduction='sum', batch_idx=None, ll_batch=None):
         pred_logits = pred_logits.view(-1, 1)
         label = torch.tensor(np_label, dtype=torch.float32).to(pred_logits.device).view(-1, 1)
         loss = F.binary_cross_entropy_with_logits(pred_logits, label, reduction=reduction)
+        
+        ind_loss = F.binary_cross_entropy_with_logits(pred_logits, label, reduction='none')
+        
+        if batch_idx is not None:
+            i = 0
+            for B in np.unique(batch_idx):
+                ll_batch[i] = ll_batch[i] + torch.sum(ind_loss[batch_idx == B])
+        
         if need_label:
-            return -loss, label
-        return -loss
+            return -loss, label, ll_batch
+        return -loss, ll_batch
 
     def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None):
         TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
@@ -771,11 +780,14 @@ class RecurTreeGen(nn.Module):
         return row_states, next_states
 
     def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
-                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
+                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None):
         ll = 0.0
         ll_wt = 0.0
         noise = 0.0
+        ll_batch = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
+        ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
+        
         if self.has_edge_feats:
             if self.method == "LSTM":
                 edge_feats_embed, state_h_prior = self.embed_edge_feats(edge_feats, noise)
@@ -796,7 +808,8 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
-        ll = ll + self.binary_ll(logit_has_edge, has_ch)
+        ll, ll_batch = ll + self.binary_ll(logit_has_edge, has_ch, batch_idx = batch_idx, ll_batch = ll_batch)
+        
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
 
         lv = 0
@@ -809,7 +822,7 @@ class RecurTreeGen(nn.Module):
                 prior_h_target = None
                 if self.method == "LSTM": 
                     prior_h_target = state_h_prior[edge_of_lv]
-                edge_ll, _ = self.predict_edge_feats(edge_state, target_feats, prior_h_target)
+                edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, prior_h_target, batch_idx = batch_idx, ll_batch_wt = ll_batch_wt)
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
@@ -817,7 +830,7 @@ class RecurTreeGen(nn.Module):
             left_logits = self.pred_has_left(cur_states[0][-1], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
-            left_ll, float_has_left = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
+            left_ll, float_has_left, ll_batch = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum', batch_idx = batch_idx, ll_batch = ll_batch)
             ll = ll + left_ll
 
             cur_states = self.cell_topdown(left_update, cur_states, lv)
@@ -869,8 +882,14 @@ class RecurTreeGen(nn.Module):
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
-            right_ll = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
+            right_ll, _ = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
             ll = ll + torch.sum(right_ll)
+            
+            if batch_idx is not None:
+                i = 0
+                for B in np.unique(batch_idx):
+                    ll_batch[i] = ll_batch[i] + torch.sum(right_ll[batch_idx == B])
+            
             lr_ids = TreeLib.GetLeftRightSelect(lv, np.sum(has_left), np.sum(has_right))
             new_states = []
             for i in range(2):
@@ -879,7 +898,7 @@ class RecurTreeGen(nn.Module):
                 new_states.append(new_s)
             cur_states = tuple(new_states)
             lv += 1
-        return ll, ll_wt, next_states
+        return ll, ll_wt, ll_batch, ll_batch_wt, next_states
 
 
 # 
