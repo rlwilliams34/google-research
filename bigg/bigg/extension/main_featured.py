@@ -380,8 +380,6 @@ if __name__ == '__main__':
     batch_loss = 0.0
     sigma_t = 1.0
     sigma_w = 1.0
-    epoch_losses_t = []
-    epoch_losses_w = []
     
     N = len(train_graphs)
     B = cmd_args.batch_size
@@ -422,6 +420,8 @@ if __name__ == '__main__':
         tot_loss = 0.0
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
+        epoch_losses_t = []
+        epoch_losses_w = []
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
@@ -502,11 +502,9 @@ if __name__ == '__main__':
         
         print('epoch complete')
         
-        if cmd_args.sigma:
+        if cmd_args.sigma and epoch > 5:
             sigma_t = np.var(epoch_losses_t, ddof = 1)
             sigma_w = np.var(epoch_losses_w, ddof = 1)
-            epoch_losses_t = []
-            epoch_losses_w = []
             print("sigma t: ", sigma_t)
             print("sigma w: ", sigma_w)
         
