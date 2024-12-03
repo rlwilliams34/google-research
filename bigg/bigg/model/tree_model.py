@@ -695,6 +695,7 @@ class RecurTreeGen(nn.Module):
             i = 0
             for B in np.unique(batch_idx):
                 ll_batch[i] = ll_batch[i] + torch.sum(ind_loss[batch_idx == B])
+                i = i + 1
         
         if need_label:
             return -loss, label, ll_batch

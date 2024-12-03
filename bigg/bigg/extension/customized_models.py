@@ -535,6 +535,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 i = 0
                 for B in np.unique(batch_idx):
                     ll_batch_wt[i] = ll_batch_wt[i] + torch.sum(ll[batch_idx == B])
+                    i = i + 1
             
             ll = torch.sum(ll)
             
