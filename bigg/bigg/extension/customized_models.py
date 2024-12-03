@@ -542,7 +542,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 #                 z, ll_kl = self.encode_weight(edge_feats, h)
 #                 _, ll = self.decode_weight(z, h, edge_feats)
 #                 ll = ll + ll_kl
-        return ll, edge_feats, ll_batch_wt
+        return ll, ll_batch_wt, edge_feats
     
 #     def encode_weight(self, edge_feats, h):
 #         edge_feats = self.standardize_edge_feats(edge_feats)
