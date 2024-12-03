@@ -507,6 +507,8 @@ if __name__ == '__main__':
             sigma_w = np.var(epoch_losses_w, ddof = 1)
             epoch_losses_t = []
             epoch_losses_w = []
+            print("sigma t: ", sigma_t)
+            print("sigma w: ", sigma_w)
         
         cur = epoch + 1
         
