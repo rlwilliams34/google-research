@@ -483,8 +483,7 @@ if __name__ == '__main__':
             if cmd_args.sigma:
                 epoch_losses_t.append(-ll.item())
                 epoch_losses_w.append(-ll_wt.item())
-                loss = -ll / sigma_t - ll_wt / sigma_w
-                loss = loss / num_nodes
+                loss = -ll / sigma_t**0.5 - ll_wt / sigma_w**0.5
             
             else:
                 loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes)#* cmd_args.accum_grad)
@@ -502,7 +501,7 @@ if __name__ == '__main__':
         
         print('epoch complete')
         
-        if cmd_args.sigma and epoch > 5:
+        if cmd_args.sigma and epoch > 0:
             sigma_t = np.var(epoch_losses_t, ddof = 1)
             sigma_w = np.var(epoch_losses_w, ddof = 1)
             print("sigma t: ", sigma_t)
