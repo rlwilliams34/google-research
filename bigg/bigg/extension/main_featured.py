@@ -479,16 +479,15 @@ if __name__ == '__main__':
                 
             else:
                 ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx)
-                print(ll_batch)
-                print(ll_batch_wt)
+                
             
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
             true_loss = -(ll + ll_wt) / num_nodes
             
             if cmd_args.sigma:
-                epoch_losses_t.append(-ll.item())
-                epoch_losses_w.append(-ll_wt.item())
+                epoch_losses_t.append(ll_batch)
+                epoch_losses_w.append(ll_batch_wt)
                 loss = -ll / sigma_t**0.5 - ll_wt / sigma_w**0.5
                 loss = loss / B
             
