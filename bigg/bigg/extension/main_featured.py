@@ -481,8 +481,8 @@ if __name__ == '__main__':
             true_loss = -(ll + ll_wt) / num_nodes
             
             if cmd_args.sigma:
-                epoch_losses_t.append(-ll)
-                epoch_losses_w.append(-ll_wt)
+                epoch_losses_t.append(-ll.item())
+                epoch_losses_w.append(-ll_wt.item())
                 loss = -ll / sigma_t - ll_wt / sigma_w
                 loss = loss / num_nodes
             
