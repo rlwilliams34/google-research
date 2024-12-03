@@ -834,7 +834,7 @@ class RecurTreeGen(nn.Module):
                 break
             cur_states = (cur_states[0][:, is_nonleaf], cur_states[1][:, is_nonleaf])
             
-            if batch_idx is None:
+            if batch_idx is not None:
                 batch_idx = batch_idx[is_nonleaf]
             
             left_logits = self.pred_has_left(cur_states[0][-1], lv)
