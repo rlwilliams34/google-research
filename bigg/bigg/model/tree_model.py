@@ -816,6 +816,10 @@ class RecurTreeGen(nn.Module):
         print(batch_idx)
         if batch_idx is not None:
             batch_idx = batch_idx[has_ch]
+        print(batch_idx)
+        print(len(batch_idx))
+        print(cur_states[0].shape)
+        print(STOP)
 
         lv = 0
         while True:
