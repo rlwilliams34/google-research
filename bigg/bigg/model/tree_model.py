@@ -808,7 +808,8 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
-        ll, ll_batch = ll + self.binary_ll(logit_has_edge, has_ch, batch_idx = batch_idx, ll_batch = ll_batch)
+        ll_cur, ll_batch = self.binary_ll(logit_has_edge, has_ch, batch_idx = batch_idx, ll_batch = ll_batch)
+        ll = ll + ll_cur
         
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
 
