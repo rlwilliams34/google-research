@@ -471,7 +471,7 @@ if __name__ == '__main__':
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
             if cmd_args.sigma:
-                batch_idx = np.concatenate([np.repeat(i, len(list_edge_feats[i])) for i in batch_indices])
+                batch_idx = np.concatenate([np.repeat(i, len(train_graphs[i])) for i in batch_indices])
             
             if cmd_args.model == "BiGG_GCN":
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
