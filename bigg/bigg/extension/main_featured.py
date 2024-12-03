@@ -206,23 +206,13 @@ if __name__ == '__main__':
     
     if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
-    
-        if cmd_args.has_node_feats:
-            list_node_feats = [torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs]
-        
-        else:
-           list_node_feats = None
-        
+        list_node_feats = ([torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs] if cmd_args.has_node_feats else None)
+        list_edge_feats = None
         if cmd_args.has_edge_feats:
             if cmd_args.method == "Test4":
                 list_edge_feats = [get_edge_feats_2(g, cmd_args.device) for g in train_graphs]
-            
             else:
                 list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
-        
-        else:
-            list_edge_feats = None
-        
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     if cmd_args.model == "BiGG_GCN":
@@ -230,7 +220,6 @@ if __name__ == '__main__':
         cmd_args.has_node_feats = False
         model = BiggWithGCN(cmd_args).to(cmd_args.device)
         cmd_args.has_edge_feats = True
-    
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     
@@ -305,7 +294,6 @@ if __name__ == '__main__':
         
         print("Generating Graph Validation Stats")
         get_graph_stats(gen_graphs, val_graphs, cmd_args.g_type)
-        
         sys.exit()
         
     
@@ -379,7 +367,6 @@ if __name__ == '__main__':
         with open(cmd_args.model_dump + '.graphs-%s' % str(cmd_args.greedy_frac), 'wb') as f:
             cp.dump(gen_graphs, f, cp.HIGHEST_PROTOCOL)
         print('graph generation complete')
-        
         sys.exit()
     #########################################################################################################
     
@@ -391,6 +378,10 @@ if __name__ == '__main__':
     lr_scheduler = {'lobster': 100, 'tree': 100 , 'db': 1000, 'er': 250, 'span': 500}
     epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
     batch_loss = 0.0
+    sigma_t = 1.0
+    sigma_w = 1.0
+    epoch_losses_t = []
+    epoch_losses_w = []
     
     N = len(train_graphs)
     B = cmd_args.batch_size
@@ -485,11 +476,19 @@ if __name__ == '__main__':
             else:
                 ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
             
-            
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
             true_loss = -(ll + ll_wt) / num_nodes
-            loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes)#* cmd_args.accum_grad)
+            
+            if cmd_args.sigma:
+                epoch_losses_t.append(-ll)
+                epoch_losses_w.append(-ll_wt)
+                loss = -ll / sigma_t - ll_wt / sigma_w
+                loss = loss / num_nodes
+            
+            else:
+                loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes)#* cmd_args.accum_grad)
+            
             loss.backward()
             grad_accum_counter += 1
             
@@ -502,6 +501,13 @@ if __name__ == '__main__':
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
         
         print('epoch complete')
+        
+        if cmd_args.sigma:
+            sigma_t = np.var(epoch_losses_t, ddof = 1)
+            sigma_w = np.var(epoch_losses_w, ddof = 1)
+            epoch_losses_t = []
+            epoch_losses_w = []
+        
         cur = epoch + 1
         
         print("CURRENT LOSSES")

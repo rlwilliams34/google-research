@@ -109,6 +109,7 @@ cmd_opt.add_argument('-sampling_method', default='softplus', type=str, help='for
 cmd_opt.add_argument('-update_left', default=False, type=eval, help='computing training times')
 cmd_opt.add_argument('-eps', default=1e-3, type=float, help='noise to be added to training data')
 cmd_opt.add_argument('-debug', default=False, type=eval, help='computing training times')
+cmd_opt.add_argument('-sigma', default=False, type=eval, help='computing training times')
 
 
 
