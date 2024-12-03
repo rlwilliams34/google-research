@@ -812,14 +812,9 @@ class RecurTreeGen(nn.Module):
         ll = ll + ll_cur
         
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
-        print(has_ch)
-        print(batch_idx)
+        
         if batch_idx is not None:
             batch_idx = batch_idx[has_ch]
-        print(batch_idx)
-        print(len(batch_idx))
-        print(cur_states[0].shape)
-        print(STOP)
 
         lv = 0
         while True:
@@ -827,15 +822,21 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
+                cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
+                
                 target_feats = edge_feats[edge_of_lv]
                 prior_h_target = None
                 if self.method == "LSTM": 
                     prior_h_target = state_h_prior[edge_of_lv]
-                edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, prior_h_target, batch_idx = batch_idx, ll_batch_wt = ll_batch_wt)
+                edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, prior_h_target, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
             cur_states = (cur_states[0][:, is_nonleaf], cur_states[1][:, is_nonleaf])
+            
+            if batch_idx is None:
+                batch_idx = batch_idx[is_nonleaf]
+            
             left_logits = self.pred_has_left(cur_states[0][-1], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
