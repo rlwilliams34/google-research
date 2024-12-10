@@ -14,7 +14,7 @@
 
 #!/bin/bash
 
-g_type=tree
+g_type=franken
 ordering=DFS
 blksize=-1
 bsize=50
