@@ -200,9 +200,9 @@ if __name__ == '__main__':
     with open(path, 'rb') as f:
         train_graphs = cp.load(f)
     
-    #print("Training Graph Example: ")
-    #print(train_graphs[0].edges(data=True))
-    
+    print("Training Graph Example: ")
+    print(train_graphs[0].edges())
+    print(STOP)
     max_num_nodes = max([len(gg.nodes) for gg in train_graphs])
     cmd_args.max_num_nodes = max_num_nodes
     
