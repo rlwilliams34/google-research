@@ -416,7 +416,7 @@ if __name__ == '__main__':
             debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, True)
         
         else:
-            edge_feats = (list_edge_feats[i] for i in [0,1] if cmd_args.has_edge_feats else None)
+            edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
             debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True)
         
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
