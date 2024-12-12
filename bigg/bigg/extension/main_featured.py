@@ -127,6 +127,8 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
     ll_t2 = 0
     ll_w2 = 0
     
+    model.has_edge_feats = False
+    
     for i in range(0, 2):
         g = graph[i]
         edge_feats_i = edge_feats[i]
@@ -140,7 +142,8 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
         if not torch.is_tensor(edge_feats_i):
             edge_feats_i = edge_feats_i[0]
         
-        ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
+        #ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
+        ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=None, edge_feats=None)
         ll_t2 = ll + ll_t2
         ll_w2 = ll_wt + ll_w2
     
@@ -151,6 +154,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
         print("Neeed to implement")
                 
     ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
+    ll_t1, ll_w1, _ = model.forward_train([0, 1]) #, node_feats=node_feats, edge_feats=edge_feats)
     
     print("=============================")
     print("Slow Code Top+Wt Likelihoods: ")
