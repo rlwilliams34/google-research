@@ -534,7 +534,7 @@ class RecurTreeGen(nn.Module):
             state = self.cell_topdown(self.topdown_left_embed[[int(has_left)]] + left_pos, state, tree_node.depth)
             pred_edge_feats = []
             if has_left:
-                if self.method == "Test4":
+                if self.has_edge_feats and self.method == "Test4":
                     prev_wt_state = self.edgeLSTM(self.topdown_left_embed[[int(has_left)]], prev_wt_state)
                 lub = min(tree_node.lch.n_cols, ub)
                 llb = max(0, lb - tree_node.rch.n_cols)
@@ -580,7 +580,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.cell_topright(self.topdown_right_embed[[int(has_right)]], topdown_state, tree_node.depth)
 
             if has_right:  # has edge in right child
-                if self.method == "Test4":
+                if self.has_edge_feats and self.method == "Test4":
                     prev_wt_state = self.edgeLSTM(self.topdown_right_embed[[int(has_right)]], prev_wt_state)
                 ll, ll_wt, right_state, num_right, right_edge_feats, prev_wt_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, prev_wt_state)
                 pred_edge_feats.append(right_edge_feats)
@@ -650,7 +650,7 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None
             #print(prev_wt_state)
             
-            if self.method == "Test4":
+            if self.has_edge_feats and self.method == "Test4":
                 prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
             
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
@@ -661,15 +661,15 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
             
-            if self.method == "LSTM2":
+            if self.has_edge_feats and self.method == "LSTM2":
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
-            if self.method == "Test4" and i > 0:
+            if self.has_edge_feats and self.method == "Test4" and i > 0:
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
             controller_state = self.row_tree(cur_state)
             
-            if self.method == "Test" and cur_row.root.is_leaf and target_edge_feats is not None:
+            if self.has_edge_feats and self.method == "Test" and cur_row.root.is_leaf and target_edge_feats is not None:
                 edge_embed = self.embed_edge_feats(target_edge_feats, prev_state=prev_wt_state)
                 controller_state = self.update_wt(edge_embed, controller_state)
                 self.row_tree.list_states[1] = [controller_state]
