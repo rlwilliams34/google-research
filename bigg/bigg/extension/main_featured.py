@@ -151,7 +151,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
     elif method == "Test4":
         print("Neeed to implement")
                 
-    ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
+    ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
     #ll_t1, ll_w1, _ = model.forward_train([0, 1]) #, node_feats=node_feats, edge_feats=edge_feats)
     
     print("=============================")
