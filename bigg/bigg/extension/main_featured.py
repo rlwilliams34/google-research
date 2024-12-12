@@ -127,11 +127,10 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
     ll_t2 = 0
     ll_w2 = 0
     
-    model.has_edge_feats = False
     
     for i in range(0, 2):
         g = graph[i]
-        edge_feats_i = edge_feats[i]
+        edge_feats_i = (edge_feats[i] if edge_feats is not None else None)
         edges = []
         for e in g.edges():
             if e[1] > e[0]:
@@ -139,11 +138,10 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
             edges.append(e)
         edges = sorted(edges)
         
-        if not torch.is_tensor(edge_feats_i):
+        if edge_feats_i is not None and edge_feats_i not torch.is_tensor(edge_feats_i):
             edge_feats_i = edge_feats_i[0]
         
-        #ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
-        ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=None, edge_feats=None)
+        ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
         ll_t2 = ll + ll_t2
         ll_w2 = ll_wt + ll_w2
     
@@ -153,8 +151,8 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
     elif method == "Test4":
         print("Neeed to implement")
                 
-    #ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
-    ll_t1, ll_w1, _ = model.forward_train([0, 1]) #, node_feats=node_feats, edge_feats=edge_feats)
+    ll_t1, ll_w1, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats)
+    #ll_t1, ll_w1, _ = model.forward_train([0, 1]) #, node_feats=node_feats, edge_feats=edge_feats)
     
     print("=============================")
     print("Slow Code Top+Wt Likelihoods: ")
@@ -408,17 +406,18 @@ if __name__ == '__main__':
     
     ### DEBUG
     if cmd_args.debug:
-        if cmd_args.method == "LSTM":
+        if cmd_args.has_edge_feats and cmd_args.method == "LSTM":
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
-        elif cmd_args.method == "Test4":
+        elif cmd_args.has_edge_feats and cmd_args.method == "Test4":
             edge_feats = [list_edge_feats[i][0] for i in [0,1]]
             lr = [list_edge_feats[i][1] for i in [0, 1]]
             edge_feats = (edge_feats, lr)
             debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, True)
         
         else:
-            debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], True)
+            edge_feats = (list_edge_feats[i] for i in [0,1] if cmd_args.has_edge_feats else None)
+            debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True)
         
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
