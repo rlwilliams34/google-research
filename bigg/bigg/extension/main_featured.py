@@ -447,6 +447,7 @@ if __name__ == '__main__':
                     param_group['lr'] = 1e-5
         
         edge_feats_embed = None
+        epoch_loss = 0.0
         
         for idx in pbar:
             start = B * idx
@@ -486,6 +487,7 @@ if __name__ == '__main__':
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
             true_loss = -(ll + ll_wt) / num_nodes
+            epoch_loss = epoch_loss + true_loss  / num_iter 
             
             if cmd_args.sigma:
                 epoch_losses_t.append(ll_batch)
@@ -508,6 +510,7 @@ if __name__ == '__main__':
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
         
         print('epoch complete')
+        print("Epoch Loss: ", epoch_loss)
         
         if cmd_args.sigma and epoch > 0:
             sigma_t = np.var(epoch_losses_t, ddof = 1)
