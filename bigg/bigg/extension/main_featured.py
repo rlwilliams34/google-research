@@ -313,6 +313,12 @@ if __name__ == '__main__':
             for _ in tqdm(range(cmd_args.num_test_gen)):
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+                for e in pred_edges:
+                    assert e[0] > e[1]
+                pred_g = nx.Graph()
+                pred_g.add_edges_from(pred_edges)
+                print("BEFORE WEIGHTS")
+                print(pred_g.edges())
                 
                 if cmd_args.model == "BiGG_GCN":
                     fix_edges = []
@@ -354,6 +360,9 @@ if __name__ == '__main__':
                         fixed_edges.append(edge)
                     pred_g.add_weighted_edges_from(fixed_edges)
                     gen_graphs.append(pred_g)
+                
+                print("AFTER WEIGHTS")
+                print(pred_g.edges())
         
         if cmd_args.max_num_nodes > -1:
             for idx in range(min(2, cmd_args.num_test_gen)):
