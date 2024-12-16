@@ -300,14 +300,17 @@ if __name__ == '__main__':
     
     elif cmd_args.phase == 'test':
         # get num nodes dist
-        print("Training graphs MMD Check")
-        get_graph_stats(gen_graphs, gt_graphs, cmd_args.g_type)
         print("Now generating sampled graphs...")
         num_node_dist = get_node_dist(train_graphs)
         path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'test')
         with open(path, 'rb') as f:
             gt_graphs = cp.load(f)
         print('# gt graphs', len(gt_graphs))
+        
+        print("Training graphs MMD Check")
+        get_graph_stats(train_graphs, gt_graphs, cmd_args.g_type)
+        print("Test graphs MMD Check")
+        get_graph_stats(gt_graphs, gt_graphs, cmd_args.g_type)
         
         gen_graphs = []
         with torch.no_grad():
