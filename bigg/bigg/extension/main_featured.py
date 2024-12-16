@@ -311,7 +311,8 @@ if __name__ == '__main__':
         print("Training graphs MMD Check")
         get_graph_stats(train_graphs, gt_graphs, cmd_args.g_type)
         print("Test graphs MMD Check")
-        get_graph_stats(random.shuffle(gt_graphs), gt_graphs, cmd_args.g_type)
+        gt_graphs2 = [gt_graphs[8 - i] for i in range(9)]
+        get_graph_stats([gt_graphs2, gt_graphs, cmd_args.g_type)
         
         gen_graphs = []
         with torch.no_grad():
