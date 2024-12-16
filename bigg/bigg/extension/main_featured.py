@@ -300,6 +300,8 @@ if __name__ == '__main__':
     
     elif cmd_args.phase == 'test':
         # get num nodes dist
+        print("Training graphs MMD Check")
+        get_graph_stats(gen_graphs, gt_graphs, cmd_args.g_type)
         print("Now generating sampled graphs...")
         num_node_dist = get_node_dist(train_graphs)
         path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'test')
@@ -315,10 +317,6 @@ if __name__ == '__main__':
                 _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 for e in pred_edges:
                     assert e[0] > e[1]
-                pred_g = nx.Graph()
-                pred_g.add_edges_from(pred_edges)
-                print("BEFORE WEIGHTS")
-                print(pred_g.edges())
                 
                 if cmd_args.model == "BiGG_GCN":
                     fix_edges = []
@@ -360,9 +358,6 @@ if __name__ == '__main__':
                         fixed_edges.append(edge)
                     pred_g.add_weighted_edges_from(fixed_edges)
                     gen_graphs.append(pred_g)
-                
-                print("AFTER WEIGHTS")
-                print(pred_g.edges())
         
         if cmd_args.max_num_nodes > -1:
             for idx in range(min(2, cmd_args.num_test_gen)):
