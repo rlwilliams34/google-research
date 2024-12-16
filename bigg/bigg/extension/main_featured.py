@@ -396,7 +396,10 @@ if __name__ == '__main__':
         cmd_args.epoch_load = 0
     
     if cmd_args.schedule:
-        cmd_args.scale_loss = 20
+        if cmd_args.g_type == 'db':
+            cmd_args.scale_loss = 50
+        else:
+            cmd_args.scale_loss = 20
     
     if cmd_args.model == "BiGG_GCN":
         cmd_args.scale_loss = 20
