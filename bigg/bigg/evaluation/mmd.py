@@ -5,7 +5,7 @@ from functools import partial
 import networkx as nx
 import numpy as np
 from scipy.linalg import toeplitz
-import pyemd
+#import pyemd
 
 def gaussian_tv(x, y, sigma=1.0):  
   support_size = max(len(x), len(y))
