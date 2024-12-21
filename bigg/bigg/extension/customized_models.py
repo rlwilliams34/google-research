@@ -473,6 +473,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if edge_feats is None:
             ll = 0
+            ll_batch_wt = 0
+            
             
             if self.sampling_method == "softplus": 
                 pred_mean = mus
