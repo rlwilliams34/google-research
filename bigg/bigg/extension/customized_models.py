@@ -96,7 +96,14 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             self.edgelen_mean = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
             self.edgelen_lvar = MLP(2 * args.embed_dim, [3 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
-            
+        
+        if self.method == "Test5":
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
+            self.edgeLSTM = nn.LSTMCell(args.embed_dim, args.embed_dim)
+            self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.merge_top_wt = BinaryTreeLSTMCell(args.embed_dim)
+            self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
         if self.method == "MLP-Leaf":
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
@@ -236,6 +243,17 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         else:
             edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
+        
+        if self.method == "Test5":
+            if prev_state is not None:
+                weights_MLP = self.edgelen_encoding(edge_feats_normalized)
+                weight_embedding = self.edgeLSTM(weights_MLP, prev_state)
+                return weight_embedding
+            
+            weights_MLP = self.edgelen_encoding(edge_feats_normalized)
+            weight_embeddings = (self.leaf_h0_wt.repeat(edge_feats.shape[0], 1), self.leaf_c0_wt.repeat(edge_feats.shape[0], 1))
+            weight_embeddings = self.edgeLSTM(weights_MLP, weight_embeddings)
+            return weight_embeddings
         
         if self.method == "Test4":
             if prev_state is not None:
@@ -490,7 +508,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             if self.sampling_method  == "softplus":
                 ### Update log likelihood with weight prediction
                 ### Trying with softplus parameterization...
-                edge_feats_invsp = edge_feats #self.compute_softminus(edge_feats)
+                edge_feats_invsp = self.compute_softminus(edge_feats)
                 
                 ### Standardize
                 #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
@@ -505,6 +523,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 diff_sq2 = torch.div(diff_sq, var)
                 
                 ## add to ll
+                ## For lognormal, you WOULD need to include the constant terms w/ x & sigma
                 ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq2, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
             
             elif self.sampling_method  == "lognormal":
