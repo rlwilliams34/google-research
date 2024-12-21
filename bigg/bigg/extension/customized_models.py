@@ -99,7 +99,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "Test5":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
-            self.edgeLSTM = nn.LSTMCell(args.embed_dim, args.embed_dim)
+            self.edgeLSTM = MultiLSTMCell(args.embed_dim, args.embed_dim, args.rnn_layers)
             self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.merge_top_wt = BinaryTreeLSTMCell(args.embed_dim)
