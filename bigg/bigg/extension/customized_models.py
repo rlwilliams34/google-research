@@ -247,8 +247,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "Test5":
             if prev_state is not None:
                 weights_MLP = self.edgelen_encoding(edge_feats_normalized)
-                print(weights_MLP.shape)
-                print(prev_state[0].shape)
+                if len(prev_state[0].shape) == 3:
+                    prev_state = (prev_state[0].squeeze(1), prev_state[1].squeeze(1))
                 weight_embedding = self.edgeLSTM(weights_MLP, prev_state)
                 return weight_embedding
             
