@@ -86,6 +86,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     
     if edge_feats is not None:
         if method in ["Test", "Test2", "Test3", "Test5"]:
+            print(edge_feats)
+            print(edge_feats.shape)
             edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
         
         else:
