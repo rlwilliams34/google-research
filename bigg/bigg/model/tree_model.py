@@ -733,7 +733,7 @@ class RecurTreeGen(nn.Module):
                     print(edge_feats.shape)
                     local_edge_feats = edge_feats[edge_idx]
                 else:
-                    print(edge_feats)
+                    print(edge_feats.shape)
                     print(edge_feats[0].shape)
                     print(edge_idx)
                     print(edge_idx.shape)
