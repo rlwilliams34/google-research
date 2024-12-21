@@ -734,6 +734,8 @@ class RecurTreeGen(nn.Module):
                 else:
                     print(edge_feats)
                     print(edge_feats[0].shape)
+                    print(edge_idx)
+                    print(edge_idx.shape)
                     if self.method == "Test5":
                         local_edge_feats = (edge_feats[0][edge_idx, :], edge_feats[1][edge_idx, :])
                     else:
