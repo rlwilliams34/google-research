@@ -864,7 +864,7 @@ class RecurTreeGen(nn.Module):
                 if self.method in ["Test", "Test2", "Test3"]: 
                     left_feats = edge_feats_embed[edge_idx[~is_rch]]
                 
-                elif self.method in ["Test4", "Test5"]
+                elif self.method in ["Test4", "Test5"]:
                     left_feats = weights_MLP[edge_idx[~is_rch]]
                     
                 else:
