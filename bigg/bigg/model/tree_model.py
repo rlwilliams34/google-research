@@ -740,6 +740,8 @@ class RecurTreeGen(nn.Module):
             if self.method in ["Test4", "Test5"] and d == 0:
                 b = self.batch_size
                 m = edge_feats[0].shape[0] // b 
+                print(b)
+                print(m)
                 idx = ([False] + [True]*(m-1))*b
                 idx = np.array(idx)
                 print(idx.shape)
