@@ -193,6 +193,9 @@ if __name__ == '__main__':
     setup_treelib(cmd_args)
     assert cmd_args.blksize < 0  # assume graph is not that large, otherwise model parallelism is needed
     
+    if cmd_args.debug:
+        cmd_args.batch_size = 2
+    
     if cmd_args.g_type == "db":
         import pickle5 as cp
     path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'train')
