@@ -734,6 +734,8 @@ class RecurTreeGen(nn.Module):
                 else:
                     print(edge_feats)
                     print(edge_feats[0].shape)
+                    if self.method == "Test5":
+                        local_edge_feats = (edge_feats[0][edge_idx, :], edge_feats[1][edge_idx, :])
                     local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt, method = self.method)
