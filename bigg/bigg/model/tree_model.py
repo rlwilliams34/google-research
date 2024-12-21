@@ -85,7 +85,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     is_leaf = [lch_isleaf, rch_isleaf]
     
     if edge_feats is not None:
-        if method in ["Test", "Test2", "Test3"]:
+        if method in ["Test", "Test2", "Test3", "Test5"]:
             edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
         
         else:
@@ -733,7 +733,6 @@ class RecurTreeGen(nn.Module):
                     local_edge_feats = edge_feats[edge_idx]
                 else:
                     local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
-                    
                 
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt, method = self.method)
             else:
