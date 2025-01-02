@@ -251,7 +251,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "Test6":
             print("Hello")
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             print(edge_embed.shape)
+            print(self.leaf_h0.shape)
             edge_embed = (self.leaf_h0.repeat(1, edge_embed.shape[1], 1) + edge_embed, self.leaf_c0.repeat(1, edge_embed.shape[1], 1) + edge_embed)
             print(edge_embed[0].shape)
             return edge_embed
