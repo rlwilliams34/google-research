@@ -510,6 +510,10 @@ class RecurTreeGen(nn.Module):
                         #edge_embed = self.embed_edge_feats(cur_feats)
                         return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, None
                     
+#                     elif self.method == "Test6":
+#                         edge_embed = self.embed_edge_feats(cur_feats)
+#                         return ll, ll_wt, (self.leaf_h0 + edge_embed, self.leaf_c0 + edge_embed), 1, cur_feats, None
+                    
                     edge_embed = self.embed_edge_feats(cur_feats)
                     return ll, ll_wt, edge_embed, 1, cur_feats, None
                     
@@ -551,6 +555,10 @@ class RecurTreeGen(nn.Module):
                 if self.method in ["Test4", "Test5"]:
                     left_edge_embed = self.standardize_edge_feats(left_edge_feats)
                     left_edge_embed = self.edgelen_encoding(left_edge_feats)
+                
+#                 elif self.method == "Test6":
+#                     ### Here we need to update the topdown state with an LSTM
+#                     continue
                 
                 else:
                     left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
