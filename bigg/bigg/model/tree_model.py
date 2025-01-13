@@ -123,8 +123,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
         print("H VEC SHAPE")
-        print(h_vecs.shape)
-        print(h_vecs)
+        print(h_buf)
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     
