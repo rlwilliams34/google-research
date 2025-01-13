@@ -37,7 +37,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.update_left = args.update_left
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus', 'vae']
-        assert self.method in ['Test', 'MLP-Repeat', 'MLP-Multi', 'MLP-Double', 'LSTM', 'MLP-Leaf', 'Test2', 'Test3', 'Test4', 'Test5', 'Test6']
+        assert self.method in ['Test', 'MLP-Repeat', 'MLP-Multi', 'MLP-Double', 'LSTM', 'MLP-Leaf', 'Test2', 'Test3', 'Test4', 'Test5', 'Test6', 'Test7']
         
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
@@ -47,6 +47,13 @@ class BiggWithEdgeLen(RecurTreeGen):
         #self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         self.topdown_update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        
+        if self.method == "Test8":
+            self.edgelen_encoding = MLP(1, [2 * args.wt_embed_dim, args.wt_embed_dim], dropout = cmd_args.wt_drop)
+            self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        
+        if self.method == "Test7":
+            self.edgelen_encoding = MLP(1, [2 * args.wt_embed_dim, args.wt_embed_dim], dropout = cmd_args.wt_drop)
         
         if self.method == "Test4":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = cmd_args.wt_drop)
@@ -247,6 +254,14 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         else:
             edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
+        
+        if self.method == "Test8":
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            return edge_embed
+        
+        if self.method == "Test7":
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            return edge_embed
         
         if self.method == "Test6":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)

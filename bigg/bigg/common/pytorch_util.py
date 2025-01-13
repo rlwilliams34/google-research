@@ -151,20 +151,20 @@ class MLP(nn.Module):
 
 
 class TreeLSTMCell(nn.Module):
-    def __init__(self, arity, latent_dim):
+    def __init__(self, arity, latent_dim, wt_dim = 0):
         super(TreeLSTMCell, self).__init__()
         self.arity = arity
         self.latent_dim = latent_dim
 
-        self.mlp_i = MLP(arity * latent_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
+        self.mlp_i = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
 
-        self.mlp_o = MLP(arity * latent_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
+        self.mlp_o = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
 
-        self.mlp_u = MLP(arity * latent_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
+        self.mlp_u = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
 
         f_list = []
         for _ in range(arity):
-            mlp_f = MLP(arity * latent_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
+            mlp_f = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
             f_list.append(mlp_f)
         self.f_list = nn.ModuleList(f_list)
 
@@ -200,6 +200,25 @@ class BinaryTreeLSTMCell(TreeLSTMCell):
         return super(BinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
 
 
+class WeightedBinaryTreeLSTMCell(TreeLSTMCell):
+    def __init__(self, latent_dim, wt_dim):
+        super(BinaryTreeLSTMCell, self).__init__(2, latent_dim, wt_dim)
+        self.wt_dim = wt_dim
+
+    def forward(self, lch_state, rch_state, left_feat=None, right_feat=None):
+        if left_feat is None:
+            dim = lch_state[0].shape[1]
+            left_feat = torch.zeros(1, dim, self.wt_dim).to(lch_state[0].device)
+        
+        if right_feat is None:
+            dim = lch_state[0].shape[1]
+            right_feat = torch.zeros(1, dim, self.wt_dim).to(lch_state[0].device)
+        
+        edge_feats = left_feat + right_feat
+        edge_feats = (edge_feats, edge_feats)
+        
+        list_h_mat, list_c_mat = zip(lch_state, rch_state, edge_feats)
+        return super(BinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
 
 
 

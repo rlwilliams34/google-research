@@ -385,7 +385,11 @@ class RecurTreeGen(nn.Module):
 
         if self.share_param:
             self.m_l2r_cell = BinaryTreeLSTMCell(args.embed_dim)
-            self.lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
+            if self.method == "Test7":
+                self.lr2p_cell = WeightedBinaryTreeLSTMCell(args.embed_dim, args.wt_embed_dim)
+            
+            else:
+                self.lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
             self.pred_has_ch = MLP(args.embed_dim, [2 * args.embed_dim, 1])
             self.m_pred_has_left = MLP(args.embed_dim, [2 * args.embed_dim, 1])
             self.m_pred_has_right = MLP(args.embed_dim, [2 * args.embed_dim, 1])
@@ -510,6 +514,12 @@ class RecurTreeGen(nn.Module):
                         #edge_embed = self.embed_edge_feats(cur_feats)
                         return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, None
                     
+                    elif self.method == "Test7":
+                        return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, None
+                    
+                    elif self.method == "Test8":
+                        return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, None
+                    
 #                     elif self.method == "Test6":
 #                         edge_embed = self.embed_edge_feats(cur_feats)
 #                         return ll, ll_wt, (self.leaf_h0 + edge_embed, self.leaf_c0 + edge_embed), 1, cur_feats, None
@@ -551,8 +561,8 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
-            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4", "Test5"] and tree_node.lch.is_leaf and has_left:
-                if self.method in ["Test4", "Test5"]:
+            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4", "Test5", "Test7", "Test8"] and tree_node.lch.is_leaf and has_left:
+                if self.method in ["Test4", "Test5", "Test7", "Test8"]:
                     left_edge_embed = self.standardize_edge_feats(left_edge_feats)
                     left_edge_embed = self.edgelen_encoding(left_edge_feats)
                 
@@ -562,6 +572,7 @@ class RecurTreeGen(nn.Module):
                 
                 else:
                     left_edge_embed = self.embed_edge_feats(left_edge_feats, prev_state=prev_wt_state)
+                
                 if self.update_left:
                     topdown_state = self.topdown_update_wt(left_edge_embed, topdown_state)
                     #left_state = self.update_wt(left_edge_embed, left_state)
@@ -598,7 +609,33 @@ class RecurTreeGen(nn.Module):
             if tree_node.col_range[1] - tree_node.col_range[0] <= self.bits_compress:
                 summary_state = self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols)
             else:
-                summary_state = self.lr2p_cell(left_state, right_state)
+                if self.method == "Test7":   
+                    left_edge_embed = None
+                    right_edge_embed = None  
+                                   
+                    if has_left and tree_node.lch.is_leaf:
+                        left_edge_embed = self.embed_edge_feats(left_edge_feats)
+                    
+                    if has_right and tree_node.rch.is_leaf:
+                        right_edge_embed = self.embed_edge_feats(right_edge_feats)
+                     
+                    summary_state = self.lr2p_cell(left_state, right_state, left_edge_embed, right_edge_embed)
+                
+                elif self.method == "Test8":
+                    left_edge_embed = None
+                    right_edge_embed = None
+                    
+                    if has_left and tree_node.lch.is_leaf:
+                        left_edge_embed = self.embed_edge_feats(left_edge_feats)
+                        
+                    if has_right and tree_node.rch.is_leaf:
+                        right_edge_embed = self.embed_edge_feats(right_edge_feats)
+                    
+                    summary_state = self.lr2p_cell(left_state, right_state, left_edge_embed, right_edge_embed)
+                
+                else:
+                    summary_state = self.lr2p_cell(left_state, right_state)
+                
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
                 if self.method == "Test":
@@ -672,8 +709,10 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats and self.method == "LSTM2":
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
-            if self.has_edge_feats and self.method in ["Test4", "Test5"] and i > 0:
-                cur_state = self.merge_top_wt(cur_state, prev_wt_state)
+            if self.has_edge_feats and self.method in ["Test8"] and i == 0 and target_edge_Feats is not None and target_edge_feats.shape[0]:
+                left_edge_embed = self.standardize_edge_feats(left_edge_feats)
+                left_edge_embed = self.edgelen_encoding(left_edge_feats)
+                cur_state = self.update_wt(left_edge_embed, cur_state)
             
             controller_state = self.row_tree(cur_state)
             
