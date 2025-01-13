@@ -379,6 +379,7 @@ class RecurTreeGen(nn.Module):
         self.topdown_left_embed = Parameter(torch.Tensor(2, args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
         glorot_uniform(self)
+        self.method = args.method
 
         if self.bits_compress > 0:
             self.bit_rep_net = BitsRepNet(args)
