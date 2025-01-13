@@ -102,7 +102,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-        #print(local_hbot.shape)
+        print("BIG CHECK")
+        print(len(leaf_check))
+        print(local_hbot.shape)
         
         if method == "Test8":
             dev = local_hbot.device
@@ -120,7 +122,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
         
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
+        print(h_vecs.shape)
         print(new_ids[i])
+        print("END")
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     
