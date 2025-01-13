@@ -202,7 +202,7 @@ class BinaryTreeLSTMCell(TreeLSTMCell):
 
 class WeightedBinaryTreeLSTMCell(TreeLSTMCell):
     def __init__(self, latent_dim, wt_dim):
-        super(BinaryTreeLSTMCell, self).__init__(2, latent_dim, wt_dim)
+        super(WeightedBinaryTreeLSTMCell, self).__init__(2, latent_dim, wt_dim)
         self.wt_dim = wt_dim
 
     def forward(self, lch_state, rch_state, left_feat=None, right_feat=None):
