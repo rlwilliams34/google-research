@@ -837,7 +837,7 @@ class RecurTreeGen(nn.Module):
             if self.method in ["Test", "Test2", "Test3", "Test8"]:
                 local_edge_feats = edge_feats[edge_idx]
                 K = local_edge_feats.shape[0]
-                loal_edge_feats = self.update_wt(local_edge_feats, (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1)))
+                local_edge_feats = self.update_wt(local_edge_feats, (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1)))
             elif self.method in ["Test4", "Test5"]:
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 init_state = (self.leaf_h0.repeat(1, len(edge_idx), 1), self.leaf_c0.repeat(1, len(edge_idx), 1))
