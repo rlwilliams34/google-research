@@ -710,7 +710,7 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats and self.method == "LSTM2":
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
-            if self.has_edge_feats and self.method in ["Test8"] and i == 0 and target_edge_Feats is not None and target_edge_feats.shape[0]:
+            if self.has_edge_feats and self.method in ["Test8"] and i == 0 and target_edge_feats is not None and target_edge_feats.shape[0]:
                 left_edge_embed = self.standardize_edge_feats(left_edge_feats)
                 left_edge_embed = self.edgelen_encoding(left_edge_feats)
                 cur_state = self.update_wt(left_edge_embed, cur_state)
