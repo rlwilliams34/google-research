@@ -386,7 +386,7 @@ class RecurTreeGen(nn.Module):
 
         if self.share_param:
             self.m_l2r_cell = BinaryTreeLSTMCell(args.embed_dim)
-            if self.method == "Test7":
+            if self.method == "Test8":
                 self.lr2p_cell = WeightedBinaryTreeLSTMCell(args.embed_dim, args.wt_embed_dim)
             
             else:
