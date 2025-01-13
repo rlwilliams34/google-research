@@ -103,16 +103,17 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
                      
-        if edge_feats is not None and method not in ["Test", "Test2", "Test3", "Test8"]:
-            if method not in ["Test4", "Test5"] or lv == 0:
+        if edge_feats is not None and method not in ["Test", "Test2", "Test3"]:
+            if method == "Test8" and lv == 0:
+                local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
+            elif method not in ["Test4", "Test5"] or lv == 0:
                 local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
         
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
         
-        
-        if method == "Test8":
+        if method == "Test8" and lv == -1:
             dev = local_hbot.device
             h0 = local_hbot.shape[1]
             h1 = h_vecs.shape[1]
@@ -170,7 +171,7 @@ def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cel
 def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node, wt_update, method):
     edge_feats = is_rch = None
     t_lch = t_rch = None
-    if method in ["Test4", "Test5"]:
+    if method in ["Test4", "Test5", "Test8"]:
         lv = 0
     else:
         lv = -1
@@ -802,7 +803,7 @@ class RecurTreeGen(nn.Module):
                 else:
                     local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 
-                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update =self.update_wt, method = self.method)
+                new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, wt_update = self.update_wt, method = self.method)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
             if self.method in ["Test4", "Test5"] and d == 0:
@@ -827,6 +828,7 @@ class RecurTreeGen(nn.Module):
                 local_edge_feats = edge_feats[edge_idx]
                 print(local_edge_feats)
                 print(local_edge_feats.shape)
+                print(STOP)
             elif self.method in ["Test4", "Test5"]:
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 init_state = (self.leaf_h0.repeat(1, len(edge_idx), 1), self.leaf_c0.repeat(1, len(edge_idx), 1))

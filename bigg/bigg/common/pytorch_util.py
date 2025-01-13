@@ -196,7 +196,7 @@ class BinaryTreeLSTMCell(TreeLSTMCell):
     def __init__(self, latent_dim):
         super(BinaryTreeLSTMCell, self).__init__(2, latent_dim)
 
-    def forward(self, lch_state, rch_state):
+    def forward(self, lch_state, rch_state, e1=None, e2=None):
         list_h_mat, list_c_mat = zip(lch_state, rch_state)
         return super(BinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
 
