@@ -84,6 +84,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     new_ids[0][0] = new_ids[1][0] = None
     is_leaf = [lch_isleaf, rch_isleaf]
     
+    print("Method: ", method)
+    print("LV: ", lv)
+    
     if edge_feats is not None:
         if method in ["Test", "Test2", "Test3", "Test8"]:
             edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
@@ -105,8 +108,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
                      
         if edge_feats is not None and method not in ["Test", "Test2", "Test3"]:
             if method == "Test8" and lv == 0:
-                continue
-                #local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
+                local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
             elif method not in ["Test4", "Test5"] or lv == 0:
                 local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
