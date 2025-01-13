@@ -98,7 +98,12 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-        if edge_feats is not None and method not in ["Test", "Test2", "Test3"]:
+        print(leaf_check)
+        print(local_hbot)
+        print(edge_feats[i])
+        
+        
+        if edge_feats is not None and method not in ["Test", "Test2", "Test3", "Test8"]:
             if method not in ["Test4", "Test5"] or lv == 0:
                 local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
@@ -908,7 +913,7 @@ class RecurTreeGen(nn.Module):
                 h_next_buf = c_next_buf = None
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-                if self.method in ["Test", "Test2", "Test3"]: 
+                if self.method in ["Test", "Test2", "Test3", "Test8"]: 
                     left_feats = edge_feats_embed[edge_idx[~is_rch]]
                 
                 elif self.method in ["Test4", "Test5"]:
@@ -919,7 +924,7 @@ class RecurTreeGen(nn.Module):
                 
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
                 
-                if self.method not in ["Test", "Test2", "Test3", "Test4", "Test5"]:
+                if self.method not in ["Test", "Test2", "Test3", "Test4", "Test5", "Test8"]:
                     h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
                 left_ids = tuple([None] + list(left_ids[1:]))
@@ -933,7 +938,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4", "Test5"] and len(left_wt_ids) > 0:
+            if self.has_edge_feats and self.method in ["Test", "LSTM2", "Test2", "Test4", "Test5", "Test8"] and len(left_wt_ids) > 0:
                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
                 
                 if self.update_left:
