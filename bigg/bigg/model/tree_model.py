@@ -95,9 +95,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     h_list = []
     c_list = []
     if method == "Test8":
-        edge_feats = []
+        list_edge_feats = []
     else:
-        edge_feats = [None, None]
+        list_edge_feats = [None, None]
     
     for i in range(2):
         leaf_check = is_leaf[i]
@@ -110,7 +110,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             z = torch.zeros(h1, h2)
             leaf_check2 = np.array(leaf_check).astype(bool)
             z[leaf_check2] = edge_feats[i]
-            edge_feats.append(z)
+            list_edge_feats.append(z)
              
         if edge_feats is not None and method not in ["Test", "Test2", "Test3", "Test8"]:
             if method not in ["Test4", "Test5"] or lv == 0:
@@ -122,7 +122,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     
-    summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]), edge_feats[0], edge_feats[1])
+    summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]), list_edge_feats[0], list_edge_feats[1])
     
     if method != "Test" or edge_feats is None:
         return summary_state
