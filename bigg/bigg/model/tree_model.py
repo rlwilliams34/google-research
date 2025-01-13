@@ -86,8 +86,14 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     
     
     if edge_feats is not None:
-        if method in ["Test", "Test2", "Test3", "Test8"]:
+        if method in ["Test", "Test2", "Test3"]:
             edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
+        
+        elif method == "Test8":
+            if lv == -1:
+                edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
+            else:
+                edge_feats = [(edge_feats[0][:, ~is_rch], edge_feats[1][:, ~is_rch]), (edge_feats[0][:, is_rch], edge_feats[1][:, is_rch])]
         
         else:
             edge_feats = [(edge_feats[0][:, ~is_rch], edge_feats[1][:, ~is_rch]), (edge_feats[0][:, is_rch], edge_feats[1][:, is_rch])]
