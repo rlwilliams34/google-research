@@ -155,6 +155,7 @@ class TreeLSTMCell(nn.Module):
         super(TreeLSTMCell, self).__init__()
         self.arity = arity
         self.latent_dim = latent_dim
+        self.wt_dim = wt_dim
 
         self.mlp_i = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
 
@@ -169,7 +170,7 @@ class TreeLSTMCell(nn.Module):
         self.f_list = nn.ModuleList(f_list)
 
     def forward(self, list_h_mat, list_c_mat):
-        assert len(list_c_mat) == self.arity == len(list_h_mat)
+        assert len(list_c_mat) == self.arity + bool(self.wt_dim) == len(list_h_mat)
         h_mat = torch.cat(list_h_mat, dim=-1)
         assert h_mat.shape[2] == self.arity * self.latent_dim
 
