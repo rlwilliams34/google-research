@@ -103,6 +103,10 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
         print("BIG CHECK")
+        print(leaf_check)
+        print(len(leaf_check))
+        print(sum(leaf_check == 1))
+        print(edge_feats[i].shape)
                      
         if edge_feats is not None and method not in ["Test", "Test2", "Test3", "Test8"]:
             if method not in ["Test4", "Test5"] or lv == 0:
