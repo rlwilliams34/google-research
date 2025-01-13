@@ -829,9 +829,9 @@ class RecurTreeGen(nn.Module):
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(0)
             if self.method in ["Test", "Test2", "Test3", "Test8"]:
                 local_edge_feats = edge_feats[edge_idx]
-                print(local_edge_feats)
-                print(local_edge_feats.shape)
-                print(STOP)
+                K = local_edge_feats.shape[0]
+                loal_edge_feats = self.update_wt(local_edge_feats, (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1)))
+                local_edge_feats = self.update_wt(left_edge_embed, cur_state)
             elif self.method in ["Test4", "Test5"]:
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 init_state = (self.leaf_h0.repeat(1, len(edge_idx), 1), self.leaf_c0.repeat(1, len(edge_idx), 1))
