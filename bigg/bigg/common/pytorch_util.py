@@ -218,7 +218,7 @@ class WeightedBinaryTreeLSTMCell(TreeLSTMCell):
         edge_feats = (edge_feats, edge_feats)
         
         list_h_mat, list_c_mat = zip(lch_state, rch_state, edge_feats)
-        return super(BinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
+        return super(WeightedBinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
 
 
 
