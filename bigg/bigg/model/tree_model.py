@@ -724,8 +724,9 @@ class RecurTreeGen(nn.Module):
                 prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
             
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
-            print(cur_state)
-            print(self.leaf_h0)
+            if i == 0:
+                print(cur_state)
+                print(self.leaf_h0)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             if self.has_node_feats:
