@@ -25,7 +25,7 @@ import torch.nn.functional as F
 from torch_scatter import scatter
 from collections import defaultdict
 from torch.nn.parameter import Parameter
-from bigg.common.pytorch_util import glorot_uniform, MLP, BinaryTreeLSTMCell, MultiLSTMCell
+from bigg.common.pytorch_util import glorot_uniform, MLP, BinaryTreeLSTMCell, MultiLSTMCell, WeightedBinaryTreeLSTMCell
 from tqdm import tqdm
 from bigg.model.util import AdjNode, ColAutomata, AdjRow
 from bigg.model.tree_clib.tree_lib import TreeLib
