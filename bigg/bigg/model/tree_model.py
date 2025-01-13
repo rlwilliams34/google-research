@@ -102,11 +102,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-        print("BIG CHECK")
-        print(leaf_check)
-        print(len(leaf_check))
-        print(sum(leaf_check == 1))
-        print(edge_feats[i].shape)
                      
         if edge_feats is not None and method not in ["Test", "Test2", "Test3", "Test8"]:
             if method not in ["Test4", "Test5"] or lv == 0:
@@ -124,21 +119,17 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             h2 = edge_feats[i].shape[-1]
             z = torch.zeros(h1, h2).to(dev)
             leaf_check2 = np.array(leaf_check).astype(bool)
-            print(leaf_check2)
             edge_ids = np.arange(h0)[leaf_check2]
-            print(edge_ids)
             test = new_ids[i][1]
             edge_ids = test[edge_ids]
-            print(edge_ids)
             z[edge_ids] = edge_feats[i]
             list_edge_feats.append(z)
         
-        print("END")
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     
     summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]), list_edge_feats[0], list_edge_feats[1])
-    print("Success!")
+    
     if method != "Test" or edge_feats is None:
         return summary_state
     
@@ -832,8 +823,10 @@ class RecurTreeGen(nn.Module):
         feat_dict = {}
         if self.has_edge_feats:
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(0)
-            if self.method in ["Test", "Test2", "Test3"]:
+            if self.method in ["Test", "Test2", "Test3", "Test8"]:
                 local_edge_feats = edge_feats[edge_idx]
+                print(local_edge_feats)
+                print(local_edge_feats.shape)
             elif self.method in ["Test4", "Test5"]:
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 init_state = (self.leaf_h0.repeat(1, len(edge_idx), 1), self.leaf_c0.repeat(1, len(edge_idx), 1))
