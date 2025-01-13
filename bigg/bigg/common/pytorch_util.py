@@ -218,15 +218,15 @@ class WeightedBinaryTreeLSTMCell(TreeLSTMCell):
         print(left_feat)
         print(right_feat)        
         edge_feats = left_feat + right_feat
-        edge_feats = (edge_feats, edge_feats)
+        edge_feats = (edge_feats.repeat(lch_state[0].shape[0], 1, 1), edge_feats.repeat(lch_state[0].shape[0], 1, 1))
         
         print(edge_feats)
         print(lch_state[0].shape)
         print(edge_feats[0].shape)
-        print(STOP)
         list_h_mat, list_c_mat = zip(lch_state, rch_state, edge_feats)
         
         print(list_h_mat[0].shape)
+        print(STOP)
         return super(WeightedBinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
 
 
