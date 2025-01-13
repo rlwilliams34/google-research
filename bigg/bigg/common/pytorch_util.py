@@ -222,9 +222,6 @@ class WeightedBinaryTreeLSTMCell(TreeLSTMCell):
         
         list_h_mat, list_c_mat = zip(lch_state, rch_state, edge_feats)
         
-        for x in list_h_mat:
-            print(x.shape)
-        
         return super(WeightedBinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
 
 
