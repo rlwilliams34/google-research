@@ -107,7 +107,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             dev = local_hbot.device
             h1 = local_hbot.shape[1]
             h2 = edge_feats[i].shape[-1]
-            z = torch.zeros(h1, h2)
+            z = torch.zeros(h1, h2).to(dev)
             leaf_check2 = np.array(leaf_check).astype(bool)
             z[leaf_check2] = edge_feats[i]
             list_edge_feats.append(z)
