@@ -123,9 +123,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     
-    print(STOP)
     summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]), list_edge_feats[0], list_edge_feats[1])
-    
+    print("Success!")
     if method != "Test" or edge_feats is None:
         return summary_state
     
