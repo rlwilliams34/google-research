@@ -214,10 +214,17 @@ class WeightedBinaryTreeLSTMCell(TreeLSTMCell):
             dim = lch_state[0].shape[1]
             right_feat = torch.zeros(1, dim, self.wt_dim).to(lch_state[0].device)
         
+        print(lch_state[0].shape)
+        print(left_feat)
+        print(right_feat)        
         edge_feats = left_feat + right_feat
         edge_feats = (edge_feats, edge_feats)
         
+        print(edge_feats)
+        
         list_h_mat, list_c_mat = zip(lch_state, rch_state, edge_feats)
+        
+        print(list_h_mat[0].shape)
         return super(WeightedBinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
 
 
