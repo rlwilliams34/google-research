@@ -84,8 +84,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     new_ids[0][0] = new_ids[1][0] = None
     is_leaf = [lch_isleaf, rch_isleaf]
     
-    print("Method: ", method)
-    print("LV: ", lv)
     
     if edge_feats is not None:
         if method in ["Test", "Test2", "Test3", "Test8"]:
@@ -831,7 +829,6 @@ class RecurTreeGen(nn.Module):
                 local_edge_feats = edge_feats[edge_idx]
                 K = local_edge_feats.shape[0]
                 loal_edge_feats = self.update_wt(local_edge_feats, (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1)))
-                local_edge_feats = self.update_wt(local_edge_feats, cur_state)
             elif self.method in ["Test4", "Test5"]:
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 init_state = (self.leaf_h0.repeat(1, len(edge_idx), 1), self.leaf_c0.repeat(1, len(edge_idx), 1))
