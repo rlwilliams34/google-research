@@ -105,16 +105,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         print("BIG CHECK")
         print(len(leaf_check))
         print(local_hbot.shape)
-        
-        if method == "Test8":
-            dev = local_hbot.device
-            h1 = local_hbot.shape[1]
-            h2 = edge_feats[i].shape[-1]
-            z = torch.zeros(h1, h2).to(dev)
-            leaf_check2 = np.array(leaf_check).astype(bool)
-            z[leaf_check2] = edge_feats[i]
-            list_edge_feats.append(z)
-             
+                     
         if edge_feats is not None and method not in ["Test", "Test2", "Test3", "Test8"]:
             if method not in ["Test4", "Test5"] or lv == 0:
                 local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
@@ -122,6 +113,23 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
         
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
+        
+        
+        if method == "Test8":
+            dev = local_hbot.device
+            h0 = local_hbot.shape[1]
+            h1 = h_vecs.shape[1]
+            h2 = edge_feats[i].shape[-1]
+            z = torch.zeros(h1, h2).to(dev)
+            leaf_check2 = np.array(leaf_check).astype(bool)
+            edge_ids = np.arange(h0)[leaf_check2]
+            print(edge_ids)
+            test = new_ids[i][1]
+            edge_ids = test[edge_ids]
+            print(edge_ids)
+            z[leaf_check2] = edge_feats[i]
+            list_edge_feats.append(z)
+        
         print(h_vecs.shape)
         print(new_ids[i])
         print("END")
