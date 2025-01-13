@@ -130,7 +130,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             test = new_ids[i][1]
             edge_ids = test[edge_ids]
             print(edge_ids)
-            z[leaf_check2] = edge_feats[i]
+            z[edge_ids] = edge_feats[i]
             list_edge_feats.append(z)
         
         print("END")
