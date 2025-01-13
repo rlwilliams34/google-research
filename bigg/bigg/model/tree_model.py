@@ -103,8 +103,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
         print("BIG CHECK")
-        print(len(leaf_check))
-        print(local_hbot.shape)
                      
         if edge_feats is not None and method not in ["Test", "Test2", "Test3", "Test8"]:
             if method not in ["Test4", "Test5"] or lv == 0:
@@ -122,6 +120,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             h2 = edge_feats[i].shape[-1]
             z = torch.zeros(h1, h2).to(dev)
             leaf_check2 = np.array(leaf_check).astype(bool)
+            print(leaf_check2)
             edge_ids = np.arange(h0)[leaf_check2]
             print(edge_ids)
             test = new_ids[i][1]
@@ -130,8 +129,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             z[leaf_check2] = edge_feats[i]
             list_edge_feats.append(z)
         
-        print(h_vecs.shape)
-        print(new_ids[i])
         print("END")
         h_list.append(h_vecs)
         c_list.append(c_vecs)
