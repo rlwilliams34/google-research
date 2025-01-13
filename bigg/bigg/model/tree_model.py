@@ -724,6 +724,8 @@ class RecurTreeGen(nn.Module):
                 prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
             
             ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
+            print(cur_state)
+            print(self.leaf_h0)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             if self.has_node_feats:
@@ -735,8 +737,8 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.merge_top_wt(cur_state, prev_wt_state)
             
             if self.has_edge_feats and self.method in ["Test8"] and i == 0 and target_edge_feats is not None and target_edge_feats.shape[0]:
-                left_edge_embed = self.standardize_edge_feats(left_edge_feats)
-                left_edge_embed = self.edgelen_encoding(left_edge_feats)
+                print("Hello!")
+                left_edge_embed = self.embed_edge_feats(left_edge_feats)
                 cur_state = self.update_wt(left_edge_embed, cur_state)
             
             controller_state = self.row_tree(cur_state)
