@@ -504,7 +504,8 @@ if __name__ == '__main__':
             loss_wt = -ll_wt / num_nodes
             true_loss = -(ll + ll_wt) / num_nodes
             epoch_loss_top = epoch_loss_top + loss_top.item()  / num_iter
-            epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
+            if cmd_args.has_edge_feats:
+                epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
             
             if cmd_args.sigma:
                 epoch_losses_t.append(ll_batch)
