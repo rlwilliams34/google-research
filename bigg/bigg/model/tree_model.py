@@ -471,6 +471,9 @@ class RecurTreeGen(nn.Module):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
         else:
+            if self.method == "Test9":
+                x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)])
+                return self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
 
     def get_prob_fix(self, prob):
@@ -781,8 +784,10 @@ class RecurTreeGen(nn.Module):
             node_feats = self.embed_node_feats(node_feats)
 
         if not self.bits_compress:
-            h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
-            c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
+            empty_h0, empty_c0 = self.get_empty_state()
+            h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
+            c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
+            
             fn_hc_bot = lambda d: (h_bot, c_bot)
         else:
             binary_embeds, base_feat = TreeLib.PrepareBinary()
