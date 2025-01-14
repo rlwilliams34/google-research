@@ -265,6 +265,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
         
         if self.method == "Test9":
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
             K = edge_embed.shape[0]
             x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
             s_in = (self.test_h0.repeat(1, K, 1), self.test_c0.repeat(1, K, 1))
