@@ -199,31 +199,29 @@ class TreeLSTMCell2(nn.Module):
         self.latent_dim = latent_dim
         self.wt_dim = wt_dim
 
-        self.mlp_i = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
+        self.mlp_i = MLP(arity * latent_dim + 2 * wt_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
 
-        self.mlp_o = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
+        self.mlp_o = MLP(arity * latent_dim + 2 * wt_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
 
-        self.mlp_u = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
+        self.mlp_u = MLP(arity * latent_dim + 2 * wt_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
 
         f_list = []
         for _ in range(arity):
-            mlp_f = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
+            mlp_f = MLP(arity * latent_dim + 2 * wt_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
             f_list.append(mlp_f)
         self.f_list = nn.ModuleList(f_list)
 
     def forward(self, list_h_mat, list_c_mat, edge_feats=None):
         assert len(list_c_mat) == self.arity == len(list_h_mat)
         if edge_feats is not None:
-            print(list_h_mat)
-            print(list_h_mat[0].shape)
-            h_mat = torch.cat([list_h_mat[0], list_h_mat[1], edge_feats[0] + edge_feats[1]], dim= -1)
-        assert h_mat.shape[2] == self.arity * self.latent_dim + self.wt_dim
+            h_mat = torch.cat([list_h_mat[0], list_h_mat[1], edge_feats[0], edge_feats[1]], dim= -1)
+        assert h_mat.shape[2] == self.arity * self.latent_dim + 2 * self.wt_dim
         
         i_j = self.mlp_i(h_mat)
 
         f_sum = 0
         for i in range(self.arity):
-            f = self.f_list[i](torch.cat([list_h_mat[i], edge_feats[i]], dim = -1))
+            f = self.f_list[i](h_mat)
             f_sum = f_sum + f * list_c_mat[i]
 
         o_j = self.mlp_o(h_mat)
