@@ -214,7 +214,7 @@ class TreeLSTMCell2(nn.Module):
     def forward(self, list_h_mat, list_c_mat, edge_feats=None):
         assert len(list_c_mat) == self.arity == len(list_h_mat)
         if edge_feats is not None:
-            h_mat = torch.cat(list_h_mat + [edge_feats[0] + edge_feats[1]], dim= -1)
+            h_mat = torch.cat(list_h_mat.append(edge_feats[0] + edge_feats[1]), dim= -1)
         assert h_mat.shape[2] == self.arity * self.latent_dim + self.wt_dim
         
         i_j = self.mlp_i(h_mat)
