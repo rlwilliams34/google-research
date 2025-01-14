@@ -207,21 +207,21 @@ class TreeLSTMCell2(nn.Module):
 
         f_list = []
         for _ in range(arity):
-            mlp_f = MLP(arity * latent_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
+            mlp_f = MLP(arity * latent_dim + wt_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
             f_list.append(mlp_f)
         self.f_list = nn.ModuleList(f_list)
 
     def forward(self, list_h_mat, list_c_mat, edge_feats=None):
         assert len(list_c_mat) == self.arity == len(list_h_mat)
         if edge_feats is not None:
-            h_mat = torch.cat(list_h_mat + [edge_feats], dim=-1)
+            h_mat = torch.cat(list_h_mat + [edge_feats[0] + edge_feats[1]], dim= -1)
         assert h_mat.shape[2] == self.arity * self.latent_dim + self.wt_dim
         
         i_j = self.mlp_i(h_mat)
 
         f_sum = 0
         for i in range(self.arity):
-            f = self.f_list[i](h_mat)
+            f = self.f_list[i](torch.cat([list_h_mat[i], edge_feats[i]], dim = -1))
             f_sum = f_sum + f * list_c_mat[i]
 
         o_j = self.mlp_o(h_mat)
@@ -249,8 +249,8 @@ class WeightedBinaryTreeLSTMCell2(TreeLSTMCell2):
             right_feat = torch.zeros(1, dim, self.wt_dim).to(lch_state[0].device)
         
                
-        edge_feats = left_feat + right_feat
-        edge_feats = (edge_feats.repeat(lch_state[0].shape[0], 1, 1), edge_feats.repeat(lch_state[0].shape[0], 1, 1))
+        edge_feats = [left_feat.repeat(lch_state[0].shape[0], 1, 1), right_feat.repeat(lch_state[0].shape[0], 1, 1)]
+        #edge_feats = (edge_feats.repeat(lch_state[0].shape[0], 1, 1), edge_feats.repeat(lch_state[0].shape[0], 1, 1))
         
         list_h_mat, list_c_mat = zip(lch_state, rch_state)
         
