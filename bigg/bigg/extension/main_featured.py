@@ -411,7 +411,7 @@ if __name__ == '__main__':
         if cmd_args.g_type == 'db':
             cmd_args.scale_loss = 50
         else:
-            cmd_args.scale_loss = 1
+            cmd_args.scale_loss = 10
     
     if cmd_args.model == "BiGG_GCN":
         cmd_args.scale_loss = 20
