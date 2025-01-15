@@ -22,7 +22,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_scatter import scatter
+#from torch_scatter import scatter
 from collections import defaultdict
 from torch.nn.parameter import Parameter
 from bigg.common.pytorch_util import * #glorot_uniform, MLP, BinaryTreeLSTMCell, MultiLSTMCell, WeightedBinaryTreeLSTMCell
