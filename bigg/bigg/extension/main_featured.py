@@ -388,7 +388,7 @@ if __name__ == '__main__':
     times = []
     loss_times = []
     epoch_list = []
-    lr_scheduler = {'lobster': 100, 'tree': 200 , 'db': 1000, 'er': 250, 'span': 500, 'franken': 200}
+    lr_scheduler = {'lobster': 100, 'tree': 100 , 'db': 1000, 'er': 250, 'span': 500, 'franken': 200}
     epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
     batch_loss = 0.0
     sigma_t = 1.0
