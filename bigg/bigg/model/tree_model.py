@@ -493,7 +493,7 @@ class RecurTreeGen(nn.Module):
             p += self.greedy_frac
         return p
 
-    def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, prev_wt_state=None):
+    def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, prev_wt_state=None, row=None):
         assert lb <= ub
         if tree_node.is_root:
             prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0][-1]))
@@ -530,6 +530,9 @@ class RecurTreeGen(nn.Module):
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     #print(cur_feats)
                     #print(prev_wt_state)
+                    print(row)
+                    col = tree_node.col_range[0]
+                    print(col)
                     if self.method != "LSTM":
                         edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
                     else:
@@ -737,7 +740,7 @@ class RecurTreeGen(nn.Module):
             if self.has_edge_feats and self.method in ["Test4", "Test5"]:
                 prev_wt_state = (self.leaf_h0_wt, self.leaf_c0_wt)
             
-            ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state)
+            ll, ll_wt, cur_state, _, target_edge_feats, prev_wt_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, prev_wt_state, row=i)
             
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
