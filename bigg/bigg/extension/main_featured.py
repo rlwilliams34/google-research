@@ -251,8 +251,8 @@ if __name__ == '__main__':
         for param_group in optimizer.param_groups:
             param_group['lr'] = cmd_args.learning_rate
     
-    print("LIST RC")
-    print(list_rc)
+    #print("LIST RC")
+    #(list_rc)
     #########################################################################################################
     if cmd_args.phase == 'validate':
         # get num nodes dist
@@ -499,6 +499,9 @@ if __name__ == '__main__':
                 #edge_feats_embed_c = (torch.cat([list_edge_feats_embed[1][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
                 #edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
                 edge_feats = [list_edge_feats[i] for i in batch_indices]
+                print("LIST RC")
+                print(list_rc)
+                print(STOP)
                 if list_rc is not None:
                     print("Hello!")
                     rc = [list_rc[i] for i in batch_indices]
