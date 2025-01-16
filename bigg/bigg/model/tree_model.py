@@ -477,8 +477,14 @@ class RecurTreeGen(nn.Module):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
         else:
-            if self.empty_h0 is None:
-                x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
+            if self.method == "Test9" or self.method == "Test10":
+                if self.method == "Test9":
+                    x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
+                
+                else:
+                    print(self.empty_embed.shape)
+                    print(STOP)
+                    x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
                 return self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
                 self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
