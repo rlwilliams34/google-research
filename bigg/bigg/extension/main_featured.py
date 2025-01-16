@@ -500,7 +500,10 @@ if __name__ == '__main__':
                 #edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
                 edge_feats = [list_edge_feats[i] for i in batch_indices]
                 if list_rc is not None:
+                    print("Hello!")
                     rc = [list_rc[i] for i in batch_indices]
+                    print(rc)
+                    print(STOP)
                     edge_feats = (edge_feats, rc)
                 
             elif cmd_args.method == "Test4":
