@@ -484,7 +484,7 @@ class RecurTreeGen(nn.Module):
                 else:
                     x_in = torch.cat([self.empty_embed, torch.zeros(1, 3 * self.empty_embed.shape[-1]).to(self.empty_embed.device)], dim = -1)
                 return self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
-                self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+                #self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
 
     def get_prob_fix(self, prob):
