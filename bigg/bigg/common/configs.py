@@ -111,6 +111,7 @@ cmd_opt.add_argument('-eps', default=1e-3, type=float, help='noise to be added t
 cmd_opt.add_argument('-debug', default=False, type=eval, help='computing training times')
 cmd_opt.add_argument('-sigma', default=False, type=eval, help='computing training times')
 
+cmd_opt.add_argument('-epoch_plateu', default=-1, type=int, help='computing training times')
 
 
 cmd_args, _ = cmd_opt.parse_known_args()
