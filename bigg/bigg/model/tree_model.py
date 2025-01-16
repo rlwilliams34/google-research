@@ -533,6 +533,7 @@ class RecurTreeGen(nn.Module):
                     print(row)
                     col = tree_node.col_range[0]
                     print(col)
+                    rc = np.array([row, col])
                     if self.method != "LSTM":
                         edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
                     else:
