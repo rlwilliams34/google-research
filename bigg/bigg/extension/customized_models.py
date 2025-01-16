@@ -278,12 +278,14 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "Test9" or self.method == "Test10":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             K = edge_embed.shape[0]
+            print(edge_embed)
+            print(edge_embed.shape)
+            print(K)
+            print(STOP)
             
             if self.method == "Test10":
                 row_pos = 0 * self.edge_pos_enc(edge_row)
                 col_pos = 0 * self.edge_pos_enc(edge_col)
-                print(row_pos)
-                print(col_pos)
                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed, row_pos, col_pos], dim = -1)
                 #print(x_in.shape)
             else:
