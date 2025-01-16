@@ -397,8 +397,14 @@ class RecurTreeGen(nn.Module):
         if not self.bits_compress:
             self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1,  args.embed_dim))
-            self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            
+            if self.has_edge_feats and args.method == "Test9":
+                self.empty_h0 = None
+                self.empty_c0 = None
+            
+            else:
+                self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1,  args.embed_dim))
+                self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
 
         self.topdown_left_embed = Parameter(torch.Tensor(2, args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
@@ -471,9 +477,10 @@ class RecurTreeGen(nn.Module):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
         else:
-            if self.method == "Test9":
+            if self.empty_h0 is None:
                 x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
                 return self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+                self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
 
     def get_prob_fix(self, prob):

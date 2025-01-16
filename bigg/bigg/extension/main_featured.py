@@ -70,11 +70,17 @@ def t(n1, n2):
     return int(t)
 
 
-def get_edge_feats(g):
+def get_edge_feats(g, method=None):
     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
-    weights = [x[2]['weight'] for x in edges]
-    return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
+    if method is None:
+        weights = [x[2]['weight'] for x in edges]
+        return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
+    
+    else:
+        weights = [[x[0], x[1], x[2]['weight']] for x in edges]
+        weights = np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
+        return weights #np.swapaxes(weights, 0, 2)
 
 
 def lr_gen(idx_list, y):    
@@ -208,6 +214,10 @@ if __name__ == '__main__':
     
     print(train_graphs[1].edges())
     
+    method = None
+    if cmd_args.method == "Test10":
+        method = "Test10"
+    
     if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
         list_node_feats = ([torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs] if cmd_args.has_node_feats else None)
@@ -216,7 +226,7 @@ if __name__ == '__main__':
             if cmd_args.method == "Test4":
                 list_edge_feats = [get_edge_feats_2(g, cmd_args.device) for g in train_graphs]
             else:
-                list_edge_feats = [torch.from_numpy(get_edge_feats(g)).to(cmd_args.device) for g in train_graphs]
+                list_edge_feats = [torch.from_numpy(get_edge_feats(g, method)).to(cmd_args.device) for g in train_graphs]
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     if cmd_args.model == "BiGG_GCN":
