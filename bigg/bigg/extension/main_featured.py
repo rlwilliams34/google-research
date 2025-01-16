@@ -79,7 +79,7 @@ def get_edge_feats(g, method=None):
     if method is not None:
         rc = [[x[0], x[1]] for x in edges]
     
-    return list([np.expand_dims(np.array(weights, dtype=np.float32), axis=1), rc])
+    return np.expand_dims(np.array(weights, dtype=np.float32), axis=1), rc
 
 
 def lr_gen(idx_list, y):    
@@ -225,10 +225,10 @@ if __name__ == '__main__':
             if cmd_args.method == "Test4":
                 list_edge_feats = [get_edge_feats_2(g, cmd_args.device) for g in train_graphs]
             else:
-                list_edge_feats = [torch.from_numpy(get_edge_feats(g, method))[0].to(cmd_args.device) for g in train_graphs]
+                list_edge_feats = [torch.from_numpy(get_edge_feats(g, method)[0]).to(cmd_args.device) for g in train_graphs]
                 list_rc = None
                 if cmd_args.method == "Test10":
-                    list_rc = [torch.from_numpy(get_edge_feats(g, method))[1].to(cmd_args.device) for g in train_graphs]
+                    list_rc = [torch.from_numpy(get_edge_feats(g, method)[1]).to(cmd_args.device) for g in train_graphs]
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     if cmd_args.model == "BiGG_GCN":
