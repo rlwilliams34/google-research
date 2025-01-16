@@ -73,6 +73,7 @@ def t(n1, n2):
 def get_edge_feats(g, method=None):
     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
+    method=None
     if method is None:
         weights = [x[2]['weight'] for x in edges]
         return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)

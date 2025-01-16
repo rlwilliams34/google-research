@@ -266,7 +266,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_feats_normalized.append(edge_feats_normalized_i)
         
         else:
-            if self.method == "Test10":
+            if self.method == "Test100":
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats[:, :, 2]) + noise
                 edge_row = edge_feats[:, :, 0]
                 edge_col = edge_feats[:, :, 1]
