@@ -280,10 +280,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             K = edge_embed.shape[0]
             
             if self.method == "Test10":
-                print(edge_row)
-                print(type(edge_row))
-                row_pos = self.edge_pos_enc(edge_row)
-                col_pos = self.edge_pos_enc(edge_col)
+                row_pos = self.edge_pos_enc(edge_row.tolist())
+                col_pos = self.edge_pos_enc(edge_col.tolist())
                 #row_pos = torch.zeros(edge_embed.shape).to(edge_embed.device)
                 #col_pos = torch.zeros(edge_embed.shape).to(edge_embed.device)
                 
