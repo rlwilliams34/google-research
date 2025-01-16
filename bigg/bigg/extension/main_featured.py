@@ -228,9 +228,7 @@ if __name__ == '__main__':
                 list_edge_feats = [torch.from_numpy(get_edge_feats(g, method)[0]).to(cmd_args.device) for g in train_graphs]
                 list_rc = None
                 if cmd_args.method == "Test10":
-                    print("Hello!")
                     list_rc = [get_edge_feats(g, method)[1] for g in train_graphs]
-                    print(list_rc)
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     if cmd_args.model == "BiGG_GCN":
@@ -253,6 +251,8 @@ if __name__ == '__main__':
         for param_group in optimizer.param_groups:
             param_group['lr'] = cmd_args.learning_rate
     
+    print("LIST RC")
+    print(list_rc)
     #########################################################################################################
     if cmd_args.phase == 'validate':
         # get num nodes dist
@@ -499,7 +499,6 @@ if __name__ == '__main__':
                 #edge_feats_embed_c = (torch.cat([list_edge_feats_embed[1][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
                 #edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
                 edge_feats = [list_edge_feats[i] for i in batch_indices]
-                print(list_rc)
                 if list_rc is not None:
                     rc = [list_rc[i] for i in batch_indices]
                     edge_feats = (edge_feats, rc)
