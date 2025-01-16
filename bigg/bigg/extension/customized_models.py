@@ -283,7 +283,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 #row_pos = self.edge_pos_enc(edge_row)
                 #col_pos = self.edge_pos_enc(edge_col)
                 row_pos = torch.zeros(edge_embed.shape).to(edge_embed.device)
-                col_pos = torch.zeros(edge_embed.shape).to(edge_embed.device)ßß
+                col_pos = torch.zeros(edge_embed.shape).to(edge_embed.device)
                 
                 edge_embed = torch.cat([edge_embed, row_pos, col_pos], dim = -1)
             
