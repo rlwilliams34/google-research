@@ -530,10 +530,11 @@ class RecurTreeGen(nn.Module):
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     #print(cur_feats)
                     #print(prev_wt_state)
-                    print(row)
-                    col = tree_node.col_range[0]
-                    print(col)
-                    rc = np.array([row, col])
+                    rc = None
+                    if self.method == "Test10":
+                        col = tree_node.col_range[0]
+                        rc = np.array([row, col])
+                    
                     if self.method != "LSTM":
                         edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
                     else:
@@ -567,7 +568,7 @@ class RecurTreeGen(nn.Module):
 #                         edge_embed = self.embed_edge_feats(cur_feats)
 #                         return ll, ll_wt, (self.leaf_h0 + edge_embed, self.leaf_c0 + edge_embed), 1, cur_feats, None
                     
-                    edge_embed = self.embed_edge_feats(cur_feats)
+                    edge_embed = self.embed_edge_feats(cur_feats, rc=rc)
                     return ll, ll_wt, edge_embed, 1, cur_feats, None
                     
                 else:
