@@ -402,7 +402,7 @@ if __name__ == '__main__':
     times = []
     loss_times = []
     epoch_list = []
-    lr_scheduler = {'lobster': 100, 'tree': 200 , 'db': 3000, 'er': 250, 'span': 500, 'franken': 200}
+    lr_scheduler = {'lobster': 100, 'tree': 200 , 'db': 2000, 'er': 250, 'span': 500, 'franken': 200}
     epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
     
     if cmd_args.epoch_plateu > -1:
