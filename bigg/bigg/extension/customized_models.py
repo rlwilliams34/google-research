@@ -48,7 +48,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         #self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         self.topdown_update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
-        self.weight_empted_dim = args.weight_embed_dim
+        self.weight_embed_dim = args.weight_embed_dim
         
         if self.method == "Test9" or self.method == "Test10":
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
