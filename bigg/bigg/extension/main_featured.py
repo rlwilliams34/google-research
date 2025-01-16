@@ -497,6 +497,7 @@ if __name__ == '__main__':
                 #edge_feats_embed_c = (torch.cat([list_edge_feats_embed[1][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
                 #edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
                 edge_feats = [list_edge_feats[i] for i in batch_indices]
+                print(list_rc)
                 if list_rc is not None:
                     rc = [list_rc[i] for i in batch_indices]
                     edge_feats = (edge_feats, rc)
