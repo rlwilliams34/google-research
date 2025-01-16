@@ -398,7 +398,7 @@ class RecurTreeGen(nn.Module):
             self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             
-            if self.has_edge_feats and args.method == "Test9":
+            if self.has_edge_feats and args.method in ["Test9", "Test10"]:
                 self.empty_h0 = None
                 self.empty_c0 = None
             
