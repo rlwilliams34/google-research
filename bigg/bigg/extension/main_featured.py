@@ -78,7 +78,7 @@ def get_edge_feats(g, method=None):
     
     if method is not None:
         rc = [[x[0], x[1]] for x in edges]
-    
+    print(rc)
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1), rc
 
 
