@@ -883,6 +883,9 @@ class RecurTreeGen(nn.Module):
         edge_feats_embed = None
         
         if self.has_edge_feats:
+            rc = None
+            if self.method == "Test10":
+                edge_feats, rc = edge_feats
             if self.method == "LSTM":
                 edge_feats_embed, state_h_prior = self.embed_edge_feats(edge_feats, noise)
                 edge_feats = torch.cat(edge_feats, dim = 0)
@@ -895,7 +898,7 @@ class RecurTreeGen(nn.Module):
                 edge_feats_embed, weights_MLP = self.embed_edge_feats(edge_feats)
             
             else:
-                edge_feats_embed = self.embed_edge_feats(edge_feats)
+                edge_feats_embed = self.embed_edge_feats(edge_feats, rc=rc)
         
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed,
                                                                            list_node_starts, num_nodes, list_col_ranges)

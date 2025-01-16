@@ -257,7 +257,7 @@ class BiggWithEdgeLen(RecurTreeGen):
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
 
-    def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False, lr_seq=None):
+    def embed_edge_feats(self, edge_feats, noise=0.0, prev_state=None, as_list=False, lr_seq=None, rc=None):
         noise = 0.0
         if not torch.is_tensor(edge_feats): 
             edge_feats_normalized = []
@@ -267,9 +267,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         else:
             if self.method == "Test100":
-                edge_feats_normalized = self.standardize_edge_feats(edge_feats[:, :, 2]) + noise
-                edge_row = edge_feats[:, :, 0]
-                edge_col = edge_feats[:, :, 1]
+                edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
+                edge_row = rc[:, :, 0]
+                edge_col = rc[:, :, 1]
             
             else:
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
