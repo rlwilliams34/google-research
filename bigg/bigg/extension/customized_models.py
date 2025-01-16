@@ -26,6 +26,7 @@ import torch.nn as nn
 import numpy 
 from torch.nn.parameter import Parameter
 from datetime import datetime
+from bigg.torch_ops import PosEncoding
 
 # pylint: skip-file
 class BiggWithEdgeLen(RecurTreeGen):
