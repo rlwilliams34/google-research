@@ -509,7 +509,7 @@ if __name__ == '__main__':
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
             if list_rc is not None:
-                rc = np.concatenate([list_rc[i] for i in batch_indices], dim=0)
+                rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
                 edge_feats = (edge_feats, rc)
                 
                 
