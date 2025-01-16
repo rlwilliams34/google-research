@@ -479,7 +479,7 @@ class RecurTreeGen(nn.Module):
         else:
             if self.method == "Test9" or self.method == "Test10":
                 if self.method == "Test9":
-                    x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
+                    x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
                 
                 else:
                     x_in = torch.cat([self.empty_embed, torch.zeros(1, 3 * self.empty_embed.shape[-1]).to(self.empty_embed.device)], dim = -1)
