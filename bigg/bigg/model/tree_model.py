@@ -597,7 +597,7 @@ class RecurTreeGen(nn.Module):
                     prev_wt_state = self.edgeLSTM(self.topdown_left_embed[[int(has_left)]], prev_wt_state)
                 lub = min(tree_node.lch.n_cols, ub)
                 llb = max(0, lb - tree_node.rch.n_cols)
-                ll, ll_wt, left_state, num_left, left_edge_feats, prev_wt_state = self.gen_row(ll, ll_wt, state, tree_node.lch, col_sm, llb, lub, edge_feats, prev_wt_state)
+                ll, ll_wt, left_state, num_left, left_edge_feats, prev_wt_state = self.gen_row(ll, ll_wt, state, tree_node.lch, col_sm, llb, lub, edge_feats, prev_wt_state, row=row)
                 pred_edge_feats.append(left_edge_feats)
             else:
                 left_state = self.get_empty_state()
@@ -646,7 +646,7 @@ class RecurTreeGen(nn.Module):
             if has_right:  # has edge in right child
                 if self.has_edge_feats and self.method == "Test4":
                     prev_wt_state = self.edgeLSTM(self.topdown_right_embed[[int(has_right)]], prev_wt_state)
-                ll, ll_wt, right_state, num_right, right_edge_feats, prev_wt_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, prev_wt_state)
+                ll, ll_wt, right_state, num_right, right_edge_feats, prev_wt_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, prev_wt_state, row=row)
                 pred_edge_feats.append(right_edge_feats)
             else:
                 right_state = self.get_empty_state()
