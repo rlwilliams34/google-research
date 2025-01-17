@@ -63,8 +63,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
                 self.empty_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
             if self.method == "Test11":
-                self.test2_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-                self.test2_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+                self.leaf_LSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+#                 self.test2_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+#                 self.test2_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             
             #self.update_wt = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
@@ -294,7 +295,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
                 edge_embed = torch.cat([edge_embed, row_pos, col_pos], dim = -1)
             
-            x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
+            if self.method == "Test9" or self.method == "Test10":
+                x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
+            
+            elif self.method == "Test11": 
+                x_in = edge_embed
+            
             s_in = (self.test_h0.repeat(1, K, 1), self.test_c0.repeat(1, K, 1))
             edge_embed = self.leaf_LSTM(x_in, s_in)
             return edge_embed
