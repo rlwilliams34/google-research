@@ -477,17 +477,17 @@ class RecurTreeGen(nn.Module):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
         else:
-            #if self.method in ["Test9", "Test10", "Test11"]:
-            #    if self.method != "Test10":
-            #        x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
-            #        if self.method == "Test11":
-            #            self.leaf_LSTM(x_in, (self.test2_h0, self.test2_c0))
-            #    
-            #    else:
-            #        x_in = torch.cat([self.empty_embed, torch.zeros(1, 3 * self.empty_embed.shape[-1]).to(self.empty_embed.device)], dim = -1)
-            #    
-            #    return self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
-            #    #self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+            if self.method in ["Test9", "Test10", "Test11"]:
+               if self.method != "Test10":
+                   x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
+                   if self.method == "Test11":
+                       self.leaf_LSTM(x_in, (self.test2_h0, self.test2_c0))
+               
+               else:
+                   x_in = torch.cat([self.empty_embed, torch.zeros(1, 3 * self.empty_embed.shape[-1]).to(self.empty_embed.device)], dim = -1)
+               
+               return self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+               #self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
 
     def get_prob_fix(self, prob):
