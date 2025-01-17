@@ -282,7 +282,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
         
         
-        if self.method == "Test9" or self.method == "Test10":
+        if self.method in ["Test9", "Test10", "Test11"]:
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             K = edge_embed.shape[0]
             
