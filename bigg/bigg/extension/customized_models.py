@@ -239,6 +239,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                     edge = edge[idx]
                     print(edge)
                     print(edge.shape)
+                    print(row_embed)
+                    print(col_embed)
                     print(row_embed.shape)
                     print(col_embed.shape)
                     edge = self.edgelen_encoding(edge.unsqueeze(-1))
