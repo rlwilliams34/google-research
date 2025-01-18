@@ -38,7 +38,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.update_left = args.update_left
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
-        assert self.method in ['Test9', 'Test10', 'Test11']
+        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12']
         
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
@@ -51,7 +51,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.leaf_LSTM = MultiLSTMCell(3 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         self.leaf_embed = Parameter(torch.Tensor(1, 2 * args.weight_embed_dim))
         
-        if self.method == "Test10":
+        if self.method == "Test10" or self.method == "Test12":
             self.edge_pos_enc = PosEncoding(args.weight_embed_dim, args.device, args.pos_base)
             self.leaf_LSTM = MultiLSTMCell(5 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
