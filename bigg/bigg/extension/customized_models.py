@@ -222,6 +222,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                 states_h = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
                 states_c = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
                 
+                print(edge_feats_idx)
+                
                 for i, edge in enumerate(edge_feats_normalized):
                     idx = torch.isfinite(edge)
                     if prev_idx is None:
