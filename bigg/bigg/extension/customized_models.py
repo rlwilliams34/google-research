@@ -185,8 +185,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method == "Test12": 
             edge_feats_normalized = []
             for e in edge_feats:
-                e = e + sigma * torch.randn(e.shape)
-                edge_feats_normalized_i = self.standardize_edge_feats(e).to(e.device)
+                e = e + sigma * torch.randn(e.shape).to(e.device)
+                edge_feats_normalized_i = self.standardize_edge_feats(e)
                 edge_feats_normalized.append(edge_feats_normalized_i)
 
             if prev_state is None:
