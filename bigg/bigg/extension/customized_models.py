@@ -256,7 +256,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                     states_c[:, cur_idx.long()] = cur_state[1]
                 
                 state = (states_h, states_c)
-                prev_h = prev_states_h
+                print(state[0].shape)
                 return state
                 
             else:
