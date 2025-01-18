@@ -237,7 +237,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                     print(cur_idx)
                     print(cur_idx.shape)
                     print(prev_states_h.shape)
-                    prev_states_h[cur_idx.long()] = cur_state[0][state_idx]
+                    prev_states_h[cur_idx.long(), :] = cur_state[0][state_idx]
                     
                     edge = edge[idx]
                     edge = self.edgelen_encoding(edge.unsqueeze(-1))
