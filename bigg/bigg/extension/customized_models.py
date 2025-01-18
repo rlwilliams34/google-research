@@ -290,6 +290,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             s_in = (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1))
             edge_embed = self.leaf_LSTM(x_in, s_in)
+            print(edge_embed[0].shape)
             return edge_embed
     
     def compute_softminus(self, edge_feats, threshold = 20):
