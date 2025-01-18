@@ -250,10 +250,10 @@ class BiggWithEdgeLen(RecurTreeGen):
                     col_pos = self.edge_pos_enc(edge_col.tolist())
                     embed_edge = torch.cat([self.leaf_embed.repeat(edge.shape[0], 1), edge, row_pos, col_pos], dim = -1)
                     
-                    cur_state = self.leaf_LSTM(embed_edge, (cur_state[0][state_idx], cur_state[1][state_idx]))
+                    cur_state = self.leaf_LSTM(embed_edge, (cur_state[0][:, state_idx], cur_state[1][:, state_idx]))
                     
-                    states_h[cur_idx.long()] = cur_state[0]
-                    states_c[cur_idx.long()] = cur_state[1]
+                    states_h[:, cur_idx.long()] = cur_state[0]
+                    states_c[:, scur_idx.long()] = cur_state[1]
                 
                 state = (states_h, states_c)
                 prev_h = prev_states_h
