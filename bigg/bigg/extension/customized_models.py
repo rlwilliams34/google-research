@@ -197,6 +197,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_feats_normalized = self.LSTM_pad(edge_feats_normalized)
                 print(edge_feats_normalized.shape)
                 print(edge_feats_normalized)
+                print(list_rc)
+                print(len(list_rc))
                 row_embed = self.LSTM_pad(rc[0])
                 col_embed = self.LSTM_pad(rc[1])
                 
