@@ -245,8 +245,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                     
                     edge_row = edge_rc[:, 0]
                     edge_col = edge_rc[:, 1]
-                    print(row)
-                    print(col)
+                    print(edge_row)
+                    print(edge_col)
                     edge = self.edgelen_encoding(edge.unsqueeze(-1))
                     row_pos = self.edge_pos_enc(edge_row.tolist())
                     col_pos = self.edge_pos_enc(edge_col.tolist())
