@@ -174,7 +174,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         lens = [len(x) for x in list_feats]
         max_len = max(lens)
         list_feats_pad = []
-        for i, edge in enumerate(list_feats_pad):
+        for i, edge in enumerate(list_feats):
             list_feats_pad.append(torch.nn.functional.pad(edge, (0, 0, 0, max_len - lens[i]), value = np.inf))
         
         list_feats_pad = torch.cat(list_feats_pad, dim = -1)
