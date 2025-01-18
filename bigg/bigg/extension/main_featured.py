@@ -426,7 +426,7 @@ if __name__ == '__main__':
         cmd_args.epoch_load = 0
     
     if cmd_args.schedule:
-        continue
+        pass
     elif cmd_args.g_type == 'db':
         cmd_args.scale_loss = 50
     else:
