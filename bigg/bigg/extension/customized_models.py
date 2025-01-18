@@ -249,23 +249,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                     row_pos = self.edge_pos_enc(edge_row.tolist())
                     col_pos = self.edge_pos_enc(edge_col.tolist())
                     embed_edge = torch.cat([self.leaf_embed.repeat(edge.shape[0], 1), edge, row_pos, col_pos], dim = -1)
-                    print(embed_edge.shape)
-                    print(STOP)
-                    
-                    
-                    
-#                     
-#             if self.method == "Test9":
-#                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
-#             
-#             if self.method == "Test10":
-#                 row_pos = self.edge_pos_enc(edge_row.tolist())
-#                 col_pos = self.edge_pos_enc(edge_col.tolist())
-#                 edge_embed = torch.cat([edge_embed, row_pos, col_pos], dim = -1)
-#                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
-#                     
-#                     
-                    
                     
                     cur_state = self.leaf_LSTM(embed_edge, (cur_state[0][state_idx], cur_state[1][state_idx]))
                     
