@@ -61,6 +61,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
         self.num_layers = args.rnn_layers
+        self.sigma = args.sigma
         
         mu_wt = torch.tensor(0, dtype = float)
         var_wt = torch.tensor(1, dtype = float)
@@ -169,7 +170,8 @@ class BiggWithEdgeLen(RecurTreeGen):
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
 
-    def embed_edge_feats(self, edge_feats, noise=0.0, rc=None):
+    def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None):
+        edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape)
         if self.method == "Test10":
             edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
             edge_row = rc[:, :, 0]
