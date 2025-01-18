@@ -709,6 +709,7 @@ class RecurTreeGen(nn.Module):
                 edge_feats, rc = edge_feats    
             edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc)
         
+        print(edge_feats_embed[0].shape)
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed,
                                                                            list_node_starts, num_nodes, list_col_ranges)
         row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
