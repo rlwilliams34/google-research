@@ -187,7 +187,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             feats_pad = torch.cat(list_feats_pad, dim = -1)
         
         else:
-            feats_pad = np.concatenate(list_feats_pad, dim = 1)
+            feats_pad = np.concatenate(list_feats_pad, axis = 1)
             print(feats_pad.shape)
             print(STOP)
         return feats_pad
