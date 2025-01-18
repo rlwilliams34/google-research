@@ -248,7 +248,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
-        h = torch.sum(h, dim = 0)
+        #h = torch.sum(h, dim = 0)
         
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
