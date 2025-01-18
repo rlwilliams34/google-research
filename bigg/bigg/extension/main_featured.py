@@ -426,13 +426,13 @@ if __name__ == '__main__':
         cmd_args.epoch_load = 0
     
     if cmd_args.schedule:
-        if cmd_args.g_type == 'db':
-            cmd_args.scale_loss = 50
-        else:
-            cmd_args.scale_loss = 10
+        continue
+    elif cmd_args.g_type == 'db':
+        cmd_args.scale_loss = 50
+    else:
+        cmd_args.scale_loss = 10
     
-    if cmd_args.model == "BiGG_GCN":
-        cmd_args.scale_loss = 20
+    print("Dividing Weight Loss by: ", cmd_args.scale_loss)
     
     model.train()
     
@@ -473,12 +473,11 @@ if __name__ == '__main__':
         else:
             model.epoch_num += 1
         
-        if cmd_args.schedule:
-            if epoch >= epoch_lr_decrease and cmd_args.learning_rate != 1e-5:
-                cmd_args.learning_rate = 1e-5
-                print("Lowering Larning Rate to 1e-5")
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = 1e-5
+        if epoch >= epoch_lr_decrease and cmd_args.learning_rate != 1e-5:
+            cmd_args.learning_rate = 1e-5
+            print("Lowering Larning Rate to 1e-5")
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = 1e-5
         
         edge_feats_embed = None
         epoch_loss_top = 0.0
