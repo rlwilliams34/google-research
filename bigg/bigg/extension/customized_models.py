@@ -243,8 +243,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                     edge = edge[idx]
                     edge_rc = rc_pad[i]
                     print(edge_rc)
+                    print(edge_rc.shape)
                     print(idx)
-                    edge_rc = edge_rc[idx]
+                    edge_rc = edge_rc[idx.cpu()]
                     print(edge_rc)
                     print(STOP)
                     edge_rc = rc_pad[idx]
