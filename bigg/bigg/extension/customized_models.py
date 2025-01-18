@@ -177,8 +177,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         for i, edge in enumerate(list_feats):
             list_feats_pad.append(torch.nn.functional.pad(edge, (0, 0, 0, max_len - lens[i]), value = np.inf))
         
-        list_feats_pad = torch.cat(list_feats_pad, dim = -1)
-        return list_feats_pad
+        feats_pad = torch.cat(list_feats_pad, dim = -1)
+        return feats_pad
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None):
         sigma = 0.0
@@ -193,7 +193,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 states_h = []
                 states_c = []
                 
+                print(edge_feats_normalized)
                 edge_feats_normalized = self.LSTM_pad(edge_feats_normalized)
+                print(edge_Feats_normalized)
                 row_embed = self.LSTM_pad(rc[0])
                 col_embed = self.LSTM_pad(rc[1])
                 
