@@ -181,11 +181,12 @@ class BiggWithEdgeLen(RecurTreeGen):
         return edge_feats_normalized
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None):
+        sigma = 0.0
         if self.method == "Test12": 
             edge_feats_normalized = []
             for e in edge_feats:
                 e = e + sigma * torch.randn(e.shape)
-                edge_feats_normalized_i = self.standardize_edge_feats(e)
+                edge_feats_normalized_i = self.standardize_edge_feats(e).to(e.device)
                 edge_feats_normalized.append(edge_feats_normalized_i)
 
             if prev_state is None:
@@ -266,7 +267,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                  return state
         
         else:
-            edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape)
+            edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
             
             if self.method in ["Test10"]:
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats)
