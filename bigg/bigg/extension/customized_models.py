@@ -245,17 +245,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                     
                     edge_row = edge_rc[:, 0]
                     edge_col = edge_rc[:, 1]
-                    print(edge_row)
-                    print(edge_col)
                     edge = self.edgelen_encoding(edge.unsqueeze(-1))
                     row_pos = self.edge_pos_enc(edge_row.tolist())
                     col_pos = self.edge_pos_enc(edge_col.tolist())
-                    print(edge.shape)
-                    print(row_pos.shape)
-                    print(col_pos.shpe)
+                    embed_edge = torch.cat([self.leaf_embed.repeat(edge.shape[0], 1), edge, row_pos, col_pos], dim = -1)
+                    print(embed_edge.shape)
                     print(STOP)
-                    embed_edge = torch.cat([self.leaf_embed.repeat(K, 1), edge, row_pos, col_pos], dim = ...)
-                    
                     
                     
                     
