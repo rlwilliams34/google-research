@@ -175,12 +175,10 @@ class BiggWithEdgeLen(RecurTreeGen):
         max_len = max(lens)
         list_feats_pad = []
         for i, feat in enumerate(list_feats):
-            print(feat.shape)
             if not isinstance(feat, torch.Tensor):
-                print(feat.shape)
                 list_feats_pad.append(np.pad(feat, (0, 0, 0, max_len - lens[i]), mode='constant', constant_values=np.inf))
+                list_feats_pad.append(np.concatenate([feat, np.fill((max_len - lens[i], 1, 2), np.inf)], axis = 0)
                 cat = False
-                print(STOP)
             else:
                 list_feats_pad.append(torch.nn.functional.pad(feat, (0, 0, 0, max_len - lens[i]), value = np.inf))
                 cat = True
@@ -189,7 +187,9 @@ class BiggWithEdgeLen(RecurTreeGen):
             feats_pad = torch.cat(list_feats_pad, dim = -1)
         
         else:
-            feats_pad = np.concatenate(list_feats_pad, )
+            feats_pad = np.concatenate(list_feats_pad, dim = 1)
+            print(feats_pad.shape)
+            print(STOP)
         return feats_pad
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None):
