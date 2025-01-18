@@ -476,7 +476,7 @@ class RecurTreeGen(nn.Module):
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     rc = None
-                    if self.method == "Test10":
+                    if self.method in ["Test10", "Test12"]:
                         col = tree_node.col_range[0]
                         rc = np.array([col, row]).reshape(1, 1, 2)
                     
@@ -705,7 +705,7 @@ class RecurTreeGen(nn.Module):
         
         if self.has_edge_feats:
             rc = None
-            if self.method == "Test10":
+            if self.method in ["Test10", "Test12"]:
                 edge_feats, rc = edge_feats    
             edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc)
         

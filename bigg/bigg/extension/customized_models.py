@@ -169,33 +169,129 @@ class BiggWithEdgeLen(RecurTreeGen):
     
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
+    
+    def LSTM_pad(self, list_feats):
+        lens = [len(x) for x in list_feats]
+        max_len = max(lens)
+        list_feats_pad = []
+        for i, edge in enumerate(list_feats_pad):
+            list_feats_pad.append(torch.nn.functional.pad(edge, (0, 0, 0, max_len - lens[i]), value = np.inf))
+        
+        edge_feats_normalized = torch.cat(edge_feats_normalized_pad, dim = -1)
+        return edge_feats_normalized
 
-    def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None):
-        edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape)
-        if self.method == "Test10":
-            edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
-            edge_row = rc[:, :, 0]
-            edge_col = rc[:, :, 1]
+    def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None):
+        if self.method == "Test12": 
+            edge_feats_normalized = []
+            for e in edge_feats:
+                e = e + sigma * torch.randn(e.shape)
+                edge_feats_normalized_i = self.standardize_edge_feats(e)
+                edge_feats_normalized.append(edge_feats_normalized_i)
+
+            if prev_state is None:
+                states_h = []
+                states_c = []
+                
+                edge_feats_normalized = LSTM_pad(edge_feats_normalized)
+                row_embed = LSTM_pad(rc[0])
+                col_embed = LSTM_pad(rc[1])
+                
+                B = edge_feats_normalized.shape[1]
+                cur_state = (self.leaf_h0_wt.repeat(B, 1), self.leaf_c0_wt.repeat(B, 1))
+                prev_states_h = []
+                prev_idx = None
+                
+                edge_feats_idx = torch.zeros(edge_feats_normalized.shape).to(edge_feats_normalized.device)
+                i = 0
+                for k in range(edge_feats_normalized.shape[1]):
+                    for idx in range(edge_feats_normalized.shape[0]):
+                        if torch.isfinite(edge_feats_normalized[:, k][idx]): 
+                            edge_feats_idx[:, k][idx] = i
+                            i = i + 1
+                        else:
+                            edge_feats_idx[:, k][idx] = np.inf
+                
+                L = torch.sum(torch.isfinite(edge_feats_normalized))
+                
+                prev_states_h = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
+                states_h = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
+                states_c = torch.zeros(L, self.embed_dim).to(edge_feats_normalized.device)
+                
+                for i, edge in enumerate(edge_feats_normalized):
+                    idx = torch.isfinite(edge)
+                    if prev_idx is None:
+                        prev_idx = idx
+                        state_idx = idx
+                    else:
+                        state_idx = idx[prev_idx]
+                        prev_idx = idx
+                    
+                    cur_idx = edge_feats_idx[i][torch.isfinite(edge_feats_idx[i])]
+                    prev_states_h[cur_idx.long()] = cur_state[0][state_idx]
+                    
+                    edge = edge[idx]
+                    edge = self.edgelen_encoding(edge.unsqueeze(-1))
+                    print(edge.shape)
+                    print(STOP)
+                    embed_edge = torch.cat([self.leaf_embed.repeat(K, 1), edge], dim = ...)
+                    
+                    
+                    
+                    
+#                     
+#             if self.method == "Test9":
+#                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
+#             
+#             if self.method == "Test10":
+#                 row_pos = self.edge_pos_enc(edge_row.tolist())
+#                 col_pos = self.edge_pos_enc(edge_col.tolist())
+#                 edge_embed = torch.cat([edge_embed, row_pos, col_pos], dim = -1)
+#                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
+#                     
+#                     
+                    
+                    
+                    cur_state = self.edgeLSTM(embed_edge, (cur_state[0][state_idx], cur_state[1][state_idx]))
+                    
+                    states_h[cur_idx.long()] = cur_state[0]
+                    states_c[cur_idx.long()] = cur_state[1]
+                
+                state = (states_h, states_c)
+                prev_h = prev_states_h
+                return state, prev_h
+                
+            else:
+                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
+                 state = self.edgeLSTM(edge_embed, prev_state)   
+                 return state
         
         else:
-            edge_feats_normalized = self.standardize_edge_feats(edge_feats) + noise
-
-        edge_embed = self.edgelen_encoding(edge_feats_normalized)
-        K = edge_embed.shape[0]
-        x_in = edge_embed
+            edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape)
+            
+            if self.method in ["Test10"]:
+                edge_feats_normalized = self.standardize_edge_feats(edge_feats)
+                edge_row = rc[:, :, 0]
+                edge_col = rc[:, :, 1]
+            
+            else:
+                edge_feats_normalized = self.standardize_edge_feats(edge_feats)
         
-        if self.method == "Test9":
-            x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
-        
-        if self.method == "Test10":
-            row_pos = self.edge_pos_enc(edge_row.tolist())
-            col_pos = self.edge_pos_enc(edge_col.tolist())
-            edge_embed = torch.cat([edge_embed, row_pos, col_pos], dim = -1)
-            x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
-        
-        s_in = (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1))
-        edge_embed = self.leaf_LSTM(x_in, s_in)
-        return edge_embed
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            K = edge_embed.shape[0]
+            x_in = edge_embed
+            
+            if self.method == "Test9":
+                x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
+            
+            if self.method == "Test10":
+                row_pos = self.edge_pos_enc(edge_row.tolist())
+                col_pos = self.edge_pos_enc(edge_col.tolist())
+                edge_embed = torch.cat([edge_embed, row_pos, col_pos], dim = -1)
+                x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
+            
+            s_in = (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1))
+            edge_embed = self.leaf_LSTM(x_in, s_in)
+            return edge_embed
     
     def compute_softminus(self, edge_feats, threshold = 20):
       '''

@@ -213,10 +213,6 @@ if __name__ == '__main__':
     
     print(train_graphs[1].edges())
     
-    method = None
-    if cmd_args.method == "Test10":
-        method = "Test10"
-    
     if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
         list_node_feats = ([torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs] if cmd_args.has_node_feats else None)
@@ -227,7 +223,7 @@ if __name__ == '__main__':
             else:
                 list_edge_feats = [torch.from_numpy(get_edge_feats(g, method)[0]).to(cmd_args.device) for g in train_graphs]
                 list_rc = None
-                if cmd_args.method == "Test10":
+                if cmd_args.method in ["Test10", "Test12"]:
                     list_rc = [get_edge_feats(g, method)[1] for g in train_graphs]
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
@@ -493,7 +489,7 @@ if __name__ == '__main__':
             
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if list_node_feats is not None else None)
             
-            if cmd_args.method in ["LSTM", "MLP-Leaf"] and cmd_args.has_edge_feats:
+            if cmd_args.method in ["Test12", "MLP-Leaf"] and cmd_args.has_edge_feats:
                 #edge_feats_embed_h = (torch.cat([list_edge_feats_embed[0][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
                 #edge_feats_embed_c = (torch.cat([list_edge_feats_embed[1][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
                 #edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
@@ -508,7 +504,11 @@ if __name__ == '__main__':
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
             if list_rc is not None:
-                rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
+                if cmd_args.method == "Test10":
+                    rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
+                
+                else:
+                    rc = [list_rc[i] for i in batch_indices]
                 edge_feats = (edge_feats, rc)
                 
                 
