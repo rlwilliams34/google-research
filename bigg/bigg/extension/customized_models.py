@@ -198,9 +198,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 #print(edge_feats_normalized.shape)
                 edge_feats_normalized = self.LSTM_pad(edge_feats_normalized)
                 rc_pad = self.LSTM_pad(rc)
-                print(rc_pad.shape)
-                print(rc_pad[0])
-                print(STOP)
                 
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0.repeat(1, B, 1), self.leaf_c0.repeat(1, B, 1))
@@ -223,8 +220,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 states_h = torch.zeros(self.num_layers, L, self.embed_dim).to(edge_feats_normalized.device)
                 states_c = torch.zeros(self.num_layers, L, self.embed_dim).to(edge_feats_normalized.device)
                 
-                print(edge_feats_idx)
-                
                 for i, edge in enumerate(edge_feats_normalized):
                     idx = torch.isfinite(edge)
                     if prev_idx is None:
@@ -238,6 +233,16 @@ class BiggWithEdgeLen(RecurTreeGen):
                     #prev_states_h[:, cur_idx.long()] = cur_state[0][:, state_idx]
                     
                     edge = edge[idx]
+                    edge_rc = rc_pad[i]
+                    print(edge_rc)
+                    print(idx)
+                    edge_rc = edge_rc[idx]
+                    print(edge_rc)
+                    print(STOP)
+                    edge_rc = rc_pad[idx]
+                    print(idx)
+                    print()
+                    print(edge_rc)
                     row = row_embed[idx]
                     col = col_embed[idx]
                     print(edge)
