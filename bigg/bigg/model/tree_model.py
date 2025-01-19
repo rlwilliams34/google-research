@@ -240,7 +240,7 @@ class FenwickTree(nn.Module):
         print(row_embeds[2][0].shape)
         print("==========================================")
         print(row_embeds[0][0])
-        print(row_embed[1][0])
+        print(row_embeds[1][0])
         print(self.init_h0)
         
         ### Have all edge embeddings (except last edge ...?)
