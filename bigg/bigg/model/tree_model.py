@@ -875,6 +875,8 @@ class RecurTreeGen(nn.Module):
         ll = 0.0
         ll_wt = 0.0
         noise = 0.0
+        print(self.leaf_h0)
+        print(self.empty_h0)
         ll_batch = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
