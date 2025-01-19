@@ -228,7 +228,8 @@ class FenwickTree(nn.Module):
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
         
-
+		print(row_embeds)
+		print(STOP)
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
