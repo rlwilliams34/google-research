@@ -33,24 +33,30 @@ from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
 
 
-nedge_list = [18, 16]
-init = []
-offset = 0
-list_edge = []
-
-
+nedge_list = [9]
 max_lv = int(np.log(max(nedge_list)) / np.log(2))
 list_indices = []
 
-cur_nedge_list = nedge_list
-list_edge = list(range(sum(cur_nedge_list)))
 
+def get_list_edge(cur_nedge_list):
+    offset = 0
+    list_edge = []
+    for nedge in cur_nedge_list:
+        nedge2 = nedge - nedge % 2
+        if nedge2 == 0:
+            continue
+        list_edge += list(range(offset, nedge2 + offset))
+        offset = nedge
+    return list_edge
+
+list_edge = get_list_edge(nedge_list)
+cur_nedge_list = nedge_list
 for lv in range(max_lv):
     left = list_edge[0::2]
     right = list_edge[1::2]
     cur_nedge_list = [x // 2 for x in cur_nedge_list]
-    list_edge = list(range(sum(cur_nedge_list)))
-    list_indices.append([(np.array(left), np.array(list_edge)), (np.array(right), np.array(list_edge))])
+    list_edge = get_list_edge(cur_nedge_list)
+    list_indices.append([(np.array(left), np.array(range(len(left)))), (np.array(right), np.array(range(len(right))))])
 
 
 print(list_indices)
@@ -415,12 +421,10 @@ class FenwickTree(nn.Module):
             if len(self.list_states) == 0:
                 return (self.init_h0, self.init_c0)
         else:
-            print("Appending State!")
             self.append_state(new_state, 0)
         pos = 0
         while pos < len(self.list_states):
             if len(self.list_states[pos]) >= 2:
-                print("Merging left and right child...")
                 lch_state, rch_state = self.list_states[pos]  # assert the length is 2
                 new_state = self.merge_cell(lch_state, rch_state)
                 self.list_states[pos] = []
@@ -429,13 +433,11 @@ class FenwickTree(nn.Module):
         state = None
         for pos in range(len(self.list_states)):
             if len(self.list_states[pos]) == 0:
-                print("SKIP!")
                 continue
             cur_state = self.list_states[pos][0]
             if state is None:
                 state = cur_state
             else:
-                print("Summarizing!")
                 state = self.summary_cell(state, cur_state)
         return state
 
