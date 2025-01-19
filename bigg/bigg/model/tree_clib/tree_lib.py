@@ -138,6 +138,7 @@ class _tree_lib(object):
             list_nedges.append(tot_edges)
             list_nnodes.append(cur_num)
         self.list_nnodes = list_nnodes
+        self.list_nedges = list_nedges
         return list_nnodes, list_nedges
 
     def PrepareTreeEmbed(self):
