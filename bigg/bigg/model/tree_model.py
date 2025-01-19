@@ -60,6 +60,7 @@ def tree_state_select(h_bot, c_bot, h_buf, c_buf, fn_all_ids):
         h_vecs = multi_index_select([prev_froms], [prev_tos], h_buf)
         c_vecs = multi_index_select([prev_froms], [prev_tos], c_buf)
     else:
+        print("We are HERE")
         h_vecs, c_vecs = hc_multi_select([bot_froms, prev_froms],
                                          [bot_tos, prev_tos],
                                          [h_bot, h_buf], [c_bot, c_buf])
