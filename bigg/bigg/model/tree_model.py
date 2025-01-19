@@ -816,7 +816,7 @@ class RecurTreeGen(nn.Module):
             prev_state = (self.leaf_h0, self.leaf_c0)
         
         for i in pbar:
-            print("CURRENT ROW: ", i)
+            #print("CURRENT ROW: ", i)
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
             else:
@@ -855,7 +855,7 @@ class RecurTreeGen(nn.Module):
             edges += [(i, x) for x in col_sm.indices]
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
-            print("#####################################################################")
+            #print("#####################################################################")
 
         if self.has_node_feats:
             node_feats = torch.cat(list_pred_node_feats, dim=0)
