@@ -233,7 +233,6 @@ class FenwickTree(nn.Module):
         print(row_embeds[0][0].shape)
         print(row_embeds[1][0].shape)
         print(row_embeds[2][0].shape)
-        print(STOP)
         
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
@@ -256,6 +255,7 @@ class FenwickTree(nn.Module):
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
         
+        print(STOP)
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=1)
         print(joint_h.shape)
