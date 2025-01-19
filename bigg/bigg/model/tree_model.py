@@ -208,15 +208,15 @@ class FenwickTree(nn.Module):
 
     def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c):
         # embed row tree
-        print("H BOT: ", h_bot)
-        print("C BOT: ", c_bot)
-        print("H BUF0: ", h_buf0)
-        print("C BUF0: ", c_buf0)
-        print("PREV H: ", prev_rowsum_h)
-        print("PREV C: ", prrev_rowsum_c)
-        print(STOP)
+        # Start with all the embeddings...
+        
+        # PREV ROSUM H AND C ARE NONE...
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
+        
+        print("TREE AGG", tree_agg_ids)
+        print(STOP)
+        
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
             if 'node' in feat_dict:
