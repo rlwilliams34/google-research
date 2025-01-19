@@ -229,6 +229,7 @@ class FenwickTree(nn.Module):
             row_embeds.append((h_buf0, c_buf0))
         
         print(row_embeds)
+        print(len(row_embeds))
         print(STOP)
         
         for i, all_ids in enumerate(tree_agg_ids):
