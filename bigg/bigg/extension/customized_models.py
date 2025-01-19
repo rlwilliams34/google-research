@@ -192,6 +192,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None):
         sigma = 0.0
+        print("Prev State: ", prev_state)
         if self.method == "Test12": 
             edge_feats_normalized = []
             for e in edge_feats:
