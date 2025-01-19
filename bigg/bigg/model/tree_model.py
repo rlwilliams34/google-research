@@ -45,6 +45,10 @@ def hc_multi_select(ids_from, ids_to, h_froms, c_froms):
 
 def tree_state_select(h_bot, c_bot, h_buf, c_buf, fn_all_ids):
     bot_froms, bot_tos, prev_froms, prev_tos = fn_all_ids()
+    print(bot_froms)
+    print(bot_tos)
+    print(prev_froms)
+    print(prev_tos)
     if h_buf is None or prev_tos is None:
         h_vecs = multi_index_select([bot_froms], [bot_tos], h_bot)
         c_vecs = multi_index_select([bot_froms], [bot_tos], c_bot)
