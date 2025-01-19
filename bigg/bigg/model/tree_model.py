@@ -215,6 +215,7 @@ class FenwickTree(nn.Module):
         row_embeds = [(self.init_h0, self.init_c0)]
         
         print("TREE AGG", tree_agg_ids)
+        print(len(tree_agg_ids))
         print(STOP)
         
         if self.has_edge_feats or self.has_node_feats:
