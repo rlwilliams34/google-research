@@ -214,10 +214,6 @@ class FenwickTree(nn.Module):
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
         
-        print("TREE AGG", tree_agg_ids)
-        print(len(tree_agg_ids))
-        print(STOP)
-        
         if self.has_edge_feats or self.has_node_feats:
             feat_dict = c_bot
             if 'node' in feat_dict:
@@ -236,6 +232,11 @@ class FenwickTree(nn.Module):
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
+            print("-----------------------------------------------------------")
+            print(i)
+            print(all_ids)
+            print("-----------------------------------------------------------")
+            
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
                 lstm_func = featured_batch_tree_lstm3
             lstm_func = partial(lstm_func, h_buf=row_embeds[-1][0], c_buf=row_embeds[-1][1],
