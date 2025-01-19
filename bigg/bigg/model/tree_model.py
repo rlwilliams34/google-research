@@ -88,9 +88,13 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     print(lch_isleaf)
     print(rch_isleaf)
     
+    print(h_bot.shape)
+    print(h_buff.shape)
+    
     if edge_feats is not None:
         edge_feats = [(edge_feats[0][:, ~is_rch], edge_feats[1][:, ~is_rch]), (edge_feats[0][:, is_rch], edge_feats[1][:, is_rch])]
         assert np.sum(is_rch) == np.sum(rch_isleaf)
+    print(edge_feats)
     node_feats = [t_lch, t_rch]
     h_list = []
     c_list = []
@@ -239,11 +243,11 @@ class FenwickTree(nn.Module):
         print(row_embeds[1][0].shape)
         print(row_embeds[2][0].shape)
         print("==========================================")
-        print(row_embeds[0][0])
-        print(row_embeds[1][0])
-        print(self.init_h0)
         
         ### Have all edge embeddings (except last edge ...?)
+        ## ROW EMBEDS 0 == init h0, init c0
+        ## ROW EMBEDS 1 == cat (empty h0, empty c0); (leaf h0, leaf c0)
+        ## ROW EMBEDS 2 contains 197 entries. NOTE There are 199 nodes. Probably all nodes EXCLUDING the first and last!
         
         
         for i, all_ids in enumerate(tree_agg_ids):
@@ -875,8 +879,6 @@ class RecurTreeGen(nn.Module):
         ll = 0.0
         ll_wt = 0.0
         noise = 0.0
-        print(self.leaf_h0)
-        print(self.empty_h0)
         ll_batch = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
