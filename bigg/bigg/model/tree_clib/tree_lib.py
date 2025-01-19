@@ -138,7 +138,7 @@ class _tree_lib(object):
             list_nedges.append(tot_edges)
             list_nnodes.append(cur_num)
         self.list_nnodes = list_nnodes
-        return list_nnodes
+        return list_nnodes, list_nedges
 
     def PrepareTreeEmbed(self):
         max_d = self.lib.MaxTreeDepth()
