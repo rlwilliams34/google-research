@@ -530,14 +530,14 @@ if __name__ == '__main__':
             if cmd_args.has_edge_feats:
                 epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
             
-            if cmd_args.sigma:
-                epoch_losses_t.append(ll_batch)
-                epoch_losses_w.append(ll_batch_wt)
-                loss = -ll / sigma_t**0.5 - ll_wt / sigma_w**0.5
-                loss = loss / B
-            
-            else:
-                loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
+#             if cmd_args.sigma:
+#                 epoch_losses_t.append(ll_batch)
+#                 epoch_losses_w.append(ll_batch_wt)
+#                 loss = -ll / sigma_t**0.5 - ll_wt / sigma_w**0.5
+#                 loss = loss / B
+#             
+#             else:
+            loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
             
             loss.backward()
             grad_accum_counter += 1
