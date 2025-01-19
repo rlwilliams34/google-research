@@ -87,6 +87,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     print(fn_all_ids(1))
     print(lch_isleaf)
     print(rch_isleaf)
+    print(STOP)
     
     if edge_feats is not None:
         edge_feats = [(edge_feats[0][:, ~is_rch], edge_feats[1][:, ~is_rch]), (edge_feats[0][:, is_rch], edge_feats[1][:, is_rch])]
