@@ -482,6 +482,7 @@ class RecurTreeGen(nn.Module):
                     
                     edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll_wt = ll_wt + edge_ll
+                    print(cur_feats)
                     edge_embed = self.embed_edge_feats(cur_feats, rc=rc, prev_state=prev_state)
                     if prev_state is not None:
                         prev_state = edge_embed
