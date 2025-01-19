@@ -253,7 +253,6 @@ class FenwickTree(nn.Module):
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=1)
         print(joint_h.shape)
-        print(STOP)
         joint_c = torch.cat(c_list, dim=1)
         
         # get history representation
@@ -291,6 +290,8 @@ class FenwickTree(nn.Module):
         pos_embed = self.pos_enc(pos_info)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
+        print(row_h.shape)
+        print(STOP)
         return (row_h, row_c), ret_state
 
 
