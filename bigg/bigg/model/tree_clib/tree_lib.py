@@ -126,12 +126,16 @@ class _tree_lib(object):
                               num_nodes,
                               int(new_batch))
         list_nnodes = []
+        list_nedges = []
         for i, gid in enumerate(list_gids):
             tot_nodes = self.graph_stats[gid][0]
             if num_nodes <= 0:
                 cur_num = tot_nodes - list_node_start[i]
             else:
                 cur_num = min(num_nodes, tot_nodes - list_node_start[i])
+            
+            tot_edges = self.graph_stats[gid][1]
+            list_nedges.append(tot_edges)
             list_nnodes.append(cur_num)
         self.list_nnodes = list_nnodes
         return list_nnodes

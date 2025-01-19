@@ -849,7 +849,11 @@ class RecurTreeGen(nn.Module):
         return -loss, ll_batch
 
     def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None):
-        TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
+        x, y = TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
+        print("RIGHT OVER HERE")
+        print(x)
+        print(y)
+        print(STOP)
         # embed trees
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
