@@ -208,6 +208,13 @@ class FenwickTree(nn.Module):
 
     def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c):
         # embed row tree
+        print("H BOT: ", h_bot)
+        print("C BOT: ", c_bot)
+        print("H BUF0: ", h_buf0)
+        print("C BUF0: ", c_buf0)
+        print("PREV H: ", prev_rowsum_h)
+        print("PREV C: ", prrev_rowsum_c)
+        print(STOP)
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
         if self.has_edge_feats or self.has_node_feats:
@@ -281,6 +288,146 @@ class FenwickTree(nn.Module):
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
         return (row_h, row_c), ret_state
+
+
+# ###
+# 
+# class FenwickTree(nn.Module):
+#     def __init__(self, args):
+#         super(FenwickTree, self).__init__()
+#         self.method = args.method
+#         self.has_edge_feats = True
+#         self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+#         self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+#         glorot_uniform(self)
+#         self.merge_cell = BinaryTreeLSTMCell(args.embed_dim)
+#         self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
+#         if args.pos_enc:
+#             self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
+#         else:
+#             self.pos_enc = lambda x: 0
+# 
+#     def reset(self, list_states=[]):
+#         self.list_states = []
+#         for l in list_states:
+#             t = []
+#             for e in l:
+#                 t.append(e)
+#             self.list_states.append(t)
+# 
+#     def append_state(self, state, level):
+#         if level >= len(self.list_states):
+#             num_aug = level - len(self.list_states) + 1
+#             for i in range(num_aug):
+#                 self.list_states.append([])
+#         self.list_states[level].append(state)
+# 
+#     def forward(self, new_state=None):
+#         if new_state is None:
+#             if len(self.list_states) == 0:
+#                 return (self.init_h0, self.init_c0)
+#         else:
+#             self.append_state(new_state, 0)
+#         pos = 0
+#         while pos < len(self.list_states):
+#             if len(self.list_states[pos]) >= 2:
+#                 lch_state, rch_state = self.list_states[pos]  # assert the length is 2
+#                 new_state = self.merge_cell(lch_state, rch_state)
+#                 self.list_states[pos] = []
+#                 self.append_state(new_state, pos + 1)
+#             pos += 1
+#         state = None
+#         for pos in range(len(self.list_states)):
+#             if len(self.list_states[pos]) == 0:
+#                 continue
+#             cur_state = self.list_states[pos][0]
+#             if state is None:
+#                 state = cur_state
+#             else:
+#                 state = self.summary_cell(state, cur_state)
+#         return state
+# 
+#     def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c):
+#         # embed row tree
+#         tree_agg_ids = TreeLib.PrepareRowEmbed()
+#         row_embeds = [(self.init_h0, self.init_c0)]
+#         if self.has_edge_feats or self.has_node_feats:
+#             feat_dict = c_bot
+#             if 'node' in feat_dict:
+#                 node_feats, is_tree_trivial, t_lch, t_rch = feat_dict['node']
+#                 sel_feat = node_feats[is_tree_trivial]
+#                 feat_dict['node'] = (sel_feat[t_lch], sel_feat[t_rch])
+#             h_bot, c_bot = h_bot
+#         if h_bot is not None:
+#             row_embeds.append((h_bot, c_bot))
+#         if prev_rowsum_h is not None:
+#             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
+#         if h_buf0 is not None:
+#             row_embeds.append((h_buf0, c_buf0))
+#         
+# 
+#         for i, all_ids in enumerate(tree_agg_ids):
+#             fn_ids = lambda x: all_ids[x]
+#             lstm_func = batch_tree_lstm3
+#             if i == 0 and (self.has_edge_feats or self.has_node_feats):
+#                 lstm_func = featured_batch_tree_lstm3
+#             lstm_func = partial(lstm_func, h_buf=row_embeds[-1][0], c_buf=row_embeds[-1][1],
+#                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
+#             if i == 0:
+#                 if self.has_edge_feats or self.has_node_feats:
+#                     new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update)
+#                 else:
+#                     new_states = lstm_func(h_bot, c_bot)
+#             else:
+#                 new_states = lstm_func(None, None)
+#             row_embeds.append(new_states)
+#         
+#         h_list, c_list = zip(*row_embeds)
+#         joint_h = torch.cat(h_list, dim=1)
+#         joint_c = torch.cat(c_list, dim=1)
+#         
+#         # get history representation
+#         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
+#         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
+#         
+#         if self.has_node_feats:
+#             base_nodes, _ = TreeLib.GetFenwickBase()
+#             if len(base_nodes):
+#                 needs_base_nodes = (init_select >= 1) & (init_select <= 2)
+#                 sub_states = (cur_state[0][needs_base_nodes], cur_state[1][needs_base_nodes])
+#                 sub_states = self.node_feat_update(node_feats[base_nodes], sub_states)
+#                 nz_idx = torch.tensor(np.nonzero(needs_base_nodes)[0]).to(node_feats.device)
+#                 new_cur = [scatter(x, nz_idx, dim=0, dim_size=init_select.shape[0]) for x in sub_states]
+#                 needs_base_nodes = torch.tensor(needs_base_nodes, dtype=torch.bool).to(node_feats.device).unsqueeze(1)
+#                 cur_state = [torch.where(needs_base_nodes, new_cur[i], cur_state[i]) for i in range(2)]
+#                 cur_state = tuple(cur_state)
+#         ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
+#         hist_rnn_states = []
+#         hist_froms = []
+#         hist_tos = []
+#         for i, (done_from, done_to, proceed_from, proceed_input) in enumerate(all_ids):
+#             hist_froms.append(done_from)
+#             hist_tos.append(done_to)
+#             hist_rnn_states.append(cur_state)
+# 
+#             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
+#             sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
+#             
+#             cur_state = self.summary_cell(sub_state, next_input)
+#         hist_rnn_states.append(cur_state)
+#         hist_froms.append(None)
+#         hist_tos.append(last_tos)
+#         hist_h_list, hist_c_list = zip(*hist_rnn_states)
+#         pos_embed = self.pos_enc(pos_info)
+#         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
+#         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
+#         return (row_h, row_c), ret_state
+# 
+# 
+# ###
+
+
+
 
 
 class BitsRepNet(nn.Module):
