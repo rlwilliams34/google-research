@@ -415,10 +415,12 @@ class FenwickTree(nn.Module):
             if len(self.list_states) == 0:
                 return (self.init_h0, self.init_c0)
         else:
+            print("Appending State!")
             self.append_state(new_state, 0)
         pos = 0
         while pos < len(self.list_states):
             if len(self.list_states[pos]) >= 2:
+                print("Merging left and right child...")
                 lch_state, rch_state = self.list_states[pos]  # assert the length is 2
                 new_state = self.merge_cell(lch_state, rch_state)
                 self.list_states[pos] = []
@@ -427,11 +429,13 @@ class FenwickTree(nn.Module):
         state = None
         for pos in range(len(self.list_states)):
             if len(self.list_states[pos]) == 0:
+                print("SKIP!")
                 continue
             cur_state = self.list_states[pos][0]
             if state is None:
                 state = cur_state
             else:
+                print("Summarizing!")
                 state = self.summary_cell(state, cur_state)
         return state
 
@@ -810,6 +814,7 @@ class RecurTreeGen(nn.Module):
             prev_state = (self.leaf_h0, self.leaf_c0)
         
         for i in pbar:
+            print("CURRENT ROW: ", i)
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
             else:
@@ -848,6 +853,7 @@ class RecurTreeGen(nn.Module):
             edges += [(i, x) for x in col_sm.indices]
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
+            print("#####################################################################")
 
         if self.has_node_feats:
             node_feats = torch.cat(list_pred_node_feats, dim=0)
