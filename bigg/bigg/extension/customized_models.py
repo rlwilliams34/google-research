@@ -51,12 +51,16 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.leaf_LSTM = MultiLSTMCell(3 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         self.leaf_embed = Parameter(torch.Tensor(1, 2 * args.weight_embed_dim))
         
-        if self.method == "Test10" or self.method == "Test12":
+        if self.method == "Test10":
             self.edge_pos_enc = PosEncoding(args.weight_embed_dim, args.device, args.pos_base)
             self.leaf_LSTM = MultiLSTMCell(5 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
         if self.method == "Test11":
             self.leaf_LSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        
+        if self.method == "Test12":
+            self.edge_pos_enc = PosEncoding(args.weight_embed_dim, args.device, args.pos_base)
+            self.leaf_LSTM = MultiLSTMCell(3 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
@@ -205,7 +209,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
                 #print(edge_feats_normalized.shape)
                 edge_feats_normalized = self.LSTM_pad(edge_feats_normalized)
-                rc_pad = self.LSTM_pad(rc)
+                #rc_pad = self.LSTM_pad(rc)
                 
                 B = edge_feats_normalized.shape[1]
                 cur_state = (self.leaf_h0.repeat(1, B, 1), self.leaf_c0.repeat(1, B, 1))
@@ -238,17 +242,17 @@ class BiggWithEdgeLen(RecurTreeGen):
                         prev_idx = idx
                     
                     cur_idx = edge_feats_idx[i][torch.isfinite(edge_feats_idx[i])]
-                    #prev_states_h[:, cur_idx.long()] = cur_state[0][:, state_idx]
                     
                     edge = edge[idx]
-                    edge_rc = rc_pad[i][idx.cpu()]
+                    #edge_rc = rc_pad[i][idx.cpu()]
                     
-                    edge_row = edge_rc[:, 0]
-                    edge_col = edge_rc[:, 1]
+                    #edge_row = edge_rc[:, 0]
+                    #edge_col = edge_rc[:, 1]
                     edge = self.edgelen_encoding(edge.unsqueeze(-1))
-                    row_pos = self.edge_pos_enc(edge_row.tolist())
-                    col_pos = self.edge_pos_enc(edge_col.tolist())
-                    embed_edge = torch.cat([self.leaf_embed.repeat(edge.shape[0], 1), edge, row_pos, col_pos], dim = -1)
+                    #row_pos = self.edge_pos_enc(edge_row.tolist())
+                    #col_pos = self.edge_pos_enc(edge_col.tolist())
+                    #embed_edge = torch.cat([self.leaf_embed.repeat(edge.shape[0], 1), edge, row_pos, col_pos], dim = -1)
+                    embed_edge = torch.cat([self.leaf_embed.repeat(edge.shape[0], 1), edge], dim = -1)
                     
                     cur_state = self.leaf_LSTM(embed_edge, (cur_state[0][:, state_idx], cur_state[1][:, state_idx]))
                     
@@ -260,13 +264,14 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
             else:
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats)
-                edge_row = rc[:, :, 0]
-                edge_col = rc[:, :, 1]
+                #edge_row = rc[:, :, 0]
+                #edge_col = rc[:, :, 1]
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 
-                row_pos = self.edge_pos_enc(edge_row.tolist())
-                col_pos = self.edge_pos_enc(edge_col.tolist())
-                edge_embed = torch.cat([self.leaf_embed, edge_embed, row_pos, col_pos], dim = -1)
+                #row_pos = self.edge_pos_enc(edge_row.tolist())
+                #col_pos = self.edge_pos_enc(edge_col.tolist())
+                #edge_embed = torch.cat([self.leaf_embed, edge_embed, row_pos, col_pos], dim = -1)
+                edge_embed = torch.cat([self.leaf_embed, edge_embed], dim = -1)
                 state = self.leaf_LSTM(edge_embed, prev_state)   
                 return state
         
