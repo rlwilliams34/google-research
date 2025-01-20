@@ -38,7 +38,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.update_left = args.update_left
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
-        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12']
+        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat']
         
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
@@ -50,6 +50,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         self.leaf_LSTM = MultiLSTMCell(3 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         self.leaf_embed = Parameter(torch.Tensor(1, 2 * args.weight_embed_dim))
+        
+        if self.method == "MLP-Repeat":
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = args.wt_drop)
         
         if self.method == "Test9":
             self.empty_embed = Parameter(torch.Tensor(1, 2 * args.weight_embed_dim))
@@ -200,6 +203,11 @@ class BiggWithEdgeLen(RecurTreeGen):
         return feats_pad
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None):
+        if self.method == "MLP-Repeat":
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
+            edge_embed = (edge_embed, edge_embed)
+            return edge_embed
         if self.method == "Test12": 
             if prev_state is None:
                 sigma = 0.1
@@ -281,7 +289,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 return state
         
         else:
-            sigma = 0
             edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
             
             if self.method in ["Test10"]:
