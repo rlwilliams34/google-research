@@ -211,7 +211,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             return edge_embed
         if self.method == "Test12": 
             if prev_state is None:
-                sigma = 0.1
                 edge_feats_normalized = []
                 for e in edge_feats:
                     e = e + sigma * torch.randn(e.shape).to(e.device)
@@ -359,7 +358,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             ll = torch.sum(ll)
         return new_state, ll, node_feats
 
-    def predict_edge_feats(self, state, edge_feats=None,prev_state=None,batch_idx=None,ll_batch_wt=None):
+    def predict_edge_feats(self, state, edge_feats=None,batch_idx=None,ll_batch_wt=None):
         """
         Args:
             state: tuple of (h=N x embed_dim, c=N x embed_dim), the current state

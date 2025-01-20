@@ -786,49 +786,6 @@ class RecurTreeGen(nn.Module):
         return ll, ll_wt, ll_batch, ll_batch_wt, next_states
 
 
-#                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-#                 
-#                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
-#                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
-#                 left_ids = tuple([None] + list(left_ids[1:]))
-# 
-#             left_subtree_states = tree_state_select(h_bot, c_bot,
-#                                                     h_next_buf, c_next_buf,
-#                                                     lambda: left_ids)
-# 
-#             has_right, num_right = TreeLib.GetChLabel(1, lv)
-#             right_pos = self.tree_pos_enc(num_right)
-#             left_subtree_states = [x + right_pos for x in left_subtree_states]
-#             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
-#             
-#             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
-#             #right_logits = self.pred_has_right(torch.sum(topdown_state[0], dim = 0), lv)
-#             right_update = self.topdown_right_embed[has_right]
-#             topdown_state = self.cell_topright(right_update, topdown_state, lv)
-#             right_ll, _ = self.binary_ll(right_logits, has_right, reduction='none')
-#             
-#             ll = ll + torch.sum(right_ll)
-#             
-#             
-#             
-#             lr_ids = TreeLib.GetLeftRightSelect(lv, np.sum(has_left), np.sum(has_right))
-#             new_states = []
-#             for i in range(2):
-#                 new_s = multi_index_select([lr_ids[0], lr_ids[2]], [lr_ids[1], lr_ids[3]],
-#                                             cur_states[i], topdown_state[i])
-#                 new_states.append(new_s)
-#             cur_states = tuple(new_states)
-#             lv += 1
-#         return ll, ll_wt, ll_batch, ll_batch_wt, next_states
-
-
-
-
-
-
-
-
-
 
 
 
