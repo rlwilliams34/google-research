@@ -660,6 +660,9 @@ class RecurTreeGen(nn.Module):
     def get_empty_state(self):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
+        
+        elif self.method == "Test9":
+            return (self.test9_h0, self.test9_c0)
         else:
 #             if self.method in ["Test9", "Test10", "Test11"]:
 #                if self.method != "Test10":
@@ -815,6 +818,12 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test12":
             prev_state = (self.leaf_h0, self.leaf_c0)
         
+        if self.method == "Test9":
+            x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
+            h, c = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+            self.test9_h0 = h
+            self.test9_c0 = c
+        
         for i in pbar:
             #print("CURRENT ROW: ", i)
             if edge_list is None:
@@ -892,8 +901,15 @@ class RecurTreeGen(nn.Module):
 
         if not self.bits_compress:
             empty_h0, empty_c0 = self.get_empty_state()
-            h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
-            c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
+            if self.method == "Test9":
+                x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
+                empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+                h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
+                c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
+                
+            else:
+                h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
+                c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
             
             fn_hc_bot = lambda d: (h_bot, c_bot)
         else:

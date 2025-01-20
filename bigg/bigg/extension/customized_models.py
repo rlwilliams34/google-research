@@ -44,12 +44,17 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
-        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
-        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = cmd_args.wt_drop)
-        self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = cmd_args.wt_drop)
+        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
+        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
+        self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
         
         self.leaf_LSTM = MultiLSTMCell(3 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         self.leaf_embed = Parameter(torch.Tensor(1, 2 * args.weight_embed_dim))
+        
+        if self.method == "Test9":
+            self.empty_embed = Parameter(torch.Tensor(1, 2 * args.weight_embed_dim))
+            self.test9_h0 = Torch.zeros(args.rnn_layers, 1, args.embed_dim, device = args.device)
+            self.test9_c0 = Torch.zeros(args.rnn_layers, 1, args.embed_dim, device = args.device)
         
         if self.method == "Test10":
             self.edge_pos_enc = PosEncoding(args.weight_embed_dim, args.device, args.pos_base)
