@@ -463,7 +463,6 @@ class RecurTreeGen(nn.Module):
                     ll_wt = ll_wt + edge_ll
                     edge_embed = self.embed_edge_feats(cur_feats, rc=rc, prev_state=prev_state)
                     if prev_state is not None:
-                        print("Hello!")
                         prev_state = edge_embed
                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state
                     
