@@ -820,7 +820,7 @@ class RecurTreeGen(nn.Module):
         
         if self.method == "Test9":
             x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
-            h, c = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+            h, c = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
             self.test9_h0 = h
             self.test9_c0 = c
         
@@ -903,7 +903,7 @@ class RecurTreeGen(nn.Module):
             empty_h0, empty_c0 = self.get_empty_state()
             if self.method == "Test9":
                 x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
-                empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+                empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
                 h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
                 c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
                 
