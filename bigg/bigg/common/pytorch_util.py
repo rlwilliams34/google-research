@@ -169,7 +169,7 @@ class TreeLSTMCell(nn.Module):
     def forward(self, list_h_mat, list_c_mat):
         assert len(list_c_mat) == self.arity == len(list_h_mat)
         h_mat = torch.cat(list_h_mat, dim=-1)
-        assert h_mat.shape[1] == self.arity * self.latent_dim
+        assert h_mat.shape[2] == self.arity * self.latent_dim
 
         i_j = self.mlp_i(h_mat)
 
