@@ -562,7 +562,6 @@ class RecurTreeGen(nn.Module):
             self.test9_c0 = c
         
         for i in pbar:
-            #print("CURRENT ROW: ", i)
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
             else:
@@ -587,21 +586,17 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            
-            ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
-            
+            ll, cur_state, _, target_edge_feats = self.gen_row(0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             if self.has_node_feats:
                 target_feat_embed = self.embed_node_feats(target_node_feats)
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
-            
-            controller_state = self.row_tree(cur_state)            
+            controller_state = self.row_tree(cur_state)
             edges += [(i, x) for x in col_sm.indices]
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
-            #print("#####################################################################")
 
         if self.has_node_feats:
             node_feats = torch.cat(list_pred_node_feats, dim=0)
