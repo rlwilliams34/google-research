@@ -721,7 +721,7 @@ class RecurTreeGen(nn.Module):
             edge_feats_embed = self.embed_edge_feats(edge_feats)
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
-        ll = ll + self.binary_ll(logit_has_edge, has_ch)
+        ll_cur, ll_batch = ll + self.binary_ll(logit_has_edge, has_ch)
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
         
         if batch_idx is not None:
