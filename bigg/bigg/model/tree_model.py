@@ -623,8 +623,6 @@ class RecurTreeGen(nn.Module):
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
-        if self.has_edge_feats:
-            edge_feats = self.embed_edge_feats(edge_feats)
 
         if not self.bits_compress:
             if self.method == "Test9":
