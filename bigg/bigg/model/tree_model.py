@@ -711,19 +711,19 @@ class RecurTreeGen(nn.Module):
             edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc)
             if self.method == "Test12":
                 edge_feats = torch.cat(edge_feats, dim = 0)
-        
-        hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed,
+       
+       
+       hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed,
                                                                            list_node_starts, num_nodes, list_col_ranges)
-        row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
-        if self.has_node_feats:
-            row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
-            ll = ll + ll_node_feats
+       row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
+       if self.has_node_feats:
+           row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
+           ll = ll + ll_node_feats
+        if self.has_edge_feats:
+            edge_feats_embed = self.embed_edge_feats(edge_feats)
         logit_has_edge = self.pred_has_ch(row_states[0][-1])
-        #logit_has_edge = self.pred_has_ch(torch.sum(row_states[0], dim = 0))
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
-        ll_cur, ll_batch = self.binary_ll(logit_has_edge, has_ch, batch_idx = batch_idx, ll_batch = ll_batch)
-        ll = ll + ll_cur
-        
+        ll = ll + self.binary_ll(logit_has_edge, has_ch)
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
         
         if batch_idx is not None:
@@ -804,6 +804,74 @@ class RecurTreeGen(nn.Module):
 
 
 
+
+
+
+
+    def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
+                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
+        ll = 0.0
+        
+        
+        
+        
+        
+        while True:
+            is_nonleaf = TreeLib.QueryNonLeaf(lv)
+            if self.has_edge_feats:
+                edge_of_lv = TreeLib.GetEdgeOf(lv)
+                edge_state = (cur_states[0][~is_nonleaf], cur_states[1][~is_nonleaf])
+                target_feats = edge_feats[edge_of_lv]
+                edge_ll, _ = self.predict_edge_feats(edge_state, target_feats)
+                ll = ll + edge_ll
+            if is_nonleaf is None or np.sum(is_nonleaf) == 0:
+                break
+            cur_states = (cur_states[0][is_nonleaf], cur_states[1][is_nonleaf])
+            left_logits = self.pred_has_left(cur_states[0], lv)
+            has_left, num_left = TreeLib.GetChLabel(-1, lv)
+            left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
+            left_ll, float_has_left = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
+            ll = ll + left_ll
+
+            cur_states = self.cell_topdown(left_update, cur_states, lv)
+
+            left_ids = TreeLib.GetLeftRootStates(lv)
+            h_bot, c_bot = fn_hc_bot(lv + 1)
+            if lv + 1 < len(h_buf_list):
+                h_next_buf, c_next_buf = h_buf_list[lv + 1], c_buf_list[lv + 1]
+            else:
+                h_next_buf = c_next_buf = None
+            if self.has_edge_feats:
+                edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
+                left_feats = edge_feats_embed[edge_idx[~is_rch]]
+                h_bot, c_bot = h_bot[left_ids[0]], c_bot[left_ids[0]]
+                h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
+                left_ids = tuple([None] + list(left_ids[1:]))
+
+            left_subtree_states = tree_state_select(h_bot, c_bot,
+                                                    h_next_buf, c_next_buf,
+                                                    lambda: left_ids)
+
+            has_right, num_right = TreeLib.GetChLabel(1, lv)
+            right_pos = self.tree_pos_enc(num_right)
+            left_subtree_states = [x + right_pos for x in left_subtree_states]
+            topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
+
+            right_logits = self.pred_has_right(topdown_state[0], lv)
+            right_update = self.topdown_right_embed[has_right]
+            topdown_state = self.cell_topright(right_update, topdown_state, lv)
+            right_ll = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
+            ll = ll + torch.sum(right_ll)
+            lr_ids = TreeLib.GetLeftRightSelect(lv, np.sum(has_left), np.sum(has_right))
+            new_states = []
+            for i in range(2):
+                new_s = multi_index_select([lr_ids[0], lr_ids[2]], [lr_ids[1], lr_ids[3]],
+                                            cur_states[i], topdown_state[i])
+                new_states.append(new_s)
+            cur_states = tuple(new_states)
+            lv += 1
+
+        return ll, next_states
 
 
 
