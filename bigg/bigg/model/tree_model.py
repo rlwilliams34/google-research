@@ -409,21 +409,9 @@ class RecurTreeGen(nn.Module):
     def get_empty_state(self):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
-        
         elif self.method == "Test9":
             return (self.test9_h0, self.test9_c0)
         else:
-#             if self.method in ["Test9", "Test10", "Test11"]:
-#                if self.method != "Test10":
-#                    x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
-#                    if self.method == "Test11":
-#                        self.leaf_LSTM(x_in, (self.test2_h0, self.test2_c0))
-#                
-#                else:
-#                    x_in = torch.cat([self.empty_embed, torch.zeros(1, 3 * self.empty_embed.shape[-1]).to(self.empty_embed.device)], dim = -1)
-#                
-#                return self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
-#                #self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
 
     def get_prob_fix(self, prob):
@@ -640,16 +628,12 @@ class RecurTreeGen(nn.Module):
 
     def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None):
         list_nnodes, list_nedges = TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
-#         print("RIGHT OVER HERE")
-#         print(list_nedges)
-#         print(STOP)
         # embed trees
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
 
         if not self.bits_compress:
-            empty_h0, empty_c0 = self.get_empty_state()
             if self.method == "Test9":
                 x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
                 empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
