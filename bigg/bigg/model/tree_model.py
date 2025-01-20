@@ -143,8 +143,8 @@ class FenwickTree(nn.Module):
         super(FenwickTree, self).__init__()
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
-        self.init_h0 = Parameter(torch.Tensor(1, args.embed_dim))
-        self.init_c0 = Parameter(torch.Tensor(1, args.embed_dim))
+        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
         glorot_uniform(self)
         if self.has_node_feats:
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
