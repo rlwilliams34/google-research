@@ -25,42 +25,12 @@ import torch.nn.functional as F
 from torch_scatter import scatter
 from collections import defaultdict
 from torch.nn.parameter import Parameter
-from bigg.common.pytorch_util import * #glorot_uniform, MLP, BinaryTreeLSTMCell, MultiLSTMCell, WeightedBinaryTreeLSTMCell
+from bigg.common.pytorch_util import glorot_uniform, MLP, BinaryTreeLSTMCell
 from tqdm import tqdm
 from bigg.model.util import AdjNode, ColAutomata, AdjRow
 from bigg.model.tree_clib.tree_lib import TreeLib
 from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
-
-
-nedge_list = [9]
-max_lv = int(np.log(max(nedge_list)) / np.log(2))
-list_indices = []
-
-
-def get_list_edge(cur_nedge_list):
-    offset = 0
-    list_edge = []
-    for nedge in cur_nedge_list:
-        nedge2 = nedge - nedge % 2
-        if nedge2 == 0:
-            continue
-        list_edge += list(range(offset, nedge2 + offset))
-        offset = nedge
-    return list_edge
-
-list_edge = get_list_edge(nedge_list)
-cur_nedge_list = nedge_list
-for lv in range(max_lv):
-    left = list_edge[0::2]
-    right = list_edge[1::2]
-    cur_nedge_list = [x // 2 for x in cur_nedge_list]
-    list_edge = get_list_edge(cur_nedge_list)
-    list_indices.append([(np.array(left), np.array(range(len(left)))), (np.array(right), np.array(range(len(right))))])
-
-
-print(list_indices)
-
 
 
 def hc_multi_select(ids_from, ids_to, h_froms, c_froms):
@@ -75,14 +45,6 @@ def hc_multi_select(ids_from, ids_to, h_froms, c_froms):
 
 def tree_state_select(h_bot, c_bot, h_buf, c_buf, fn_all_ids):
     bot_froms, bot_tos, prev_froms, prev_tos = fn_all_ids()
-#     print(bot_froms)
-#     print(bot_tos)
-#     print(prev_froms)
-#     print(prev_tos)
-#     if h_bot is not None:
-#         print(h_bot.shape)
-#     if h_buf is not None:
-#         print(h_buf.shape)
     if h_buf is None or prev_tos is None:
         h_vecs = multi_index_select([bot_froms], [bot_tos], h_bot)
         c_vecs = multi_index_select([bot_froms], [bot_tos], c_bot)
@@ -90,30 +52,11 @@ def tree_state_select(h_bot, c_bot, h_buf, c_buf, fn_all_ids):
         h_vecs = multi_index_select([prev_froms], [prev_tos], h_buf)
         c_vecs = multi_index_select([prev_froms], [prev_tos], c_buf)
     else:
-#         print("We are HERE")
         h_vecs, c_vecs = hc_multi_select([bot_froms, prev_froms],
                                          [bot_tos, prev_tos],
                                          [h_bot, h_buf], [c_bot, c_buf])
-#         print(h_vecs.shape)
     return h_vecs, c_vecs
 
-
-
-# BOT FROMS: None
-# BOT TOS: [0]
-# PREV FROMS: [  1   3   5   7   9  11  13  15  17  19  21  23  25  27  29  31  33  35
-#   37  39  41  43  45  47  49  51  53  55  57  59  61  63  65  67  69  71
-#   73  75  77  79  81  83  85  87  89  91  93  95  97  99 101 103 105 107
-#  109 111 113 115 117 119 121 123 125 127 129 131 133 135 137 139 141 143
-#  145 147 149 151 153 155 157 159 161 163 165 167 169 171 173 175 177 179
-#  181 183 185 187 189 191 193 195]
-# PREV TOS: [ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
-#  25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
-#  49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72
-#  73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96
-#  97 98]
-# 
-# HBUF == 
 
 def batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell):
     h_list = []
@@ -124,15 +67,13 @@ def batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell):
         c_list.append(c_vecs)
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
+
 def selective_update_hc(h, c, zero_one, feats):
     nz_idx = torch.tensor(np.nonzero(zero_one)[0]).to(h.device)
-    num_layers = h.shape[0]
-    embed_dim = h.shape[2]
-    local_edge_feats_h = scatter(feats[0], nz_idx, dim=1, dim_size=h.shape[1])
-    local_edge_feats_c = scatter(feats[1], nz_idx, dim=1, dim_size=h.shape[1])
+    local_edge_feats = scatter(feats, nz_idx, dim=0, dim_size=h.shape[0])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
-    h = torch.where(zero_one, local_edge_feats_h, h)
-    c = torch.where(zero_one, local_edge_feats_c, c)
+    h = torch.where(zero_one, local_edge_feats, h)
+    c = torch.where(zero_one, local_edge_feats, c)
     return h, c
 
 def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None):
@@ -140,46 +81,23 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     lch_isleaf, rch_isleaf = new_ids[0][0], new_ids[1][0]
     new_ids[0][0] = new_ids[1][0] = None
     is_leaf = [lch_isleaf, rch_isleaf]
-#     print(fn_all_ids(0))
-#     print(fn_all_ids(1))
-#     print(lch_isleaf)
-#     print(rch_isleaf)
-#     
-#     print(h_bot.shape)
-#     if h_buf is not None:
-#         print(h_buf.shape)
-    
     if edge_feats is not None:
-        edge_feats = [(edge_feats[0][:, ~is_rch], edge_feats[1][:, ~is_rch]), (edge_feats[0][:, is_rch], edge_feats[1][:, is_rch])]
+        edge_feats = [edge_feats[~is_rch], edge_feats[is_rch]]
         assert np.sum(is_rch) == np.sum(rch_isleaf)
-#     print(edge_feats)
     node_feats = [t_lch, t_rch]
     h_list = []
     c_list = []
-    list_edge_feats = [None, None]
-    
     for i in range(2):
         leaf_check = is_leaf[i]
-        local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-                     
+        local_hbot, local_cbot = h_bot[leaf_check], c_bot[leaf_check]
         if edge_feats is not None:
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
-#         print("IN THE I LOOP: ")
-#         print(new_ids[i])
-#         print(local_hbot.shape)
-#         print(local_cbot.shape)
-#         if h_buf is not None:
-#             print(h_buf.shape)
-#             print(c_buf.shape)
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
-        
         h_list.append(h_vecs)
         c_list.append(c_vecs)
-    
-    summary_state = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]), list_edge_feats[0], list_edge_feats[1])
-    return summary_state
+    return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
 def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell):
@@ -211,7 +129,6 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
-#         print("Hello Test")
         return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
@@ -221,176 +138,13 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
         raise NotImplementedError  #TODO: handle model parallelism with features
 
 
-# class FenwickTree(nn.Module):
-#     def __init__(self, args):
-#         super(FenwickTree, self).__init__()
-#         self.method = args.method
-#         self.has_edge_feats = args.has_edge_feats
-#         self.has_node_feats = args.has_node_feats
-#         self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-#         self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-#         glorot_uniform(self)
-#         if self.has_node_feats:
-#             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
-#         self.merge_cell = BinaryTreeLSTMCell(args.embed_dim)
-#         self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
-#         if args.pos_enc:
-#             self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
-#         else:
-#             self.pos_enc = lambda x: 0
-# 
-#     def reset(self, list_states=[]):
-#         self.list_states = []
-#         for l in list_states:
-#             t = []
-#             for e in l:
-#                 t.append(e)
-#             self.list_states.append(t)
-# 
-#     def append_state(self, state, level):
-#         if level >= len(self.list_states):
-#             num_aug = level - len(self.list_states) + 1
-#             for i in range(num_aug):
-#                 self.list_states.append([])
-#         self.list_states[level].append(state)
-# 
-#     def forward(self, new_state=None):
-#         if new_state is None:
-#             if len(self.list_states) == 0:
-#                 return (self.init_h0, self.init_c0)
-#         else:
-#             self.append_state(new_state, 0)
-#         pos = 0
-#         while pos < len(self.list_states):
-#             if len(self.list_states[pos]) >= 2:
-#                 lch_state, rch_state = self.list_states[pos]  # assert the length is 2
-#                 new_state = self.merge_cell(lch_state, rch_state)
-#                 self.list_states[pos] = []
-#                 self.append_state(new_state, pos + 1)
-#             pos += 1
-#         state = None
-#         for pos in range(len(self.list_states)):
-#             if len(self.list_states[pos]) == 0:
-#                 continue
-#             cur_state = self.list_states[pos][0]
-#             if state is None:
-#                 state = cur_state
-#             else:
-#                 state = self.summary_cell(state, cur_state)
-#         return state
-# 
-#     def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c):
-#         # embed row tree
-#         # Start with all the embeddings...
-#         
-#         # PREV ROSUM H AND C ARE NONE...
-#         tree_agg_ids = TreeLib.PrepareRowEmbed()
-#         row_embeds = [(self.init_h0, self.init_c0)]
-#         
-#         if self.has_edge_feats or self.has_node_feats:
-#             feat_dict = c_bot
-#             if 'node' in feat_dict:
-#                 node_feats, is_tree_trivial, t_lch, t_rch = feat_dict['node']
-#                 sel_feat = node_feats[is_tree_trivial]
-#                 feat_dict['node'] = (sel_feat[t_lch], sel_feat[t_rch])
-#             h_bot, c_bot = h_bot
-#         if h_bot is not None:
-#             row_embeds.append((h_bot, c_bot))
-#         if prev_rowsum_h is not None:
-#             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
-#         if h_buf0 is not None:
-#             row_embeds.append((h_buf0, c_buf0))
-#         
-#         print(row_embeds)
-#         print(len(row_embeds))
-#         print(row_embeds[0][0].shape)
-#         print(row_embeds[1][0].shape)
-#         print(row_embeds[2][0].shape)
-#         print("==========================================")
-#         
-#         ### Have all edge embeddings (except last edge ...?)
-#         ## ROW EMBEDS 0 == init h0, init c0
-#         ## ROW EMBEDS 1 == cat (empty h0, empty c0); (leaf h0, leaf c0)
-#         ## ROW EMBEDS 2 contains 197 entries. NOTE There are 199 nodes. Probably all nodes EXCLUDING the first and last!
-#         
-#         
-#         for i, all_ids in enumerate(tree_agg_ids):
-#             fn_ids = lambda x: all_ids[x]
-#             lstm_func = batch_tree_lstm3
-#             print("-----------------------------------------------------------")
-#             print(i)
-#             print(all_ids)
-#             print("-----------------------------------------------------------")
-#             
-#             if i == 0 and (self.has_edge_feats or self.has_node_feats):
-#                 lstm_func = featured_batch_tree_lstm3
-#             lstm_func = partial(lstm_func, h_buf=row_embeds[-1][0], c_buf=row_embeds[-1][1],
-#                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
-#             if i == 0:
-#                 if self.has_edge_feats or self.has_node_feats:
-#                     new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update)
-#                 else:
-#                     new_states = lstm_func(h_bot, c_bot)
-#             else:
-#                 new_states = lstm_func(None, None)
-#             row_embeds.append(new_states)
-#         
-#         print(STOP)
-#         h_list, c_list = zip(*row_embeds)
-#         joint_h = torch.cat(h_list, dim=1)
-#         print(joint_h.shape)
-#         joint_c = torch.cat(c_list, dim=1)
-#         
-#         # get history representation
-#         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-#         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
-#         
-#         if self.has_node_feats:
-#             base_nodes, _ = TreeLib.GetFenwickBase()
-#             if len(base_nodes):
-#                 needs_base_nodes = (init_select >= 1) & (init_select <= 2)
-#                 sub_states = (cur_state[0][needs_base_nodes], cur_state[1][needs_base_nodes])
-#                 sub_states = self.node_feat_update(node_feats[base_nodes], sub_states)
-#                 nz_idx = torch.tensor(np.nonzero(needs_base_nodes)[0]).to(node_feats.device)
-#                 new_cur = [scatter(x, nz_idx, dim=0, dim_size=init_select.shape[0]) for x in sub_states]
-#                 needs_base_nodes = torch.tensor(needs_base_nodes, dtype=torch.bool).to(node_feats.device).unsqueeze(1)
-#                 cur_state = [torch.where(needs_base_nodes, new_cur[i], cur_state[i]) for i in range(2)]
-#                 cur_state = tuple(cur_state)
-#         ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
-#         hist_rnn_states = []
-#         hist_froms = []
-#         hist_tos = []
-#         for i, (done_from, done_to, proceed_from, proceed_input) in enumerate(all_ids):
-#             hist_froms.append(done_from)
-#             hist_tos.append(done_to)
-#             hist_rnn_states.append(cur_state)
-# 
-#             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
-#             sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
-#             
-#             cur_state = self.summary_cell(sub_state, next_input)
-#         hist_rnn_states.append(cur_state)
-#         hist_froms.append(None)
-#         hist_tos.append(last_tos)
-#         hist_h_list, hist_c_list = zip(*hist_rnn_states)
-#         pos_embed = self.pos_enc(pos_info)
-#         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
-#         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
-#         print(row_h.shape)
-#         print(STOP)
-#         return (row_h, row_c), ret_state
-# 
-
-###
-
 class FenwickTree(nn.Module):
     def __init__(self, args):
         super(FenwickTree, self).__init__()
-        self.method = args.method
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
-        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+        self.init_h0 = Parameter(torch.Tensor(1, args.embed_dim))
+        self.init_c0 = Parameter(torch.Tensor(1, args.embed_dim))
         glorot_uniform(self)
         if self.has_node_feats:
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
@@ -458,7 +212,6 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
-        
 
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
@@ -475,15 +228,13 @@ class FenwickTree(nn.Module):
             else:
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
-        
         h_list, c_list = zip(*row_embeds)
-        joint_h = torch.cat(h_list, dim=1)
-        joint_c = torch.cat(c_list, dim=1)
-        
+        joint_h = torch.cat(h_list, dim=0)
+        joint_c = torch.cat(c_list, dim=0)
+
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-        cur_state = (joint_h[:, init_select], joint_c[:, init_select])
-        
+        cur_state = (joint_h[init_select], joint_c[init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
             if len(base_nodes):
@@ -495,7 +246,7 @@ class FenwickTree(nn.Module):
                 needs_base_nodes = torch.tensor(needs_base_nodes, dtype=torch.bool).to(node_feats.device).unsqueeze(1)
                 cur_state = [torch.where(needs_base_nodes, new_cur[i], cur_state[i]) for i in range(2)]
                 cur_state = tuple(cur_state)
-        ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
+        ret_state = (joint_h[next_ids], joint_c[next_ids])
         hist_rnn_states = []
         hist_froms = []
         hist_tos = []
@@ -504,9 +255,8 @@ class FenwickTree(nn.Module):
             hist_tos.append(done_to)
             hist_rnn_states.append(cur_state)
 
-            next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
-            sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
-            
+            next_input = joint_h[proceed_input], joint_c[proceed_input]
+            sub_state = cur_state[0][proceed_from], cur_state[1][proceed_from]
             cur_state = self.summary_cell(sub_state, next_input)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
@@ -516,12 +266,6 @@ class FenwickTree(nn.Module):
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
         return (row_h, row_c), ret_state
-
-
-###
-
-
-
 
 
 class BitsRepNet(nn.Module):
