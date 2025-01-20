@@ -468,7 +468,7 @@ class RecurTreeGen(nn.Module):
                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state
                     
                 else:
-                    return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None
+                    return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None
         else:
             tree_node.split()
 
