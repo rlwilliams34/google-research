@@ -126,20 +126,15 @@ class _tree_lib(object):
                               num_nodes,
                               int(new_batch))
         list_nnodes = []
-        list_nedges = []
         for i, gid in enumerate(list_gids):
             tot_nodes = self.graph_stats[gid][0]
             if num_nodes <= 0:
                 cur_num = tot_nodes - list_node_start[i]
             else:
                 cur_num = min(num_nodes, tot_nodes - list_node_start[i])
-            
-            tot_edges = self.graph_stats[gid][1]
-            list_nedges.append(tot_edges)
             list_nnodes.append(cur_num)
         self.list_nnodes = list_nnodes
-        self.list_nedges = list_nedges
-        return list_nnodes, list_nedges
+        return list_nnodes
 
     def PrepareTreeEmbed(self):
         max_d = self.lib.MaxTreeDepth()
@@ -278,25 +273,17 @@ class _tree_lib(object):
 
     def GetEdgeOf(self, lv):
         n = self.lib.NumEdgesAtLevel(lv)
-        #print("n", n)
         if n == 0:
             return None
         edge_idx = np.empty((n,), dtype=np.int32)
-        #print("lv: ", lv)
         self.lib.GetEdgesOfLevel(lv, ctypes.c_void_p(edge_idx.ctypes.data))
         return edge_idx
 
     def GetEdgeAndLR(self, lv):
-        #print("lv", lv)
         n = self.lib.NumEdgesAtLevel(lv)
-        #print("num edges: ", n)
         lr = np.empty((n,), dtype=np.int32)
         self.lib.GetIsEdgeRch(lv, ctypes.c_void_p(lr.ctypes.data))
         edge_idx = self.GetEdgeOf(lv)
-        #if edge_idx is not None and edge_idx[0] > 1000:
-        #    print("edge index: ", edge_idx)
-        #print("edge index: ", edge_idx)
-        #print("lr: ", lr)
         return edge_idx, lr.astype(bool)
 
     def GetTrivialNodes(self):
