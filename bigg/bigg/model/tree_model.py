@@ -586,7 +586,7 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            ll, cur_state, _, target_edge_feats = self.gen_row(0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats)
+            ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             if self.has_node_feats:
@@ -603,6 +603,7 @@ class RecurTreeGen(nn.Module):
         if self.has_edge_feats:
             edge_feats = torch.cat(list_pred_edge_feats, dim=0)
         return total_ll, total_ll_wt, edges, self.row_tree.list_states, node_feats, edge_feats
+
 
     def binary_ll(self, pred_logits, np_label, need_label=False, reduction='sum', batch_idx=None, ll_batch=None):
         pred_logits = pred_logits.view(-1, 1)
