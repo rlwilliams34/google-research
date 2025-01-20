@@ -748,7 +748,7 @@ class RecurTreeGen(nn.Module):
                 h_next_buf = c_next_buf = None
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-                left_feats = edge_feats_embed[edge_idx[~is_rch]]
+                left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[left_ids[0]], c_bot[left_ids[0]]
                 #h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 left_ids = tuple([None] + list(left_ids[1:]))
@@ -762,11 +762,18 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
 
-            right_logits = self.pred_has_right(topdown_state[0], lv)
+            right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
-            right_ll = self.binary_ll(right_logits, has_right, reduction='none') * float_has_left
+            right_ll, _ = self.binary_ll(right_logits, has_right, reduction='none')
+            right_ll = right_ll * float_has_left
             ll = ll + torch.sum(right_ll)
+            
+            if batch_idx is not None:
+                i = 0
+                for B in np.unique(batch_idx):
+                    ll_batch[i] = ll_batch[i] + torch.sum(right_ll[batch_idx == B])
+            
             lr_ids = TreeLib.GetLeftRightSelect(lv, np.sum(has_left), np.sum(has_right))
             new_states = []
             for i in range(2):
@@ -776,11 +783,11 @@ class RecurTreeGen(nn.Module):
             cur_states = tuple(new_states)
             lv += 1
 
-        return ll, next_states
+        return ll, ll_wt, ll_batch, ll_batch_wt, next_states
 
 
 #                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-#                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
+#                 
 #                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
 #                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
 #                 left_ids = tuple([None] + list(left_ids[1:]))
@@ -799,13 +806,10 @@ class RecurTreeGen(nn.Module):
 #             right_update = self.topdown_right_embed[has_right]
 #             topdown_state = self.cell_topright(right_update, topdown_state, lv)
 #             right_ll, _ = self.binary_ll(right_logits, has_right, reduction='none')
-#             right_ll = right_ll * float_has_left
+#             
 #             ll = ll + torch.sum(right_ll)
 #             
-#             if batch_idx is not None:
-#                 i = 0
-#                 for B in np.unique(batch_idx):
-#                     ll_batch[i] = ll_batch[i] + torch.sum(right_ll[batch_idx == B])
+#             
 #             
 #             lr_ids = TreeLib.GetLeftRightSelect(lv, np.sum(has_left), np.sum(has_right))
 #             new_states = []
