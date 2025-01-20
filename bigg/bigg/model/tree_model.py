@@ -697,7 +697,7 @@ class RecurTreeGen(nn.Module):
             rc = None
             if self.method in ["Test10", "Test12"]:
                 edge_feats, rc = edge_feats    
-            edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc)
+            edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=0, rc=rc)
             if self.method == "Test12":
                 edge_feats = torch.cat(edge_feats, dim = 0)
        
