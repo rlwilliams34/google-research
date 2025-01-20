@@ -662,6 +662,7 @@ class RecurTreeGen(nn.Module):
             return self.bit_rep_net([], 1)
         
         elif self.method == "Test9":
+            print(self.test9_h0))
             return (self.test9_h0, self.test9_c0)
         else:
 #             if self.method in ["Test9", "Test10", "Test11"]:
