@@ -424,8 +424,6 @@ class RecurTreeGen(nn.Module):
         assert lb <= ub
         if tree_node.is_root:
             prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0][-1]))
-            #prob_has_edge = torch.sigmoid(self.pred_has_ch(torch.sum(state[0], dim = 0)))
-
             if col_sm.supervised:
                 has_edge = len(col_sm.indices) > 0
             else:
@@ -444,7 +442,7 @@ class RecurTreeGen(nn.Module):
         else:
             assert ub > 0
             tree_node.has_edge = True
-
+        
         if not tree_node.has_edge:  # an empty tree
             return ll, ll_wt, self.get_empty_state(), 0, None, prev_state
 
@@ -465,6 +463,7 @@ class RecurTreeGen(nn.Module):
                     ll_wt = ll_wt + edge_ll
                     edge_embed = self.embed_edge_feats(cur_feats, rc=rc, prev_state=prev_state)
                     if prev_state is not None:
+                        print("Hello!")
                         prev_state = edge_embed
                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state
                     
@@ -475,7 +474,6 @@ class RecurTreeGen(nn.Module):
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
             left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
-            #left_prob = torch.sigmoid(self.pred_has_left(torch.sum(state[0], dim = 0 ), tree_node.depth))
 
             if col_sm.supervised:
                 has_left = col_sm.next_edge < mid
@@ -500,14 +498,12 @@ class RecurTreeGen(nn.Module):
 
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
-                       
             rlb = max(0, lb - num_left)
             rub = min(tree_node.rch.n_cols, ub - num_left)
             if not has_left:
                 has_right = True
             else:
                 right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0][-1], tree_node.depth))
-                #right_prob = torch.sigmoid(self.pred_has_right(torch.sum(topdown_state[0], dim = 0), tree_node.depth))
                 if col_sm.supervised:
                     has_right = col_sm.has_edge(mid, tree_node.col_range[1])
                 else:
@@ -530,11 +526,10 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols)
             else:
                 summary_state = self.lr2p_cell(left_state, right_state)
-                
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
-            
             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_state
+            
 
     def forward(self, node_end, edge_list=None, node_feats=None, edge_feats=None, node_start=0, list_states=[], lb_list=None, ub_list=None, col_range=None, num_nodes=None, display=False):
         pos = 0
