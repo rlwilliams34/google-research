@@ -281,7 +281,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 return state
         
         else:
-            print(sigma)
+            sigma = 0
             edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
             
             if self.method in ["Test10"]:
