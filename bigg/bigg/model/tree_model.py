@@ -53,26 +53,154 @@ def lv_offset(num_edges):
     num_entries = np.sum(offset_list)
     return offset_list, num_entries
 
-## Note number of entries per graph's set of edges will be sum of the lv offset lsit
+## Note number of entries per graph's set of edges will be sum of the lv offset list
 
-def lv_list(k, n):
-    offset, _ = lv_offset(n)
-    lv = 0
-    lv_list = []
-    for i in range(len(bin(k)[2:])):
-        if k & 2**i == 2**i:
-            lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
-    return lv_list
+# def lv_list(k, n):
+#     offset, _ = lv_offset(n)
+#     lv = 0
+#     lv_list = []
+#     for i in range(len(bin(k)[2:])):
+#         if k & 2**i == 2**i:
+#             lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
+#     return lv_list
 
 ### THIS GIVES A LIST OF INDICES FOR THE THINGIE!!!!!
-def lv_list(k, offset):
-    lv = 0
+# def lv_list(k, offset):
+#     lv = 0
+#     lv_list = []
+#     for i in range(len(bin(k)[2:])):
+#         if k & 2**i == 2**i:
+#             lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
+#     return lv_list
+
+def lv_list(k, list_offset, batch_id):
+    offset = list_offset[batch_id]
     lv_list = []
     for i in range(len(bin(k)[2:])):
         if k & 2**i == 2**i:
-            lv_list += [int(k // 2**i + np.sum(offset[:i]))]
+            offset_tot = np.sum([np.sum(l[:i]) for l in list_offset])
+            val = int(k // 2**i + offset_tot - 1)
+            offset_batch = np.sum([l[i] for l in list_offset[:batch_id] if len(l) >= i+1])
+            val += offset_batch
+            lv_list += [int(val)]
     return lv_list
 
+
+
+# def get_lv_list(num_edges):
+#     offset, num_entries = lv_offset(num_edges)
+#     vals = []
+#     for k in range(1, num_edges + 1):
+#         vals += [lv_list(k, offset)]
+#     return vals
+
+def get_batch_lv_list(list_num_edges):
+    batch_id = 0
+    list_offset = []
+    for num_edges in list_num_edges:
+        offset, _ = lv_offset(num_edges)
+        list_offset += [offset]
+    out = []
+    for num_edges in list_num_edges:
+        vals = []
+        for k in range(1, num_edges + 1):
+            cur = lv_list(k, list_offset, batch_id)
+            vals.append(cur)
+        out.append(vals)
+        batch_id += 1
+    return out
+
+
+def flatten(xss):
+    return [x for xs in xss for x in xs]
+
+def prepare_batch(batch_lv_in):
+    batch_size = len(batch_lv_in)
+    list_num_edges = [len(lv_in) for lv_in in batch_lv_in]
+    tot_num_edges = np.sum(list_num_edges)
+    flat_lv_in = flatten(batch_lv_in)
+    list_lvs = [[len(l) for l in lv_in] for lv_in in batch_lv_in]
+    flat_list_lvs = flatten(list_lvs)
+    max_len = np.max([np.max(l) for l in list_lvs])
+    all_ids = []
+    init_select = flatten([[x[0] for x in batch_lv_in[i]] for i in range(batch_size)])
+    last_tos = [j for j in range(len(flat_lv_in)) if flat_list_lvs[j] == max_len]
+    lv = 1
+    while True:
+        done_from = [j for j in range(len(flat_lv_in)) if len(flat_lv_in[j]) == 1]
+        done_to = [j for j in range(tot_num_edges) if flat_list_lvs[j] == lv]
+        proceed_from = [j for j in range(len(flat_lv_in)) if len(flat_lv_in[j]) > 1]
+        proceed_input = [l[1] for l in flat_lv_in if len(l) > 1]
+        all_ids.append((done_from, done_to, proceed_from, proceed_input))
+        flat_lv_in = [l[1:] for l in flat_lv_in if len(l) > 1]
+        lv += 1
+        if max([len(l) for l in flat_lv_in]) <= 1:
+            break
+    return init_select, all_ids, last_tos
+
+
+
+
+
+
+
+
+
+
+
+# def prepare(lv_in):
+#     num_edges = len(lv_in)
+#     lvs = [len(l) for l in lv_in]
+#     max_len = np.max(lvs)
+#     all_ids = []
+#     init_select = [x[0] for x in lv_in]
+#     last_tos = [j for j in range(num_edges) if len(lv_in[j]) == max_len]
+#     lv = 1
+#     while True:
+#         if lv_in == []:
+#             break
+#         done_from = [j for j in range(len(lv_in)) if len(lv_in[j]) == 1]
+#         done_to = [j for j in range(num_edges) if lvs[j] == lv]
+#         proceed_from = [j for j in range(len(lv_in)) if len(lv_in[j]) > 1]
+#         proceed_input = [l[1] for l in lv_in if len(l) > 1]
+#         all_ids.append((done_from, done_to, proceed_from, proceed_input))
+#         lv_in= [l[1:] for l in lv_in if len(l) > 1]
+#         lv += 1
+#         if max([len(l) for l in lv_in]) <= 1:
+#             break
+#     return init_select, all_ids, last_tos
+####
+
+# cur_lv_offsets = [l[lv] if len(l) >= lv+1 else 0 for l in all_lv]
+# 
+# def prepare(lv_in, batch_lvs):
+#     num_edges = len(lv_in)
+#     lvs = [len(l) for l in lv_in]
+#     max_len = np.max(lvs)
+#     all_ids = []
+#     init_select = [x[0] for x in lv_in]
+#     last_tos = [j for j in range(num_edges) if len(lv_in[j]) == max_len]
+#     lv = 1
+#     while True:
+#         done_from = [j for j in range(len(lv_in)) if len(lv_in[j]) == 1]
+#         done_to = [j for j in range(num_edges) if lvs[j] == lv]
+#         proceed_from = [j for j in range(len(lv_in)) if len(lv_in[j]) > 1]
+#         proceed_input = [l[1] for l in lv_in if len(l) > 1]
+#         all_ids.append((done_from, done_to, proceed_from, proceed_input))
+#         lv_in= [l[1:] for l in lv_in if len(l) > 1]
+#         lv += 1
+#         if max([len(l) for l in lv_in]) <= 1:
+#             break
+#     return init_select, all_ids, last_tos
+# 
+# 
+# LV = 0 —> No offset
+# LV = 1 —> OFFSET BY TOTAL IN LV 1. == 8
+# LV = 2 —> OFFSET BY TOTAL IN LV 1+2 == 12
+# LV = 3 —> OFFSET BY TOTAL IN LV 1+2+3 == 14
+
+
+## Now need to incorporate BATCH Sizes...bleh
 
 # We have a graph with M edges...
 # First, we need to compute all of the g i j 's and put them in a list
@@ -277,14 +405,14 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
-        print(row_embeds)
-        for x in row_embeds:
-            print(x[0].shape)
+#         print(row_embeds)
+#         for x in row_embeds:
+#             print(x[0].shape)
 
         for i, all_ids in enumerate(tree_agg_ids):
-            print("i: ", i)
-            print("all ids: ", all_ids)
-            print("======================================================")
+#             print("i: ", i)
+#             print("all ids: ", all_ids)
+#             print("======================================================")
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
@@ -302,14 +430,14 @@ class FenwickTree(nn.Module):
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=1)
         joint_c = torch.cat(c_list, dim=1)
-        print(joint_h.shape)
+#         print(joint_h.shape)
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-        print("Init select: ", init_select)
-        print("All IDs: ", all_ids)
-        print("Last Tos: ", last_tos)
-        print("Next Ids: ", next_ids)
+#         print("Init select: ", init_select)
+#         print("All IDs: ", all_ids)
+#         print("Last Tos: ", last_tos)
+#         print("Next Ids: ", next_ids)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
@@ -327,12 +455,12 @@ class FenwickTree(nn.Module):
         hist_froms = []
         hist_tos = []
         for i, (done_from, done_to, proceed_from, proceed_input) in enumerate(all_ids):
-            print("I: ", i)
-            print("Done from", done_from)
-            print("Don to", done_to)
-            print("Proceed_from", proceed_from)
-            print("Proceed_input", proceed_input)
-            print("====================================================")
+#             print("I: ", i)
+#             print("Done from", done_from)
+#             print("Don to", done_to)
+#             print("Proceed_from", proceed_from)
+#             print("Proceed_input", proceed_input)
+#             print("====================================================")
             hist_froms.append(done_from)
             hist_tos.append(done_to)
             hist_rnn_states.append(cur_state)
@@ -346,21 +474,19 @@ class FenwickTree(nn.Module):
         hist_tos.append(last_tos)
         hist_h_list, hist_c_list = zip(*hist_rnn_states)
         pos_embed = self.pos_enc(pos_info)
-        print("Hist froms: ", hist_froms)
-        print("Hist tos: ", hist_tos)
-        print(STOP)
+#         print("Hist froms: ", hist_froms)
+#         print("Hist tos: ", hist_tos)
+#         print(STOP)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
         return (row_h, row_c), ret_state
 
-
-
-    def forward_train_EDIT(self, edge_feats_init_embed):
+    def forward_train_weights(self, edge_feats_init_embed, list_num_edges):
         # embed row tree
-        tree_agg_ids = TreeLib.PrepareRowEmbed() ##### REPLACE...
+        list_indices = get_list_indices(list_num_edges)
         edge_embeds = [edge_feats_init_embed]
         
-        for i, all_ids in enumerate(tree_agg_ids):
+        for i, all_ids in enumerate(list_indices):
             fn_ids = lambda x: all_ids[x]
             new_states = batch_tree_lstm3(None, None, h_buf=edge_embeds[-1][0], c_buf=edge_embeds[-1][1], h_past=None, c_past=None, fn_all_ids=fn_ids, cell=self.merge_cell)
             edge_embeds.append(new_states)
@@ -369,11 +495,9 @@ class FenwickTree(nn.Module):
         joint_c = torch.cat(c_list, dim=1)
 
         # get history representation
-        init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary() #### REPLACE
-        print("Init select: ", init_select)
-        print("All IDs: ", all_ids)
-        print("Last Tos: ", last_tos)
-        print("Next Ids: ", next_ids)
+        #init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary() #### REPLACE
+        batch_lv_list = get_batch_lv_list(list_num_edges)
+        init_select, all_ids, last_tos = collect_batch_indices(batch_lv_list)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
         #ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
@@ -381,12 +505,6 @@ class FenwickTree(nn.Module):
         hist_froms = []
         hist_tos = []
         for i, (done_from, done_to, proceed_from, proceed_input) in enumerate(all_ids):
-            print("I: ", i)
-            print("Done from", done_from)
-            print("Don to", done_to)
-            print("Proceed_from", proceed_from)
-            print("Proceed_input", proceed_input)
-            print("====================================================")
             hist_froms.append(done_from)
             hist_tos.append(done_to)
             hist_rnn_states.append(cur_state)
@@ -403,11 +521,6 @@ class FenwickTree(nn.Module):
         edge_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) #+ pos_embed
         edge_embeddings = (edge_h, edge_c)
         return edge_embeddings
-
-
-
-
-
 
 class BitsRepNet(nn.Module):
     def __init__(self, args):
@@ -820,7 +933,7 @@ class RecurTreeGen(nn.Module):
         return row_states, next_states
 
     def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
-                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None):
+                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None, list_num_edges=None):
         ll = 0.0
         ll_wt = 0.0
         noise = 0.0
@@ -832,7 +945,7 @@ class RecurTreeGen(nn.Module):
             rc = None
             if self.method in ["Test10", "Test12"]:
                 edge_feats, rc = edge_feats    
-            edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc)
+            edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges)
             if self.method == "Test12":
                 edge_feats = torch.cat(edge_feats, dim = 0)
        

@@ -13,6 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+lstm = nn.LSTM(3, 3, 2)  # Input dim is 3, output dim is 3
+inputs = [torch.randn(1, 3) for _ in range(5)]  # make a sequence of length 5
+
+# initialize the hidden state.
+hidden = (torch.randn(2, 1, 3),
+          torch.randn(2, 1, 3))
+for i in inputs:
+    # Step through the sequence one element at a time.
+    # after each step, hidden contains the hidden state.
+    out, hidden = lstm(i.view(1, 1, -1), hidden)
+
+# alternatively, we can do the entire sequence all at once.
+# the first value returned by LSTM is all of the hidden states throughout
+# the sequence. the second is just the most recent hidden state
+# (compare the last slice of "out" with "hidden" below, they are the same)
+# The reason for this is that:
+# "out" will give you access to all hidden states in the sequence
+# "hidden" will allow you to continue the sequence and backpropagate,
+# by passing it as an argument  to the lstm at a later time
+# Add the extra 2nd dimension
+inputs = torch.cat(inputs).view(len(inputs), 1, -1)
+hidden = (torch.randn(2, 1, 3), torch.randn(2, 1, 3))  # clean out hidden state
+out, hidden = lstm(inputs, hidden)
+print(out)
+print(hidden)
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -454,6 +481,7 @@ if __name__ == '__main__':
         epoch_losses_t = []
         epoch_losses_w = []
         batch_idx = None
+        list_num_edges = None
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
@@ -502,6 +530,9 @@ if __name__ == '__main__':
             
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
+                if cmd_args.method == "Test285":
+                    list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
+                print(list_num_edges)
             
             if list_rc is not None:
                 if cmd_args.method == "Test10":
@@ -520,7 +551,7 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx)
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges)
                 
             
             loss_top = -ll / num_nodes
