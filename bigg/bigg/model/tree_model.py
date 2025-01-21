@@ -123,7 +123,7 @@ def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
                 out[batch] = out[batch] + [cur_lvs[i].tolist()]
                 i += 1
     print(out)
-    return out.tolist()
+    return out.tolist()[0]
 
 # def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
 #     batch_id = 0
