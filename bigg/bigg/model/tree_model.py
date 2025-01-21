@@ -36,7 +36,7 @@ def lv_list(k, n):
     lv_list = []
     for i in range(len(bin(k)[2:])):
         if k & 2**i == 2**i:
-            lv_list += [int(k // 2**i + np.sum(offset[:i]))]
+            lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
     return lv_list
 
 ### THIS GIVES A LIST OF INDICES FOR THE THINGIE!!!!!
@@ -45,7 +45,7 @@ def lv_list(k, offset):
     lv_list = []
     for i in range(len(bin(k)[2:])):
         if k & 2**i == 2**i:
-            lv_list += [int(k // 2**i + np.sum(offset[:i]))]
+            lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
     return lv_list
 
 
@@ -272,6 +272,7 @@ class FenwickTree(nn.Module):
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=1)
         joint_c = torch.cat(c_list, dim=1)
+        print(joint_h.shape)
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
