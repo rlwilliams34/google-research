@@ -258,6 +258,9 @@ class FenwickTree(nn.Module):
             print(x[0].shape)
 
         for i, all_ids in enumerate(tree_agg_ids):
+            print("i: ", i)
+            print("all ids: ", all_ids)
+            print("======================================================")
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
@@ -322,6 +325,64 @@ class FenwickTree(nn.Module):
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
         return (row_h, row_c), ret_state
+
+
+
+    def forward_train_EDIT(self, edge_feats_init_embed):
+        # embed row tree
+        tree_agg_ids = TreeLib.PrepareRowEmbed() ##### REPLACE...
+        edge_embeds = [edge_feats_init_embed]
+        
+        for i, all_ids in enumerate(tree_agg_ids):
+            fn_ids = lambda x: all_ids[x]
+            lstm_func = partial(batch_tree_lstm3, h_buf=edge_embeds[-1][0], c_buf=edge_embeds[-1][1],
+                                 fn_all_ids=fn_ids, cell=self.merge_cell)
+            new_states = lstm_func(None, None)
+            edge_embeds.append(new_states)
+        h_list, c_list = zip(*edge_embeds)
+        joint_h = torch.cat(h_list, dim=1)
+        joint_c = torch.cat(c_list, dim=1)
+        print(joint_h.shape)
+
+        # get history representation
+        init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary() #### REPLACE
+        print("Init select: ", init_select)
+        print("All IDs: ", all_ids)
+        print("Last Tos: ", last_tos)
+        print("Next Ids: ", next_ids)
+        cur_state = (joint_h[:, init_select], joint_c[:, init_select])
+        
+        ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
+        hist_rnn_states = []
+        hist_froms = []
+        hist_tos = []
+        for i, (done_from, done_to, proceed_from, proceed_input) in enumerate(all_ids):
+            print("I: ", i)
+            print("Done from", done_from)
+            print("Don to", done_to)
+            print("Proceed_from", proceed_from)
+            print("Proceed_input", proceed_input)
+            print("====================================================")
+            hist_froms.append(done_from)
+            hist_tos.append(done_to)
+            hist_rnn_states.append(cur_state)
+
+            next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
+            sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
+            cur_state = self.summary_cell(sub_state, next_input)
+        print(STOP)
+        hist_rnn_states.append(cur_state)
+        hist_froms.append(None)
+        hist_tos.append(last_tos)
+        hist_h_list, hist_c_list = zip(*hist_rnn_states)
+        pos_embed = self.pos_enc(pos_info)
+        row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
+        row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
+        return edge_embeddings
+
+
+
+
 
 
 class BitsRepNet(nn.Module):
