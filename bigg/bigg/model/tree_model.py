@@ -527,7 +527,7 @@ class FenwickTree(nn.Module):
 
         # get history representation
         #init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary() #### REPLACE
-        batch_lv_list = get_batch_lv_list(list_num_edges)
+        batch_lv_list = get_batch_lv_list_fast(list_num_edges)
         init_select, all_ids, last_tos = prepare_batch(batch_lv_list)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
