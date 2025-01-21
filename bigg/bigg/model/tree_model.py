@@ -340,12 +340,15 @@ class FenwickTree(nn.Module):
             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
             sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
             cur_state = self.summary_cell(sub_state, next_input)
-        print(STOP)
+        
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
         hist_tos.append(last_tos)
         hist_h_list, hist_c_list = zip(*hist_rnn_states)
         pos_embed = self.pos_enc(pos_info)
+        print("Hist froms: ", hist_froms)
+        print("Hist tos: ", hist_tos)
+        print(STOP)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
         return (row_h, row_c), ret_state
@@ -398,8 +401,6 @@ class FenwickTree(nn.Module):
         #pos_embed = self.pos_enc(pos_info)
         edge_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) #+ pos_embed
         edge_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) #+ pos_embed
-        print("Hist froms: ", hist_froms)
-        print("Hist tos: ", hist_tos)
         edge_embeddings = (edge_h, edge_c)
         return edge_embeddings
 
