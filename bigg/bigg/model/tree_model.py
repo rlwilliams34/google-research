@@ -18,6 +18,31 @@ from __future__ import division
 from __future__ import print_function
 # pylint: skip-file
 
+
+def get_list_edge(cur_nedge_list):
+    offset = 0
+    list_edge = []
+    for nedge in cur_nedge_list:
+        nedge2 = nedge - nedge % 2
+        list_edge += list(range(offset, nedge2 + offset))
+        offset += nedge
+    return list_edge
+
+def get_list_indices(nedge_list):
+    max_lv = int(np.log(max(nedge_list)) / np.log(2))
+    list_indices = []
+    list_edge = get_list_edge(nedge_list)
+    cur_nedge_list = nedge_list
+    empty = np.array([], dtype=np.int32)
+    for lv in range(max_lv):
+        left = list_edge[0::2]
+        right = list_edge[1::2]
+        cur_nedge_list = [x // 2 for x in cur_nedge_list]
+        list_edge = get_list_edge(cur_nedge_list)
+        list_indices.append([(empty, empty, np.array(left, dtype=np.int32), np.array(range(len(left)), dtype = np.int32), empty, empty), (empty, empty, np.array(right, dtype=np.int32), np.array(range(len(right)), dtype=np.int32), empty, empty)])
+    return list_indices
+
+####
 def lv_offset(num_edges):
     offset_list = []
     lv = 0
@@ -139,7 +164,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
-
 
 def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell):
     if h_past is None:
@@ -328,21 +352,18 @@ class FenwickTree(nn.Module):
 
 
 
-    def forward_train_EDIT(self, edge_feats_init_embed):
+    def forward_train_EDIT(self, edge_feats_init_embed, helper_info...):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed() ##### REPLACE...
         edge_embeds = [edge_feats_init_embed]
         
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
-            lstm_func = partial(batch_tree_lstm3, h_buf=edge_embeds[-1][0], c_buf=edge_embeds[-1][1],
-                                 fn_all_ids=fn_ids, cell=self.merge_cell)
-            new_states = lstm_func(None, None)
+            new_states = batch_tree_lstm3(None, None, h_buf=edge_embeds[-1][0], c_buf=edge_embeds[-1][1], h_past=None, c_past=None, fn_all_ids=fn_ids, cell=self.merge_cell)
             edge_embeds.append(new_states)
         h_list, c_list = zip(*edge_embeds)
         joint_h = torch.cat(h_list, dim=1)
         joint_c = torch.cat(c_list, dim=1)
-        print(joint_h.shape)
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary() #### REPLACE
@@ -352,7 +373,7 @@ class FenwickTree(nn.Module):
         print("Next Ids: ", next_ids)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
-        ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
+        #ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
         hist_rnn_states = []
         hist_froms = []
         hist_tos = []
@@ -370,14 +391,16 @@ class FenwickTree(nn.Module):
             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
             sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
             cur_state = self.summary_cell(sub_state, next_input)
-        print(STOP)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
         hist_tos.append(last_tos)
         hist_h_list, hist_c_list = zip(*hist_rnn_states)
-        pos_embed = self.pos_enc(pos_info)
-        row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
-        row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
+        #pos_embed = self.pos_enc(pos_info)
+        edge_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) #+ pos_embed
+        edge_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) #+ pos_embed
+        print("Hist froms: ", hist_froms)
+        print("Hist tos: ", hist_tos)
+        edge_embeddings = (edge_h, edge_c)
         return edge_embeddings
 
 
