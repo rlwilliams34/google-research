@@ -254,6 +254,8 @@ class FenwickTree(nn.Module):
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
         print(row_embeds)
+        for x in row_embeds:
+            print(x[0].shape)
 
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
