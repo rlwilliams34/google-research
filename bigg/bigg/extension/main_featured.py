@@ -150,15 +150,15 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
         ll_t2 = ll + ll_t2
         ll_w2 = ll_wt + ll_w2
     
+    list_num_edges = None
+    if cmd_args.method == "Test285":
+        list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
+    
     if isinstance(edge_feats, list) and method != "Test4":
         edge_feats = torch.cat(edge_feats, dim = 0)
     
     elif method == "Test4":
         print("Neeed to implement")
-    
-    list_num_edges = None
-    if cmd_args.method == "Test285":
-        list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
     
     ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges)
     #ll_t1, ll_w1, _ = model.forward_train([0, 1]) #, node_feats=node_feats, edge_feats=edge_feats)
