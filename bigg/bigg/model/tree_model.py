@@ -18,6 +18,42 @@ from __future__ import division
 from __future__ import print_function
 # pylint: skip-file
 
+def lv_offset(num_edges):
+    offset_list = []
+    lv = 0
+    while num_edges >= 1:
+        offset_list.append(num_edges)
+        num_edges = num_edges // 2
+        lv += 1
+    num_entries = np.sum(offset_list)
+    return offset_list, num_entries
+
+## Note number of entries per graph's set of edges will be sum of the lv offset lsit
+
+def lv_list(k, n):
+    offset, _ = lv_offset(n)
+    lv = 0
+    lv_list = []
+    for i in range(len(bin(k)[2:])):
+        if k & 2**i == 2**i:
+            lv_list += [int(k // 2**i + np.sum(offset[:i]))]
+    return lv_list
+
+### THIS GIVES A LIST OF INDICES FOR THE THINGIE!!!!!
+def lv_list(k, offset):
+    lv = 0
+    lv_list = []
+    for i in range(len(bin(k)[2:])):
+        if k & 2**i == 2**i:
+            lv_list += [int(k // 2**i + np.sum(offset[:i]))]
+    return lv_list
+
+
+# We have a graph with M edges...
+# First, we need to compute all of the g i j 's and put them in a list
+# LEVEL OFFSET helps give the indices of each state needed for the summary cell merges
+
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -239,6 +275,11 @@ class FenwickTree(nn.Module):
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
+        print("Init select: ", init_select)
+        print("All IDs: ", all_ids)
+        print("Last Tos: ", last_tos)
+        print("Next Ids: ", next_ids)
+        print(STOP)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
