@@ -94,13 +94,15 @@ def lv_list(k, list_offset, batch_id):
 #         vals += [lv_list(k, offset)]
 #     return vals
 
-def get_batch_lv_list(list_num_edges):
+def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
     batch_id = 0
     list_offset = []
     for num_edges in list_num_edges:
         offset, _ = lv_offset(num_edges)
         list_offset += [offset]
-    out = []
+    
+    ## THIS SECTION NEEDS TO BE FASTER!
+    out = [] 
     for num_edges in list_num_edges:
         vals = []
         for k in range(1, num_edges + 1):
