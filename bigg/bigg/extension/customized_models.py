@@ -215,11 +215,11 @@ class BiggWithEdgeLen(RecurTreeGen):
             s_in = (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1))
             edge_embed = self.leaf_LSTM(x_in, s_in)
             
-            if list_num_edges is None:
-                edge_embed = self.weight_tree(edge_embed)
-            
-            else:
-                edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges)
+#             if list_num_edges is None:
+#                 edge_embed = self.weight_tree(edge_embed)
+#             
+#             else:
+#                 edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges)
                 
             return edge_embed
             
