@@ -122,6 +122,7 @@ def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
             if cur_it:
                 out[batch] = out[batch] + [cur_lvs[i].tolist()]
                 i += 1
+    print(out)
     return out.tolist()
 
 # def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
@@ -130,17 +131,6 @@ def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
 #     for num_edges in list_num_edges:
 #         offset, _ = lv_offset(num_edges)
 #         list_offset += [offset]
-#     
-#     max_edge = np.max(list_num_edges)
-#     batch_size = len(list_num_edges)
-#     out = np.empty((batch_size,), object)
-#     out.fill([])
-#     
-#     for k in range(1, max_edge):
-#         cur = (k <= np.array(list_num_edges))
-#         
-#     
-#     
 #     
 #     ## THIS SECTION NEEDS TO BE FASTER!
 #     out = [] 
