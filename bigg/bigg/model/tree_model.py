@@ -43,13 +43,16 @@ def get_list_indices(nedge_list):
     return list_indices
 
 ####
-def lv_offset(num_edges):
+def lv_offset(num_edges, max_lv = -1):
     offset_list = []
     lv = 0
     while num_edges >= 1:
         offset_list.append(num_edges)
         num_edges = num_edges // 2
         lv += 1
+    
+    if max_lv > 0:
+        offset_list = np.pad(offset_list, (0, max_lv - len(offset_list)), 'constant', constant_values=0)
     num_entries = np.sum(offset_list)
     return offset_list, num_entries
 
@@ -73,44 +76,82 @@ def lv_offset(num_edges):
 #             lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
 #     return lv_list
 
-def lv_list(k, list_offset, batch_id):
-    offset = list_offset[batch_id]
+# def lv_list(k, list_offset, batch_id):
+#     offset = list_offset[batch_id]
+#     lv_list = []
+#     for i in range(len(bin(k)[2:])):
+#         if k & 2**i == 2**i:
+#             offset_tot = np.sum([np.sum(l[:i]) for l in list_offset])
+#             val = int(k // 2**i + offset_tot - 1)
+#             offset_batch = np.sum([l[i] for l in list_offset[:batch_id] if len(l) >= i+1])
+#             val += offset_batch
+#             lv_list += [int(val)]
+#     return lv_list
+
+def batch_lv_list(k, list_offset):
     lv_list = []
     for i in range(len(bin(k)[2:])):
         if k & 2**i == 2**i:
-            offset_tot = np.sum([np.sum(l[:i]) for l in list_offset])
+            offset_tot = np.sum(list_offset[:, :i])
             val = int(k // 2**i + offset_tot - 1)
-            offset_batch = np.sum([l[i] for l in list_offset[:batch_id] if len(l) >= i+1])
-            val += offset_batch
-            lv_list += [int(val)]
+            offset_batch = np.cumsum([0] + [l[i] for l in list_offset[:-1]])
+            offset_batch = offset_batch[list_offset[:,0] >= k]
+            val = val + offset_batch
+            lv_list.append(val)
+    lv_list = np.stack(lv_list, axis = 1)
     return lv_list
 
 
-
-# def get_lv_list(num_edges):
-#     offset, num_entries = lv_offset(num_edges)
-#     vals = []
-#     for k in range(1, num_edges + 1):
-#         vals += [lv_list(k, offset)]
-#     return vals
-
 def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
-    batch_id = 0
+    #batch_id = 0
     list_offset = []
-    for num_edges in list_num_edges:
-        offset, _ = lv_offset(num_edges)
-        list_offset += [offset]
+    max_lv = int(np.max([np.log(e)/np.log(2) for e in list_num_edges]) + 1)
+    list_offset = np.array([lv_offset(num_edges, max_lv)[0] for num_edges in list_num_edges])
+    #return list_offset
     
-    ## THIS SECTION NEEDS TO BE FASTER!
-    out = [] 
-    for num_edges in list_num_edges:
-        vals = []
-        for k in range(1, num_edges + 1):
-            cur = lv_list(k, list_offset, batch_id)
-            vals.append(cur)
-        out.append(vals)
-        batch_id += 1
-    return out
+    max_edge = np.max(list_num_edges)
+    batch_size = len(list_num_edges)
+    out = np.empty((batch_size,), object)
+    out.fill([])
+    
+    for k in range(1, max_edge):
+        cur = (k <= np.array(list_num_edges))
+        cur_lvs = batch_lv_list(k, list_offset)
+        i = 0
+        for batch, cur_it in enumerate(cur):
+            if cur_it:
+                out[batch] = out[batch] + [cur_lvs[i].tolist()]
+                i += 1
+    return out.tolist()
+
+# def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
+#     batch_id = 0
+#     list_offset = []
+#     for num_edges in list_num_edges:
+#         offset, _ = lv_offset(num_edges)
+#         list_offset += [offset]
+#     
+#     max_edge = np.max(list_num_edges)
+#     batch_size = len(list_num_edges)
+#     out = np.empty((batch_size,), object)
+#     out.fill([])
+#     
+#     for k in range(1, max_edge):
+#         cur = (k <= np.array(list_num_edges))
+#         
+#     
+#     
+#     
+#     ## THIS SECTION NEEDS TO BE FASTER!
+#     out = [] 
+#     for num_edges in list_num_edges: #Get rid of this and do things by batch instead...
+#         vals = []
+#         for k in range(1, num_edges + 1):
+#             cur = lv_list(k, list_offset, batch_id)
+#             vals.append(cur)
+#         out.append(vals)
+#         batch_id += 1
+#     return out
 
 
 def flatten(xss):
