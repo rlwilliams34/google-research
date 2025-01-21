@@ -45,7 +45,7 @@ def lv_list(k, offset):
     lv_list = []
     for i in range(len(bin(k)[2:])):
         if k & 2**i == 2**i:
-            lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
+            lv_list += [int(k // 2**i + np.sum(offset[:i]))]
     return lv_list
 
 
@@ -283,7 +283,6 @@ class FenwickTree(nn.Module):
         print("All IDs: ", all_ids)
         print("Last Tos: ", last_tos)
         print("Next Ids: ", next_ids)
-        print(STOP)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
@@ -301,6 +300,12 @@ class FenwickTree(nn.Module):
         hist_froms = []
         hist_tos = []
         for i, (done_from, done_to, proceed_from, proceed_input) in enumerate(all_ids):
+            print("I: ", i)
+            print("Done from", done_from)
+            print("Don to", done_to)
+            print("Proceed_from", proceed_from)
+            print("Proceed_input", proceed_input)
+            print("====================================================")
             hist_froms.append(done_from)
             hist_tos.append(done_to)
             hist_rnn_states.append(cur_state)
@@ -308,6 +313,7 @@ class FenwickTree(nn.Module):
             next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
             sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
             cur_state = self.summary_cell(sub_state, next_input)
+        print(STOP)
         hist_rnn_states.append(cur_state)
         hist_froms.append(None)
         hist_tos.append(last_tos)
