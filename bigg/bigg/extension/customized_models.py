@@ -76,7 +76,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
         self.num_layers = args.rnn_layers
-        self.sigma = args.sigma
+        self.sigma = args.noise
         
         mu_wt = torch.tensor(0, dtype = float)
         var_wt = torch.tensor(1, dtype = float)

@@ -102,12 +102,10 @@ def batch_lv_list(k, list_offset):
     return lv_list
 
 
-def get_batch_lv_list_fast(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
-    #batch_id = 0
+def get_batch_lv_list_fast(list_num_edges): 
     list_offset = []
     max_lv = int(np.max([np.log(e)/np.log(2) for e in list_num_edges]) + 1)
     list_offset = np.array([lv_offset(num_edges, max_lv)[0] for num_edges in list_num_edges])
-    #return list_offset
     
     max_edge = np.max(list_num_edges)
     batch_size = len(list_num_edges)

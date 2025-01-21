@@ -101,6 +101,7 @@ cmd_opt.add_argument('-model', default = "BiGG_E", type = str, help = "BiGG_E or
 cmd_opt.add_argument('-scale_loss', default=1, type=float, help='Amount to scale weight loss by during training')
 cmd_opt.add_argument('-schedule', default=False, type=eval, help='Amount to scale weight loss by during training')
 cmd_opt.add_argument('-sigma', default=0.0, type=eval, help='Tuning parameter for noise drawn from N(0, s) added to weights during training')
+cmd_opt.add_argument('-noise', default=0.0, type=eval, help='Tuning parameter for noise drawn from N(0, s) added to weights during training')
 
 
 cmd_opt.add_argument('-weight_embed_dim', default=16, type=int, help='embed size for weights')
