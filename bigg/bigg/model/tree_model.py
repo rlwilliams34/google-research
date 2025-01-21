@@ -352,7 +352,7 @@ class FenwickTree(nn.Module):
 
 
 
-    def forward_train_EDIT(self, edge_feats_init_embed, helper_info...):
+    def forward_train_EDIT(self, edge_feats_init_embed):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed() ##### REPLACE...
         edge_embeds = [edge_feats_init_embed]
