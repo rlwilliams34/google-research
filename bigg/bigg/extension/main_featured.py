@@ -721,10 +721,10 @@ if __name__ == '__main__':
                 if cmd_args.method in ["Test285", "Test286", "Test287"]:
                     list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
                     if db_info is not None:
-                        if cmd_args.gtype == "db":
+                        if cmd_args.g_type == "db":
                             i = batch_indices[0]
                             db_info_it = db_info[i]
-                        elif cmd_args.gtype == "tree":
+                        elif cmd_args.g_type == "tree":
                             db_info_it = db_info
             
             if list_rc is not None:
