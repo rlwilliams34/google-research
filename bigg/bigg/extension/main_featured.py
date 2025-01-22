@@ -427,6 +427,7 @@ if __name__ == '__main__':
                 list_num_edges = [len(g.edges()) for g in train_graphs]
                 db_info = []
                 for num_edges in list_num_edges:
+                    print(num_edges)
                     info1 = get_list_indices([num_edges])
                     batch_lv_list = get_batch_lv_list_fast([num_edges])
                     print(batch_lv_list)
