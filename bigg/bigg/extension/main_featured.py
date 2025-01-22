@@ -430,7 +430,7 @@ if __name__ == '__main__':
                     info1 = get_list_indices([num_edges])
                     batch_lv_list = get_batch_lv_list_fast([num_edges])
                     info2 = prepare_batch(batch_lv_list)
-                    db_info.append[(info1, info2)]
+                    db_info.append([info1, info2])
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     if cmd_args.model == "BiGG_GCN":
