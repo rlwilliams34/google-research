@@ -38,7 +38,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.update_left = args.update_left
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
-        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285']
+        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286']
         
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
@@ -72,6 +72,12 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "Test285":
             self.weight_tree = FenwickTree(args)
+        
+        if self.method == "Test286":
+            self.weight_tree = FenwickTree(args)
+            self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+            self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
+            
         
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
@@ -206,7 +212,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         return feats_pad
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None, list_num_edges=None):
-        if self.method == "Test285":
+        if self.method == "Test285" or self.method == "Test286":
             edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
