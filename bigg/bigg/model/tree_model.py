@@ -18,6 +18,21 @@ from __future__ import division
 from __future__ import print_function
 # pylint: skip-file
 
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch_scatter import scatter
+from collections import defaultdict
+from torch.nn.parameter import Parameter
+from bigg.common.pytorch_util import * #glorot_uniform, MLP, BinaryTreeLSTMCell, MultiLSTMCell, WeightedBinaryTreeLSTMCell
+from tqdm import tqdm
+from bigg.model.util import AdjNode, ColAutomata, AdjRow
+from bigg.model.tree_clib.tree_lib import TreeLib
+from bigg.torch_ops import multi_index_select, PosEncoding
+from functools import partial
+
+
 
 def get_list_edge(cur_nedge_list):
     offset = 0
@@ -167,16 +182,6 @@ def prepare_batch(batch_lv_in):
             break
     return init_select, all_ids, last_tos
 
-
-
-
-
-
-
-
-
-
-
 # def prepare(lv_in):
 #     num_edges = len(lv_in)
 #     lvs = [len(l) for l in lv_in]
@@ -222,33 +227,7 @@ def prepare_batch(batch_lv_in):
 #             break
 #     return init_select, all_ids, last_tos
 # 
-# 
-# LV = 0 —> No offset
-# LV = 1 —> OFFSET BY TOTAL IN LV 1. == 8
-# LV = 2 —> OFFSET BY TOTAL IN LV 1+2 == 12
-# LV = 3 —> OFFSET BY TOTAL IN LV 1+2+3 == 14
 
-
-## Now need to incorporate BATCH Sizes...bleh
-
-# We have a graph with M edges...
-# First, we need to compute all of the g i j 's and put them in a list
-# LEVEL OFFSET helps give the indices of each state needed for the summary cell merges
-
-
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch_scatter import scatter
-from collections import defaultdict
-from torch.nn.parameter import Parameter
-from bigg.common.pytorch_util import * #glorot_uniform, MLP, BinaryTreeLSTMCell, MultiLSTMCell, WeightedBinaryTreeLSTMCell
-from tqdm import tqdm
-from bigg.model.util import AdjNode, ColAutomata, AdjRow
-from bigg.model.tree_clib.tree_lib import TreeLib
-from bigg.torch_ops import multi_index_select, PosEncoding
-from functools import partial
 
 
 def hc_multi_select(ids_from, ids_to, h_froms, c_froms):
@@ -361,7 +340,7 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
 
 
 class FenwickTree(nn.Module):
-    def __init__(self, args):
+    def __init__(self, args, weighted=False):
         super(FenwickTree, self).__init__()
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
@@ -372,6 +351,11 @@ class FenwickTree(nn.Module):
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         self.merge_cell = BinaryTreeLSTMCell(args.embed_dim)
         self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
+        
+        if weighted:
+            self.merge_cell = WeightedBinaryTreeLSTMCell(args.embed_dim)
+            self.summary_cell = WeightedBinaryTreeLSTMCell(args.embed_dim)
+        
         if args.pos_enc:
             self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
         else:

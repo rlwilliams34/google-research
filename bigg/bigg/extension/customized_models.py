@@ -77,7 +77,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.weight_tree = FenwickTree(args)
             self.leaf_LSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
             self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
-            
+
+        if self.method == "Test287":
+            self.weight_tree = FenwickTree(args)
+            self.leaf_GRU = torch.GRU(1, args.weight_embed_dim, args.num_layers) #MultiLSTMCell(1, args.weight_embed_dim, args.rnn_layers)
+            self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.weight_embed_dim))      
+            self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.weight_embed_dim))      
         
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
@@ -223,6 +228,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                 s_in = (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1))
                 edge_embed = self.leaf_LSTM(x_in, s_in)
             
+            if self.method == "Test287":
+                K = edge_feats_normalized.shape[0]
+                h = self.leaf_h0.repeat(1, K, 1)
+                edge_embed = self.leaf_GRU(edge_feats_normalized, h) 
+                edge_embed = (edge_embed, torch.zeros(self.num_layers, K, self.embed_dim, device = edge_embed.device))
+                       
             else:
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 K = edge_feats_normalized.shape[0]
