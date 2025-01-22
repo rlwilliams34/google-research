@@ -429,6 +429,7 @@ if __name__ == '__main__':
                 for num_edges in list_num_edges:
                     info1 = get_list_indices([num_edges])
                     batch_lv_list = get_batch_lv_list_fast([num_edges])
+                    print(batch_lv_list)
                     info2 = prepare_batch(batch_lv_list)
                     db_info.append([info1, info2])
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
