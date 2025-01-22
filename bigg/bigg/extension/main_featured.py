@@ -400,6 +400,7 @@ if __name__ == '__main__':
     
     if cmd_args.g_type == "db":
         import pickle5 as cp
+    db_info = None
     path = os.path.join(cmd_args.data_dir, '%s-graphs.pkl' % 'train')
     
     with open(path, 'rb') as f:
@@ -714,7 +715,7 @@ if __name__ == '__main__':
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
                 if cmd_args.method in ["Test285", "Test286", "Test287"]:
                     list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
-                    if cmd_args.g_type == "db":
+                    if cmd_args.g_type == "db" and db_info is not None:
                         db_info_it = db_info[i]
             
             if list_rc is not None:
