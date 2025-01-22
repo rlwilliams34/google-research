@@ -714,6 +714,7 @@ if __name__ == '__main__':
                 if cmd_args.method in ["Test285", "Test286", "Test287"]:
                     list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
                     if cmd_args.g_type == "db" and db_info is not None:
+                        i = batch_indices[0]
                         db_info_it = db_info[i]
             
             if list_rc is not None:
