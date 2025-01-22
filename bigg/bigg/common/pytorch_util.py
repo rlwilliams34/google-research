@@ -263,10 +263,10 @@ class WeightedBinaryTreeLSTMCell(WeightedTreeLSTMCell):
 
     def forward(self, lch_state, rch_state):
         list_h_mat, list_c_mat = zip(lch_state, rch_state)
-        B = h.shape[1]
         
         for i in range(2):
             h = list_h_mat[i]
+            B = h.shape[1]
             if h.shape[-1] == self.weight_dim:
                 h = torch.cat([h, torch.zeros(self.num_layers, B, self.weight_dim)], device = h.device)
             
