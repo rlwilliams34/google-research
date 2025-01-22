@@ -507,7 +507,7 @@ if __name__ == '__main__':
             
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
-                if cmd_args.method in ["Test285", "Test286"]:
+                if cmd_args.method in ["Test285", "Test286", "Test287"]:
                     list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
             
             if list_rc is not None:
