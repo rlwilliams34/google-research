@@ -429,7 +429,7 @@ if __name__ == '__main__':
                 for num_edges in list_num_edges:
                     print(num_edges)
                     info1 = get_list_indices([num_edges])
-                    batch_lv_list = get_batch_lv_list_fast([num_edges])
+                    batch_lv_list = get_batch_lv_list_fast([num_edges])[0]
                     print(batch_lv_list)
                     info2 = prepare_batch(batch_lv_list)
                     db_info.append([info1, info2])
