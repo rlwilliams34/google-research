@@ -151,7 +151,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
         ll_w2 = ll_wt + ll_w2
     
     list_num_edges = None
-    if cmd_args.method in ["Test285", "Test286"]:
+    if cmd_args.method in ["Test285", "Test286", "Test287"]:
         list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
     
     if isinstance(edge_feats, list) and method != "Test4":
