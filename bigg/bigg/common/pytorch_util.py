@@ -223,7 +223,7 @@ class WeightedTreeLSTMCell(nn.Module):
 
         self.mlp_o = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
 
-        self.mlp_u = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim), latent_dim], act_last='tanh')
+        self.mlp_u = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
 
         f_list = []
         for _ in range(arity):
