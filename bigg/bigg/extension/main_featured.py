@@ -112,7 +112,7 @@ def lv_list(k, list_offset, batch_id):
             lv_list += [int(val)]
     return lv_list
 
-def batch_lv_list(k, list_offset):
+def batch_lv_list1(k, list_offset):
     lv_list = []
     for i in range(len(bin(k)[2:])):
         if k & 2**i == 2**i:
@@ -138,7 +138,7 @@ def get_batch_lv_list_fast(list_num_edges):
     
     for k in range(1, max_edge+1):
         cur = (k <= np.array(list_num_edges))
-        cur_lvs = batch_lv_list(k, list_offset)
+        cur_lvs = batch_lv_list1(k, list_offset)
         i = 0
         for batch, cur_it in enumerate(cur):
             if cur_it:
