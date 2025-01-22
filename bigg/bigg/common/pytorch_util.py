@@ -264,6 +264,7 @@ class WeightedBinaryTreeLSTMCell(WeightedTreeLSTMCell):
     def forward(self, lch_state, rch_state):
         list_h_mat, list_c_mat = zip(lch_state, rch_state)
         
+        list_h = []
         for i in range(2):
             h = list_h_mat[i]
             B = h.shape[1]
@@ -275,8 +276,9 @@ class WeightedBinaryTreeLSTMCell(WeightedTreeLSTMCell):
                 
             else:
                 print("HIDDEN STATE MISMATCH IN WEIGHTED TREE CELL")
-            list_h_mat[i] = h
-                    
+            list_h.append(h)
+        
+        list_h_mat = tuple(list_h)
         return super(WeightedBinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
         
 
