@@ -33,7 +33,7 @@ from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
 
 
-
+## HELPER FUNCTIONS FOR FENWICK TREE WEIGHTS
 def get_list_edge(cur_nedge_list):
     offset = 0
     list_edge = []
@@ -44,6 +44,7 @@ def get_list_edge(cur_nedge_list):
     return list_edge
 
 def get_list_indices(nedge_list):
+    '''Retries list of indices for states of batched graphs'''
     max_lv = int(np.log(max(nedge_list)) / np.log(2))
     list_indices = []
     list_edge = get_list_edge(nedge_list)
@@ -82,7 +83,6 @@ def lv_offset(num_edges, max_lv = -1):
 #             lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
 #     return lv_list
 
-### THIS GIVES A LIST OF INDICES FOR THE THINGIE!!!!!
 # def lv_list(k, offset):
 #     lv = 0
 #     lv_list = []
@@ -137,22 +137,22 @@ def get_batch_lv_list_fast(list_num_edges):
                 i += 1
     return out.tolist()
 
-def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
-    batch_id = 0
-    list_offset = []
-    for num_edges in list_num_edges:
-        offset, _ = lv_offset(num_edges)
-        list_offset += [offset]
-    ## THIS SECTION NEEDS TO BE FASTER!
-    out = [] 
-    for num_edges in list_num_edges: #Get rid of this and do things by batch instead...
-        vals = []
-        for k in range(1, num_edges + 1):
-            cur = lv_list(k, list_offset, batch_id)
-            vals.append(cur)
-        out.append(vals)
-        batch_id += 1
-    return out
+# def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
+#     batch_id = 0
+#     list_offset = []
+#     for num_edges in list_num_edges:
+#         offset, _ = lv_offset(num_edges)
+#         list_offset += [offset]
+#     ## THIS SECTION NEEDS TO BE FASTER!
+#     out = [] 
+#     for num_edges in list_num_edges: #Get rid of this and do things by batch instead...
+#         vals = []
+#         for k in range(1, num_edges + 1):
+#             cur = lv_list(k, list_offset, batch_id)
+#             vals.append(cur)
+#         out.append(vals)
+#         batch_id += 1
+#     return out
 
 
 def flatten(xss):

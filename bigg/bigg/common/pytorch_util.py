@@ -210,77 +210,78 @@ class BinaryTreeLSTMCell(TreeLSTMCell):
 
 
 
-
-
-class WeightedTreeLSTMCell(nn.Module):
-    def __init__(self, arity, latent_dim, weight_dim):
-        super(WeightedTreeLSTMCell, self).__init__()
-        self.arity = arity
-        self.latent_dim = latent_dim
-        self.weight_dim = weight_dim
-
-        self.mlp_i = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
-
-        self.mlp_o = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
-
-        self.mlp_u = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
-
-        f_list = []
-        for _ in range(arity):
-            mlp_f = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
-            f_list.append(mlp_f)
-        self.f_list = nn.ModuleList(f_list)
-
-    def forward(self, list_h_mat, list_c_mat):
-        assert len(list_c_mat) == self.arity == len(list_h_mat)
-        h_mat = torch.cat(list_h_mat, dim=-1)
-        assert h_mat.shape[2] == self.arity * self.latent_dim + self.weight_dim
-        i_j = self.mlp_i(h_mat)
-
-        f_sum = 0
-        for i in range(self.arity):
-            f = self.f_list[i](h_mat)
-            f_sum = f_sum + f * list_c_mat[i]
-
-        o_j = self.mlp_o(h_mat)
-
-        u_j = self.mlp_u(h_mat)
-
-        c_j = i_j * u_j + f_sum
-
-        h_j = o_j * torch.tanh(c_j)
-
-        return h_j, c_j
-
-
-class WeightedBinaryTreeLSTMCell(WeightedTreeLSTMCell):
-    def __init__(self, latent_dim, weight_dim, num_layers):
-        super(WeightedBinaryTreeLSTMCell, self).__init__(2, latent_dim, weight_dim)
-        self.latent_dim = latent_dim
-        self.weight_dim = weight_dim
-        self.num_layers = num_layers
-        self.dim = latent_dim + weight_dim
-
-    def forward(self, lch_state, rch_state):
-        list_h_mat, list_c_mat = zip(lch_state, rch_state)
-        
-        list_h = []
-        for i in range(2):
-            h = list_h_mat[i]
-            B = h.shape[1]
-            if h.shape[-1] == self.weight_dim:
-                h = torch.cat([h, torch.zeros(self.num_layers, B, self.weight_dim, device = h.device)], dim = -1)
-            
-            elif h.shape[-1] == self.latent_dim:
-                h = torch.cat([torch.zeros(self.num_layers, B, self.latent_dim, device = h.device), h], dim = -1)
-                
-            else:
-                print("HIDDEN STATE MISMATCH IN WEIGHTED TREE CELL")
-            list_h.append(h)
-        
-        list_h_mat = tuple(list_h)
-        return super(WeightedBinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
-        
+# 
+# 
+# class WeightedTreeLSTMCell(nn.Module):
+#     def __init__(self, arity, latent_dim, weight_dim):
+#         super(WeightedTreeLSTMCell, self).__init__()
+#         self.arity = arity
+#         self.latent_dim = latent_dim
+#         self.weight_dim = weight_dim
+# 
+#         self.mlp_i = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
+# 
+#         self.mlp_o = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='sigmoid')
+# 
+#         self.mlp_u = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
+# 
+#         f_list = []
+#         for _ in range(arity):
+#             mlp_f = MLP(arity * latent_dim + weight_dim, [2 * arity * latent_dim, latent_dim], act_last='tanh')
+#             f_list.append(mlp_f)
+#         self.f_list = nn.ModuleList(f_list)
+# 
+#     def forward(self, list_h_mat, list_c_mat):
+#         assert len(list_c_mat) == self.arity == len(list_h_mat)
+#         h_mat = torch.cat(list_h_mat, dim=-1)
+#         
+#         assert h_mat.shape[2] == self.arity * self.latent_dim + self.weight_dim
+#         i_j = self.mlp_i(h_mat)
+# 
+#         f_sum = 0
+#         for i in range(self.arity):
+#             f = self.f_list[i](h_mat)
+#             f_sum = f_sum + f * list_c_mat[i]
+# 
+#         o_j = self.mlp_o(h_mat)
+# 
+#         u_j = self.mlp_u(h_mat)
+# 
+#         c_j = i_j * u_j + f_sum
+# 
+#         h_j = o_j * torch.tanh(c_j)
+# 
+#         return h_j, c_j
+# 
+# 
+# class WeightedBinaryTreeLSTMCell(WeightedTreeLSTMCell):
+#     def __init__(self, latent_dim, weight_dim, num_layers):
+#         super(WeightedBinaryTreeLSTMCell, self).__init__(2, latent_dim, weight_dim)
+#         self.latent_dim = latent_dim
+#         self.weight_dim = weight_dim
+#         self.num_layers = num_layers
+#         self.dim = latent_dim + weight_dim
+# 
+#     def forward(self, lch_state, rch_state):
+#         list_h_mat, list_c_mat = zip(lch_state, rch_state)
+#         
+#         list_h = []
+#         for i in range(2):
+#             h = list_h_mat[i]
+#             B = h.shape[1]
+#             if h.shape[-1] == self.weight_dim:
+#                 h = torch.cat([h, torch.zeros(self.num_layers, B, self.weight_dim, device = h.device)], dim = -1)
+#             
+#             elif h.shape[-1] == self.latent_dim:
+#                 h = torch.cat([torch.zeros(self.num_layers, B, self.latent_dim, device = h.device), h], dim = -1)
+#                 
+#             else:
+#                 print("HIDDEN STATE MISMATCH IN WEIGHTED TREE CELL")
+#             list_h.append(h)
+#         
+#         list_h_mat = tuple(list_h)
+#         return super(WeightedBinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
+#         
 
 
     
