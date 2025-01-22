@@ -424,7 +424,7 @@ if __name__ == '__main__':
                 if cmd_args.method in ["Test10", "Test12"]:
                     list_rc = [get_edge_feats(g, cmd_args.method)[1] for g in train_graphs]
             
-            if cmd_args.g_type == "dbfok":
+            if cmd_args.g_type == "db":
                 list_num_edges = [len(g.edges()) for g in train_graphs]
                 db_info = []
                 for num_edges in list_num_edges:
@@ -433,7 +433,7 @@ if __name__ == '__main__':
                     batch_lv_list = get_batch_lv_list_fast([num_edges])
                     print(batch_lv_list)
                     info2 = prepare_batch(batch_lv_list)
-                    db_info.append([info1, info2])
+                    db_info += [[info1, info2]]
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     if cmd_args.model == "BiGG_GCN":
