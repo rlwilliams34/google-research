@@ -214,7 +214,7 @@ class BinaryTreeLSTMCell(TreeLSTMCell):
 
 class WeightedTreeLSTMCell(nn.Module):
     def __init__(self, arity, latent_dim, weight_dim):
-        super(TreeLSTMCell, self).__init__()
+        super(WeightedTreeLSTMCell, self).__init__()
         self.arity = arity
         self.latent_dim = latent_dim
         self.weight_dim = weight_dim
