@@ -799,7 +799,7 @@ class RecurTreeGen(nn.Module):
         edges = []
         self.row_tree.reset(list_states)
         controller_state = self.row_tree()
-        if self.method in ["Test285", "Test286"]:
+        if self.method in ["Test285", "Test286", "Test287"]:
             self.weight_tree.reset([])
         if num_nodes is None:
             num_nodes = node_end
