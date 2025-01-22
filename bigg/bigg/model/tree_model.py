@@ -353,8 +353,8 @@ class FenwickTree(nn.Module):
         self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
         
         if weighted:
-            self.merge_cell = WeightedBinaryTreeLSTMCell(args.embed_dim)
-            self.summary_cell = WeightedBinaryTreeLSTMCell(args.embed_dim)
+            self.merge_cell = WeightedBinaryTreeLSTMCell(args.embed_dim, args.weight_embed_dim)
+            self.summary_cell = WeightedBinaryTreeLSTMCell(args.embed_dim, args.weight_embed_dim)
         
         if args.pos_enc:
             self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
