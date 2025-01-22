@@ -151,7 +151,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
         ll_w2 = ll_wt + ll_w2
     
     list_num_edges = None
-    if cmd_args.method == "Test285":
+    if cmd_args.method in ["Test285", "Test286"]:
         list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
     
     if isinstance(edge_feats, list) and method != "Test4":
@@ -507,7 +507,7 @@ if __name__ == '__main__':
             
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
-                if cmd_args.method == "Test285":
+                if cmd_args.method in ["Test285", "Test286"]:
                     list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
             
             if list_rc is not None:
