@@ -79,7 +79,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
 
         if self.method == "Test287":
-            self.weight_tree = FenwickTree(args)
+            self.weight_tree = FenwickTree(args, weighted = True)
             self.leaf_GRU = nn.GRU(1, args.weight_embed_dim, args.rnn_num_layers) #MultiLSTMCell(1, args.weight_embed_dim, args.rnn_layers)
             self.leaf_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.weight_embed_dim))      
             self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.weight_embed_dim))      
