@@ -435,6 +435,7 @@ if __name__ == '__main__':
             
             elif cmd_args.g_type == "tree":
                 list_num_edges = [len(train_graphs[0].edges())] * cmd_args.batch_size
+                print(list_num_edges)
                 info1 = get_list_indices([list_num_edges])
                 batch_lv_list = get_batch_lv_list_fast([list_num_edges])
                 info2 = prepare_batch(batch_lv_list)
