@@ -215,7 +215,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             feats_pad = np.concatenate(list_feats_pad, axis = 1)
         return feats_pad
 
-    def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None, list_num_edges=None):
+    def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None, list_num_edges=None, db_info=None):
         if self.method in ["Test285", "Test286", "Test287"]:
             edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
@@ -242,7 +242,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = self.weight_tree(edge_embed)
             
             else:
-                edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges)
+                edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges, db_info)
                 
             return edge_embed
             

@@ -418,14 +418,8 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
-#         print(row_embeds)
-#         for x in row_embeds:
-#             print(x[0].shape)
 
         for i, all_ids in enumerate(tree_agg_ids):
-#             print("i: ", i)
-#             print("all ids: ", all_ids)
-#             print("======================================================")
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
@@ -443,14 +437,9 @@ class FenwickTree(nn.Module):
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=1)
         joint_c = torch.cat(c_list, dim=1)
-#         print(joint_h.shape)
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-#         print("Init select: ", init_select)
-#         print("All IDs: ", all_ids)
-#         print("Last Tos: ", last_tos)
-#         print("Next Ids: ", next_ids)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
@@ -468,12 +457,6 @@ class FenwickTree(nn.Module):
         hist_froms = []
         hist_tos = []
         for i, (done_from, done_to, proceed_from, proceed_input) in enumerate(all_ids):
-#             print("I: ", i)
-#             print("Done from", done_from)
-#             print("Don to", done_to)
-#             print("Proceed_from", proceed_from)
-#             print("Proceed_input", proceed_input)
-#             print("====================================================")
             hist_froms.append(done_from)
             hist_tos.append(done_to)
             hist_rnn_states.append(cur_state)
@@ -487,16 +470,17 @@ class FenwickTree(nn.Module):
         hist_tos.append(last_tos)
         hist_h_list, hist_c_list = zip(*hist_rnn_states)
         pos_embed = self.pos_enc(pos_info)
-#         print("Hist froms: ", hist_froms)
-#         print("Hist tos: ", hist_tos)
-#         print(STOP)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
         return (row_h, row_c), ret_state
 
-    def forward_train_weights(self, edge_feats_init_embed, list_num_edges):
+    def forward_train_weights(self, edge_feats_init_embed, list_num_edges, db_info):
         # embed row tree
-        list_indices = get_list_indices(list_num_edges)
+        if db_info is None:
+            list_indices = get_list_indices(list_num_edges)
+        
+        else:
+            list_indices = db_info[0]
         edge_embeds = [edge_feats_init_embed]
         
         for i, all_ids in enumerate(list_indices):
@@ -508,12 +492,15 @@ class FenwickTree(nn.Module):
         joint_c = torch.cat(c_list, dim=1)
 
         # get history representation
-        #init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary() #### REPLACE
-        batch_lv_list = get_batch_lv_list_fast(list_num_edges)
-        init_select, all_ids, last_tos = prepare_batch(batch_lv_list)
+        if db_info is None:
+            batch_lv_list = get_batch_lv_list_fast(list_num_edges)
+            init_select, all_ids, last_tos = prepare_batch(batch_lv_list)
+        
+        else:
+            init_select, all_ids, last_tos = db_info[1] 
+        
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
-        #ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
         hist_rnn_states = []
         hist_froms = []
         hist_tos = []
@@ -948,7 +935,7 @@ class RecurTreeGen(nn.Module):
         return row_states, next_states
 
     def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
-                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None, list_num_edges=None):
+                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None, list_num_edges=None, db_info=None):
         ll = 0.0
         ll_wt = 0.0
         noise = 0.0
@@ -960,7 +947,7 @@ class RecurTreeGen(nn.Module):
             rc = None
             if self.method in ["Test10", "Test12"]:
                 edge_feats, rc = edge_feats    
-            edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges)
+            edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges, db_info)
             if self.method == "Test12":
                 edge_feats = torch.cat(edge_feats, dim = 0)
        

@@ -42,7 +42,200 @@ import gc
 torch.cuda.empty_cache()
 gc.collect()
 
+## HELPER FUNCTIONS FOR FENWICK TREE WEIGHTS
+def get_list_edge(cur_nedge_list):
+    offset = 0
+    list_edge = []
+    for nedge in cur_nedge_list:
+        nedge2 = nedge - nedge % 2
+        list_edge += list(range(offset, nedge2 + offset))
+        offset += nedge
+    return list_edge
 
+def get_list_indices(nedge_list):
+    '''Retries list of indices for states of batched graphs'''
+    max_lv = int(np.log(max(nedge_list)) / np.log(2))
+    list_indices = []
+    list_edge = get_list_edge(nedge_list)
+    cur_nedge_list = nedge_list
+    empty = np.array([], dtype=np.int32)
+    for lv in range(max_lv):
+        left = list_edge[0::2]
+        right = list_edge[1::2]
+        cur_nedge_list = [x // 2 for x in cur_nedge_list]
+        list_edge = get_list_edge(cur_nedge_list)
+        list_indices.append([(empty, empty, np.array(left, dtype=np.int32), np.array(range(len(left)), dtype = np.int32), empty, empty), (empty, empty, np.array(right, dtype=np.int32), np.array(range(len(right)), dtype=np.int32), empty, empty)])
+    return list_indices
+
+####
+def lv_offset(num_edges, max_lv = -1):
+    offset_list = []
+    lv = 0
+    while num_edges >= 1:
+        offset_list.append(num_edges)
+        num_edges = num_edges // 2
+        lv += 1
+    
+    if max_lv > 0:
+        offset_list = np.pad(offset_list, (0, max_lv - len(offset_list)), 'constant', constant_values=0)
+    num_entries = np.sum(offset_list)
+    return offset_list, num_entries
+
+## Note number of entries per graph's set of edges will be sum of the lv offset list
+
+# def lv_list(k, n):
+#     offset, _ = lv_offset(n)
+#     lv = 0
+#     lv_list = []
+#     for i in range(len(bin(k)[2:])):
+#         if k & 2**i == 2**i:
+#             lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
+#     return lv_list
+
+# def lv_list(k, offset):
+#     lv = 0
+#     lv_list = []
+#     for i in range(len(bin(k)[2:])):
+#         if k & 2**i == 2**i:
+#             lv_list += [int(k // 2**i + np.sum(offset[:i])) - 1]
+#     return lv_list
+
+def lv_list(k, list_offset, batch_id):
+    offset = list_offset[batch_id]
+    lv_list = []
+    for i in range(len(bin(k)[2:])):
+        if k & 2**i == 2**i:
+            offset_tot = np.sum([np.sum(l[:i]) for l in list_offset])
+            val = int(k // 2**i + offset_tot - 1)
+            offset_batch = np.sum([l[i] for l in list_offset[:batch_id] if len(l) >= i])
+            val += offset_batch
+            lv_list += [int(val)]
+    return lv_list
+
+def batch_lv_list(k, list_offset):
+    lv_list = []
+    for i in range(len(bin(k)[2:])):
+        if k & 2**i == 2**i:
+            offset_tot = np.sum(list_offset[:, :i])
+            val = int(k // 2**i + offset_tot - 1)
+            offset_batch = np.cumsum([0] + [l[i] for l in list_offset[:-1]])
+            offset_batch = offset_batch[list_offset[:,0] >= k]
+            val = val + offset_batch
+            lv_list.append(val)
+    lv_list = np.stack(lv_list, axis = 1)
+    return lv_list
+
+
+def get_batch_lv_list_fast(list_num_edges): 
+    list_offset = []
+    max_lv = int(np.max([np.log(e)/np.log(2) for e in list_num_edges]) + 1)
+    list_offset = np.array([lv_offset(num_edges, max_lv)[0] for num_edges in list_num_edges])
+    
+    max_edge = np.max(list_num_edges)
+    batch_size = len(list_num_edges)
+    out = np.empty((batch_size,), object)
+    out.fill([])
+    
+    for k in range(1, max_edge+1):
+        cur = (k <= np.array(list_num_edges))
+        cur_lvs = batch_lv_list(k, list_offset)
+        i = 0
+        for batch, cur_it in enumerate(cur):
+            if cur_it:
+                out[batch] = out[batch] + [cur_lvs[i].tolist()]
+                i += 1
+    return out.tolist()
+
+# def get_batch_lv_list(list_num_edges): ### SLOWDOWN CULPRIT!!!!!
+#     batch_id = 0
+#     list_offset = []
+#     for num_edges in list_num_edges:
+#         offset, _ = lv_offset(num_edges)
+#         list_offset += [offset]
+#     ## THIS SECTION NEEDS TO BE FASTER!
+#     out = [] 
+#     for num_edges in list_num_edges: #Get rid of this and do things by batch instead...
+#         vals = []
+#         for k in range(1, num_edges + 1):
+#             cur = lv_list(k, list_offset, batch_id)
+#             vals.append(cur)
+#         out.append(vals)
+#         batch_id += 1
+#     return out
+
+
+def flatten(xss):
+    return [x for xs in xss for x in xs]
+
+def prepare_batch(batch_lv_in):
+    batch_size = len(batch_lv_in)
+    list_num_edges = [len(lv_in) for lv_in in batch_lv_in]
+    tot_num_edges = np.sum(list_num_edges)
+    flat_lv_in = flatten(batch_lv_in)
+    list_lvs = [[len(l) for l in lv_in] for lv_in in batch_lv_in]
+    flat_list_lvs = flatten(list_lvs)
+    max_len = np.max([np.max(l) for l in list_lvs])
+    all_ids = []
+    init_select = flatten([[x[0] for x in batch_lv_in[i]] for i in range(batch_size)])
+    last_tos = [j for j in range(len(flat_lv_in)) if flat_list_lvs[j] == max_len]
+    lv = 1
+    while True:
+        done_from = [j for j in range(len(flat_lv_in)) if len(flat_lv_in[j]) == 1]
+        done_to = [j for j in range(tot_num_edges) if flat_list_lvs[j] == lv]
+        proceed_from = [j for j in range(len(flat_lv_in)) if len(flat_lv_in[j]) > 1]
+        proceed_input = [l[1] for l in flat_lv_in if len(l) > 1]
+        all_ids.append((done_from, done_to, proceed_from, proceed_input))
+        flat_lv_in = [l[1:] for l in flat_lv_in if len(l) > 1]
+        lv += 1
+        if max([len(l) for l in flat_lv_in]) <= 1:
+            break
+    return init_select, all_ids, last_tos
+
+# def prepare(lv_in):
+#     num_edges = len(lv_in)
+#     lvs = [len(l) for l in lv_in]
+#     max_len = np.max(lvs)
+#     all_ids = []
+#     init_select = [x[0] for x in lv_in]
+#     last_tos = [j for j in range(num_edges) if len(lv_in[j]) == max_len]
+#     lv = 1
+#     while True:
+#         if lv_in == []:
+#             break
+#         done_from = [j for j in range(len(lv_in)) if len(lv_in[j]) == 1]
+#         done_to = [j for j in range(num_edges) if lvs[j] == lv]
+#         proceed_from = [j for j in range(len(lv_in)) if len(lv_in[j]) > 1]
+#         proceed_input = [l[1] for l in lv_in if len(l) > 1]
+#         all_ids.append((done_from, done_to, proceed_from, proceed_input))
+#         lv_in= [l[1:] for l in lv_in if len(l) > 1]
+#         lv += 1
+#         if max([len(l) for l in lv_in]) <= 1:
+#             break
+#     return init_select, all_ids, last_tos
+####
+
+# cur_lv_offsets = [l[lv] if len(l) >= lv+1 else 0 for l in all_lv]
+# 
+# def prepare(lv_in, batch_lvs):
+#     num_edges = len(lv_in)
+#     lvs = [len(l) for l in lv_in]
+#     max_len = np.max(lvs)
+#     all_ids = []
+#     init_select = [x[0] for x in lv_in]
+#     last_tos = [j for j in range(num_edges) if len(lv_in[j]) == max_len]
+#     lv = 1
+#     while True:
+#         done_from = [j for j in range(len(lv_in)) if len(lv_in[j]) == 1]
+#         done_to = [j for j in range(num_edges) if lvs[j] == lv]
+#         proceed_from = [j for j in range(len(lv_in)) if len(lv_in[j]) > 1]
+#         proceed_input = [l[1] for l in lv_in if len(l) > 1]
+#         all_ids.append((done_from, done_to, proceed_from, proceed_input))
+#         lv_in= [l[1:] for l in lv_in if len(l) > 1]
+#         lv += 1
+#         if max([len(l) for l in lv_in]) <= 1:
+#             break
+#     return init_select, all_ids, last_tos
+# 
 
 def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     batch_g = nx.Graph()
@@ -229,6 +422,15 @@ if __name__ == '__main__':
                 list_rc = None
                 if cmd_args.method in ["Test10", "Test12"]:
                     list_rc = [get_edge_feats(g, cmd_args.method)[1] for g in train_graphs]
+            
+            if cmd_args.g_type == "db":
+                list_num_edges = [len(g.edges()) for g in train_graphs]
+                db_info = []
+                for num_edges in list_num_edges:
+                    info1 = get_list_indices([num_edges])
+                    batch_lv_list = get_batch_lv_list_fast([num_edges])
+                    info2 = prepare_batch(batch_lv_list)
+                    db_info.append[(info1, info2)]
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     if cmd_args.model == "BiGG_GCN":
@@ -404,6 +606,7 @@ if __name__ == '__main__':
     epoch_list = []
     lr_scheduler = {'lobster': 100, 'tree': 200 , 'db': 2000, 'er': 250, 'span': 500, 'franken': 200}
     epoch_lr_decrease = lr_scheduler[cmd_args.g_type]
+    db_info_it = None
     
     if cmd_args.epoch_plateu > -1:
         epoch_lr_decrease = cmd_args.epoch_plateu
@@ -509,6 +712,8 @@ if __name__ == '__main__':
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
                 if cmd_args.method in ["Test285", "Test286", "Test287"]:
                     list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
+                    if cmd_args.g_type == "db":
+                        db_info_it = db_info[i]
             
             if list_rc is not None:
                 if cmd_args.method == "Test10":
@@ -527,7 +732,7 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges)
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it)
                 
             
             loss_top = -ll / num_nodes
