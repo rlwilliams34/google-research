@@ -268,10 +268,10 @@ class WeightedBinaryTreeLSTMCell(WeightedTreeLSTMCell):
             h = list_h_mat[i]
             B = h.shape[1]
             if h.shape[-1] == self.weight_dim:
-                h = torch.cat([h, torch.zeros(self.num_layers, B, self.weight_dim)], device = h.device)
+                h = torch.cat([h, torch.zeros(self.num_layers, B, self.weight_dim, device = h.device)], dim = -1)
             
             elif h.shape[-1] == self.latent_dim:
-                h = torch.cat([torch.zeros(self.num_layers, B, self.latent_dim), h], device = h.device)
+                h = torch.cat([torch.zeros(self.num_layers, B, self.latent_dim, device = h.device), h], dim = -1)
                 
             else:
                 print("HIDDEN STATE MISMATCH IN WEIGHTED TREE CELL")
