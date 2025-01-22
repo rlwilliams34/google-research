@@ -69,9 +69,17 @@ class MultiLSTMCell(nn.Module):
         super(MultiLSTMCell, self).__init__()
 
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers)
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
 
-    def forward(self, x_input, states):
-        h, c = states
+    def forward(self, x_input, states=None):
+        if states is None:
+            h = torch.zeros(self.num_layers, x_input.shape[0], self.hidden_size, device = x_input.device)
+            c = torch.zeros(self.num_layers, x_input.shape[0], self.hidden_size, device = x_input.device)
+        
+        else:
+            h, c = states
+        
         if len(x_input.shape) != len(h.shape):
             x_input = x_input.unsqueeze(0)
         
