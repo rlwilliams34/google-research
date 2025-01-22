@@ -280,8 +280,7 @@ class WeightedBinaryTreeLSTMCell(WeightedTreeLSTMCell):
         return super(WeightedBinaryTreeLSTMCell, self).forward(list_h_mat, list_c_mat)
         
 
-H SHAPE IS # LAYERS, BATCH SIZE, HIDDEN DIM
-    
+
     
     
     
