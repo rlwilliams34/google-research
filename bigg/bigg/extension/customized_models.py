@@ -231,7 +231,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             if self.method == "Test287":
                 K = edge_feats_normalized.shape[0]
                 h = self.leaf_h0.repeat(1, K, 1)
-                _, edge_embed = self.leaf_GRU(edge_feats_normalized, h) 
+                _, edge_embed = self.leaf_GRU(edge_feats_normalized.unsqueeze(1), h) 
                 edge_embed = (edge_embed, torch.zeros(self.num_layers, K, self.embed_dim, device = edge_embed.device))
                        
             else:
