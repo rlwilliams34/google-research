@@ -424,7 +424,7 @@ if __name__ == '__main__':
                 if cmd_args.method in ["Test10", "Test12"]:
                     list_rc = [get_edge_feats(g, cmd_args.method)[1] for g in train_graphs]
             
-            if cmd_args.g_type == "dbkm,":
+            if cmd_args.g_type == "db":
                 list_num_edges = [len(g.edges()) for g in train_graphs]
                 db_info = []
                 for num_edges in list_num_edges:
@@ -432,6 +432,13 @@ if __name__ == '__main__':
                     batch_lv_list = get_batch_lv_list_fast([num_edges])
                     info2 = prepare_batch(batch_lv_list)
                     db_info += [(info1, info2)]
+            
+            elif cmd_args.g_type == "tree":
+                list_num_edges = [len(train_graphs[0]).edges] * cmd_args.batch_size
+                info1 = get_list_indices([list_num_edges])
+                batch_lv_list = get_batch_lv_list_fast([list_num_edges])
+                info2 = prepare_batch(batch_lv_list)
+                db_info = (info1, info2)
         print('# graphs', len(train_graphs), 'max # nodes', max_num_nodes)
     
     if cmd_args.model == "BiGG_GCN":
@@ -713,9 +720,12 @@ if __name__ == '__main__':
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
                 if cmd_args.method in ["Test285", "Test286", "Test287"]:
                     list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
-                    if cmd_args.g_type == "db" and db_info is not None:
-                        i = batch_indices[0]
-                        db_info_it = db_info[i]
+                    if db_info is not None:
+                        if cmd_args.gtype == "db":
+                            i = batch_indices[0]
+                            db_info_it = db_info[i]
+                        elif cmd_args.gtype == "tree":
+                            db_info_it = db_info
             
             if list_rc is not None:
                 if cmd_args.method == "Test10":
