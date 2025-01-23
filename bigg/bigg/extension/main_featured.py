@@ -668,6 +668,9 @@ if __name__ == '__main__':
             edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
             debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True)
         
+    loss_tops_list = np.zeros(num_epochs - cmd_args.epoch_load)
+    loss_wts_list = np.zeros(num_epochs - cmd_args.epoch_load)
+    
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
         pbar = tqdm(range(num_iter))
@@ -701,6 +704,8 @@ if __name__ == '__main__':
         edge_feats_embed = None
         epoch_loss_top = 0.0
         epoch_loss_wt = 0.0
+        
+        
         
         for idx in pbar:
             start = B * idx
@@ -784,7 +789,9 @@ if __name__ == '__main__':
         print('epoch complete')
         print("Epoch Loss (Topology): ", epoch_loss_top)
         print("Epoch Loss (Weights): ", epoch_loss_wt)
-        
+        loss_tops_list[epoch] = epoch_loss_top
+        loss_wts_list[epoch] = epoch_loss_wt 
+                
 #         if cmd_args.sigma and epoch > 0:
 #             sigma_t = np.var(epoch_losses_t, ddof = 1)
 #             sigma_w = np.var(epoch_losses_w, ddof = 1)
@@ -801,7 +808,13 @@ if __name__ == '__main__':
             print('saving epoch')
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             torch.save(checkpoint, os.path.join(cmd_args.save_dir, 'epoch-%d.ckpt' % (epoch + 1)))
-        
+    
+    print("Training Complete")
+    print("TOPOLOGY LOSSES")
+    print(loss_tops_list)
+    if cmd_args.has_edge_feats:
+        print("WEIGHT LOSSES")
+        print(loss_wts_list)
         
         
         
