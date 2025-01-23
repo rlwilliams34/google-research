@@ -643,6 +643,12 @@ if __name__ == '__main__':
     else:
         cmd_args.scale_loss = 10
     
+    if cmd_args.epoch_load >= epoch_lr_decrease:
+        cmd_args.learning_rate = 1e-4
+        if cmd_args.epoch_load >= epoch_lr_decrease + 100:
+            cmd_args.learning_Rate = 1e-5
+    
+    print("Current Learning Rate is: ", cmd_args.learning_rate)
     print("Dividing Weight Loss by: ", cmd_args.scale_loss)
     
     model.train()
@@ -686,10 +692,11 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         if epoch >= epoch_lr_decrease and cmd_args.learning_rate != 1e-5:
-            cmd_args.learning_rate = 1e-5
-            print("Lowering Larning Rate to 1e-5")
+            cmd_args.learning_rate = cmd_args.learning_rate / 10
+            print("Lowering Larning Rate to: ", cmd_args.learning_rate)
+            epoch_lr_decrease += 100
             for param_group in optimizer.param_groups:
-                param_group['lr'] = 1e-5
+                param_group['lr'] = cmd_args.learning_rate
         
         edge_feats_embed = None
         epoch_loss_top = 0.0
