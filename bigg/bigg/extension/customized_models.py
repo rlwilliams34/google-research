@@ -236,8 +236,8 @@ class BiggWithEdgeLen(RecurTreeGen):
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, rc=None, prev_state=None, list_num_edges=None, db_info=None):
         if self.method in ["Test285", "Test286", "Test287", "Test288"]:
-            edge_feats = edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
-            edge_feats_normalized = self.standardize_edge_feats(edge_feats)
+            edge_feats2 = edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+            edge_feats_normalized = self.standardize_edge_feats(edge_feats2)
             K = edge_feats_normalized.shape[0]
             
             if self.method == "Test285":
@@ -379,7 +379,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             x_in = edge_embed
             
             if self.update_ll:
-                ll = self.predict_edge_feats(edge_embed)
+                ll = self.predict_edge_feats(edge_embed, edge_feats=edge_feats)
             
             if self.method == "Test9":
                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
@@ -464,8 +464,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         elif h.shape[-1] == self.weight_embed_dim:
             mus, lvars = self.edgelen_mean_global(h), self.edgelen_lvar_global(h)
-            print(mus.shape)
-            print(lvars.shape)
         #mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
         if edge_feats is None:
