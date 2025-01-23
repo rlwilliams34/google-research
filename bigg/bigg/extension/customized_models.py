@@ -82,6 +82,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.weight_tree = FenwickTree(args)
             self.leaf_LSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
             self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))  
+            self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = args.wt_drop)
         
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
@@ -228,9 +229,10 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = self.leaf_LSTM(x_in, s_in)
             
             if self.method == "Test287":
+                edge_feats_normalized = self.standardize_edge_feats(edge_feats)
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
-                K = edge_feats_normalized.shape[0]
-                edge_embed = self.leaf_LSTM(edge_embed)
+                edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
+                edge_embed = (edge_embed, edge_embed)
                        
             else:
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
