@@ -375,7 +375,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 #             else:
             
             if self.update_ll:
-                edge_feats_normalized = edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+                edge_feats_normalized = edge_feats #+ sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
             
             else:
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device))
@@ -506,6 +506,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ### Update log likelihood with weight prediction
                 ### Trying with softplus parameterization...
                 edge_feats_invsp = self.compute_softminus(edge_feats)
+                
+                if self.update_ll:
+                    edge_feats_invsp = edge_feats_invsp + self.sigma * torch.zeros(edge_feats_invsp.shape).to(edge_feats_invsp.device)
                 
                 ### Standardize
                 #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)
