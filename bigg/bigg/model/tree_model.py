@@ -997,7 +997,7 @@ class RecurTreeGen(nn.Module):
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
-            print(cur_states[0].shape)
+#             print(cur_states[0].shape)
             cur_states = (cur_states[0][:, is_nonleaf], cur_states[1][:, is_nonleaf])
             
             if batch_idx is not None:
@@ -1005,11 +1005,11 @@ class RecurTreeGen(nn.Module):
             
             ## Tricky part...need most recent edge feat predicted here
             ## Maybe... edge_idx GetEdgeAndLR(lv + 1) but just the edge and concatenate and predict...not sure
-            edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-            print("====================================")
-            print(edge_idx.shape)
-            print(cur_states[0].shape)
-            print("=====================================")
+#             edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
+#             print("====================================")
+#             print(edge_idx.shape)
+#             print(cur_states[0].shape)
+#             print("=====================================")
             #pred_feats = (edge_feats_embed[0][:, edge_idx], edge_feats_embed[1][:, edge_idx]) 
             
             left_logits = self.pred_has_left(cur_states[0][-1], lv)
