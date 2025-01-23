@@ -340,7 +340,7 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
 
 
 class FenwickTree(nn.Module):
-    def __init__(self, args, weighted=False):
+    def __init__(self, args, weighted=False, weights=False):
         super(FenwickTree, self).__init__()
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
@@ -355,6 +355,10 @@ class FenwickTree(nn.Module):
         if weighted:
             self.merge_cell = WeightedBinaryTreeLSTMCell(args.embed_dim, args.weight_embed_dim, args.rnn_layers)
             self.summary_cell = WeightedBinaryTreeLSTMCell(args.embed_dim, args.weight_embed_dim, args.rnn_layers)
+        
+        if weights:
+            self.merge_cell = BinaryTreeLSTMCell(args.weight_embed_dim)
+            self.summary_cell = BinaryTreeLSTMCell(args.weight_embed_dim)
         
         if args.pos_enc:
             self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
@@ -658,7 +662,7 @@ class RecurTreeGen(nn.Module):
     def get_empty_state(self):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
-        elif self.method == "Test9":
+        elif self.method == "Test9" or self.method == "Test288":
             return (self.test9_h0, self.test9_c0)
         else:
             return (self.empty_h0, self.empty_c0)
@@ -800,9 +804,11 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test12":
             prev_state = (self.leaf_h0, self.leaf_c0)
         
-        if self.method == "Test9":
+        if self.method == "Test9" or self.method == "Test288":
             x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
             h, c = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
+            if self.method == "Test288":
+                h, c = self.leaf_LSTM(x_in, (self.empty_h0, self.empty_c0))
             self.test9_h0 = h
             self.test9_c0 = c
         
@@ -878,6 +884,8 @@ class RecurTreeGen(nn.Module):
             if self.method == "Test9":
                 x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
                 empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
+                if self.method == "Test288":
+                    empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.empty_h0, self.empty_c0))
                 h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
                 c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
                 
