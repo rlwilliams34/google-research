@@ -717,7 +717,7 @@ class RecurTreeGen(nn.Module):
                     ll_wt = ll_wt + edge_ll
                     if self.update_ll:
                         edge_embed = self.embed_edge_feats(cur_feats, rc=rc, prev_state=prev_state)
-#                         ll_wt = ll_wt + ll_wt_embed
+                        ll_wt = ll_wt + ll_wt_embed
                         
                     else:
                         edge_embed = self.embed_edge_feats(cur_feats, rc=rc, prev_state=prev_state)
@@ -963,7 +963,7 @@ class RecurTreeGen(nn.Module):
                 edge_feats, rc = edge_feats
             if self.update_ll:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges, db_info=db_info)
-#                 ll_wt = ll_wt + ll_wt_embed
+                ll_wt = ll_wt + ll_wt_embed
             
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges, db_info=db_info)

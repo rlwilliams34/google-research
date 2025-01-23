@@ -244,7 +244,10 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             if self.method == "Test285":
                 #Encode weight in MLP; concatenate leaf embeddings; run through empty state LSTM
+                if self.update_ll:
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
+                    ll = self.predict_edge_feats(edge_embed, edge_feats=edge_feats)
+                    edge_embed = edge_embed.detach().clone()
                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
                 #s_in = (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1))
                 edge_embed = self.leaf_LSTM(x_in)
@@ -507,8 +510,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ### Trying with softplus parameterization...
                 edge_feats_invsp = self.compute_softminus(edge_feats)
                 
-                if self.update_ll:
-                    edge_feats_invsp = edge_feats_invsp + self.sigma * torch.zeros(edge_feats_invsp.shape).to(edge_feats_invsp.device)
+#                 if self.update_ll:
+#                     edge_feats_invsp = edge_feats_invsp + self.sigma * torch.zeros(edge_feats_invsp.shape).to(edge_feats_invsp.device)
                 
                 ### Standardize
                 #edge_feats_invsp = self.standardize_edge_feats(edge_feats_invsp)

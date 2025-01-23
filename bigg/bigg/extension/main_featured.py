@@ -694,13 +694,19 @@ if __name__ == '__main__':
         else:
             model.epoch_num += 1
         
-        if epoch >= epoch_lr_decrease and cmd_args.learning_rate != 1e-5:
+        if epoch >= epoch_lr_decrease and cmd_args.learning_rate == 1e-3:
             cmd_args.learning_rate = cmd_args.learning_rate / 10
             print("Lowering Larning Rate to: ", cmd_args.learning_rate)
             epoch_lr_decrease += 100
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
         
+        elif epoch >= epoch_lr_decrease + 100 and cmd_args.learning_rate == 1e-4:
+            cmd_args.learning_rate = cmd_args.learning_rate / 10
+            print("Lowering Larning Rate to: ", cmd_args.learning_rate)
+            epoch_lr_decrease += 100
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = cmd_args.learning_rate
         edge_feats_embed = None
         epoch_loss_top = 0.0
         epoch_loss_wt = 0.0
