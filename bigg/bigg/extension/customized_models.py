@@ -45,8 +45,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
-        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
-        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
+        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
+        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
         
         if self.update_ll:
             self.edgelen_mean_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 1], dropout = args.wt_drop)
@@ -450,14 +450,18 @@ class BiggWithEdgeLen(RecurTreeGen):
             and, if edge_feats is None, then return the prediction of edge_feats
             else return the edge_feats as it is
         """
-        h, _ = state
+        if torch.is_tensor(state):
+            h = state
+        
+        else:
+            h, _ = state
         #h = torch.sum(h, dim = 0)
         
         if h.shape[-1] == self.embed_dim:
             mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         elif h.shape[-1] == self.weight_embed_dim:
-            mus, lvars = self.edgelen_mean_global(h[-1]), self.edgelen_lvar_global(h[-1])
+            mus, lvars = self.edgelen_mean_global(h), self.edgelen_lvar_global(h)
         #mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
         if edge_feats is None:
