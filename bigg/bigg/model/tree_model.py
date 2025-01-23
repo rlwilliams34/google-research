@@ -997,6 +997,7 @@ class RecurTreeGen(nn.Module):
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
+            print(cur_states[0].shape)
             cur_states = (cur_states[0][:, is_nonleaf], cur_states[1][:, is_nonleaf])
             
             if batch_idx is not None:
