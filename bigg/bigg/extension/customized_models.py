@@ -244,8 +244,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             if self.method == "Test285":
                 #Encode weight in MLP; concatenate leaf embeddings; run through empty state LSTM
-                if self.update_ll:
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
+                if self.update_ll:
                     ll = self.predict_edge_feats(edge_embed, edge_feats=edge_feats)
                     edge_embed = edge_embed.detach().clone()
                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
