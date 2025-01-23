@@ -421,7 +421,7 @@ if __name__ == '__main__':
             else:
                 list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)[0]).to(cmd_args.device) for g in train_graphs]
                 list_rc = None
-                if cmd_args.method in ["Test10", "Test12"]:
+                if cmd_args.method in ["Test12"]:
                     list_rc = [get_edge_feats(g, cmd_args.method)[1] for g in train_graphs]
             
             if cmd_args.g_type == "db":
@@ -740,7 +740,7 @@ if __name__ == '__main__':
                             db_info_it = db_info
             
             if list_rc is not None:
-                if cmd_args.method == "Test10":
+                if cmd_args.method == "":
                     rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
                 
                 else:
