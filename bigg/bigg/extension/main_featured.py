@@ -789,8 +789,8 @@ if __name__ == '__main__':
         print('epoch complete')
         print("Epoch Loss (Topology): ", epoch_loss_top)
         print("Epoch Loss (Weights): ", epoch_loss_wt)
-        loss_tops_list[epoch] = epoch_loss_top
-        loss_wts_list[epoch] = epoch_loss_wt 
+        loss_tops_list[epoch - cmd_args.epoch_load] = epoch_loss_top
+        loss_wts_list[epoch - cmd_args.epoch_load] = epoch_loss_wt 
                 
 #         if cmd_args.sigma and epoch > 0:
 #             sigma_t = np.var(epoch_losses_t, ddof = 1)
