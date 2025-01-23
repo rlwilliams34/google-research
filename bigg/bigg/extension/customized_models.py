@@ -452,8 +452,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         """
         if torch.is_tensor(state):
             h = state
-            print(h)
-            print(h.shape)
         
         else:
             h, _ = state
