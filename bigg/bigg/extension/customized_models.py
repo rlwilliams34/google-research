@@ -34,6 +34,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         super().__init__(args)
         cmd_args.wt_drop = -1
         self.method = args.method
+        self.update_ll = False
         self.sampling_method = cmd_args.sampling_method
         self.update_left = args.update_left
         
