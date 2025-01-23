@@ -34,7 +34,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         super().__init__(args)
         cmd_args.wt_drop = -1
         self.method = args.method
-        self.update_ll = False
+        self.update_ll = args.update_ll
         self.sampling_method = cmd_args.sampling_method
         self.update_left = args.update_left
         
@@ -48,8 +48,9 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
         
-        #self.edgelen_mean_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
-        #self.edgelen_lvar_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
+        if self.update_ll:
+            self.edgelen_mean_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 1], dropout = args.wt_drop)
+            self.edgelen_lvar_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 1], dropout = args.wt_drop)
         
         self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
         
@@ -456,7 +457,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         elif h.shape[-1] == self.weight_embed_dim:
-            mus, lvars = self.edgelen_mean_globe(h[-1]), self.edgelen_lvar_globe(h[-1])
+            mus, lvars = self.edgelen_mean_global(h[-1]), self.edgelen_lvar_global(h[-1])
         #mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
         if edge_feats is None:

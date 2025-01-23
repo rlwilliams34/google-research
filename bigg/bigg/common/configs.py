@@ -115,6 +115,7 @@ cmd_opt.add_argument('-debug', default=False, type=eval, help='computing trainin
 
 cmd_opt.add_argument('-epoch_plateu', default=-1, type=int, help='computing training times')
 cmd_opt.add_argument('-alt_9', default=False, type=eval, help='computing training times')
+cmd_opt.add_argument('-update_ll', default=False, type=eval, help='computing training times')
 
 
 cmd_args, _ = cmd_opt.parse_known_args()
