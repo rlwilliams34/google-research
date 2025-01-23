@@ -385,7 +385,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             x_in = edge_embed
             
             if self.update_ll:
-                ll = self.predict_edge_feats(edge_embed, edge_feats=edge_feats_normalized)
+                ll = self.predict_edge_feats(edge_embed, edge_feats=edge_feats)
                 edge_embed = edge_embed.detach().clone()
             
             if self.method == "Test9":
