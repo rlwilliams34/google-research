@@ -580,6 +580,7 @@ class RecurTreeGen(nn.Module):
         super(RecurTreeGen, self).__init__()
 
         self.directed = args.directed
+        self.alt_9 = args.alt_9
         self.sigma = args.sigma
         self.batch_size = args.batch_size
         self.self_loop = args.self_loop
@@ -807,7 +808,7 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test9" or self.method == "Test288":
             x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
             h, c = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
-            if self.method == "Test288":
+            if self.method == "Test288" or self.alt_9:
                 h, c = self.leaf_LSTM(x_in, (self.empty_h0, self.empty_c0))
             self.test9_h0 = h
             self.test9_c0 = c
