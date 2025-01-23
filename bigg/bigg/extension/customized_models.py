@@ -464,6 +464,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         elif h.shape[-1] == self.weight_embed_dim:
             mus, lvars = self.edgelen_mean_global(h), self.edgelen_lvar_global(h)
+            print(mus.shape)
+            print(lvars.shape)
         #mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
         if edge_feats is None:
