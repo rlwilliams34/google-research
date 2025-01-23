@@ -38,7 +38,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.update_left = args.update_left
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
-        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287']
+        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test288']
         
         self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
