@@ -962,7 +962,7 @@ class RecurTreeGen(nn.Module):
             if self.method in ["Test12"]:
                 edge_feats, rc = edge_feats
             if self.update_ll:
-                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges, db_info=db_info)
+                edge_feats_embed, ll_wt_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges, db_info=db_info)
                 ll_wt = ll_wt + ll_wt_embed
             
             else:

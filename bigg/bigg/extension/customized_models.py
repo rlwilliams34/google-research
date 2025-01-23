@@ -281,6 +281,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed[0][-1]], dim = -1)
                 s_in = (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1))
                 edge_embed = self.leaf_LSTM(x_in, s_in)
+            
+            if self.update_ll:
+                return edge_embed, ll
             return edge_embed
             
         if self.method == "MLP-Repeat":
