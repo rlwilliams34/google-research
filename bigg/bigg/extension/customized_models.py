@@ -48,7 +48,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
         self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
         
-        self.leaf_LSTM = MultiLSTMCell(3 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
         
         if self.method == "MLP-Repeat":
@@ -225,18 +225,21 @@ class BiggWithEdgeLen(RecurTreeGen):
             K = edge_feats_normalized.shape[0]
             
             if self.method == "Test285":
+                #Encode weight in MLP; concatenate leaf embeddings; run through empty state LSTM
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
                 #s_in = (self.leaf_h0.repeat(1, K, 1), self.leaf_c0.repeat(1, K, 1))
                 edge_embed = self.leaf_LSTM(x_in)
             
             elif self.method == "Test287":
+                # Just use MLP for init state"
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats)
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
                 edge_embed = (edge_embed, edge_embed)
                        
             else:
+                # Encode Weight in MLP; concatenate leaf embedding; run through init leaf-state LSTM
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
                 K = edge_feats_normalized.shape[0]
