@@ -55,7 +55,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = args.wt_drop)
         
         if self.method == "Test9":
-            self.empty_embed = Parameter(torch.Tensor(1, 2 * args.weight_embed_dim))
+            self.empty_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
             self.test9_h0 = torch.zeros(args.rnn_layers, 1, args.embed_dim, device = args.device)
             self.test9_c0 = torch.zeros(args.rnn_layers, 1, args.embed_dim, device = args.device)
         
