@@ -980,7 +980,7 @@ class RecurTreeGen(nn.Module):
         ll_cur, ll_batch = self.binary_ll(logit_has_edge, has_ch, batch_idx = batch_idx, ll_batch = ll_batch)
         ll = ll + ll_cur
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
-        
+        ## Easy ^^ just the last edge weight from prior row generation index...
         if batch_idx is not None:
             batch_idx = batch_idx[has_ch]
         
@@ -992,6 +992,7 @@ class RecurTreeGen(nn.Module):
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
+                ## Here, would need to input prior edge embedding...torch cat (init, edge_feats_except_last)
                 edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
@@ -1000,6 +1001,15 @@ class RecurTreeGen(nn.Module):
             
             if batch_idx is not None:
                 batch_idx = batch_idx[is_nonleaf]
+            
+            ## Tricky part...need most recent edge feat predicted here
+            ## Maybe... edge_idx GetEdgeAndLR(lv + 1) but just the edge and concatenate and predict...not sure
+            edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
+            print("====================================")
+            print(edge_idx.shape)
+            print(cur_state[0].shape)
+            print("=====================================")
+            #pred_feats = (edge_feats_embed[0][:, edge_idx], edge_feats_embed[1][:, edge_idx]) 
             
             left_logits = self.pred_has_left(cur_states[0][-1], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
@@ -1030,7 +1040,8 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
-
+            
+            ## Same idea...use the edge idx???
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
