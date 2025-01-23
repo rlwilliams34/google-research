@@ -1007,7 +1007,7 @@ class RecurTreeGen(nn.Module):
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
             print("====================================")
             print(edge_idx.shape)
-            print(cur_state[0].shape)
+            print(cur_states[0].shape)
             print("=====================================")
             #pred_feats = (edge_feats_embed[0][:, edge_idx], edge_feats_embed[1][:, edge_idx]) 
             
