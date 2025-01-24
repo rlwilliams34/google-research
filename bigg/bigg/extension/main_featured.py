@@ -267,12 +267,7 @@ def get_edge_feats(g, method=None):
     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
     weights = [x[2]['weight'] for x in edges]
-    rc = None
-    
-    if method is not None:
-        rc = [[x[0], x[1]] for x in edges]
-        rc = np.expand_dims(np.array(rc, dtype=np.float32), axis=1)
-    return np.expand_dims(np.array(weights, dtype=np.float32), axis=1), rc
+    return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
 
 
 def lr_gen(idx_list, y):    
@@ -415,10 +410,7 @@ if __name__ == '__main__':
         list_node_feats = ([torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs] if cmd_args.has_node_feats else None)
         list_edge_feats = None
         if cmd_args.has_edge_feats:
-            list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)[0]).to(cmd_args.device) for g in train_graphs]
-            list_rc = None
-            if cmd_args.method in ["Test12"]:
-                list_rc = [get_edge_feats(g, cmd_args.method)[1] for g in train_graphs]
+            list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)).to(cmd_args.device) for g in train_graphs]
             
             if cmd_args.g_type == "db":
                 list_num_edges = [len(g.edges()) for g in train_graphs]
@@ -731,14 +723,6 @@ if __name__ == '__main__':
                             db_info_it = db_info[i]
                         elif cmd_args.g_type == "tree":
                             db_info_it = db_info
-            
-            if list_rc is not None:
-                if cmd_args.method == "":
-                    rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
-                
-                else:
-                    rc = [list_rc[i] for i in batch_indices]
-                edge_feats = (edge_feats, rc)
                 
                 
             if cmd_args.sigma:
