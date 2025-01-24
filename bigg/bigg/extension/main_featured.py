@@ -749,7 +749,7 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it)
+                ll, ll_wt, ll_batch, ll_batch_wt, _, ll_wt_embed = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it)
                 
             
             loss_top = -ll / num_nodes
@@ -766,7 +766,7 @@ if __name__ == '__main__':
 #                 loss = loss / B
 #             
 #             else:
-            loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
+            loss = -(ll + (ll_wt + ll_wt_embed) / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
             
             loss.backward()
             grad_accum_counter += 1
