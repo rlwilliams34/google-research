@@ -892,7 +892,7 @@ class RecurTreeGen(nn.Module):
         if not self.bits_compress:
             empty_h0, empty_c0 = self.get_empty_state(update_state)
             h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
-            c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1))
+            c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
             fn_hc_bot = lambda d: (h_bot, c_bot)
         
         else:
