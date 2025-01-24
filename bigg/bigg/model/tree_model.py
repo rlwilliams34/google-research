@@ -798,6 +798,16 @@ class RecurTreeGen(nn.Module):
         controller_state = self.row_tree()
         if self.method in ["Test285", "Test286", "Test287", "Test288"]:
             self.weight_tree.reset([])
+        
+        if self.method == "Test9" or self.method == "Test288":
+            if self.method == "Test9" or self.method == "Test288":
+            x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
+            h, c = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
+            if self.method == "Test288" or self.alt_9:
+                h, c = self.leaf_LSTM(x_in, (self.empty_h0, self.empty_c0))
+            self.test9_h0 = h
+            self.test9_c0 = c
+        
         if num_nodes is None:
             num_nodes = node_end
         pbar = range(node_start, node_end)
