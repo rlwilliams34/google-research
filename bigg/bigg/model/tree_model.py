@@ -800,7 +800,6 @@ class RecurTreeGen(nn.Module):
             self.weight_tree.reset([])
         
         if self.method == "Test9" or self.method == "Test288":
-            if self.method == "Test9" or self.method == "Test288":
             x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
             h, c = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
             if self.method == "Test288" or self.alt_9:
