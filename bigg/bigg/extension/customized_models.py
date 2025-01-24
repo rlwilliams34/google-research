@@ -381,6 +381,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             if self.update_ll:
+                edge_embed = self.edgelen_encoding(edge_feats)
                 ll = self.predict_edge_feats(edge_embed, edge_feats=edge_feats)
                 edge_embed = edge_embed.detach().clone()
             
