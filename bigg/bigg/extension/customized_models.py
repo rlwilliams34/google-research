@@ -75,8 +75,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "Test286":
             self.weight_tree = FenwickTree(args)
-            self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
-            self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
+            self.leaf_LSTM = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
 
         if self.method == "Test287":
             self.weight_tree = FenwickTree(args)
@@ -245,6 +244,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 x_in = torch.cat([self.leaf_embed.repeat(B, 1), edge_embed], dim = -1)
                 edge_embed = self.leaf_LSTM(x_in)
+            
+            elif self.method == "Test286":
+                edge_embed = self.leaf_LSTM(edge_feats_normalized)
             
             elif self.method == "Test287":
                 # Just use MLP for init state"
