@@ -946,7 +946,6 @@ class RecurTreeGen(nn.Module):
                       list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None, list_num_edges=None, db_info=None):
         ll = 0.0
         ll_wt = 0.0
-        ll_wt_embed = 0.0
         noise = 0.0
         ll_batch = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
@@ -1055,7 +1054,7 @@ class RecurTreeGen(nn.Module):
             cur_states = tuple(new_states)
             lv += 1
 
-        return ll, ll_wt, ll_batch, ll_batch_wt, next_states, ll_wt_embed
+        return ll, ll_wt, ll_batch, ll_batch_wt, next_states
 
 
 
