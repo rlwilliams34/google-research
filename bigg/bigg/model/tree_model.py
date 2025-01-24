@@ -598,9 +598,9 @@ class RecurTreeGen(nn.Module):
             self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1,  args.embed_dim))
             self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             
-            if self.method == "Test9":
-                self.empty_h0 = None
-                self.empty_c0 = None
+#             if self.method == "Test9":
+#                 self.empty_h0 = None
+#                 self.empty_c0 = None
 
         self.topdown_left_embed = Parameter(torch.Tensor(2, args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
@@ -671,7 +671,6 @@ class RecurTreeGen(nn.Module):
         else:
             if update_state:
                 x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
-                print(self.empty_h0)
                 self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
 
@@ -890,13 +889,13 @@ class RecurTreeGen(nn.Module):
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
-        
-        update_state = False
-        if self.method in ["Test9", "Test288"]:
-            update_state = True
 
         if not self.bits_compress:
-            empty_h0, empty_c0 = self.get_empty_state(update_state)
+            if self.method in ["Test9", "Test288"]:
+                x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
+                empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
+            else:
+                empty_h0, empty_c0 = self.get_empty_state()
             h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
             c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
             fn_hc_bot = lambda d: (h_bot, c_bot)
