@@ -36,7 +36,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.method = args.method
         self.update_ll = args.update_ll
         self.sampling_method = cmd_args.sampling_method
-        self.update_left = args.update_left
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test288']
@@ -45,10 +44,10 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.nodelen_pred = MLP(args.embed_dim, [2 * args.embed_dim, 1])
         self.node_state_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         
-        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
-        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
-        #self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
-        #self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
+        #self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
+        #self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
+        self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
+        self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
         
         if self.update_ll:
             self.edgelen_mean_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 1], dropout = args.wt_drop)
