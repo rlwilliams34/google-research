@@ -64,8 +64,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "Test9":
             self.empty_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
-            self.test_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.weight_embed_dim))
-            self.test_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.weight_embed_dim))
+            self.test_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.test_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
         
         if self.method == "Test10":
             self.edge_pos_enc = PosEncoding(args.weight_embed_dim, args.device, args.pos_base)
