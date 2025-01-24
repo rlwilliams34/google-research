@@ -579,8 +579,6 @@ class RecurTreeGen(nn.Module):
         super(RecurTreeGen, self).__init__()
 
         self.directed = args.directed
-        self.alt_9 = args.alt_9
-        self.sigma = args.noise
         self.batch_size = args.batch_size
         self.self_loop = args.self_loop
         self.bits_compress = args.bits_compress
@@ -1388,7 +1386,7 @@ class RecurTreeGen(nn.Module):
 #     def embed_node_feats(self, node_feats):
 #         raise NotImplementedError
 # 
-#     def embed_edge_feats(self, edge_feats):
+#     def (self, edge_feats):
 #         raise NotImplementedError
 # 
 #     def predict_node_feats(self, state, node_feats=None):

@@ -215,10 +215,10 @@ class BiggWithEdgeLen(RecurTreeGen):
             feats_pad = np.concatenate(list_feats_pad, axis = 1)
         return feats_pad
 
-    def embed_edge_feats(self, edge_feats, prev_state=None, list_num_edges=None, db_info=None):
+    def embed_edge_feats(self, edge_feats, sigma=0.0, prev_state=None, list_num_edges=None, db_info=None):
         if self.method != "Test12":
             B = edge_feats.shape[0]
-            edge_feats_normalized = self.standardize_edge_feats(edge_feats) + self.sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+            edge_feats_normalized = self.standardize_edge_feats(edge_feats) + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
         
         if self.method == "MLP-Repeat":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
@@ -272,7 +272,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             if prev_state is None:
                 edge_feats_normalized = []
                 for e in edge_feats:
-                    edge_feats_normalized_i = self.standardize_edge_feats(e) + self.sigma * torch.randn(e.shape).to(e.device)
+                    edge_feats_normalized_i = self.standardize_edge_feats(e) +  sigma * torch.randn(e.shape).to(e.device)
                     edge_feats_normalized.append(edge_feats_normalized_i)
                 
                 states_h = []
