@@ -660,13 +660,15 @@ class RecurTreeGen(nn.Module):
         mlp = self.m_pred_has_right if self.share_param else self.has_right_modules[lv]
         return mlp(x)
 
-    def get_empty_state(self):
+    def get_empty_state(self, update_state=False):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
-        elif self.method == "Test9" or self.method == "Test288":
-            return (self.test9_h0, self.test9_c0)
         else:
+            if update_state:
+                x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
+                self.empty_h0, self.empty_c0 = self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
+
 
     def get_prob_fix(self, prob):
         p = prob * (1 - self.greedy_frac)
@@ -799,13 +801,8 @@ class RecurTreeGen(nn.Module):
         if self.method in ["Test285", "Test286", "Test287", "Test288"]:
             self.weight_tree.reset([])
         
-        if self.method == "Test9" or self.method == "Test288":
-            x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
-            h, c = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
-            if self.method == "Test288" or self.alt_9:
-                h, c = self.leaf_LSTM(x_in, (self.empty_h0, self.empty_c0))
-            self.test9_h0 = h
-            self.test9_c0 = c
+        if self.method in ["Test9", "Test288"]:
+            self.get_empty_state(update_state=True)
         
         if num_nodes is None:
             num_nodes = node_end
@@ -819,13 +816,6 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test12":
             prev_state = (self.leaf_h0, self.leaf_c0)
         
-        if self.method == "Test9" or self.method == "Test288":
-            x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
-            h, c = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
-            if self.method == "Test288" or self.alt_9:
-                h, c = self.leaf_LSTM(x_in, (self.empty_h0, self.empty_c0))
-            self.test9_h0 = h
-            self.test9_c0 = c
         
         for i in pbar:
             if edge_list is None:
@@ -894,20 +884,15 @@ class RecurTreeGen(nn.Module):
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
+        
+        update_state = False
+        if self.method in ["Test9", "Test288"]:
+            update_state = True
 
         if not self.bits_compress:
-            if self.method == "Test9":
-                x_in = torch.cat([self.empty_embed, torch.zeros(1, self.weight_embed_dim).to(self.empty_embed.device)], dim = -1)
-                empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.leaf_h0, self.leaf_c0))
-                if self.method == "Test288":
-                    empty_h0, empty_c0 = self.leaf_LSTM(x_in, (self.empty_h0, self.empty_c0))
-                h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
-                c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1)
-                
-            else:
-                h_bot = torch.cat([self.empty_h0, self.leaf_h0], dim=1)
-                c_bot = torch.cat([self.empty_c0, self.leaf_c0], dim=1)
-            
+            empty_h0, empty_c0 = self.get_empty_state(update_state)
+            h_bot = torch.cat([empty_h0, self.leaf_h0], dim=1)
+            c_bot = torch.cat([empty_c0, self.leaf_c0], dim=1))
             fn_hc_bot = lambda d: (h_bot, c_bot)
         
         else:

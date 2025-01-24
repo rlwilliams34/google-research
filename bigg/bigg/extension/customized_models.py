@@ -64,8 +64,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "Test9":
             self.empty_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
-            self.test9_h0 = torch.zeros(args.rnn_layers, 1, args.embed_dim, device = args.device)
-            self.test9_c0 = torch.zeros(args.rnn_layers, 1, args.embed_dim, device = args.device)
+            self.test9_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.weight_embed_dim))
+            self.test9_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.weight_embed_dim))
         
         if self.method == "Test10":
             self.edge_pos_enc = PosEncoding(args.weight_embed_dim, args.device, args.pos_base)
@@ -370,6 +370,14 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = torch.cat([self.leaf_embed, edge_embed], dim = -1)
                 state = self.leaf_LSTM(edge_embed, prev_state)   
                 return state
+        if self.method == "Test9":
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            K = edge_embed.shape[0]
+            x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
+            s_in = (self.test_h0.repeat(1, K, 1), self.test_c0.repeat(1, K, 1))
+            edge_embed = self.leaf_LSTM(x_in, s_in)
+            return edge_embed
+        
         
         else:
             
@@ -386,9 +394,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             else:
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device))
             
-            edge_embed = self.edgelen_encoding(edge_feats_normalized)
-            K = edge_embed.shape[0]
-            x_in = edge_embed
             
 #             if self.update_ll:
 #                 ll = self.predict_edge_feats(edge_embed, edge_feats=edge_feats)
