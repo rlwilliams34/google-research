@@ -465,6 +465,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         elif h.shape[-1] == self.weight_embed_dim:
             w_hat = self.hidden_to_wt(h)
+            w_hat = torch.exp(w_hat)
             ll = -torch.square(edge_feats - w_hat)
             ll = torch.sum(ll)
             return ll
