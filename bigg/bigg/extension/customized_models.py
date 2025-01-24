@@ -381,13 +381,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             else:
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats + sigma * torch.randn(edge_feats.shape).to(edge_feats.device))
             
-            
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
             if self.update_ll:
                 ll = self.predict_edge_feats(edge_embed, edge_feats=edge_feats)
                 edge_embed = edge_embed.detach().clone()
             
             if self.method == "Test9":
-                edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 x_in = torch.cat([self.leaf_embed.repeat(K, 1), edge_embed], dim = -1)
             
             if self.method == "Test10":
