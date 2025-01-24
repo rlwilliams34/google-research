@@ -54,7 +54,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.edgelen_lvar_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 1], dropout = args.wt_drop)
         
         self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
-        
         self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
         
@@ -97,8 +96,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.weight_tree = FenwickTree(args, weights=True)
             self.weight_LSTM = MultiLSTMCell(1, args.weight_embed_dim, args.rnn_layers)
             self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
-            self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))  
-            #self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = args.wt_drop)
+            self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
             self.empty_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
             self.test9_h0 = torch.zeros(args.rnn_layers, 1, args.embed_dim, device = args.device)
             self.test9_c0 = torch.zeros(args.rnn_layers, 1, args.embed_dim, device = args.device)
@@ -221,7 +219,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         list_feats_pad = []
         for i, feat in enumerate(list_feats):
             if not isinstance(feat, torch.Tensor):
-                #list_feats_pad.append(np.pad(feat, (0, 0, 0, max_len - lens[i]), mode='constant', constant_values=np.inf))
                 list_feats_pad.append(np.concatenate([feat, np.full((max_len - lens[i], 1, 2), np.inf)], axis = 0))
                 cat = False
             else:
@@ -254,7 +251,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             elif self.method == "Test287":
                 # Just use MLP for init state"
-                edge_feats_normalized = self.standardize_edge_feats(edge_feats)
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
                 edge_embed = (edge_embed, edge_embed)
@@ -286,13 +282,14 @@ class BiggWithEdgeLen(RecurTreeGen):
                 return edge_embed, ll
             return edge_embed
             
-        if self.method == "MLP-Repeat":
+        elif self.method == "MLP-Repeat":
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             edge_embed = (edge_embed, edge_embed)
             return edge_embed
-        if self.method == "Test12": 
+        
+        elif self.method == "Test12": 
             if prev_state is None:
                 edge_feats_normalized = []
                 for e in edge_feats:
@@ -303,7 +300,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 states_h = []
                 states_c = []
                 
-                #print(edge_feats_normalized.shape)
                 edge_feats_normalized = self.LSTM_pad(edge_feats_normalized)
                 #rc_pad = self.LSTM_pad(rc)
                 
@@ -372,7 +368,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 return state        
         
         else:
-            
 #             if self.method in ["Test10"]:
 #                 edge_feats_normalized = self.standardize_edge_feats(edge_feats)
 #                 edge_row = rc[:, :, 0]

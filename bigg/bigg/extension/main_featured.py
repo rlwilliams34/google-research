@@ -347,14 +347,13 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
     if cmd_args.method in ["Test285", "Test286", "Test287", "Test288"]:
         list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
     
-    if isinstance(edge_feats, list) and method != "Test4":
+    if isinstance(edge_feats, list):
         edge_feats = torch.cat(edge_feats, dim = 0)
     
     elif method == "Test4":
         print("Neeed to implement")
     
     ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges)
-    #ll_t1, ll_w1, _ = model.forward_train([0, 1]) #, node_feats=node_feats, edge_feats=edge_feats)
     
     print("=============================")
     print("Fast Code Top+Wt Likelihoods: ")
@@ -416,13 +415,10 @@ if __name__ == '__main__':
         list_node_feats = ([torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs] if cmd_args.has_node_feats else None)
         list_edge_feats = None
         if cmd_args.has_edge_feats:
-            if cmd_args.method == "Test4":
-                list_edge_feats = [get_edge_feats_2(g, cmd_args.device) for g in train_graphs]
-            else:
-                list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)[0]).to(cmd_args.device) for g in train_graphs]
-                list_rc = None
-                if cmd_args.method in ["Test12"]:
-                    list_rc = [get_edge_feats(g, cmd_args.method)[1] for g in train_graphs]
+            list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)[0]).to(cmd_args.device) for g in train_graphs]
+            list_rc = None
+            if cmd_args.method in ["Test12"]:
+                list_rc = [get_edge_feats(g, cmd_args.method)[1] for g in train_graphs]
             
             if cmd_args.g_type == "db":
                 list_num_edges = [len(g.edges()) for g in train_graphs]
@@ -658,12 +654,6 @@ if __name__ == '__main__':
         if cmd_args.has_edge_feats and cmd_args.method == "LSTM":
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
-        elif cmd_args.has_edge_feats and cmd_args.method == "Test4":
-            edge_feats = [list_edge_feats[i][0] for i in [0,1]]
-            lr = [list_edge_feats[i][1] for i in [0, 1]]
-            edge_feats = (edge_feats, lr)
-            debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, True)
-        
         else:
             edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
             debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True)
@@ -682,10 +672,7 @@ if __name__ == '__main__':
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
-                if cmd_args.method == "Test4":
-                    edge_feats = list_edge_feats[i][0]
-                else:
-                    edge_feats = list_edge_feats[i]
+                edge_feats = list_edge_feats[i]
                 model.update_weight_stats(edge_feats)
         
         if cmd_args.model == "BiGG_GCN":
