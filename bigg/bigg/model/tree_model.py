@@ -581,7 +581,7 @@ class RecurTreeGen(nn.Module):
 
         self.directed = args.directed
         self.alt_9 = args.alt_9
-        self.sigma = args.sigma
+        self.sigma = args.noise
         self.batch_size = args.batch_size
         self.self_loop = args.self_loop
         self.bits_compress = args.bits_compress
@@ -596,6 +596,10 @@ class RecurTreeGen(nn.Module):
             self.leaf_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             self.empty_h0 = Parameter(torch.Tensor(args.rnn_layers, 1,  args.embed_dim))
             self.empty_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            
+            if self.method == "Test9":
+                self.empty_h0 = None
+                self.empty_c0 = None
 
         self.topdown_left_embed = Parameter(torch.Tensor(2, args.embed_dim))
         self.topdown_right_embed = Parameter(torch.Tensor(2, args.embed_dim))
