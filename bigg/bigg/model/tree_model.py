@@ -722,12 +722,7 @@ class RecurTreeGen(nn.Module):
                     
                     edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll_wt = ll_wt + edge_ll
-                    if self.update_ll:
-                        edge_embed, ll_wt_embed = self.embed_edge_feats(cur_feats, rc=rc, prev_state=prev_state)
-                        ll_wt = ll_wt + ll_wt_embed
-                        
-                    else:
-                        edge_embed = self.embed_edge_feats(cur_feats, rc=rc, prev_state=prev_state)
+                    edge_embed = self.embed_edge_feats(cur_feats, rc=rc, prev_state=prev_state)
                     if prev_state is not None:
                         prev_state = edge_embed
                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state
@@ -961,12 +956,8 @@ class RecurTreeGen(nn.Module):
             rc = None
             if self.method in ["Test12"]:
                 edge_feats, rc = edge_feats
-            if self.update_ll:
-                edge_feats_embed, ll_wt_embed_it = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges, db_info=db_info)
-                ll_wt_embed = ll_wt_embed + ll_wt_embed_it
-            
-            else:
-                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges, db_info=db_info)
+                
+            edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, rc=rc, list_num_edges=list_num_edges, db_info=db_info)
             if self.method == "Test12":
                 edge_feats = torch.cat(edge_feats, dim = 0)
        
