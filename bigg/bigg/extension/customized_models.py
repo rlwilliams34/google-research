@@ -50,8 +50,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         #self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
         
         if self.update_ll:
-            self.edgelen_mean_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 1], dropout = args.wt_drop)
-            self.edgelen_lvar_global = MLP(args.weight_embed_dim, [2 * args.weight_embed_dim, 1], dropout = args.wt_drop)
+            self.hidden_to_wt = nn.Linear(args.weight_embed_dim, 1)
         
         self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
         self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
@@ -374,7 +373,6 @@ class BiggWithEdgeLen(RecurTreeGen):
 #                 edge_col = rc[:, :, 1]
             
 #             else:
-            
             if self.update_ll:
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats) #+ sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
             
@@ -466,7 +464,10 @@ class BiggWithEdgeLen(RecurTreeGen):
             mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         elif h.shape[-1] == self.weight_embed_dim:
-            mus, lvars = self.edgelen_mean_global(h), self.edgelen_lvar_global(h)
+            w_hat = self.hidden_to_wt(h)
+            ll = torch.square(edge_feats - w_hat)
+            ll = torch.sum(ll)
+            return ll
         #mus, lvars = self.edgelen_mean(h), self.edgelen_lvar(h)
         
         if edge_feats is None:
@@ -552,10 +553,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                     i = i + 1
             
             ll = torch.sum(ll)
-#         
-        if h.shape[-1] == self.weight_embed_dim:
-            return ll
-        
         return ll, ll_batch_wt, edge_feats
 
 
