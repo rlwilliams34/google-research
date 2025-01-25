@@ -437,6 +437,8 @@ class FenwickTree(nn.Module):
                     weight_state = (edge_feats_embed[0][:, 0], edge_feats_embed[1][:, 0])
                 elif i == 2:
                     weight_state = (edge_feats_embed[0][:, list_last_edge], edge_feats_embed[1][:, list_last_edge])
+                print(cur_state[0].shape)
+                print(weight_state[0].shape)
                 cur_state = func(cur_state, weight_state)
                 row_embeds[i] = cur_state
         
