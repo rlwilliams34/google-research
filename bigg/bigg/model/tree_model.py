@@ -318,7 +318,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     if method == "Special": 
         test = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
         print("BIG TEST")
-        print(test)
+        print(test[0])
         print("BIG TEST")
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
@@ -835,6 +835,10 @@ class RecurTreeGen(nn.Module):
         total_ll = 0.0
         total_ll_wt = 0.0
         edges = []
+        print("PARAMS")
+        print(self.leaf_h0)
+        print(self.empty_h0)
+        
         self.row_tree.reset(list_states)
         controller_state = self.row_tree()
         if self.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
@@ -895,20 +899,19 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "Test75":
-#                 if i <= 1:
-#                     print("===============================")
-#                     print("Current i: ", i)
-#                     print("CURRENT STATE")
-#                     print(cur_state)
-#                     print("PREVIOUS STATE")
-#                     print(prev_state)
-#                     print("===============================")
+                if i <= 1:
+                    print("===============================")
+                    print("Current i: ", i)
+                    print("CURRENT STATE")
+                    print(cur_state)
+                    print("PREVIOUS STATE")
+                    print(prev_state)
+                    print("===============================")
                 cur_state = self.merge_top_wt(cur_state, prev_state)
-                if i == 2:
-                    print("I: ", i)
-                    print("Current State: ", cur_state)
             
             controller_state = self.row_tree(cur_state)
+            if i == 2:
+                print("AFTER STATES 0 and 1 ARE MERGED: ", controller_state)
             edges += [(i, x) for x in col_sm.indices]
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
