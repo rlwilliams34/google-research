@@ -462,7 +462,6 @@ class FenwickTree(nn.Module):
         ## Rows 0 --> 198; 199 --> ...
         ## Need Entries [1], [200]
         if list_last_edge is not None:
-            ### HERE WE CAN DO THE UPDATING STATES FOR ROW ####1...
             weight_state = (edge_feats_embed_l[0][:, list_last_edge[1][0]], edge_feats_embed_l[1][:, list_last_edge[1][0]])
             cur_state_1 = (cur_state[0][:, list_last_edge[1][1]], cur_state[1][:, list_last_edge[1][1]])
             cur_state_1 = func(cur_state_1, weight_state)
@@ -866,7 +865,7 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
             
-            if self.method == "Test75":
+            if self.method == "Test75" and i > 0:
                 cur_state = self.merge_top_wt(cur_state, prev_state)
             
             controller_state = self.row_tree(cur_state)
