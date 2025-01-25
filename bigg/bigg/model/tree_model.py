@@ -865,6 +865,7 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "Test75":
+                print("i", i)
                 print(controller_state)
                 print(prev_state)
                 controller_state = self.merge_top_wt(controller_state, prev_state)
