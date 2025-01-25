@@ -337,7 +337,6 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
     ll_t2 = 0
     ll_w2 = 0
     
-    
     for i in range(0, 2):
         g = graph[i]
         edge_feats_i = (edge_feats[i] if edge_feats is not None else None)
@@ -356,7 +355,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
         ll_w2 = ll_wt + ll_w2
     
     list_num_edges = None
-    if cmd_args.method in ["Test285", "Test286", "Test287", "Test288"]:
+    if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
         list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
     
     if isinstance(edge_feats, list):
