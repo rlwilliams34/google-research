@@ -416,7 +416,7 @@ class FenwickTree(nn.Module):
                     print(rch_state)
                 new_state = self.merge_cell(lch_state, rch_state)
                 if print_it:
-                    print("NEW STATE: ". new_state)
+                    print("NEW STATE: ", new_state)
                 self.list_states[pos] = []
                 self.append_state(new_state, pos + 1)
             pos += 1
