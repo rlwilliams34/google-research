@@ -427,7 +427,6 @@ class FenwickTree(nn.Module):
         print(row_embeds[0][0].shape)
         print(row_embeds[1][0].shape)
         print(row_embeds[2][0].shape)
-        print(STOP)
         
         if self.method == "Test75":
             for i in len(range(row_embeds)):
@@ -439,6 +438,8 @@ class FenwickTree(nn.Module):
                     weight_state = (edge_feats_embed[0][:, list_last_edge], edge_feats_embed[1][:, list_last_edge])
                 cur_state = self.merge_top_wt(cur_state, weight_state)
                 row_embeds[i] = cur_state
+        
+        print(STOP)
         
 
         for i, all_ids in enumerate(tree_agg_ids):
