@@ -304,7 +304,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
                 weight_state = (edge_embed_l[0][:, 0:1].repeat(1, len(leaf_check), 1), edge_embed_l[1][:, 0:1].repeat(1, len(leaf_check), 1))
             else:
                 weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
-            if i == 1:
             new_local_hbot, new_local_cbot = func((local_hbot, local_cbot), weight_state)
             h_vecs[:, new_ids[i][1]] = new_local_hbot
             c_vecs[:, new_ids[i][1]] = new_local_cbot
