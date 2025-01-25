@@ -300,8 +300,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             ## Need... edge_embed_l
             ## embeds_1_idx
             if i == 0:
-                print(edge_embed_l[0][0])
-                weight_state = (edge_embed_l[0][0].repeat(1, len(leaf_check), 1), edge_embed_l[0][1].repeat(1, len(leaf_check), 1))
+                print(edge_embed_l[0][:, 0])
+                weight_state = (edge_embed_l[0][:, 0:1].repeat(1, len(leaf_check), 1), edge_embed_l[1][:, 0:1].repeat(1, len(leaf_check), 1))
                 print(weight_state)
             else:
                 weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
