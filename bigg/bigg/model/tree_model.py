@@ -292,6 +292,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     c_list = []
     for i in range(2):
         leaf_check = is_leaf[i]
+        print(leaf_check)
         print("i: ", i)
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
         if method == "Special":
