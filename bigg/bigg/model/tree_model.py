@@ -430,7 +430,7 @@ class FenwickTree(nn.Module):
         print(row_embeds[2][0].shape)
         
         if self.method == "Test75":
-            for i in len(range(row_embeds)):
+            for i in range(len(row_embeds)):
                 print("i: ", i)
                 cur_state = row_embeds[i]
                 if i == 0:
