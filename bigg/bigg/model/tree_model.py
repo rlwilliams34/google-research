@@ -304,11 +304,13 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
                 weight_state = (edge_embed_l[0][:, 0:1].repeat(1, len(leaf_check), 1), edge_embed_l[1][:, 0:1].repeat(1, len(leaf_check), 1))
             else:
                 weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
-            print("WEIGHT STATE: ", weight_state)
             
             new_local_hbot, new_local_cbot = func((local_hbot, local_cbot), weight_state)
             h_vecs[:, new_ids[i][1]] = new_local_hbot
             c_vecs[:, new_ids[i][1]] = new_local_cbot
+            print("local h bot: ", new_local_hbot)
+        
+        print("h vecs: ", h_vecs)
         
         h_list.append(h_vecs)
         c_list.append(c_vecs)
@@ -872,7 +874,7 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            if i <= 2:
+            if i == 2:
                 print("+++++++++++++++++++++++++++++++++++")
                 print("i ", i)
                 print("controller state:", controller_state)
@@ -886,15 +888,17 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "Test75":
-                if i <= 1:
-                    print("===============================")
-                    print("Current i: ", i)
-                    print("CURRENT STATE")
-                    print(cur_state)
-                    print("PREVIOUS STATE")
-                    print(prev_state)
-                    print("===============================")
+#                 if i <= 1:
+#                     print("===============================")
+#                     print("Current i: ", i)
+#                     print("CURRENT STATE")
+#                     print(cur_state)
+#                     print("PREVIOUS STATE")
+#                     print(prev_state)
+#                     print("===============================")
                 cur_state = self.merge_top_wt(cur_state, prev_state)
+                print("I: ", i)
+                print("Current State: ", cur_state)
             
             controller_state = self.row_tree(cur_state)
             edges += [(i, x) for x in col_sm.indices]
