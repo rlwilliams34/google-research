@@ -291,9 +291,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     c_list = []
     for i in range(2):
         leaf_check = is_leaf[i]
-        local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]         
+        local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]  
+        print("method: ", method)       
         if edge_feats is not None and method != "Test75":
-            print("Hello")
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
@@ -737,6 +737,7 @@ class RecurTreeGen(nn.Module):
                     edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                     if prev_state is not None:
                         prev_state = edge_embed
+                        return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state
                     
                 else:
