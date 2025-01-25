@@ -342,6 +342,7 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
 class FenwickTree(nn.Module):
     def __init__(self, args, weighted=False, weights=False):
         super(FenwickTree, self).__init__()
+        self.method = args.method
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
         self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
