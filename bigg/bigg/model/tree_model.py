@@ -312,11 +312,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     
     if method == "Special": 
         test = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
-        print("BIG TEST")
-        print(test[0])
-        print(h_list[0][:, 0])
-        print(h_list[1][:, 0])
-        print("BIG TEST")
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
@@ -410,13 +405,7 @@ class FenwickTree(nn.Module):
         while pos < len(self.list_states):
             if len(self.list_states[pos]) >= 2:
                 lch_state, rch_state = self.list_states[pos]  # assert the length is 2
-                if print_it:
-                    print("Hello!")
-                    print(lch_state)
-                    print(rch_state)
                 new_state = self.merge_cell(lch_state, rch_state)
-                if print_it:
-                    print("NEW STATE: ", new_state)
                 self.list_states[pos] = []
                 self.append_state(new_state, pos + 1)
             pos += 1
@@ -523,7 +512,6 @@ class FenwickTree(nn.Module):
         pos_embed = self.pos_enc(pos_info)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
-        print(multi_index_select(hist_froms, hist_tos, *hist_h_list))
         return (row_h, row_c), ret_state
 
     def forward_train_weights(self, edge_feats_init_embed, list_num_edges, db_info):
@@ -893,22 +881,11 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "Test75":
-                if i <= 1:
-                    print("===============================")
-                    print("Current i: ", i)
-                    print("CURRENT STATE")
-                    print(cur_state)
-                    print("PREVIOUS STATE")
-                    print(prev_state)
-                    print("===============================")
                 cur_state = self.merge_top_wt(cur_state, prev_state)
-                if i <= 1:
-                    print("AFTER MERGE: ", cur_state)
             
             #controller_state = self.row_tree(cur_state)
             if i == 2:
-                controller_state = self.row_tree(cur_state, print_it=True)
-                print("AFTER STATES 0 and 1 ARE MERGED: ", controller_state)
+                controller_state = self.row_tree(cur_state)
             
             else:
                 controller_state = self.row_tree(cur_state)
