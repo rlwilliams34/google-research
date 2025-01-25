@@ -748,8 +748,8 @@ if __name__ == '__main__':
                             db_info_it = db_info
                         
                     if cmd_args.method == "Test75":
-                        list_last_edge = [last_edge_list[i][0] for i in batch_indices]
-                        list_last_edge_1 = [last_edge_list[i][1] for i in batch_indices]
+                        list_last_edge = [last_edge_list[i] for i in batch_indices]
+                        list_last_edge_1 = [last_edge_list[i] for i in batch_indices]
                         print(list_last_edge)
                         print(list_last_edge_1)
                         list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
