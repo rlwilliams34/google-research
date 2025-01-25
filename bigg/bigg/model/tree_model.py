@@ -831,7 +831,7 @@ class RecurTreeGen(nn.Module):
             
         
         elif self.method == "Test75":
-            prev_state = self.weight_tree()   
+            prev_state = (self.weight_tree.init_h0, self.weight_tree.init_c0)
         for i in pbar:
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
