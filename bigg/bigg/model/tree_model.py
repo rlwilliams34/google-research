@@ -303,8 +303,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             print("Weight State: ", weight_state)
             print("Local Hbot: ", local_hbot)
             
-            new_local_hbot, new_local_cbot = func((local_hbot, local_cbot), weight_state)
-            local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, (new_local_hbot, new_local_cbot))
+            local_hbot, local_cbot = func((local_hbot, local_cbot), weight_state)
+            #local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, (new_local_hbot, new_local_cbot))
             print(local_hbot.shape)
             
         elif edge_feats is not None and method != "Test75":
