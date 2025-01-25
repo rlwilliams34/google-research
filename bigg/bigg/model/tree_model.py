@@ -293,6 +293,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]         
         if edge_feats is not None and method != "Test75":
+            print("Hello")
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
@@ -459,7 +460,8 @@ class FenwickTree(nn.Module):
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
-        
+        ## Rows 0 --> 198; 199 --> ...
+        ## Need Entries [1], [200]
         if list_last_edge is not None:
             ### HERE WE CAN DO THE UPDATING STATES FOR ROW ####1...
             weight_state = (edge_feats_embed[0][:, list_last_edge[1][0]], edge_feats_embed[1][:, list_last_edge[1][0]])
