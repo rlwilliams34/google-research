@@ -897,8 +897,9 @@ class RecurTreeGen(nn.Module):
 #                     print(prev_state)
 #                     print("===============================")
                 cur_state = self.merge_top_wt(cur_state, prev_state)
-                print("I: ", i)
-                print("Current State: ", cur_state)
+                if i == 2:
+                    print("I: ", i)
+                    print("Current State: ", cur_state)
             
             controller_state = self.row_tree(cur_state)
             edges += [(i, x) for x in col_sm.indices]
