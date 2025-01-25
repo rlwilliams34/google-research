@@ -753,8 +753,8 @@ if __name__ == '__main__':
                         list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
                         offset = 0
                         for k in range(len(list_last_edge)):
-                            list_last_edge_k = list_last_edge[k]
-                            list_last_edge_1_k = list_last_edge_1[k]
+                            list_last_edge_k = list_last_edge[k][0]
+                            list_last_edge_1_k = list_last_edge_1[k][1]
                             offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
                             offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
                             offset += list_offsets[k]
