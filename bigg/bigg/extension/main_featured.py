@@ -796,10 +796,10 @@ if __name__ == '__main__':
                         
                         
                         last_edge_1_idx = []
-                        idx = 1
+                        id_ = 1
                         for b in batch_indices:
-                            last_edge_1_idx.append(idx)
-                            idx += len(train_graphs[b])
+                            last_edge_1_idx.append(id_)
+                            id_ += len(train_graphs[b])
                         list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
                         list_last_edge = (list_last_edge, list_last_edge_1)
                         
