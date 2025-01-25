@@ -986,7 +986,6 @@ class RecurTreeGen(nn.Module):
         ll_cur, ll_batch = self.binary_ll(logit_has_edge, has_ch, batch_idx = batch_idx, ll_batch = ll_batch)
         ll = ll + ll_cur
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
-        print(batch_idx)
         if batch_idx is not None:
             batch_idx = batch_idx[has_ch]
         
@@ -1041,12 +1040,8 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
-                
-                if self.update_left:
-                    leaf_topdown_states = self.topdown_update_wt(left_feats, leaf_topdown_states)
-                
-                else:
-                    leaf_topdown_states = self.update_wt(left_feats, leaf_topdown_states)
+                left_feats_stand = self.standardize_edge_feats(edge_feats[edge_idx[~is_rch]])
+                leaf_topdown_states = self.update_wt(left_feats_stand, leaf_topdown_states)
                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
 
