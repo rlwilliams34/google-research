@@ -364,6 +364,8 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
     elif method == "Test4":
         print("Neeed to implement")
     
+    print(info)
+    
     ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info)
     
     print("=============================")
