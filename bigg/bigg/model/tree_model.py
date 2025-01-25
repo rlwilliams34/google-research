@@ -814,7 +814,7 @@ class RecurTreeGen(nn.Module):
         edges = []
         self.row_tree.reset(list_states)
         controller_state = self.row_tree()
-        if self.method in ["Test285", "Test286", "Test287", "Test288"]:
+        if self.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
             self.weight_tree.reset([])
         
         if num_nodes is None:
@@ -828,10 +828,10 @@ class RecurTreeGen(nn.Module):
         prev_state = None
         if self.method == "Test12":
             prev_state = (self.leaf_h0, self.leaf_c0)
+            
         
         elif self.method == "Test75":
-            prev_state = self.weight_tree.reset([])       
-            print("Prev state: ", prev_state) 
+            prev_state = self.weight_tree()   
         for i in pbar:
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
@@ -866,9 +866,6 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "Test75":
-                print("i", i)
-                print(controller_state)
-                print(prev_state)
                 controller_state = self.merge_top_wt(controller_state, prev_state)
             
             controller_state = self.row_tree(cur_state)
