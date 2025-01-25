@@ -459,6 +459,7 @@ class FenwickTree(nn.Module):
         
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         print(init_select)
+        print(cur_state[0].shape)
         ## Rows 0 --> 198; 199 --> ...
         ## Need Entries [1], [200]
 #         if list_last_edge is not None:
