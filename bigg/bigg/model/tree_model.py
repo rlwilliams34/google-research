@@ -293,7 +293,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-        if edge_feats is not None and method != "Test75":
+        if edge_feats is not None and method not in ["Test75", "Special"]:
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
