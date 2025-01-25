@@ -278,7 +278,7 @@ def selective_update_hc(h, c, zero_one, feats):
 
 
 
-def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None, method=None):
+def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None, method=None, func=None, edge_embed_l=None, edge_embed_idx=None):
     new_ids = [list(fn_all_ids(0)), list(fn_all_ids(1))]
     lch_isleaf, rch_isleaf = new_ids[0][0], new_ids[1][0]
     new_ids[0][0] = new_ids[1][0] = None
@@ -292,12 +292,19 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     c_list = []
     for i in range(2):
         leaf_check = is_leaf[i]
-        local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]    
-        print(leaf_check)
-        print(local_hbot.shape)
+        local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
         if method == "Special" and sum(leaf_check) > 0:
             print("Hi")
-        if edge_feats is not None and method != "Test75":
+            ## Need... edge_embed_l
+            ## embeds_1_idx
+            if i == 0:
+                weight_state = (edge_embed_l[0][0].repeat(1, len(leaf_check), 1), edge_embed_l[0][1].repeat(1, len(leaf_check), 1))
+            else:
+                weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
+            new_local_hbot, new_local_cbot = func(weight_state, (local_hbot, local_cbot))
+            local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, (new_local_hbot, new_local_cbot))
+            
+        elif edge_feats is not None and method != "Test75":
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
@@ -305,6 +312,23 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
+
+
+#         if list_last_edge is not None:
+#             embeds_1_idx = list_last_edge[1][0]
+#             #print(embeds_1_idx)
+#             cur_1_idx = list_last_edge[1][1]
+#             #print(cur_1_idx)
+#             #print(edge_feats_embed_l[0].shape)
+#             #print(cur_state[0].shape)
+#             weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
+#             #print(weight_state)
+#             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
+#             print(cur_state_1)
+#             cur_state_1 = func(cur_state_1, weight_state)
+#             cur_state[0][:, cur_1_idx] = cur_state_1[0]
+#             cur_state[1][:, cur_1_idx] = cur_state_1[1]
+
 
 def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell):
     if h_past is None:
@@ -327,7 +351,7 @@ def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cel
         return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
-def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node, method):
+def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node, method, func=None, edge_embed_l=None, edge_embed_idx=None):
     edge_feats = is_rch = None
     t_lch = t_rch = None
     if 'edge' in feat_dict:
@@ -335,11 +359,11 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, method)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, method, func, edge_embed_l, edge_embed_idx)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
     elif h_buf is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, method)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, method, func, edge_embed_l, edge_embed_idx)
     else:
         raise NotImplementedError  #TODO: handle model parallelism with features
 
@@ -449,7 +473,7 @@ class FenwickTree(nn.Module):
                     
                     else:
                         method = self.method
-                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=method)
+                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=method, func=func, edge_embed_l=edge_feats_embed_l, edge_embed_idx=list_last_edge[1][0])
                 else:
                     new_states = lstm_func(h_bot, c_bot)
             else:
