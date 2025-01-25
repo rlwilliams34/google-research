@@ -331,7 +331,7 @@ def get_last_edge(g):
 #     return weights, np.transpose(np.array(lr_seq))
 
 
-def debug_model(model, graph, node_feats, edge_feats, method=None):
+def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
     ll_t1 = 0
     ll_w1 = 0
     ll_t2 = 0
@@ -365,7 +365,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None):
     elif method == "Test4":
         print("Neeed to implement")
     
-    ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges)
+    ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info)
     
     print("=============================")
     print("Fast Code Top+Wt Likelihoods: ")
@@ -667,6 +667,35 @@ if __name__ == '__main__':
     if cmd_args.debug:
         if cmd_args.has_edge_feats and cmd_args.method == "LSTM":
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
+        
+        elif cmd_args.method == "Test75":
+            batch_indices = [0, 1]
+            list_last_edge = [last_edge_list[i] for i in batch_indices]
+            list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
+            list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
+            offset = 0
+            for k in range(len(list_last_edge)):
+                list_last_edge_k = list_last_edge[k]
+                list_last_edge_1_k = list_last_edge_1[k]
+                offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
+                offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
+                offset += list_offsets[k]
+                list_last_edge[k] = np.array(offset_list_last_edge_k)
+                list_last_edge_1[k] = np.array(offset_list_last_edge_1_k)
+            
+            list_last_edge = np.concatenate(list_last_edge, axis = 0)
+            list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
+            
+            
+            last_edge_1_idx = []
+            idx = 1
+            for b in batch_indices:
+                last_edge_1_idx.append(idx)
+                idx += len(train_graphs[b])
+                list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
+                list_last_edge = (list_last_edge, list_last_edge_1)
+            
+            debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=list_last_edge)
         
         else:
             edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
