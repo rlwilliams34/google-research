@@ -986,6 +986,7 @@ class RecurTreeGen(nn.Module):
         ll_cur, ll_batch = self.binary_ll(logit_has_edge, has_ch, batch_idx = batch_idx, ll_batch = ll_batch)
         ll = ll + ll_cur
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
+        print(batch_idx)
         if batch_idx is not None:
             batch_idx = batch_idx[has_ch]
         
