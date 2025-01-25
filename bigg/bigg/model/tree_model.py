@@ -904,12 +904,7 @@ class RecurTreeGen(nn.Module):
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
             
-            if self.method == "Test75" and i > 0:
-                if i == 1:
-                    print("CURRENT STATE")
-                    print(cur_state)
-                    #print("PREVIOUS STATE")
-                    #print(prev_state)
+            if self.method == "Test75":
                 cur_state = self.merge_top_wt(cur_state, prev_state)
             
             controller_state = self.row_tree(cur_state)
