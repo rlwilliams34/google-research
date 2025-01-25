@@ -304,18 +304,10 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
                 weight_state = (edge_embed_l[0][:, 0:1].repeat(1, len(leaf_check), 1), edge_embed_l[1][:, 0:1].repeat(1, len(leaf_check), 1))
             else:
                 weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
-                print(weight_state)
             if i == 1:
-                print("HERE HERE")
-                print(local_hbot)
-                print(weight_state)
             new_local_hbot, new_local_cbot = func((local_hbot, local_cbot), weight_state)
             h_vecs[:, new_ids[i][1]] = new_local_hbot
             c_vecs[:, new_ids[i][1]] = new_local_cbot
-            print("local h bot: ", new_local_hbot)
-        
-        print("h vecs: ", h_vecs)
-        
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     
@@ -483,7 +475,6 @@ class FenwickTree(nn.Module):
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-        print(init_select)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
         if list_last_edge is not None:
@@ -839,9 +830,6 @@ class RecurTreeGen(nn.Module):
         total_ll = 0.0
         total_ll_wt = 0.0
         edges = []
-        print("PARAMS")
-        print(self.leaf_h0)
-        print(self.empty_h0)
         
         self.row_tree.reset(list_states)
         controller_state = self.row_tree()
@@ -889,11 +877,6 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            if i == 2:
-                print("+++++++++++++++++++++++++++++++++++")
-                print("i ", i)
-                print("controller state:", controller_state)
-                print("+++++++++++++++++++++++++++++++++++")
             ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
