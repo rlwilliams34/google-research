@@ -290,20 +290,9 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     node_feats = [t_lch, t_rch]
     h_list = []
     c_list = []
-    print(new_ids[0])
-    print(new_ids[1])
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-#         if method == "Special":
-#             if i == 0:
-#                 weight_state = (edge_embed_l[0][:, 0:1].repeat(1, len(leaf_check), 1), edge_embed_l[1][:, 0:1].repeat(1, len(leaf_check), 1))
-#                 #leaf_check = [1 for _ in leaf_check]
-#             else:
-#                 weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
-#             
-#             local_hbot, local_cbot = func((local_hbot, local_cbot), weight_state)
-#             #local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, (new_local_hbot, new_local_cbot))
             
             
         if edge_feats is not None and method != "Test75":
@@ -319,7 +308,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
                 weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
             
             local_hbot, local_cbot = func((local_hbot, local_cbot), weight_state)
-            print(new_ids[i][1])
             h_vecs[:, new_ids[i][1]] = local_hbot
             c_vecs[:, new_ids[i][1]] = local_cbot
         
@@ -490,20 +478,20 @@ class FenwickTree(nn.Module):
         #print(cur_state[0].shape)
         ## Rows 0 --> 198; 199 --> ...
         ## Need Entries [1], [200]
-#         if list_last_edge is not None:
-#             embeds_1_idx = list_last_edge[1][0]
-#             #print(embeds_1_idx)
-#             cur_1_idx = list_last_edge[1][1]
-#             #print(cur_1_idx)
-#             #print(edge_feats_embed_l[0].shape)
-#             #print(cur_state[0].shape)
-#             weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
-#             #print(weight_state)
-#             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
-#             print(cur_state_1)
-#             cur_state_1 = func(cur_state_1, weight_state)
-#             cur_state[0][:, cur_1_idx] = cur_state_1[0]
-#             cur_state[1][:, cur_1_idx] = cur_state_1[1]
+        if list_last_edge is not None:
+            embeds_1_idx = list_last_edge[1][0]
+            #print(embeds_1_idx)
+            cur_1_idx = list_last_edge[1][1]
+            #print(cur_1_idx)
+            #print(edge_feats_embed_l[0].shape)
+            #print(cur_state[0].shape)
+            weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
+            #print(weight_state)
+            cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
+            print(cur_state_1)
+            cur_state_1 = func(cur_state_1, weight_state)
+            cur_state[0][:, cur_1_idx] = cur_state_1[0]
+            cur_state[1][:, cur_1_idx] = cur_state_1[1]
         
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
