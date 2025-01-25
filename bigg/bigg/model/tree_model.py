@@ -817,8 +817,6 @@ class RecurTreeGen(nn.Module):
         if self.method in ["Test285", "Test286", "Test287", "Test288"]:
             self.weight_tree.reset([])
         
-
-        
         if num_nodes is None:
             num_nodes = node_end
         pbar = range(node_start, node_end)
@@ -867,6 +865,8 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "Test75":
+                print(controller_state)
+                print(prev_state)
                 controller_state = self.merge_top_wt(controller_state, prev_state)
             
             controller_state = self.row_tree(cur_state)
