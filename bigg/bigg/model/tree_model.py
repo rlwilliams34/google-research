@@ -292,20 +292,20 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     c_list = []
     for i in range(2):
         leaf_check = is_leaf[i]
-        print(leaf_check)
-        print("i: ", i)
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
         if method == "Special":
-            print("Hi")
-            ## Need... edge_embed_l
-            ## embeds_1_idx
             if i == 0:
                 weight_state = (edge_embed_l[0][:, 0:1].repeat(1, len(leaf_check), 1), edge_embed_l[1][:, 0:1].repeat(1, len(leaf_check), 1))
                 leaf_check = [1 for _ in leaf_check]
             else:
                 weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
+            
+            print("Weight State: ", weight_state)
+            print("Local Hbot: ", local_hbot)
+            
             new_local_hbot, new_local_cbot = func((local_hbot, local_cbot), weight_state)
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, (new_local_hbot, new_local_cbot))
+            print(local_hbot.shape)
             
         elif edge_feats is not None and method != "Test75":
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
@@ -315,22 +315,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
-
-
-#         if list_last_edge is not None:
-#             embeds_1_idx = list_last_edge[1][0]
-#             #print(embeds_1_idx)
-#             cur_1_idx = list_last_edge[1][1]
-#             #print(cur_1_idx)
-#             #print(edge_feats_embed_l[0].shape)
-#             #print(cur_state[0].shape)
-#             weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
-#             #print(weight_state)
-#             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
-#             print(cur_state_1)
-#             cur_state_1 = func(cur_state_1, weight_state)
-#             cur_state[0][:, cur_1_idx] = cur_state_1[0]
-#             cur_state[1][:, cur_1_idx] = cur_state_1[1]
 
 
 def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell):
