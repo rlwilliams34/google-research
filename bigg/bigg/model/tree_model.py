@@ -431,6 +431,9 @@ class FenwickTree(nn.Module):
             row_embeds[-1] = cur_state
 
         for i, all_ids in enumerate(tree_agg_ids):
+            if i == 0:
+                print(all_ids)
+                print(STOP)
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
             if i == 0 and list_last_edge is None and (self.has_edge_feats or self.has_node_feats):
@@ -458,20 +461,20 @@ class FenwickTree(nn.Module):
         #print(cur_state[0].shape)
         ## Rows 0 --> 198; 199 --> ...
         ## Need Entries [1], [200]
-        if list_last_edge is not None:
-            embeds_1_idx = list_last_edge[1][0]
-            #print(embeds_1_idx)
-            cur_1_idx = list_last_edge[1][1]
-            #print(cur_1_idx)
-            #print(edge_feats_embed_l[0].shape)
-            #print(cur_state[0].shape)
-            weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
-            #print(weight_state)
-            cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
-            print(cur_state_1)
-            cur_state_1 = func(cur_state_1, weight_state)
-            cur_state[0][:, cur_1_idx] = cur_state_1[0]
-            cur_state[1][:, cur_1_idx] = cur_state_1[1]
+#         if list_last_edge is not None:
+#             embeds_1_idx = list_last_edge[1][0]
+#             #print(embeds_1_idx)
+#             cur_1_idx = list_last_edge[1][1]
+#             #print(cur_1_idx)
+#             #print(edge_feats_embed_l[0].shape)
+#             #print(cur_state[0].shape)
+#             weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
+#             #print(weight_state)
+#             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
+#             print(cur_state_1)
+#             cur_state_1 = func(cur_state_1, weight_state)
+#             cur_state[0][:, cur_1_idx] = cur_state_1[0]
+#             cur_state[1][:, cur_1_idx] = cur_state_1[1]
         
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
