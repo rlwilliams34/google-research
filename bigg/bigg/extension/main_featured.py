@@ -690,10 +690,10 @@ if __name__ == '__main__':
             
             
             last_edge_1_idx = []
-            idx = 1
+            id_ = 1
             for b in batch_indices:
-                last_edge_1_idx.append(idx)
-                idx += len(train_graphs[b])
+                last_edge_1_idx.append(id_)
+                id_ += len(train_graphs[b])
             list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
             list_last_edge = (list_last_edge, list_last_edge_1)    
             
@@ -743,9 +743,7 @@ if __name__ == '__main__':
                 param_group['lr'] = cmd_args.learning_rate
         edge_feats_embed = None
         epoch_loss_top = 0.0
-        epoch_loss_wt = 0.0
-        
-        
+        epoch_loss_wt = 0.0        
         
         for idx in pbar:
             start = B * idx
