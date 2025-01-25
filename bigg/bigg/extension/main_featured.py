@@ -262,7 +262,6 @@ def t(n1, n2):
     t = r * (r - 1) // 2 + c
     return t
 
-Z, W1, W2, W3, W4, W5, Y1, Y2, Y3
 
 def get_edge_feats(g, method=None):
     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
