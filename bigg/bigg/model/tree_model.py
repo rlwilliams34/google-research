@@ -472,20 +472,11 @@ class FenwickTree(nn.Module):
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
-        print(init_select)
-        print(cur_state[0].shape)
-        ## Rows 0 --> 198; 199 --> ...
-        ## Need Entries [1], [200]
+        
         if list_last_edge is not None:
             cur_1_idx = list_last_edge[1][1]
-            #print(cur_1_idx)
-            #print(edge_feats_embed_l[0].shape)
-            #print(cur_state[0].shape)
-            #weight_state = (edge_feats_embed_l[0][:, 0:1], edge_feats_embed_l[1][:, 0:1])
             weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
-            #print(weight_state)
             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
-            print(cur_state_1)
             cur_state_1 = func(cur_state_1, weight_state)
             cur_state[0][:, cur_1_idx] = cur_state_1[0]
             cur_state[1][:, cur_1_idx] = cur_state_1[1]
@@ -521,6 +512,7 @@ class FenwickTree(nn.Module):
         pos_embed = self.pos_enc(pos_info)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
+        print(row_h)
         return (row_h, row_c), ret_state
 
     def forward_train_weights(self, edge_feats_init_embed, list_num_edges, db_info):
@@ -879,6 +871,9 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
+            if i <= 1:
+                print("i ", i)
+                print("controller state:", controller_state)
             ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
@@ -888,12 +883,12 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "Test75":
-                if i <= 1:
-                    print("Current i: ", i)
-                    print("CURRENT STATE")
-                    print(cur_state)
-                    print("PREVIOUS STATE")
-                    print(prev_state)
+#                 if i <= 1:
+#                     print("Current i: ", i)
+#                     print("CURRENT STATE")
+#                     print(cur_state)
+#                     print("PREVIOUS STATE")
+#                     print(prev_state)
                 cur_state = self.merge_top_wt(cur_state, prev_state)
             
             controller_state = self.row_tree(cur_state)
