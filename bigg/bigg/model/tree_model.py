@@ -463,8 +463,8 @@ class FenwickTree(nn.Module):
         if list_last_edge is not None:
             ### HERE WE CAN DO THE UPDATING STATES FOR ROW ####1...
             weight_state = (edge_feats_embed[0][:, list_last_edge[1][0]], edge_feats_embed[1][:, list_last_edge[1][0]])
-            cur_state_1 = (cur_state_1[0][:, list_last_edge[1][1]], cur_state[1][:, list_last_edge[1][1]])
-            cur_state_1 = funt(cur_state_1, weight_state)
+            cur_state_1 = (cur_state[0][:, list_last_edge[1][1]], cur_state[1][:, list_last_edge[1][1]])
+            cur_state_1 = func(cur_state_1, weight_state)
             cur_state[0][:, list_last_edge[1][1]] = cur_state_1[0]
             cur_state[1][:, list_last_edge[1][1]] = cur_state_1[1]
         
