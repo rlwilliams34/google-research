@@ -735,7 +735,7 @@ if __name__ == '__main__':
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
         
-        elif epoch >= epoch_lr_decrease + 100 and cmd_args.learning_rate == 1e-4:
+        elif epoch >= epoch_lr_decrease and cmd_args.learning_rate == 1e-4:
             cmd_args.learning_rate = cmd_args.learning_rate / 10
             print("Lowering Larning Rate to: ", cmd_args.learning_rate)
             epoch_lr_decrease += 100
