@@ -741,7 +741,7 @@ if __name__ == '__main__':
                         elif cmd_args.g_type == "tree":
                             db_info_it = db_info
                         
-                    if self.method == "Test75":
+                    if cmd_args.method == "Test75":
                         list_last_edge = [last_edge_list[i] for i in batch_indices]
                         list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
                         offset = 0
