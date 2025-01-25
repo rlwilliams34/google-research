@@ -469,7 +469,7 @@ class FenwickTree(nn.Module):
                     
                     else:
                         method = self.method
-                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=method, func=func, edge_embed_l=edge_feats_embed_l, edge_embed_idx=list_last_edge[1][0])
+                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=method, func=func, edge_embed_l=edge_feats_embed_l, edge_embed_idx=(list_last_edge[1][0] if list_last_edge is not None else None))
                 else:
                     new_states = lstm_func(h_bot, c_bot)
             else:
