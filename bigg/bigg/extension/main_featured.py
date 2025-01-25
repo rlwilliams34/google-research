@@ -669,6 +669,7 @@ if __name__ == '__main__':
         
     loss_tops_list = np.zeros(cmd_args.num_epochs - cmd_args.epoch_load)
     loss_wts_list = np.zeros(cmd_args.num_epochs - cmd_args.epoch_load)
+    list_last_edge = None
     
     for epoch in range(cmd_args.epoch_load, cmd_args.num_epochs):
         tot_loss = 0.0
