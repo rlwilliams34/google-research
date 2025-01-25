@@ -427,11 +427,10 @@ class FenwickTree(nn.Module):
         if list_last_edge is not None:
             for i in range(len(row_embeds)):
                 cur_state = row_embeds[i]
-                if i == 0:
-                    weight_state = (edge_feats_embed_l[0][:, 0:1], edge_feats_embed_l[1][:, 0:1])
-                elif i == 2:
+#                 if i == 0:
+#                     weight_state = (edge_feats_embed_l[0][:, 0:1], edge_feats_embed_l[1][:, 0:1])
+                if i == 2:
                     weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
-                if i != 1:
                     cur_state = func(cur_state, weight_state)
                 row_embeds[i] = cur_state
         
@@ -459,6 +458,7 @@ class FenwickTree(nn.Module):
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
+        print(init_select)
         ## Rows 0 --> 198; 199 --> ...
         ## Need Entries [1], [200]
         if list_last_edge is not None:
