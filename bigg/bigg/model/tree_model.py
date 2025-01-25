@@ -848,7 +848,7 @@ class RecurTreeGen(nn.Module):
             
         
         elif self.method == "Test75":
-            prev_state =  self.weight_tree()
+            prev_state =  (self.weight_tree.init_h0, self.weight_tree.init_c0) #self.weight_tree()
         for i in pbar:
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
@@ -897,7 +897,7 @@ class RecurTreeGen(nn.Module):
 #                     print(prev_state)
 #                     print("===============================")
                 cur_state = self.merge_top_wt(cur_state, prev_state)
-                if i == 2:
+                if i <= 1:
                     print("I: ", i)
                     print("Current State: ", cur_state)
             
