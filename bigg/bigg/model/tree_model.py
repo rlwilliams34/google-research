@@ -424,29 +424,16 @@ class FenwickTree(nn.Module):
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
         
-        print(edge_feats_embed[0].shape)
-        print(row_embeds[0][0].shape)
-        print(row_embeds[1][0].shape)
-        print(row_embeds[2][0].shape)
-        
-        if self.method == "Test75":
+        if list_last_edge is not None:
             for i in range(len(row_embeds)):
-                print("i: ", i)
                 cur_state = row_embeds[i]
                 if i == 0:
                     weight_state = (edge_feats_embed[0][:, 0:1], edge_feats_embed[1][:, 0:1])
                 elif i == 2:
-                    print("Hello")
-                    print(edge_feats_embed[0].shape)
-                    print(list_last_edge[0].shape)
                     weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
-                print(cur_state[0].shape)
-                print(weight_state[0].shape)
                 if i != 1:
                     cur_state = func(cur_state, weight_state)
                 row_embeds[i] = cur_state
-        
-        print(STOP)
         
 
         for i, all_ids in enumerate(tree_agg_ids):
@@ -470,6 +457,8 @@ class FenwickTree(nn.Module):
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
+        print(init_select)
+        print(STOP)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()

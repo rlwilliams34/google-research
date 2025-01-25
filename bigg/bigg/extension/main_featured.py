@@ -274,7 +274,7 @@ def get_last_edge(g):
     last_edges_1 = []
     idx = -1
     idx_count = 0
-    for r in g.nodes():
+    for r in sorted(g.nodes()):
         neighbors = [n for n in list(g.neighbors(r)) if n < r]
         idx_count += len(neighbors)
         if len(neighbors) > 0:
