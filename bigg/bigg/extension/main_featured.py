@@ -749,7 +749,7 @@ if __name__ == '__main__':
                         
                     if cmd_args.method == "Test75":
                         list_last_edge = [last_edge_list[i] for i in batch_indices]
-                        list_last_edge_1 = [last_edge_list_1[i] for i in batch_indices]
+                        list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
                         list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
                         offset = 0
                         for k in range(len(list_last_edge)):
