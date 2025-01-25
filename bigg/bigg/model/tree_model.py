@@ -293,6 +293,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]       
         if edge_feats is not None and method != "Test75":
+            if method == "Special":
+                print("Hi!")
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
@@ -431,17 +433,19 @@ class FenwickTree(nn.Module):
             row_embeds[-1] = cur_state
 
         for i, all_ids in enumerate(tree_agg_ids):
-            if i == 0:
-                print(all_ids)
-                print(STOP)
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
-            if i == 0 and list_last_edge is None and (self.has_edge_feats or self.has_node_feats):
+            if i == 0 and (self.has_edge_feats or self.has_node_feats):
                 lstm_func = featured_batch_tree_lstm3
             lstm_func = partial(lstm_func, h_buf=row_embeds[-1][0], c_buf=row_embeds[-1][1],
                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
             if i == 0:
-                if list_last_edge is None and (self.has_edge_feats or self.has_node_feats):
+                if self.has_edge_feats or self.has_node_feats:
+                    if self.method == "Test75":
+                        method = "Special"
+                    
+                    else:
+                        method = self.method
                     new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=self.method)
                 else:
                     new_states = lstm_func(h_bot, c_bot)
