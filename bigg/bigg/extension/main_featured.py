@@ -763,7 +763,7 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it, last_edge=list_last_edge))
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it, last_edge=list_last_edge)
                 
             
             loss_top = -ll / num_nodes
