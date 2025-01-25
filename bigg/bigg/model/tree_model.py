@@ -405,7 +405,7 @@ class FenwickTree(nn.Module):
                 state = self.summary_cell(state, cur_state)
         return state
 
-    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c):
+    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, edge_feats_embed=None):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
@@ -422,6 +422,12 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
+        
+        print(edge_feats_embed[0].shape)
+        print(row_embeds[0].shape)
+        print(row_embeds[1].shape)
+        print(row_embeds[2].shape)
+        print(STOP)
 
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
@@ -944,14 +950,15 @@ class RecurTreeGen(nn.Module):
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
         
-        print(list_last_edge)
-        print(STOP)
-        
         if self.has_edge_feats:
             edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
-       
+            
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
-        row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
+        
+        if self.method == "Test75":
+            row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, edge_feats_embed)
+        else:
+            row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
         if self.has_node_feats:
             row_states, ll_node_feats, _ = self.predict_node_feats(row_states, node_feats)
             ll = ll + ll_node_feats
