@@ -230,7 +230,10 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method != "Test12":
             B = edge_feats.shape[0]
             print(sigma)
-            edge_feats_normalized = self.standardize_edge_feats(edge_feats) + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+            edge_feats_normalized = self.standardize_edge_feats(edge_feats) 
+            print(edge_feats_normalized)
+            edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+            print(edge_feats_normalized)
         
         if self.method == "MLP-Repeat":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
