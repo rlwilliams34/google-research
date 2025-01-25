@@ -425,6 +425,8 @@ class FenwickTree(nn.Module):
             if len(self.list_states[pos]) == 0:
                 continue
             cur_state = self.list_states[pos][0]
+            if print_it:
+                print("HELLO HELLO HELLO")
             if state is None:
                 state = cur_state
             else:
