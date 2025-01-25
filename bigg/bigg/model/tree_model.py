@@ -400,7 +400,7 @@ class FenwickTree(nn.Module):
                 self.list_states.append([])
         self.list_states[level].append(state)
 
-    def forward(self, new_state=None):
+    def forward(self, new_state=None, print_it=False):
         if new_state is None:
             if len(self.list_states) == 0:
                 return (self.init_h0, self.init_c0)
@@ -410,7 +410,13 @@ class FenwickTree(nn.Module):
         while pos < len(self.list_states):
             if len(self.list_states[pos]) >= 2:
                 lch_state, rch_state = self.list_states[pos]  # assert the length is 2
+                if print_it:
+                    print("Hello!")
+                    print(lch_state)
+                    print(rch_state)
                 new_state = self.merge_cell(lch_state, rch_state)
+                if print_it:
+                    print("NEW STATE: ". new_state)
                 self.list_states[pos] = []
                 self.append_state(new_state, pos + 1)
             pos += 1
@@ -901,7 +907,11 @@ class RecurTreeGen(nn.Module):
             
             controller_state = self.row_tree(cur_state)
             if i == 2:
+                controller_state = self.row_tree(cur_state, print_it=True)
                 print("AFTER STATES 0 and 1 ARE MERGED: ", controller_state)
+            
+            else:
+                controller_state = self.row_tree(cur_state)
             edges += [(i, x) for x in col_sm.indices]
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
