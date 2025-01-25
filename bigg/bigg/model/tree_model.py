@@ -662,7 +662,7 @@ class RecurTreeGen(nn.Module):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
         else:
-            if self.method == "Test9":
+            if self.method in ["Test9", "Test288"]:
                 x_in = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)], dim = -1)
                 return self.leaf_LSTM(x_in, (self.test_h0, self.test_c0))
             return (self.empty_h0, self.empty_c0)
@@ -788,6 +788,8 @@ class RecurTreeGen(nn.Module):
         if self.method in ["Test285", "Test286", "Test287", "Test288"]:
             self.weight_tree.reset([])
         
+
+        
         if num_nodes is None:
             num_nodes = node_end
         pbar = range(node_start, node_end)
@@ -800,7 +802,8 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test12":
             prev_state = (self.leaf_h0, self.leaf_c0)
         
-        
+        elif self.method == "Test75":
+            prev_state = self.weight_tree.reset([])        
         for i in pbar:
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
@@ -833,6 +836,10 @@ class RecurTreeGen(nn.Module):
                 target_feat_embed = self.embed_node_feats(target_node_feats)
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
+            
+            if self.method == "Test75":
+                controller_state = self.merge_top_wt(controller_state, prev_state)
+            
             controller_state = self.row_tree(cur_state)
             edges += [(i, x) for x in col_sm.indices]
             total_ll = total_ll + ll

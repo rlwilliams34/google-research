@@ -259,9 +259,10 @@ def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
 def t(n1, n2):
     r = max(n1, n2)
     c = min(n1, n2)
-    t = r * (r - 1) / 2 + c
-    return int(t)
+    t = r * (r - 1) // 2 + c
+    return t
 
+Z, W1, W2, W3, W4, W5, Y1, Y2, Y3
 
 def get_edge_feats(g, method=None):
     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
@@ -269,49 +270,62 @@ def get_edge_feats(g, method=None):
     weights = [x[2]['weight'] for x in edges]
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
 
-
-def lr_gen(idx_list, y):    
-    if len(idx_list) == 1:
-        return ''
-    if len(idx_list) == 2:
-        if y == idx_list[0]:
-            return 'L'
-        else:
-            return 'R'
-    else:
-        midpoint = len(idx_list) // 2
-        left_idx_list = idx_list[:midpoint]
-                
-        if y in left_idx_list:
-            if len(left_idx_list) == 1:
-                return 'L'
-            return 'L' + lr_gen(left_idx_list, y)
-        
-        else:
-            right_idx_list = idx_list[midpoint:]
-            return 'R' + lr_gen(right_idx_list, y)
-
-
-def get_lr_seq(row_, col_):
-    mydict = {'L': 0, 'R': 1}
-    row = max(row_, col_)
-    col = min(row_, col_)
-    idx_list = list(range(row))
-    lr_seq = lr_gen(idx_list, col)
-    bin_lr_seq = list(map(mydict.get, lr_seq))
-    return bin_lr_seq
-
-
-def get_edge_feats_2(g, device):
-    #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
-    edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
-    weights = [x[2]['weight'] for x in edges]
-    weights = np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
-    weights = torch.from_numpy(weights).to(device)
-    lr_seq = [get_lr_seq(x[0], x[1]) for x in edges]
-    max_len = max(len(x) for x in lr_seq)
-    lr_seq = [x + [-1] * (max_len - len(x)) for x in lr_seq]
-    return weights, np.transpose(np.array(lr_seq))
+def get_last_edge(g):
+    last_edges = []
+    idx = -1
+    idx_count = 0
+    for r in g.nodes():
+        neighbors = [n for n in list(g.neighbors(r)) if n < r]
+        idx_count += len(neighbors)
+        if len(neighbors) > 0:
+            c = max(neighbors)
+            idx = idx_count
+        last_edges.append(idx)
+    return np.array(last_edges)
+# 
+# 
+# def lr_gen(idx_list, y):    
+#     if len(idx_list) == 1:
+#         return ''
+#     if len(idx_list) == 2:
+#         if y == idx_list[0]:
+#             return 'L'
+#         else:
+#             return 'R'
+#     else:
+#         midpoint = len(idx_list) // 2
+#         left_idx_list = idx_list[:midpoint]
+#                 
+#         if y in left_idx_list:
+#             if len(left_idx_list) == 1:
+#                 return 'L'
+#             return 'L' + lr_gen(left_idx_list, y)
+#         
+#         else:
+#             right_idx_list = idx_list[midpoint:]
+#             return 'R' + lr_gen(right_idx_list, y)
+# 
+# 
+# def get_lr_seq(row_, col_):
+#     mydict = {'L': 0, 'R': 1}
+#     row = max(row_, col_)
+#     col = min(row_, col_)
+#     idx_list = list(range(row))
+#     lr_seq = lr_gen(idx_list, col)
+#     bin_lr_seq = list(map(mydict.get, lr_seq))
+#     return bin_lr_seq
+# 
+# 
+# def get_edge_feats_2(g, device):
+#     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
+#     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
+#     weights = [x[2]['weight'] for x in edges]
+#     weights = np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
+#     weights = torch.from_numpy(weights).to(device)
+#     lr_seq = [get_lr_seq(x[0], x[1]) for x in edges]
+#     max_len = max(len(x) for x in lr_seq)
+#     lr_seq = [x + [-1] * (max_len - len(x)) for x in lr_seq]
+#     return weights, np.transpose(np.array(lr_seq))
 
 
 def debug_model(model, graph, node_feats, edge_feats, method=None):
@@ -411,6 +425,10 @@ if __name__ == '__main__':
         list_edge_feats = None
         if cmd_args.has_edge_feats:
             list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)).to(cmd_args.device) for g in train_graphs]
+            
+            last_edge_list = None
+            if cmd_args.method == "Test75":
+                last_edge_list = [get_last_edge(g) for g in train_graphs]
             
             if cmd_args.g_type == "db":
                 list_num_edges = [len(g.edges()) for g in train_graphs]
@@ -715,7 +733,7 @@ if __name__ == '__main__':
             
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
-                if cmd_args.method in ["Test285", "Test286", "Test287", "Test288"]:
+                if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
                     list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
                     if db_info is not None:
                         if cmd_args.g_type == "db":
@@ -723,6 +741,18 @@ if __name__ == '__main__':
                             db_info_it = db_info[i]
                         elif cmd_args.g_type == "tree":
                             db_info_it = db_info
+                        
+                    if self.method == "Test75":
+                        list_last_edge = [last_edge_list[i] for i in batch_indices]
+                        list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
+                        offset = 0
+                        for k in range(len(list_last_edge)):
+                            list_last_edge_k = list_last_edge[k]
+                            offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
+                            offset += list_offsets[k]
+                            list_last_edge[k] = np.array(offset_list_last_edge_k)
+                        
+                        list_last_edge = np.concatenate(list_last_edge, axis = 0)
                 
                 
             if cmd_args.sigma:
@@ -733,7 +763,7 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it)
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it, last_edge=list_last_edge))
                 
             
             loss_top = -ll / num_nodes
