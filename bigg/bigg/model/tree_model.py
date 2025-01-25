@@ -479,13 +479,11 @@ class FenwickTree(nn.Module):
         ## Rows 0 --> 198; 199 --> ...
         ## Need Entries [1], [200]
         if list_last_edge is not None:
-            embeds_1_idx = list_last_edge[1][0]
-            #print(embeds_1_idx)
             cur_1_idx = list_last_edge[1][1]
             #print(cur_1_idx)
             #print(edge_feats_embed_l[0].shape)
             #print(cur_state[0].shape)
-            weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
+            weight_state = (edge_feats_embed_l[0][:, 0:1], edge_feats_embed_l[1][:, 0:1])
             #print(weight_state)
             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
             print(cur_state_1)
