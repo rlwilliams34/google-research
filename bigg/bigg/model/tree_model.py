@@ -406,7 +406,7 @@ class FenwickTree(nn.Module):
                 state = self.summary_cell(state, cur_state)
         return state
 
-    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, edge_feats_embed=None, list_last_edge=None):
+    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, edge_feats_embed=None, list_last_edge=None, func=None):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
@@ -437,7 +437,7 @@ class FenwickTree(nn.Module):
                     weight_state = (edge_feats_embed[0][:, 0], edge_feats_embed[1][:, 0])
                 elif i == 2:
                     weight_state = (edge_feats_embed[0][:, list_last_edge], edge_feats_embed[1][:, list_last_edge])
-                cur_state = self.merge_top_wt(cur_state, weight_state)
+                cur_state = func(cur_state, weight_state)
                 row_embeds[i] = cur_state
         
         print(STOP)
@@ -977,7 +977,7 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test75":
             edge_feats_embed_h = torch.cat([self.weight_tree.init_h0, edge_feats_embed[0]], dim = 1)
             edge_feats_embed_c = torch.cat([self.weight_tree.init_c0, edge_feats_embed[1]], dim = 1)
-            row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, (edge_feats_embed_h, edge_feats_embed_c), list_last_edge)
+            row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, (edge_feats_embed_h, edge_feats_embed_c), list_last_edge, self.merge_top_wt)
         else:
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
         if self.has_node_feats:
