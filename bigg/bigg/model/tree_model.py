@@ -482,7 +482,7 @@ class FenwickTree(nn.Module):
             #print(edge_feats_embed_l[0].shape)
             #print(cur_state[0].shape)
             #weight_state = (edge_feats_embed_l[0][:, 0:1], edge_feats_embed_l[1][:, 0:1])
-            weight_state = (edge_feats_embed[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
+            weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
             #print(weight_state)
             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
             print(cur_state_1)
