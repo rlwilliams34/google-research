@@ -294,7 +294,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         leaf_check = is_leaf[i]
         print("i: ", i)
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-        if method == "Special" and sum(leaf_check) > 0:
+        if method == "Special":
             print("Hi")
             print(local_hbot)
             ## Need... edge_embed_l
