@@ -406,7 +406,7 @@ class FenwickTree(nn.Module):
                 state = self.summary_cell(state, cur_state)
         return state
 
-    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, edge_feats_embed=None, list_last_edge=None, func=None):
+    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, edge_feats_embed_l=None, list_last_edge=None, func=None):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
@@ -428,9 +428,9 @@ class FenwickTree(nn.Module):
             for i in range(len(row_embeds)):
                 cur_state = row_embeds[i]
                 if i == 0:
-                    weight_state = (edge_feats_embed[0][:, 0:1], edge_feats_embed[1][:, 0:1])
+                    weight_state = (edge_feats_embed_l[0][:, 0:1], edge_feats_embed_l[1][:, 0:1])
                 elif i == 2:
-                    weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
+                    weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
                 if i != 1:
                     cur_state = func(cur_state, weight_state)
                 row_embeds[i] = cur_state
@@ -463,7 +463,7 @@ class FenwickTree(nn.Module):
         ## Need Entries [1], [200]
         if list_last_edge is not None:
             ### HERE WE CAN DO THE UPDATING STATES FOR ROW ####1...
-            weight_state = (edge_feats_embed[0][:, list_last_edge[1][0]], edge_feats_embed[1][:, list_last_edge[1][0]])
+            weight_state = (edge_feats_embed_l[0][:, list_last_edge[1][0]], edge_feats_embed_l[1][:, list_last_edge[1][0]])
             cur_state_1 = (cur_state[0][:, list_last_edge[1][1]], cur_state[1][:, list_last_edge[1][1]])
             cur_state_1 = func(cur_state_1, weight_state)
             cur_state[0][:, list_last_edge[1][1]] = cur_state_1[0]
