@@ -425,8 +425,6 @@ class FenwickTree(nn.Module):
             if len(self.list_states[pos]) == 0:
                 continue
             cur_state = self.list_states[pos][0]
-            if print_it:
-                print("HELLO HELLO HELLO")
             if state is None:
                 state = cur_state
             else:
@@ -525,7 +523,7 @@ class FenwickTree(nn.Module):
         pos_embed = self.pos_enc(pos_info)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
-        print(row_h)
+        print(multi_index_select(hist_froms, hist_tos, *hist_h_list))
         return (row_h, row_c), ret_state
 
     def forward_train_weights(self, edge_feats_init_embed, list_num_edges, db_info):
