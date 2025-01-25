@@ -773,7 +773,6 @@ class RecurTreeGen(nn.Module):
                 left_edge_embed = self.standardize_edge_feats(left_edge_feats)
                 topdown_state = self.update_wt(left_edge_embed, topdown_state)
             
-            
             rlb = max(0, lb - num_left)
             rub = min(tree_node.rch.n_cols, ub - num_left)
             if not has_left:
@@ -831,7 +830,7 @@ class RecurTreeGen(nn.Module):
             
         
         elif self.method == "Test75":
-            prev_state = (self.weight_tree.init_h0, self.weight_tree.init_c0)
+            prev_state =  self.weight_tree()
         for i in pbar:
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
