@@ -458,8 +458,20 @@ class FenwickTree(nn.Module):
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         print(init_select)
+        print(init_select.shape)
         print(STOP)
+        
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
+        
+        if list_last_edge is not None:
+            ### HERE WE CAN DO THE UPDATING STATES FOR ROW ####1...
+            weight_state = (edge_feats_embed[0][:, list_last_edge[1][0]], edge_feats_embed[1][:, list_last_edge[1][0]])
+            cur_state_1 = (cur_state_1[0][:, list_last_edge[1][1]], cur_state[1][:, list_last_edge[1][1]])
+            cur_state_1 = funt(cur_state_1, weight_state)
+            cur_state[0][:, INDEX] = cur_state_1[0]
+            cur_state[1][:, INDEX] = cur_state_1[1]
+        
+        
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
             if len(base_nodes):
