@@ -974,10 +974,8 @@ class RecurTreeGen(nn.Module):
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
         
         if self.method == "Test75":
-            print(self.weight_tree.init_h0.shape)
-            print(edge_feats_embed[0].shape)
-            edge_feats_embed_h = torch.cat([self.weight_tree.init_h0, edge_feats_embed[0]], dim = -1)
-            edge_feats_embed_c = torch.cat([self.weight_tree.init_c0, edge_feats_embed[1]], dim = -1)
+            edge_feats_embed_h = torch.cat([self.weight_tree.init_h0, edge_feats_embed[0]], dim = 1)
+            edge_feats_embed_c = torch.cat([self.weight_tree.init_c0, edge_feats_embed[1]], dim = 1)
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, (edge_feats_embed_h, edge_feats_embed_c), list_last_edge)
         else:
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
