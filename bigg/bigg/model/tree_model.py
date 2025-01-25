@@ -314,6 +314,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         test = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
         print("BIG TEST")
         print(test[0])
+        print(h_list[0][:, 0])
+        print(h_list[1][:, 0])
         print("BIG TEST")
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
