@@ -750,11 +750,13 @@ if __name__ == '__main__':
                     if cmd_args.method == "Test75":
                         list_last_edge = [last_edge_list[i][0] for i in batch_indices]
                         list_last_edge_1 = [last_edge_list[i][1] for i in batch_indices]
+                        print(list_last_edge)
+                        print(list_last_edge_1)
                         list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
                         offset = 0
                         for k in range(len(list_last_edge)):
-                            list_last_edge_k = list_last_edge[k][0]
-                            list_last_edge_1_k = list_last_edge_1[k][1]
+                            list_last_edge_k = list_last_edge[k]
+                            list_last_edge_1_k = list_last_edge_1[k]
                             offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
                             offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
                             offset += list_offsets[k]
