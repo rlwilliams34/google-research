@@ -468,8 +468,6 @@ class FenwickTree(nn.Module):
             cur_state[0][:, list_last_edge[1][1]] = cur_state_1[0]
             cur_state[1][:, list_last_edge[1][1]] = cur_state_1[1]
         
-        print(STOP)
-        
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
             if len(base_nodes):
