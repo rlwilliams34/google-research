@@ -905,6 +905,12 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             if self.method == "Test75":
+                if i <= 1:
+                    print("Current i: ")
+                    print("CURRENT STATE")
+                    print(cur_state)
+                    #print("PREVIOUS STATE")
+                    #print(prev_state)
                 cur_state = self.merge_top_wt(cur_state, prev_state)
             
             controller_state = self.row_tree(cur_state)
