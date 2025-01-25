@@ -908,6 +908,8 @@ class RecurTreeGen(nn.Module):
                     print(prev_state)
                     print("===============================")
                 cur_state = self.merge_top_wt(cur_state, prev_state)
+                if i <= 1:
+                    print("AFTER MERGE: ", cur_state)
             
             controller_state = self.row_tree(cur_state)
             if i == 2:
