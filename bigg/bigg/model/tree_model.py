@@ -425,15 +425,10 @@ class FenwickTree(nn.Module):
             row_embeds.append((h_buf0, c_buf0))
         
         if list_last_edge is not None:
-            for i in range(len(row_embeds)):
-                cur_state = row_embeds[i]
-#                 if i == 0:
-#                     weight_state = (edge_feats_embed_l[0][:, 0:1], edge_feats_embed_l[1][:, 0:1])
-                if i == 2:
-                    weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
-                    cur_state = func(cur_state, weight_state)
-                row_embeds[i] = cur_state
-        
+            cur_state = row_embeds[-1]
+            weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
+            cur_state = func(cur_state, weight_state)
+            row_embeds[-1] = cur_state
 
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
@@ -450,6 +445,7 @@ class FenwickTree(nn.Module):
             else:
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
+        
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=1)
         joint_c = torch.cat(c_list, dim=1)
@@ -463,11 +459,15 @@ class FenwickTree(nn.Module):
         ## Rows 0 --> 198; 199 --> ...
         ## Need Entries [1], [200]
         if list_last_edge is not None:
-            weight_state = (edge_feats_embed_l[0][:, list_last_edge[1][0]], edge_feats_embed_l[1][:, list_last_edge[1][0]])
-            cur_state_1 = (cur_state[0][:, list_last_edge[1][1]], cur_state[1][:, list_last_edge[1][1]])
+            embeds_1_idx = list_last_edge[1][0]
+            print(embeds_1_idx)
+            cur_1_idx = list_last_edge[1][1]
+            print(cur_1_idx)
+            weight_state = (edge_feats_embed_l[0][:, embeds_1_idx], edge_feats_embed_l[1][:, embeds_1_idx])
+            cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
             cur_state_1 = func(cur_state_1, weight_state)
-            cur_state[0][:, list_last_edge[1][1]] = cur_state_1[0]
-            cur_state[1][:, list_last_edge[1][1]] = cur_state_1[1]
+            cur_state[0][:, cur_1_idx] = cur_state_1[0]
+            cur_state[1][:, cur_1_idx] = cur_state_1[1]
         
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
