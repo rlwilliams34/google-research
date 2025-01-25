@@ -290,6 +290,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     node_feats = [t_lch, t_rch]
     h_list = []
     c_list = []
+    print(new_ids[0])
+    print(new_ids[1])
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
