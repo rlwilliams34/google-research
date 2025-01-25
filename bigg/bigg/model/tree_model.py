@@ -905,7 +905,7 @@ class RecurTreeGen(nn.Module):
                 if i <= 1:
                     print("AFTER MERGE: ", cur_state)
             
-            controller_state = self.row_tree(cur_state)
+            #controller_state = self.row_tree(cur_state)
             if i == 2:
                 controller_state = self.row_tree(cur_state, print_it=True)
                 print("AFTER STATES 0 and 1 ARE MERGED: ", controller_state)
