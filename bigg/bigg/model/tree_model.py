@@ -457,9 +457,6 @@ class FenwickTree(nn.Module):
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-        print(init_select)
-        print(init_select.shape)
-        print(STOP)
         
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
@@ -468,9 +465,10 @@ class FenwickTree(nn.Module):
             weight_state = (edge_feats_embed[0][:, list_last_edge[1][0]], edge_feats_embed[1][:, list_last_edge[1][0]])
             cur_state_1 = (cur_state_1[0][:, list_last_edge[1][1]], cur_state[1][:, list_last_edge[1][1]])
             cur_state_1 = funt(cur_state_1, weight_state)
-            cur_state[0][:, INDEX] = cur_state_1[0]
-            cur_state[1][:, INDEX] = cur_state_1[1]
+            cur_state[0][:, list_last_edge[1][1]] = cur_state_1[0]
+            cur_state[1][:, list_last_edge[1][1]] = cur_state_1[1]
         
+        print(STOP)
         
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
@@ -970,11 +968,6 @@ class RecurTreeGen(nn.Module):
         ll_batch = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
-        
-        
-        print(list_last_edge)
-        print(list_last_edge[0].shape)
-        print(list_last_edge[1].shape)
         
         if self.has_edge_feats:
             edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
