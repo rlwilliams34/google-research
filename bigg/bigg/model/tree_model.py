@@ -471,7 +471,7 @@ class FenwickTree(nn.Module):
 
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-        
+        print(init_select)
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
         if list_last_edge is not None:
