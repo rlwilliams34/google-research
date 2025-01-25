@@ -271,6 +271,7 @@ def get_edge_feats(g, method=None):
 
 def get_last_edge(g):
     last_edges = []
+    last_edges_1 = []
     idx = -1
     idx_count = 0
     for r in g.nodes():
@@ -279,8 +280,11 @@ def get_last_edge(g):
         if len(neighbors) > 0:
             c = max(neighbors)
             idx = idx_count
-        last_edges.append(idx)
-    return np.array(last_edges)
+        if r == 1:
+            last_edges_1.append(idx)
+        elif r > 1:
+            last_edges.append(idx)
+    return np.array(last_edges), np.array(last_edges_1)
 # 
 # 
 # def lr_gen(idx_list, y):    
@@ -427,7 +431,8 @@ if __name__ == '__main__':
             
             last_edge_list = None
             if cmd_args.method == "Test75":
-                last_edge_list = [get_last_edge(g) for g in train_graphs]
+                last_edge_list = [get_last_edge(g)[0] for g in train_graphs]
+                last_edge_1_list = [get_last_edge(g)[1] for g in train_graphs]
             
             if cmd_args.g_type == "db":
                 list_num_edges = [len(g.edges()) for g in train_graphs]
@@ -743,16 +748,22 @@ if __name__ == '__main__':
                             db_info_it = db_info
                         
                     if cmd_args.method == "Test75":
-                        list_last_edge = [last_edge_list[i] for i in batch_indices]
+                        list_last_edge = [last_edge_list[i][0] for i in batch_indices]
+                        list_last_edge_1 = [last_edge_list[i][1] for i in batch_indices]
                         list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
                         offset = 0
                         for k in range(len(list_last_edge)):
                             list_last_edge_k = list_last_edge[k]
+                            list_last_edge_1_k = list_last_edge_1[k]
                             offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
+                            offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
                             offset += list_offsets[k]
                             list_last_edge[k] = np.array(offset_list_last_edge_k)
+                            list_last_edge_1[k] = np.array(offset_list_last_edge_1_k)
                         
                         list_last_edge = np.concatenate(list_last_edge, axis = 0)
+                        list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
+                        list_last_edge = (list_last_edge, list_last_edge_1)
                 
                 
             if cmd_args.sigma:
