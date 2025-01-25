@@ -764,6 +764,15 @@ if __name__ == '__main__':
                         list_last_edge = np.concatenate(list_last_edge, axis = 0)
                         list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
                         list_last_edge = (list_last_edge, list_last_edge_1)
+                        
+                        last_edge_1_idx = []
+                        idx = 1
+                        for batch_idx in batch_indices:
+                            last_edge_1_idx.append(idx)
+                            idx += len(train_graphs[batch_idx])
+                        print(last_edge_1_idx)
+                        list_last_edge[1] = [list_last_edge_1, np.array(last_edge_1_idx)]
+                        
                 
                 
             if cmd_args.sigma:
