@@ -262,6 +262,79 @@ class _tree_lib(object):
         if dtype is not None:
             has_ch = has_ch.astype(dtype)
         return has_ch, num_ch
+    
+    def GetTopdownEdgeIdx(self, max_depth=-1, dtype=None):
+        edge_idx = [None] * range(max_depth)
+        for d in range(max_depth, -1, -1): ##BACKWARDS....
+            cur_edge_idx, lr = GetEdgeandLR(d)
+            if d == max_depth - 1:
+                has_ch = []
+            else:
+                has_ch = "..."
+            if np.sum(has_ch) > 0:
+                if right is leaf: get edge idx 
+                elif has left:
+                    get left edge
+    
+    def GetTopdownEdgeIdx(self, max_depth=-1, dtype=None):
+        edge_idx = [None] * range(max_depth)
+        for d in range(max_depth, -1, -1): ##BACKWARDS....
+            is_nonleaf = QueryNonLeaf(lv)
+            num_internal = np.sum(is_nonleaf)
+            num_leaves = np.sum(~is_nonleaf)
+            
+            edge_idx_it = np.zeros((num_internal, ), dtype=np.int32)
+            left_childen_feats = None
+            right_children_feats = None
+            
+            if left_children_feats is None:
+                assert num_internal == 0
+                cur_edge_idx, _ = GetEdgeandLR(d)
+                num_parents = QueryNonleaf(lv - 1)
+                num_internal_parents = np.sum(is_nonleaf)
+                left_children_feats = np.array([-1] * num_internal_parents)
+                right_children_feats = np.array([-1] * num_internal_parents)
+                
+                test_is_left, _ = GetChLabel(-1, lv - 1)
+                test_is_right, _ = GetChLabel(1, lv - 1)
+                
+                left_children_feats[test_is_left] = cur_edge_idx[test_is_left]
+                right_children_feats[test_is_right] = cur_edge_idx[test_is_right]
+                
+                edge_idx[d] = edge_idx_it
+            
+            else:
+                mrs = [lch[i] for i in range(len(lch)) if lch[i] > -1 else rch[i]]
+                edge_idx_it = np.array(mrs, dtype=np.int32)
+                mrs = [rch[i] for i in range(len(lch)) if rch[i] > -1 else lch[i]]
+                edge_idx[d] = edge_idx_it
+                
+                old_left_children_feats = left_children_feats
+                old_right_children_feats = right_children_feats
+                
+                if lv == 0:
+                    return edge_idx
+                
+                # edge_idx_it ==> WEIGHTS CORRESPONDING TO INTERNAL NODES
+                # cur_edge_idx, _ = GetEdgeandLR(d) ==> WEIGHTS CORRESPONDING TO LEAVES
+                
+                is_nonleaf = QueryNonLeaf(lv)
+                cur_weights = np.zeros((len(is_nonleaf, )), dtype=np.int32)
+                cur_edge_idx, _ = GetEdgeandLR(d)
+                cur_weights[is_nonleaf] = edge_idx_it
+                cur_weights[~is_nonleaf] = cur_edge_idx
+                
+                num_parents = QueryNonleaf(lv - 1)
+                num_internal_parents = np.sum(is_nonleaf)
+                left_children_feats = np.array([-1] * num_internal_parents)
+                right_children_feats = np.array([-1] * num_internal_parents)
+                
+                test_is_left, _ = GetChLabel(-1, lv - 1)
+                test_is_right, _ = GetChLabel(1, lv - 1)
+                
+                left_children_feats[test_is_left] = cur_weights[test_is_left]
+                right_children_feats[test_is_right] = cur_weights[test_is_right]
+        return edge_idx    
 
     def QueryNonLeaf(self, depth):
         n = self.lib.NumCurNodes(depth)

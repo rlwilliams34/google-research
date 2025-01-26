@@ -1000,6 +1000,12 @@ class RecurTreeGen(nn.Module):
             print("Is Rch shape: ", is_rch.shape)
             print("----------------------------")
         
+        print("BIG TEEST MOMENT:", max_level)
+        test = GetTopdownEdgeIdx(max_level)
+        print(test)
+        print(STOP)
+        
+        
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]
             if d == max_level:
