@@ -326,11 +326,8 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         if method == "Special" and np.sum(leaf_check) > 0:
             weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
             new_local_hbot, new_local_cbot = func((h_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1), c_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1)), weight_state)
-            print(leaf_check)
-            print(weight_state)
-            print(h_bot[:, 1:2])
             print(new_local_hbot)
-            
+            print(leaf_check == 1)
             h_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_hbot
             c_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_cbot
         h_list.append(h_vecs)
@@ -463,7 +460,7 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
-        print(list_last_edge)
+        
         if list_last_edge is not None:
             cur_state = row_embeds[-1]
             weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
