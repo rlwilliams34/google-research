@@ -279,7 +279,7 @@ class _tree_lib(object):
             if left_children_feats is None:
                 assert num_internal == 0
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
-                num_parents = self.QueryNonleaf(d - 1)
+                num_parents = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 left_children_feats = np.array([-1] * num_internal_parents)
                 right_children_feats = np.array([-1] * num_internal_parents)
@@ -314,7 +314,7 @@ class _tree_lib(object):
                 cur_weights[is_nonleaf] = edge_idx_it
                 cur_weights[~is_nonleaf] = cur_edge_idx
                 
-                num_parents = self.QueryNonleaf(d - 1)
+                num_parents = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 left_children_feats = np.array([-1] * num_internal_parents)
                 right_children_feats = np.array([-1] * num_internal_parents)
