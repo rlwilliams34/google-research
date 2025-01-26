@@ -292,9 +292,10 @@ class _tree_lib(object):
                 edge_idx[d] = edge_idx_it
             
             else:
-                mrs = [lch[i] for i in range(len(lch)) if lch[i] > -1 else rch[i]]
+                mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
+                print(mrs)
                 edge_idx_it = np.array(mrs, dtype=np.int32)
-                mrs = [rch[i] for i in range(len(lch)) if rch[i] > -1 else lch[i]]
+                mrs = [(rch[i] if lch[i] > -1 else rch[i]) for i in range(len(rch))]
                 edge_idx[d] = edge_idx_it
                 
                 old_left_children_feats = left_children_feats
