@@ -325,10 +325,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         
         if method == "Special" and np.sum(leaf_check) > 0:
             weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
-            print(leaf_check)
-            print(np.sum(leaf_check))
-            print(weight_state[0].shape)
-            print(local_hbot[:, 1].repeat(1, np.sum(leaf_check), 1).shape)
             new_local_hbot, new_local_cbot = func((local_hbot[:, 1].repeat(1, np.sum(leaf_check), 1), local_cbot[:, 1].repeat(1, np.sum(leaf_check), 1)), weight_state)
             h_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_hbot
             c_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_cbot
@@ -466,16 +462,11 @@ class FenwickTree(nn.Module):
         if list_last_edge is not None:
             cur_state = row_embeds[-1]
             weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
-            print(cur_state[0].shape)
-            print(edge_feats_embed_l[0].shape)
-            print(list_last_edge[0].shape)
-            print(list_last_edge[0])
             
             cur_state = func(cur_state, weight_state)
             row_embeds[-1] = cur_state
 
         for i, all_ids in enumerate(tree_agg_ids):
-            print(all_ids)
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
@@ -495,7 +486,7 @@ class FenwickTree(nn.Module):
             else:
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
-        print(STOP)
+        
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=1)
         joint_c = torch.cat(c_list, dim=1)
