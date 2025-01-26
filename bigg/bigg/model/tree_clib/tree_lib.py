@@ -328,7 +328,7 @@ class _tree_lib(object):
                 cur_weights[is_nonleaf] = edge_idx_it
                 cur_weights[~is_nonleaf] = cur_edge_idx
                 print(cur_weights)
-                print(cur_ege_idx)
+                print(cur_edge_idx)
                 print(cur_idx_it)
                 
                 is_nonleaf = self.QueryNonLeaf(d - 1)
