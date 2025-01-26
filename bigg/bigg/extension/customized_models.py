@@ -102,6 +102,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.weight_tree = FenwickTree(args)
             self.leaf_LSTM = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
             self.update_wt = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
+            self.joint_lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
         
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
@@ -268,7 +269,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             elif self.method in ["Test286", "Test75"]:
                 edge_embed = self.leaf_LSTM(edge_feats_normalized)
-                if False:
+                if self.method == "Test75":
                     edge_embed_topdown = self.update_wt(edge_feats_normalized, (self.leaf_h0.repeat(1, B, 1), self.leaf_h0.repeat(1, B, 1)))
             
             elif self.method == "Test287":
@@ -296,7 +297,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             else:
                 edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges, db_info)
             
-            if False:
+            if self.method == "Test75":
                 return edge_embed, edge_embed_topdown
             return edge_embed
         
