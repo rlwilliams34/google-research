@@ -268,7 +268,7 @@ class _tree_lib(object):
         edge_idx = [None] * max_depth
         for d in range(max_depth + 1, -1, -1): ##BACKWARDS....
             print("Current level: ", d)
-            is_nonleaf = self.QueryNonLeaf(lv)
+            is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
             
@@ -279,13 +279,13 @@ class _tree_lib(object):
             if left_children_feats is None:
                 assert num_internal == 0
                 cur_edge_idx, _ = self.GetEdgeandLR(d)
-                num_parents = self.QueryNonleaf(lv - 1)
+                num_parents = self.QueryNonleaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 left_children_feats = np.array([-1] * num_internal_parents)
                 right_children_feats = np.array([-1] * num_internal_parents)
                 
-                test_is_left, _ = self.GetChLabel(-1, lv - 1)
-                test_is_right, _ = self.GetChLabel(1, lv - 1)
+                test_is_left, _ = self.GetChLabel(-1, d - 1)
+                test_is_right, _ = self.GetChLabel(1, d - 1)
                 
                 left_children_feats[test_is_left] = cur_edge_idx[test_is_left]
                 right_children_feats[test_is_right] = cur_edge_idx[test_is_right]
@@ -302,25 +302,25 @@ class _tree_lib(object):
                 old_left_children_feats = left_children_feats
                 old_right_children_feats = right_children_feats
                 
-                if lv == 0:
+                if d == 0:
                     return edge_idx
                 
                 # edge_idx_it ==> WEIGHTS CORRESPONDING TO INTERNAL NODES
                 # cur_edge_idx, _ = GetEdgeandLR(d) ==> WEIGHTS CORRESPONDING TO LEAVES
                 
-                is_nonleaf = self.QueryNonLeaf(lv)
+                is_nonleaf = self.QueryNonLeaf(d)
                 cur_weights = np.zeros((len(is_nonleaf, )), dtype=np.int32)
                 cur_edge_idx, _ = self.GetEdgeandLR(d)
                 cur_weights[is_nonleaf] = edge_idx_it
                 cur_weights[~is_nonleaf] = cur_edge_idx
                 
-                num_parents = self.QueryNonleaf(lv - 1)
+                num_parents = self.QueryNonleaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 left_children_feats = np.array([-1] * num_internal_parents)
                 right_children_feats = np.array([-1] * num_internal_parents)
                 
-                test_is_left, _ = self.GetChLabel(-1, lv - 1)
-                test_is_right, _ = self.GetChLabel(1, lv - 1)
+                test_is_left, _ = self.GetChLabel(-1, d - 1)
+                test_is_right, _ = self.GetChLabel(1, d - 1)
                 
                 left_children_feats[test_is_left] = cur_weights[test_is_left]
                 right_children_feats[test_is_right] = cur_weights[test_is_right]
