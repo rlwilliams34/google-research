@@ -263,18 +263,6 @@ class _tree_lib(object):
             has_ch = has_ch.astype(dtype)
         return has_ch, num_ch
     
-    def GetTopdownEdgeIdx(self, max_depth=-1, dtype=None):
-        edge_idx = [None] * range(max_depth)
-        for d in range(max_depth, -1, -1): ##BACKWARDS....
-            cur_edge_idx, lr = GetEdgeandLR(d)
-            if d == max_depth - 1:
-                has_ch = []
-            else:
-                has_ch = "..."
-            if np.sum(has_ch) > 0:
-                if right is leaf: get edge idx 
-                elif has left:
-                    get left edge
     
     def GetTopdownEdgeIdx(self, max_depth=-1, dtype=None):
         edge_idx = [None] * range(max_depth)
