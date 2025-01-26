@@ -330,9 +330,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             c_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_cbot
         h_list.append(h_vecs)
         c_list.append(c_vecs)
-    
-#     if method == "Special": 
-#         test = cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
     return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
