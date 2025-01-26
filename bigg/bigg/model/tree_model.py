@@ -1085,6 +1085,7 @@ class RecurTreeGen(nn.Module):
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             print("+++++++++++++++++++++++++++++++++++++++++++++++")
             print("New Level: ", lv)
+            print("is_nonleaf": is_nonleaf)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
@@ -1133,8 +1134,8 @@ class RecurTreeGen(nn.Module):
                 if lv > 0:
                     test_is_left, _ = TreeLib.GetChLabel(-1, lv - 1)
                     test_is_right, _ = TreeLib.GetChLabel(-1, lv - 1)
-                    print(test_is_left[is_nonleaf]) # <-- Gives boolean for whether this is a LEFT or RIGHT child state
-                    print(test_is_right[is_nonleaf])
+                    #print(test_is_left[is_nonleaf]) # <-- Gives boolean for whether this is a LEFT or RIGHT child state
+                    #print(test_is_right[is_nonleaf])
                     print(is_nonleaf)
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 
