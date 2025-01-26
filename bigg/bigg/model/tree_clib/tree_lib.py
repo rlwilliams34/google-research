@@ -329,7 +329,7 @@ class _tree_lib(object):
                 cur_weights[~is_nonleaf] = cur_edge_idx
                 print(cur_weights)
                 print(cur_edge_idx)
-                print(cur_idx_it)
+                print(edge_idx_it)
                 
                 is_nonleaf = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
