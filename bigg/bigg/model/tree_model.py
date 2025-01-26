@@ -1013,7 +1013,7 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test75":
             cur_state = (h_buf_list[0], c_buf_list[0])
             weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
-            cur_state = func(cur_state, weight_state)
+            cur_state = self.merge_top_wt(cur_state, weight_state)
             
             edge_embed_idx = list_last_edge[1][0]
             weight_state = (edge_feats_embed[0][:, edge_embed_idx], edge_feats_embed[1][:, edge_embed_idx])
