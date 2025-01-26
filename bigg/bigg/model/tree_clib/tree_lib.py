@@ -298,9 +298,12 @@ class _tree_lib(object):
                 print(rch) 
                 print(test_is_left)
                 print(test_is_right)
-                lch[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
-                rch[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
-                
+                # Length of Current Edge Index is SIX (# Number of States in Level Above)
+                # For each edge index, need to know if this is the LEFT or RIGHT child of parent node
+                lch[test_is_left.astype(bool)] = cur_edge_idx[NEED TO KNOW IF IT IS A LEFT CHILD]
+                rch[test_is_right.astype(bool)] = cur_edge_idx[NEED TO KNOW IF IT IS A RIGHT CHILD]
+                ## Error Here
+                # We have the weight indices in order for level 2. Now need to match them to left and right children lists
                 print(lch)
                 print(rch)
                 
@@ -346,7 +349,8 @@ class _tree_lib(object):
                 print(test_is_left)
                 print(test_is_right)
                 
-                
+                check = self.GetLeftRootStates(d)
+                print(check)
                 lch[test_is_left.astype(bool)] = cur_weights[test_is_left.astype(bool)]
                 rch[test_is_right.astype(bool)] = cur_weights[test_is_right.astype(bool)]
                 
