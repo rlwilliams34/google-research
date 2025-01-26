@@ -682,7 +682,7 @@ class FenwickTree(nn.Module):
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
         #print(row_h)
-        return (row_h, row_c), ret_state.
+        return (row_h, row_c), ret_state
 
 
 class BitsRepNet(nn.Module):
