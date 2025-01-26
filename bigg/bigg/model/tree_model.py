@@ -1119,7 +1119,7 @@ class RecurTreeGen(nn.Module):
             edge_idx_it = np.zeros((n,), dtype=np.int32)
             if n == 0:
                 edge_idx[d] = []
-                print("N IS ZERO"")
+                print("N IS ZERO")
             else:
                 has_left, num_left = GetChLabel(-1, d + 1)
                 has_right, num_right = GetChLabel(1, d + 1)
