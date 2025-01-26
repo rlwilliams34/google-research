@@ -957,7 +957,7 @@ class RecurTreeGen(nn.Module):
             else:
                 summary_state = self.lr2p_cell(left_state, right_state)
                 if self.method == "Test75":
-                    joint_summary_state = self.joint_lr2p_cell(left_joint_state, right_joint_state)
+                    joint_summary_state = self.joint_lr2p_cell(joint_left_state, joint_right_state)
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
             if self.method == "Test75":
