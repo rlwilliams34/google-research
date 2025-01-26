@@ -324,10 +324,12 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
         
         if method == "Special" and np.sum(leaf_check) > 0:
+            print(edge_embed_idx)
             weight_state = (edge_embed_l[0][:, edge_embed_idx][leaf_check], edge_embed_l[1][:, edge_embed_idx][leaf_check])
             print(leaf_check)
             print(weight_state[0].shape)
             print(local_hbot.shape)
+            print(local_h_bot[:, [1 for l in leaf_check if l = 1]])
             new_local_hbot, new_local_cbot = func((local_hbot[:, leaf_check], local_cbot[:, leaf_check]), weight_state)
             h_vecs[:, new_ids[i][1]][leaf_check] = new_local_hbot
             c_vecs[:, new_ids[i][1]][leaf_check] = new_local_cbot
