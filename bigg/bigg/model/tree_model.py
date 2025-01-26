@@ -33,6 +33,30 @@ from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
 
 
+
+# def get_max_deg(train_graphs):
+#     max_degrees = []
+#     for G in train_graphs:
+#         degrees = [deg for (node, deg) in G.degree()]
+#         max_degrees.append(np.max(degrees))
+#     return np.max(degrees)
+# 
+# def get_edge_feats_lstm(g, max_deg=-1):
+#     if max_deg=-1:
+#         degrees = [deg for (node, deg) in g.degree()]
+#         max_deg = np.max(degrees)
+#     list_of_edge_feats = []
+#     init_edge = []
+#     for i in len(range(g.nodes())):
+#         x = list(g.edges(i, data=True))
+#         x = sorted(x, key= lambda y:y[1])
+#         x = list(g.edges(i, data=True))
+#         weights = [x[2]['weight'] for x in x]
+#         [x[0] > x[1] for x in x]
+# 
+# 
+# 
+# degrees = [val for (node, val) in G.degree()]
 ## HELPER FUNCTIONS FOR FENWICK TREE WEIGHTS
 def get_list_edge(cur_nedge_list):
     offset = 0
@@ -441,6 +465,9 @@ class FenwickTree(nn.Module):
         if list_last_edge is not None:
             cur_state = row_embeds[-1]
             weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
+            print(cur_state[0].shape)
+            print(edge_feats_embed_l[0].shape)
+            print(list_last_edge[0].shape)
             cur_state = func(cur_state, weight_state)
             row_embeds[-1] = cur_state
 
