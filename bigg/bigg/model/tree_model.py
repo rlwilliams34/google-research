@@ -1126,6 +1126,8 @@ class RecurTreeGen(nn.Module):
                 print(n)
                 print("has left: ", test_has_left.shape)
                 print("Has right: ", test_has_right.shape)
+                print(has_left)
+                print(has_right)
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 
             print("Current State Size: ", cur_states[0].shape)
