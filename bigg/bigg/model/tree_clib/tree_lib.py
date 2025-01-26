@@ -279,7 +279,7 @@ class _tree_lib(object):
             if left_children_feats is None:
                 assert num_internal == 0
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
-                num_parents = self.QueryNonLeaf(d - 1)
+                is_nonleaf = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 left_children_feats = np.array([-1] * num_internal_parents)
                 right_children_feats = np.array([-1] * num_internal_parents)
@@ -288,11 +288,11 @@ class _tree_lib(object):
                 test_is_right, _ = self.GetChLabel(1, d - 1)
                 
                 print("~~~~~~ INFO ~~~~~~~~~")
-                print(cur_edge_idx)
-                print(num_parents)
-                print(num_internal_parents)
+                print(cur_edge_idx) 
+                print(is_nonleaf)
+                print(num_internal_parents) 
                 print(left_children_feats)
-                print(right_children_feats)
+                print(right_children_feats) 
                 print(test_is_left)
                 print(test_is_right)
                 left_children_feats[test_is_left] = cur_edge_idx[test_is_left]
