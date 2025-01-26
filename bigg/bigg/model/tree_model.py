@@ -1129,10 +1129,12 @@ class RecurTreeGen(nn.Module):
                 print("Has right: ", test_has_right.shape)
                 print(test_has_left)
                 print(test_has_right)
+                print(is_nonleaf)
                 if lv > 0:
                     test_is_left, _ = TreeLib.GetChLabel(-1, lv - 1)
-                    
-                    print(test_is_left)
+                    test_is_right, _ = TreeLib.GetChLabel(-1, lv - 1)
+                    print(test_is_left[is_nonleaf]) # <-- Gives boolean for whether this is a LEFT or RIGHT child state
+                    print(test_is_right[is_nonleaf])
                     print(is_nonleaf)
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 
