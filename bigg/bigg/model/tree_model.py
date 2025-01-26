@@ -325,11 +325,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         
         if method == "Special" and np.sum(leaf_check) > 0:
             weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
-            print(leaf_check)
-            print(weight_state[0].shape)
-            print(h_bot.shape)
-            print(h_bot[:, 1:2].shape)
-            print(h_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1).shape)
             new_local_hbot, new_local_cbot = func((h_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1), c_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1)), weight_state)
             h_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_hbot
             c_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_cbot
@@ -902,7 +897,7 @@ class RecurTreeGen(nn.Module):
             ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
-                if self.method == "Test75":
+                if self.method == "Test75" and cur_row.has_edge:
                     cur_state = self.merge_top_wt(cur_state, prev_state)
             
             if self.has_node_feats:
@@ -911,12 +906,7 @@ class RecurTreeGen(nn.Module):
             assert lb <= len(col_sm.indices) <= ub
             
             
-            #controller_state = self.row_tree(cur_state)
-            if i == 2:
-                controller_state = self.row_tree(cur_state)
-            
-            else:
-                controller_state = self.row_tree(cur_state)
+            controller_state = self.row_tree(cur_state)
             edges += [(i, x) for x in col_sm.indices]
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
