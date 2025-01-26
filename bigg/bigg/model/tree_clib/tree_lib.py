@@ -273,7 +273,7 @@ class _tree_lib(object):
             num_leaves = np.sum(~is_nonleaf)
             
             edge_idx_it = np.zeros((num_internal, ), dtype=np.int32)
-            left_childen_feats = None
+            left_children_feats = None
             right_children_feats = None
             
             if left_children_feats is None:
