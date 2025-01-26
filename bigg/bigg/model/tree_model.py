@@ -1130,7 +1130,9 @@ class RecurTreeGen(nn.Module):
                 print("~~~~~~~~~~~ EDGE INFO ~~~~~~~~~~~~~~~~~~~")
                 print("Edge IDX Shape: ", edge_idx.shape)
                 print("Is RCH shape: ", is_rch.shape)
-                print("LEFT IDS 0: ", left_ids[0].shape)
+                print("LEFT IDS 0 SHAPE: ", left_ids[0].shape)
+                print(cur_states[0].shape)
+                print("LEFT IDS: ", left_ids)
                 print("~~~~~~~~~~~!!!!!!!!!!!~~~~~~~~~~~~~~~~~~~")
                 
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
