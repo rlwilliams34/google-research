@@ -1082,6 +1082,13 @@ class RecurTreeGen(nn.Module):
         
         lv=0
         while True:
+            if lv==3:
+                test_is_left, _ = TreeLib.GetChLabel(-1, lv - 1)
+                test_is_right, _ = TreeLib.GetChLabel(1, lv - 1)
+                ### ^ Use above to place edge indices in left and right state lists respecitvelly
+                print(test_is_left) # <-- Gives boolean for whether this is a LEFT or RIGHT child state
+                print(test_is_right)
+                print(is_nonleaf)
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             print("+++++++++++++++++++++++++++++++++++++++++++++++")
             print("New Level: ", lv)
@@ -1134,6 +1141,7 @@ class RecurTreeGen(nn.Module):
                 if lv > 1:
                     test_is_left, _ = TreeLib.GetChLabel(-1, lv - 1)
                     test_is_right, _ = TreeLib.GetChLabel(1, lv - 1)
+                    ### ^ Use above to place edge indices in left and right state lists respecitvelly
                     print(test_is_left) # <-- Gives boolean for whether this is a LEFT or RIGHT child state
                     print(test_is_right)
                     print(is_nonleaf)
