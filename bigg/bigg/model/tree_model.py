@@ -463,7 +463,7 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
-        
+        print(list_last_edge)
         if list_last_edge is not None:
             cur_state = row_embeds[-1]
             weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
