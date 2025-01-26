@@ -1100,7 +1100,7 @@ class RecurTreeGen(nn.Module):
                 h_next_buf = c_next_buf = None
                 
             
-            print("Current State Size: ", cur_state[0].shape))
+            print("Current State Size: ", cur_state[0].shape)
 
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
