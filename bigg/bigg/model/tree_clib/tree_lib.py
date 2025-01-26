@@ -349,7 +349,7 @@ class _tree_lib(object):
                 print(test_is_left)
                 print(test_is_right)
                 
-                check = self.GetLeftRootStates(d)
+                check = self.GetLeftRootStates(d - 1)
                 print(check)
                 lch[test_is_left.astype(bool)] = cur_weights[test_is_left.astype(bool)]
                 rch[test_is_right.astype(bool)] = cur_weights[test_is_right.astype(bool)]
