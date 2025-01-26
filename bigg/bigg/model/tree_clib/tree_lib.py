@@ -287,6 +287,14 @@ class _tree_lib(object):
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
                 
+                print("~~~~~~ INFO ~~~~~~~~~")
+                print(cur_edge_idx)
+                print(num_parents)
+                print(num_internal_parents)
+                print(left_children_feats)
+                print(right_children_feats)
+                print(test_is_left)
+                print(test_is_right)
                 left_children_feats[test_is_left] = cur_edge_idx[test_is_left]
                 right_children_feats[test_is_right] = cur_edge_idx[test_is_right]
                 
