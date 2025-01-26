@@ -1133,6 +1133,7 @@ class RecurTreeGen(nn.Module):
                     test_is_left, _ = TreeLib.GetChLabel(-1, lv - 1)
                     
                     print(test_is_left)
+                    print(is_nonleaf)
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 
             print("Current State Size: ", cur_states[0].shape)
