@@ -1100,6 +1100,8 @@ class RecurTreeGen(nn.Module):
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
                 if self.method == "Test75":
+                    edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
+                    local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                     new_h_wt, new_c_wt = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.joint_lr2p_cell, method=None)
                     h_buf_list_wt[d] = new_h_wt
                     c_buf_list_wt[d] = new_c_wt
