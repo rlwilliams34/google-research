@@ -280,10 +280,10 @@ def get_last_edge(g):
         if len(neighbors) > 0:
             c = max(neighbors)
             idx = idx_count
-        if r == 1:
-            last_edges_1.append(idx)
-        elif r > 1:
-            last_edges.append(idx)
+            if r == 1:
+                last_edges_1.append(idx)
+            elif r > 1:
+                last_edges.append(idx)
     return np.array(last_edges), np.array(last_edges_1)
 # 
 # 

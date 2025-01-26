@@ -323,14 +323,11 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
         
-        if method == "Special":
-            if i == 0:
-                weight_state = (edge_embed_l[0][:, 0:1].repeat(1, len(leaf_check), 1), edge_embed_l[1][:, 0:1].repeat(1, len(leaf_check), 1))
-            else:
-                weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
-            new_local_hbot, new_local_cbot = func((local_hbot, local_cbot), weight_state)
-            h_vecs[:, new_ids[i][1]] = new_local_hbot
-            c_vecs[:, new_ids[i][1]] = new_local_cbot
+        if method == "Special" and np.sum(leaf_check) > 0:
+            weight_state = (edge_embed_l[0][:, edge_embed_idx][leaf_check], edge_embed_l[1][:, edge_embed_idx][leaf_check])
+            new_local_hbot, new_local_cbot = func((local_hbot[leaf_check], local_cbot[leaf_check]), weight_state)
+            h_vecs[:, new_ids[i][1]][leaf_check] = new_local_hbot
+            c_vecs[:, new_ids[i][1]][leaf_check] = new_local_cbot
         h_list.append(h_vecs)
         c_list.append(c_vecs)
     
@@ -470,8 +467,8 @@ class FenwickTree(nn.Module):
             print(list_last_edge[0].shape)
             print(list_last_edge[0])
             
-            #cur_state = func(cur_state, weight_state)
-            #row_embeds[-1] = cur_state
+            cur_state = func(cur_state, weight_state)
+            row_embeds[-1] = cur_state
 
         for i, all_ids in enumerate(tree_agg_ids):
             print(all_ids)
@@ -503,7 +500,7 @@ class FenwickTree(nn.Module):
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
-        if list_last_edge is not None:
+        if list_last_edge is not None and len(list_last_edge[1][1]):
             cur_1_idx = list_last_edge[1][1]
             weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
@@ -905,13 +902,14 @@ class RecurTreeGen(nn.Module):
             ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
+                if self.method == "Test75":
+                    cur_state = self.merge_top_wt(cur_state, prev_state)
+            
             if self.has_node_feats:
                 target_feat_embed = self.embed_node_feats(target_node_feats)
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
             
-            if self.method == "Test75":
-                cur_state = self.merge_top_wt(cur_state, prev_state)
             
             #controller_state = self.row_tree(cur_state)
             if i == 2:
