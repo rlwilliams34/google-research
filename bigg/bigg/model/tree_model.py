@@ -498,6 +498,7 @@ class FenwickTree(nn.Module):
         if list_last_edge is not None and len(list_last_edge[1][1]):
             print("WE ARE HERE")
             cur_1_idx = list_last_edge[1][1]
+            print(cur_1_idx)
             weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
             cur_state_1 = func(cur_state_1, weight_state)
