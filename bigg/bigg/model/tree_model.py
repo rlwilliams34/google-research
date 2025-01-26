@@ -1130,10 +1130,14 @@ class RecurTreeGen(nn.Module):
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             print("Has right: ", has_right.shape)
             print("Num right: ", num_right.shape)
-            print("+++++++++++++++++++++++++++++++++++++++++++++++")
+
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
+            
+            print("TEST: ", topdown_state[0].shape)
+            print("HAS LEFT: ", has_left.shape)
+            print("+++++++++++++++++++++++++++++++++++++++++++++++")
 #             if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
 #                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
 #                 left_feats_stand = self.standardize_edge_feats(edge_feats[edge_idx[~is_rch]])
@@ -1142,6 +1146,8 @@ class RecurTreeGen(nn.Module):
 #                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
 ## Challenge: Need the edge feat that corresponds to the topdown state that is being referenced...
 ## For each topdown state, need the corresponding edge feature to be udpated ....
+
+## topdown_states (HAS LEFT)
 
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
