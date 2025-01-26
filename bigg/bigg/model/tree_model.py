@@ -821,7 +821,7 @@ class RecurTreeGen(nn.Module):
             if has_left:
                 lub = min(tree_node.lch.n_cols, ub)
                 llb = max(0, lb - tree_node.rch.n_cols)
-                ll, ll_wt, left_state, num_left, left_edge_feats, prev_state, joint_left_state = self.gen_row(ll, ll_wt, state, tree_node.lch, col_sm, llb, lub, edge_feats, row=row, prev_state=prev_state)
+                ll, ll_wt, left_state, num_left, left_edge_feats, prev_state = self.gen_row(ll, ll_wt, state, tree_node.lch, col_sm, llb, lub, edge_feats, row=row, prev_state=prev_state)
                 pred_edge_feats.append(left_edge_feats)
             else:
                 left_state = self.get_empty_state()
