@@ -1114,8 +1114,8 @@ class RecurTreeGen(nn.Module):
                 
                 print("~~~~~~~~~~~ EDGE INFO ~~~~~~~~~~~~~~~~~~~")
                 print("Edge IDX Shape: ", edge_idx.shape)
-                print("Is RCH shape: ", is_rch)
-                print("LEFT IDS 0: ", left_ids[0])
+                print("Is RCH shape: ", is_rch.shape)
+                print("LEFT IDS 0: ", left_ids[0].shape)
                 print("~~~~~~~~~~~!!!!!!!!!!!~~~~~~~~~~~~~~~~~~~")
                 
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
@@ -1128,8 +1128,8 @@ class RecurTreeGen(nn.Module):
             print("left subtree state: ", left_subtree_states[0].shape)
 
             has_right, num_right = TreeLib.GetChLabel(1, lv)
-            print("Has right: ", has_right)
-            print("Num right: ", num_right)
+            print("Has right: ", has_right.shape)
+            print("Num right: ", num_right.shape)
             print("+++++++++++++++++++++++++++++++++++++++++++++++")
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
