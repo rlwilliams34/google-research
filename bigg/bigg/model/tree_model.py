@@ -922,9 +922,10 @@ class RecurTreeGen(nn.Module):
                     print("============================")
                 if self.method == "Test75":
                     cur_state = self.merge_top_wt(cur_state, prev_state)
-                    print("AFTER MERGE")
-                    print(cur_state)
-                    print("+++++++++++++++++++++++++++++")
+                    if i == 1:
+                        print("AFTER MERGE")
+                        print(cur_state)
+                        print("+++++++++++++++++++++++++++++")
             
             if self.has_node_feats:
                 target_feat_embed = self.embed_node_feats(target_node_feats)
