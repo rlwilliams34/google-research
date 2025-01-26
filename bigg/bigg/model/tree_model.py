@@ -494,13 +494,15 @@ class FenwickTree(nn.Module):
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
-        
+        print(list_last_edge)
         if list_last_edge is not None and len(list_last_edge[1][1]):
             cur_1_idx = list_last_edge[1][1]
             weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
+            print("============================")
             print(cur_state_1[0])
             print(weight_state[0])
+            print("============================")
             cur_state_1 = func(cur_state_1, weight_state)
             cur_state[0][:, cur_1_idx] = cur_state_1[0]
             cur_state[1][:, cur_1_idx] = cur_state_1[1]
@@ -889,9 +891,11 @@ class RecurTreeGen(nn.Module):
             cur_pos_embed = self.row_tree.pos_enc([num_nodes - i])
             controller_state = [x + cur_pos_embed for x in controller_state]
             if i <= 2:
+                print("============================")
                 print("CURRENT STATE")
                 print("i: ", i)
                 print(controller_state)
+                print("============================")
             
             if self.has_node_feats:
                 target_node_feats = None if node_feats is None else node_feats[[i]]
@@ -906,9 +910,11 @@ class RecurTreeGen(nn.Module):
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
                 if i == 1:
+                    print("============================")
                     print("BEFORE MERGE")
                     print(cur_state)
                     print(prev_state)
+                    print("============================")
                 if self.method == "Test75":
                     cur_state = self.merge_top_wt(cur_state, prev_state)
             
