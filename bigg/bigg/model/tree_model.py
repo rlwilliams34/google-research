@@ -495,6 +495,8 @@ class FenwickTree(nn.Module):
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         print(list_last_edge)
+        print(edge_feats_embed_l[0].shape)
+        print(cur_state[0].shape)
         if list_last_edge is not None and len(list_last_edge[1][1]):
             cur_1_idx = list_last_edge[1][1]
             weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
