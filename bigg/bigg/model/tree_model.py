@@ -1216,7 +1216,7 @@ class RecurTreeGen(nn.Module):
                     left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
 #                 if self.method != "Test75":
-#                     h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
+                h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
                 left_ids = tuple([None] + list(left_ids[1:]))
 
