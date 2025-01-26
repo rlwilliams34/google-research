@@ -1008,7 +1008,10 @@ class RecurTreeGen(nn.Module):
                 h_buf = h_buf_list[d + 1]
                 c_buf = c_buf_list[d + 1]
             h_bot, c_bot = fn_hc_bot(d + 1)
-            
+            print("````````````````````````````````")
+            print("D: ", d)
+            print(fn_ids)
+            print("````````````````````````````````")
             if self.has_edge_feats and self.method != "Test75":
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
