@@ -958,7 +958,6 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols)
             else:
                 summary_state = self.lr2p_cell(left_state, right_state)
-                print("Hi")
                 if self.method == "Test75":
                     joint_summary_state = self.joint_lr2p_cell(joint_left_state, joint_right_state)
             if self.has_edge_feats:
