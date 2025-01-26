@@ -496,11 +496,11 @@ class FenwickTree(nn.Module):
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
         if list_last_edge is not None and len(list_last_edge[1][1]):
-            print("WE ARE HERE")
             cur_1_idx = list_last_edge[1][1]
-            print(cur_1_idx)
             weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
+            print(cur_state_1[0])
+            print(weight_state[0])
             cur_state_1 = func(cur_state_1, weight_state)
             cur_state[0][:, cur_1_idx] = cur_state_1[0]
             cur_state[1][:, cur_1_idx] = cur_state_1[1]
@@ -905,6 +905,10 @@ class RecurTreeGen(nn.Module):
             ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
+                if i == 1:
+                    print("BEFORE MERGE")
+                    print(cur_state)
+                    print(prev_state)
                 if self.method == "Test75":
                     cur_state = self.merge_top_wt(cur_state, prev_state)
             
