@@ -313,8 +313,8 @@ class _tree_lib(object):
                 mrs = [(rch[i] if lch[i] > -1 else rch[i]) for i in range(len(rch))]
                 edge_idx[d] = edge_idx_it
                 
-                old_lch = lch
-                old_rch = rch
+                #old_lch = lch
+                #old_rch = rch
                 
                 if d == 0:
                     return edge_idx
@@ -327,8 +327,11 @@ class _tree_lib(object):
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
                 cur_weights[is_nonleaf] = edge_idx_it
                 cur_weights[~is_nonleaf] = cur_edge_idx
+                print(cur_weights)
+                print(cur_ege_idx)
+                print(cur_idx_it)
                 
-                num_parents = self.QueryNonLeaf(d - 1)
+                is_nonleaf = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 lch = np.array([-1] * num_internal_parents)
                 rch = np.array([-1] * num_internal_parents)
@@ -336,8 +339,20 @@ class _tree_lib(object):
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
                 
-                lch[test_is_left] = cur_weights[test_is_left]
-                rch[test_is_right] = cur_weights[test_is_right]
+                print(is_nonleaf)
+                print(num_internal_parents)
+                print(lch)
+                print(rch)
+                print(tet_is_left)
+                print(test_is_right)
+                
+                
+                lch[test_is_left.astype(bool)] = cur_weights[test_is_left.astype(bool)]
+                rch[test_is_right.astype(bool)] = cur_weights[test_is_right.astype(bool)]
+                
+                print(lch)
+                print(rch)
+                print("END LEVEL")
         return edge_idx    
 
     def QueryNonLeaf(self, depth):
