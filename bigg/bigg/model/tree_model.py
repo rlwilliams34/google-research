@@ -1108,6 +1108,7 @@ class RecurTreeGen(nn.Module):
                 h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
                 left_ids = tuple([None] + list(left_ids[1:]))
+                
 
             left_subtree_states = tree_state_select(h_bot, c_bot,
                                                     h_next_buf, c_next_buf,
