@@ -1121,10 +1121,10 @@ class RecurTreeGen(nn.Module):
                 edge_idx[d] = []
                 print("N IS ZERO")
             else:
-                has_left, num_left = TreeLib.GetChLabel(-1, lv + 1)
-                has_right, num_right = TreeLib.GetChLabel(1, lv + 1)
-                print("has left: ", has_left.shape)
-                print("Has right: ", has_right.shape)
+                test_has_left, test_num_left = TreeLib.GetChLabel(-1, lv + 1)
+                test_has_right, test_num_right = TreeLib.GetChLabel(1, lv + 1)
+                print("has left: ", test_has_left.shape)
+                print("Has right: ", test_has_right.shape)
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 
             print("Current State Size: ", cur_states[0].shape)
