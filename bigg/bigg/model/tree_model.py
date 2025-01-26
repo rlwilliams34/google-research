@@ -596,108 +596,6 @@ class FenwickTree(nn.Module):
         edge_c = multi_index_select(hist_froms, hist_tos, *hist_c_list)
         edge_embeddings = (edge_h, edge_c)
         return edge_embeddings
-        
-    def forward_train_75(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, h_buf0_wt, c_buf0_top, weight_state=None, func=None):
-        # embed row tree
-        tree_agg_ids = TreeLib.PrepareRowEmbed()
-        row_embeds = [(self.init_h0, self.init_c0)]
-        row_embeds_wt = [(self.init_h0, self.init_c0)]
-        if self.has_edge_feats or self.has_node_feats:
-            feat_dict = c_bot
-            if 'node' in feat_dict:
-                node_feats, is_tree_trivial, t_lch, t_rch = feat_dict['node']
-                sel_feat = node_feats[is_tree_trivial]
-                feat_dict['node'] = (sel_feat[t_lch], sel_feat[t_rch])
-            h_bot, c_bot = h_bot
-        if h_bot is not None:
-            row_embeds.append((h_bot, c_bot))
-            row_embeds_wt.append((h_bot, c_bot))
-        if prev_rowsum_h is not None:
-            row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
-        if h_buf0 is not None:
-            row_embeds.append((h_buf0, c_buf0))
-            row_embeds_wt.append((h_buf0_wt, c_buf0_top))
-
-        for i, all_ids in enumerate(tree_agg_ids):
-            fn_ids = lambda x: all_ids[x]
-            lstm_func = batch_tree_lstm3
-            if i == 0 and (self.has_edge_feats or self.has_node_feats):
-                lstm_func = featured_batch_tree_lstm3
-            lstm_func = partial(lstm_func, h_buf=row_embeds[-1][0], c_buf=row_embeds[-1][1],
-                                h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
-            
-            lstm_func_wt = partial(lstm_func, h_buf=row_embeds_wt[-1][0], c_buf=row_embeds_wt[-1][1],
-                                h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
-            if i == 0:
-                if self.has_edge_feats or self.has_node_feats:
-                    if self.method == "Test75":
-                        method = "Special"
-                    
-                    else:
-                        method = self.method
-                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=None)
-                    new_states_wt = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=method, func=func, weight_state=weight_state)
-                else:
-                    new_states = lstm_func(h_bot, c_bot)
-            else:
-                new_states = lstm_func(None, None)
-                new_states_wt = lstm_func_wt(None, None)
-            row_embeds.append(new_states)
-            row_embeds_wt.append(new_states_wt)
-        
-        h_list, c_list = zip(*row_embeds)
-        joint_h = torch.cat(h_list, dim=1)
-        joint_c = torch.cat(c_list, dim=1)
-        
-        h_list_wt, c_list_wt = zip(*row_embeds_wt)
-        joint_h_wt = torch.cat(h_list_wt, dim=1)
-        joint_c_wt = torch.cat(c_list_wt, dim=1)
-
-        # get history representation
-        init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
-        cur_state = (joint_h[:, init_select], joint_c[:, init_select])
-        cur_state_wt = (joint_h_wt[:, init_select], joint_c_wt[:, init_select])
-        
-        
-        if self.has_node_feats:
-            base_nodes, _ = TreeLib.GetFenwickBase()
-            if len(base_nodes):
-                needs_base_nodes = (init_select >= 1) & (init_select <= 2)
-                sub_states = (cur_state[0][needs_base_nodes], cur_state[1][needs_base_nodes])
-                sub_states = self.node_feat_update(node_feats[base_nodes], sub_states)
-                nz_idx = torch.tensor(np.nonzero(needs_base_nodes)[0]).to(node_feats.device)
-                new_cur = [scatter(x, nz_idx, dim=0, dim_size=init_select.shape[0]) for x in sub_states]
-                needs_base_nodes = torch.tensor(needs_base_nodes, dtype=torch.bool).to(node_feats.device).unsqueeze(1)
-                cur_state = [torch.where(needs_base_nodes, new_cur[i], cur_state[i]) for i in range(2)]
-                cur_state = tuple(cur_state)
-        ret_state = (joint_h[:, next_ids], joint_c[:, next_ids])
-        ret_state_wt = (joint_h_wt[:, next_ids], joint_c_wt[:, next_ids])
-        hist_rnn_states = []
-        hist_froms = []
-        hist_tos = []
-        for i, (done_from, done_to, proceed_from, proceed_input) in enumerate(all_ids):
-            hist_froms.append(done_from)
-            hist_tos.append(done_to)
-            hist_rnn_states.append(cur_state)
-
-            next_input = joint_h[:, proceed_input], joint_c[:, proceed_input]
-            sub_state = cur_state[0][:, proceed_from], cur_state[1][:, proceed_from]
-            cur_state = self.summary_cell(sub_state, next_input)
-            
-            next_input_wt = joint_h_wt[:, proceed_input], joint_c_wt[:, proceed_input]
-            sub_state_wt = cur_state_wt[0][:, proceed_from], cur_state_wt[1][:, proceed_from]
-            cur_state_wt = self.summary_cell(sub_state_wt, next_input_wt)
-            
-        hist_rnn_states.append(cur_state)
-        hist_froms.append(None)
-        hist_tos.append(last_tos)
-        hist_h_list, hist_c_list = zip(*hist_rnn_states)
-        pos_embed = self.pos_enc(pos_info)
-        row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
-        row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
-        #print(row_h)
-        return (row_h, row_c), ret_state
-
 
 class BitsRepNet(nn.Module):
     def __init__(self, args):
@@ -872,14 +770,14 @@ class RecurTreeGen(nn.Module):
         
         if not tree_node.has_edge:  # an empty tree
             if self.method == "Test75":
-                return ll, ll_wt, self.get_empty_state(), 0, None, prev_state, self.get_empty_state()
+                return ll, ll_wt, self.get_empty_state(), 0, None, prev_state
             return ll, ll_wt, self.get_empty_state(), 0, None, prev_state, None
 
         if tree_node.is_leaf:
             tree_node.bits_rep = [0]
             col_sm.add_edge(tree_node.col_range[0])
             if self.bits_compress:
-                return ll, self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols), 1, None, None, None
+                return ll, self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols), 1, None, None
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
@@ -889,19 +787,19 @@ class RecurTreeGen(nn.Module):
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                     else:
                         if self.method == "Test75":
-                            edge_embed, joint_state_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
+                            edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                             prev_state = edge_embed
-                            return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state, joint_state_embed
+                            return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                         
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                         prev_state = edge_embed
                         
-                        return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state, None
+                        return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                             
                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state, None
                     
                 else:
-                    return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None, None
+                    return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None
         else:
             tree_node.split()
 
@@ -931,17 +829,17 @@ class RecurTreeGen(nn.Module):
                 num_left = 0
 
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
-            
-            if self.method == "Test75":
-                topdown_state = self.l2r_cell(state, (joint_left_state[0] + right_pos, joint_left_state[1] + right_pos), tree_node.depth)
-            
-            else:
-                topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
-            
+            topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
+            ## Here, use an LSTM to update the topological left state prior with the most recent edge weight (left_Edge_feats[-1?]).  I think after topdown update
+            # if self.method == "Test75":
+                #left_state = self.update_wt(self.standardize_edge_feats(left_feats[-1]), left_state)
 #             if self.has_edge_feats and self.method == "Test75" and tree_node.lch.is_leaf and has_left:
 #                 ### Potentially ignore this for the topdown state updates....
 #                 left_edge_embed = self.standardize_edge_feats(left_edge_feats)
 #                 topdown_state = self.update_wt(left_edge_embed, topdown_state)
+            
+#             if has_left and self.has_edge_feats and self.method == "Test75":
+#                 topdown_state = self.update_wt(topdown_state, prev_state) ##maybe..?
             
             rlb = max(0, lb - num_left)
             rub = min(tree_node.rch.n_cols, ub - num_left)
@@ -962,7 +860,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.cell_topright(self.topdown_right_embed[[int(has_right)]], topdown_state, tree_node.depth)
 
             if has_right:  # has edge in right child
-                ll, ll_wt, right_state, num_right, right_edge_feats, prev_state, joint_right_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, row=row, prev_state=prev_state)
+                ll, ll_wt, right_state, num_right, right_edge_feats, prev_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, row=row, prev_state=prev_state)
                 pred_edge_feats.append(right_edge_feats)
             else:
                 right_state = self.get_empty_state()
@@ -972,13 +870,9 @@ class RecurTreeGen(nn.Module):
                 summary_state = self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols)
             else:
                 summary_state = self.lr2p_cell(left_state, right_state)
-                if self.method == "Test75":
-                    joint_summary_state = self.joint_lr2p_cell(joint_left_state, joint_right_state)
             if self.has_edge_feats:
                 edge_feats = torch.cat(pred_edge_feats, dim=0)
-            if self.method == "Test75":
-                return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_state, joint_summary_state
-            return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_state, None
+            return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_state
             
 
     def forward(self, node_end, edge_list=None, node_feats=None, edge_feats=None, node_start=0, list_states=[], lb_list=None, ub_list=None, col_range=None, num_nodes=None, display=False):
@@ -1094,10 +988,6 @@ class RecurTreeGen(nn.Module):
         max_level = len(all_ids) - 1
         h_buf_list = [None] * (len(all_ids) + 1)
         c_buf_list = [None] * (len(all_ids) + 1)
-        
-        if self.method == "Test75":
-            h_buf_list_wt = [None] * (len(all_ids) + 1)
-            c_buf_list_wt = [None] * (len(all_ids) + 1)
 
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]
@@ -1113,12 +1003,6 @@ class RecurTreeGen(nn.Module):
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, method=self.method)
             else:
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
-                if self.method == "Test75":
-                    edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
-                    local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
-                    new_h_wt, new_c_wt = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.joint_lr2p_cell, method=None)
-                    h_buf_list_wt[d] = new_h_wt
-                    c_buf_list_wt[d] = new_c_wt
             h_buf_list[d] = new_h
             c_buf_list[d] = new_c
         hc_bot = fn_hc_bot(0)
@@ -1136,8 +1020,6 @@ class RecurTreeGen(nn.Module):
             feat_dict['node'] = (node_feats, is_tree_trivial, t_lch, t_rch)
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
-        if self.method == "Test75":
-            return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, h_buf_list_wt, c_buf_list_wt
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
     
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
@@ -1164,7 +1046,7 @@ class RecurTreeGen(nn.Module):
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
         
         if self.method == "Test75":
-            hc_bot, fn_hc_bot, h_buf_list, c_buf_list, h_buf_list_wt, c_buf_list_wt = self.forward_row_trees(graph_ids, node_feats, edge_feats_topdown, list_node_starts, num_nodes, list_col_ranges)
+            hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_topdown, list_node_starts, num_nodes, list_col_ranges)
             cur_state = (h_buf_list[0], c_buf_list[0])
             weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
             cur_state = self.merge_top_wt(cur_state, weight_state)
@@ -1215,10 +1097,7 @@ class RecurTreeGen(nn.Module):
             left_ids = TreeLib.GetLeftRootStates(lv)
             h_bot, c_bot = fn_hc_bot(lv + 1)
             if lv + 1 < len(h_buf_list):
-                if self.method == "Test75":
-                    h_next_buf, c_next_buf = h_buf_list_wt[lv + 1], c_buf_list_wt[lv + 1]
-                else:
-                    h_next_buf, c_next_buf = h_buf_list[lv + 1], c_buf_list[lv + 1]
+                h_next_buf, c_next_buf = h_buf_list[lv + 1], c_buf_list[lv + 1]
             else:
                 h_next_buf = c_next_buf = None
 
@@ -1248,6 +1127,8 @@ class RecurTreeGen(nn.Module):
 #                 leaf_topdown_states = self.update_wt(left_feats_stand, leaf_topdown_states)
 #                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
 #                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
+## Challenge: Need the edge feat that corresponds to the topdown state that is being referenced...
+## For each topdown state, need the corresponding edge feature to be udpated ....
 
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]

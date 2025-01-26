@@ -269,8 +269,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             elif self.method in ["Test286", "Test75"]:
                 edge_embed = self.leaf_LSTM(edge_feats_normalized)
-                if self.method == "Test75":
-                    edge_embed_topdown = self.update_wt(edge_feats_normalized, (self.leaf_h0.repeat(1, B, 1), self.leaf_h0.repeat(1, B, 1)))
             
             elif self.method == "Test287":
                 # Just use MLP for init state"
@@ -291,14 +289,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                 s_in = (self.leaf_h0.repeat(1, B, 1), self.leaf_c0.repeat(1, B, 1))
                 edge_embed = self.leaf_LSTM(x_in, s_in)
             
-#             if list_num_edges is None:
-#                 edge_embed = self.weight_tree(edge_embed)
-#             
-#             else:
-#                 edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges, db_info)
+            if list_num_edges is None:
+                edge_embed = self.weight_tree(edge_embed)
             
-            if self.method == "Test75":
-                return edge_embed, edge_embed_topdown
+            else:
+                edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges, db_info)
+            
             return edge_embed
         
 #         elif self.method == "Test75":
