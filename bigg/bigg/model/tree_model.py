@@ -34,29 +34,37 @@ from functools import partial
 
 
 
-# def get_max_deg(train_graphs):
-#     max_degrees = []
-#     for G in train_graphs:
-#         degrees = [deg for (node, deg) in G.degree()]
-#         max_degrees.append(np.max(degrees))
-#     return np.max(degrees)
-# 
-# def get_edge_feats_lstm(g, max_deg=-1):
-#     if max_deg=-1:
-#         degrees = [deg for (node, deg) in g.degree()]
-#         max_deg = np.max(degrees)
-#     list_of_edge_feats = []
-#     init_edge = []
-#     for i in len(range(g.nodes())):
-#         x = list(g.edges(i, data=True))
-#         x = sorted(x, key= lambda y:y[1])
-#         x = list(g.edges(i, data=True))
-#         weights = [x[2]['weight'] for x in x]
-#         [x[0] > x[1] for x in x]
-# 
-# 
-# 
-# degrees = [val for (node, val) in G.degree()]
+def get_max_deg(train_graphs):
+    max_degrees = []
+    for G in train_graphs:
+        degrees = [deg for (node, deg) in G.degree()]
+        max_degrees.append(np.max(degrees))
+    return np.max(degrees)
+
+def get_edge_feats_lstm(g, max_deg=-1):
+    if max_deg==-1:
+        degrees = [deg for (node, deg) in g.degree()]
+        max_deg = np.max(degrees)
+    print("Max Degree: ", max_deg)
+    list_of_edge_feats = []
+    init_edge = []
+    for i in range(len(g.nodes())):
+        x = list(g.edges(i, data=True))
+        x = sorted(x, key= lambda y:y[1])
+        x = list(g.edges(i, data=True))
+        weights = [x[2]['weight'] for x in x]
+        init_idx = np.sum([x[0] > x[1] for x in x])
+        weights = np.pad(np.array(weights), (0, max_deg - len(weights)), 'constant', constant_values=-1)
+        list_of_edge_feats.append(weights[:, np.newaxis])
+        print(weights)
+        init_edge.append(init_edge)
+    return np.concatenate(list_of_edge_feats, -1), init_edge
+
+for i, j in list(g.edges()):
+    g[i][j]['weight'] = 1 / (i + j + 1)
+
+
+degrees = [val for (node, val) in G.degree()]
 ## HELPER FUNCTIONS FOR FENWICK TREE WEIGHTS
 def get_list_edge(cur_nedge_list):
     offset = 0
