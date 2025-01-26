@@ -302,7 +302,7 @@ def selective_update_hc(h, c, zero_one, feats):
 
 
 
-def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None, method=None, func=None, edge_embed_l=None, edge_embed_idx=None):
+def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_all_ids, cell, t_lch=None, t_rch=None, cell_node=None, method=None, func=None, weight_state=None, edge_embed_idx=None):
     new_ids = [list(fn_all_ids(0)), list(fn_all_ids(1))]
     lch_isleaf, rch_isleaf = new_ids[0][0], new_ids[1][0]
     new_ids[0][0] = new_ids[1][0] = None
@@ -324,7 +324,6 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         h_vecs, c_vecs = tree_state_select(local_hbot, local_cbot, h_buf, c_buf, lambda : new_ids[i])
         
         if method == "Special" and np.sum(leaf_check) > 0:
-            weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
             new_local_hbot, new_local_cbot = func((h_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1), c_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1)), weight_state)
             h_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_hbot
             c_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_cbot
@@ -354,7 +353,7 @@ def batch_tree_lstm3(h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cel
         return cell((h_list[0], c_list[0]), (h_list[1], c_list[1]))
 
 
-def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node, method, func=None, edge_embed_l=None, edge_embed_idx=None):
+def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_past, fn_all_ids, cell, cell_node, method, func=None, weight_state=None):
     edge_feats = is_rch = None
     t_lch = t_rch = None
     if 'edge' in feat_dict:
@@ -362,11 +361,11 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
     if 'node' in feat_dict:
         t_lch, t_rch = feat_dict['node']
     if h_past is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, method, func, edge_embed_l, edge_embed_idx)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, lambda i: fn_all_ids(i)[:-2], cell, t_lch, t_rch, cell_node, method, func, weight_state)
     elif h_bot is None:
         return batch_tree_lstm2(h_buf, c_buf, h_past, c_past, lambda i: fn_all_ids(i)[2:], cell)
     elif h_buf is None:
-        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, method, func, edge_embed_l, edge_embed_idx)
+        return featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_past, c_past, lambda i: fn_all_ids(i)[0, 1, 4, 5], cell, t_lch, t_rch, cell_node, method, func, weight_state)
     else:
         raise NotImplementedError  #TODO: handle model parallelism with features
 
@@ -438,7 +437,7 @@ class FenwickTree(nn.Module):
                 state = self.summary_cell(state, cur_state)
         return state
 
-    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, edge_feats_embed_l=None, list_last_edge=None, func=None):
+    def forward_train(self, h_bot, c_bot, h_buf0, c_buf0, prev_rowsum_h, prrev_rowsum_c, weight_state=None, func=None):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
@@ -456,12 +455,12 @@ class FenwickTree(nn.Module):
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
         
-        if list_last_edge is not None:
-            cur_state = row_embeds[-1]
-            weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
-            
-            cur_state = func(cur_state, weight_state)
-            row_embeds[-1] = cur_state
+#         if list_last_edge is not None:
+#             cur_state = row_embeds[-1]
+#             weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
+#             
+#             cur_state = func(cur_state, weight_state)
+#             row_embeds[-1] = cur_state
 
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
@@ -477,7 +476,7 @@ class FenwickTree(nn.Module):
                     
                     else:
                         method = self.method
-                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=method, func=func, edge_embed_l=edge_feats_embed_l, edge_embed_idx=(list_last_edge[1][0] if list_last_edge is not None else None))
+                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=method, func=func, weight_state=weight_state)
                 else:
                     new_states = lstm_func(h_bot, c_bot)
             else:
@@ -1012,7 +1011,14 @@ class RecurTreeGen(nn.Module):
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
         
         if self.method == "Test75":
-            row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, edge_feats_embed, list_last_edge, self.merge_top_wt)
+            cur_state = (h_buf_list[0], c_buf_list[0])
+            weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
+            cur_state = func(cur_state, weight_state)
+            
+            edge_embed_idx = list_last_edge[1][0]
+            weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
+            row_states, next_states = self.row_tree.forward_train(*hc_bot, cur_state[0], cur_state[1], *prev_rowsum_states, weight_state, self.merge_top_wt)
+        
         else:
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
         if self.has_node_feats:
