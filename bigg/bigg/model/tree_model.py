@@ -1115,7 +1115,7 @@ class RecurTreeGen(nn.Module):
                 h_next_buf = c_next_buf = None
             
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            n = TreeLib.lib.NumInternalNodes(depth)
+            n = TreeLib.lib.NumInternalNodes(d)
             edge_idx_it = np.zeros((n,), dtype=np.int32)
             if n == 0:
                 edge_idx[d] = []
