@@ -343,7 +343,7 @@ class _tree_lib(object):
                 print(num_internal_parents)
                 print(lch)
                 print(rch)
-                print(tet_is_left)
+                print(test_is_left)
                 print(test_is_right)
                 
                 
