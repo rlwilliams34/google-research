@@ -1123,6 +1123,7 @@ class RecurTreeGen(nn.Module):
             else:
                 test_has_left, test_num_left = TreeLib.GetChLabel(-1, lv + 1)
                 test_has_right, test_num_right = TreeLib.GetChLabel(1, lv + 1)
+                print(n)
                 print("has left: ", test_has_left.shape)
                 print("Has right: ", test_has_right.shape)
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
