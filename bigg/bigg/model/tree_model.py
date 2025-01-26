@@ -468,6 +468,8 @@ class FenwickTree(nn.Module):
             print(cur_state[0].shape)
             print(edge_feats_embed_l[0].shape)
             print(list_last_edge[0].shape)
+            print(list_last_edge[0])
+            
             cur_state = func(cur_state, weight_state)
             row_embeds[-1] = cur_state
 
