@@ -326,6 +326,11 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
         if method == "Special" and np.sum(leaf_check) > 0:
             weight_state = (edge_embed_l[0][:, edge_embed_idx], edge_embed_l[1][:, edge_embed_idx])
             new_local_hbot, new_local_cbot = func((h_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1), c_bot[:, 1:2].repeat(1, np.sum(leaf_check), 1)), weight_state)
+            print(leaf_check)
+            print(weight_state)
+            print(h_bot[:, 1:2])
+            print(new_local_hbot)
+            
             h_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_hbot
             c_vecs[:, new_ids[i][1][leaf_check == 1]] = new_local_cbot
         h_list.append(h_vecs)
@@ -1030,9 +1035,7 @@ class RecurTreeGen(nn.Module):
         hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
         
         if self.method == "Test75":
-            edge_feats_embed_h = torch.cat([self.weight_tree.init_h0, edge_feats_embed[0]], dim = 1)
-            edge_feats_embed_c = torch.cat([self.weight_tree.init_c0, edge_feats_embed[1]], dim = 1)
-            row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, (edge_feats_embed_h, edge_feats_embed_c), list_last_edge, self.merge_top_wt)
+            row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, edge_feats_embed, list_last_edge, self.merge_top_wt)
         else:
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states)
         if self.has_node_feats:
