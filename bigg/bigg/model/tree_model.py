@@ -1042,7 +1042,7 @@ class RecurTreeGen(nn.Module):
             edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
         
         if self.method == "Test75":
-            hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_topdown, list_node_starts, num_nodes, list_col_ranges)
+            hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
             cur_state = (h_buf_list[0], c_buf_list[0])
             weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
             cur_state = self.merge_top_wt(cur_state, weight_state)
@@ -1097,10 +1097,10 @@ class RecurTreeGen(nn.Module):
             else:
                 h_next_buf = c_next_buf = None
 
-            if self.has_edge_feats:
+            if self.has_edge_feats and self.method != "Test75":
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                 if self.method == "Test75":
-                    left_feats = (edge_feats_topdown[0][:, edge_idx[~is_rch]], edge_feats_topdown[1][:, edge_idx[~is_rch]])
+                    left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 else:
                     left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
