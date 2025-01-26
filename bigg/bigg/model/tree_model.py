@@ -71,7 +71,6 @@ from functools import partial
 ## THEN WILL NEED SOME INDEXING THAT GRABS EACH GET FROM THE CORRECT LIST
 
 
-degrees = [val for (node, val) in G.degree()]
 ## HELPER FUNCTIONS FOR FENWICK TREE WEIGHTS
 def get_list_edge(cur_nedge_list):
     offset = 0
