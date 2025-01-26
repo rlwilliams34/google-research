@@ -537,7 +537,7 @@ class FenwickTree(nn.Module):
         pos_embed = self.pos_enc(pos_info)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
-        print(row_h)
+        #print(row_h)
         return (row_h, row_c), ret_state
 
     def forward_train_weights(self, edge_feats_init_embed, list_num_edges, db_info):
@@ -889,12 +889,6 @@ class RecurTreeGen(nn.Module):
             ub = cur_row.root.n_cols if ub_list is None else ub_list[i]
             cur_pos_embed = self.row_tree.pos_enc([num_nodes - i])
             controller_state = [x + cur_pos_embed for x in controller_state]
-            if i <= 2:
-                print("============================")
-                print("CURRENT STATE AFTER POS ENCODING")
-                print("i: ", i)
-                print(controller_state)
-                print("============================")
             
             if self.has_node_feats:
                 target_node_feats = None if node_feats is None else node_feats[[i]]
@@ -908,18 +902,8 @@ class RecurTreeGen(nn.Module):
             ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
-                if i <= 2:
-                    print("============================")
-                    print("BEFORE MERGE")
-                    print(cur_state)
-                    print(prev_state)
-                    print("============================")
                 if self.method == "Test75":
                     cur_state = self.merge_top_wt(cur_state, prev_state)
-                    if i <= 2:
-                        print("AFTER MERGE")
-                        print(cur_state)
-                        print("+++++++++++++++++++++++++++++")
             
             if self.has_node_feats:
                 target_feat_embed = self.embed_node_feats(target_node_feats)
