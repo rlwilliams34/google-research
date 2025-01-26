@@ -265,7 +265,9 @@ class _tree_lib(object):
     
     
     def GetTopdownEdgeIdx(self, max_depth=-1, dtype=None):
-        edge_idx = [None] * (max_depth + 1)
+        edge_idx = [None] * (max_depth + 2)
+        print(edge_idx)
+        print(len(edge_idx))
         for d in range(max_depth + 1, -1, -1): ##BACKWARDS....
             print("Current level: ", d)
             is_nonleaf = self.QueryNonLeaf(d)
@@ -297,6 +299,9 @@ class _tree_lib(object):
                 print(test_is_right)
                 left_children_feats[test_is_left] = cur_edge_idx[test_is_left]
                 right_children_feats[test_is_right] = cur_edge_idx[test_is_right]
+                
+                print(left_children_feats)
+                print(right_children_feats)
                 
                 edge_idx[d] = edge_idx_it
             
