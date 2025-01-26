@@ -988,9 +988,19 @@ class RecurTreeGen(nn.Module):
         max_level = len(all_ids) - 1
         h_buf_list = [None] * (len(all_ids) + 1)
         c_buf_list = [None] * (len(all_ids) + 1)
-
+        
+        if self.method == "Test75":
+            left_feat_idx = [None] * (len(all_ids) + 1)
+        
+        for d in range(len(all_ids) -1, -1, -1):
+            print("----------------------------")
+            print("D")
+            edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
+            print("Edge idx shape: ", edge_idx.shape)
+            print("Is Rch shape: ", is_rch.shape)
+            print("----------------------------")
+        
         for d in range(len(all_ids) - 1, -1, -1):
-            print("THIS IS D: ", d)
             fn_ids = lambda i: all_ids[d][i]
             if d == max_level:
                 h_buf = c_buf = None
@@ -998,6 +1008,7 @@ class RecurTreeGen(nn.Module):
                 h_buf = h_buf_list[d + 1]
                 c_buf = c_buf_list[d + 1]
             h_bot, c_bot = fn_hc_bot(d + 1)
+            
             if self.has_edge_feats and self.method != "Test75":
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
