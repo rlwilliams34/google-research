@@ -1133,7 +1133,7 @@ class RecurTreeGen(nn.Module):
                 print(is_nonleaf)
                 if lv < 2:
                     test_is_left, _ = TreeLib.GetChLabel(-1, lv + 1)
-                    test_is_right, _ = TreeLib.GetChLabel(-1, lv - 1)
+                    test_is_right, _ = TreeLib.GetChLabel(-1, lv + 1)
                     print(test_is_left) # <-- Gives boolean for whether this is a LEFT or RIGHT child state
                     print(test_is_right)
                     print(is_nonleaf)
