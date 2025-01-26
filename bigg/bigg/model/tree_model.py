@@ -495,16 +495,16 @@ class FenwickTree(nn.Module):
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
         
-        if list_last_edge is not None and len(list_last_edge[1][1]):
-            cur_1_idx = list_last_edge[1][1]
-            weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
-            cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
-            print("INPUT FOR NODE 1")
-            print(cur_state[0])
-            print(weight_state[0])
-            cur_state_1 = func(cur_state_1, weight_state)
-            cur_state[0][:, cur_1_idx] = cur_state_1[0]
-            cur_state[1][:, cur_1_idx] = cur_state_1[1]
+#         if list_last_edge is not None and len(list_last_edge[1][1]):
+#             cur_1_idx = list_last_edge[1][1]
+#             weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
+#             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
+#             print("INPUT FOR NODE 1")
+#             print(cur_state_1[0])
+#             print(weight_state[0])
+#             cur_state_1 = func(cur_state_1, weight_state)
+#             cur_state[0][:, cur_1_idx] = cur_state_1[0]
+#             cur_state[1][:, cur_1_idx] = cur_state_1[1]
         
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
