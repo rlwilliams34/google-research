@@ -1068,6 +1068,8 @@ class RecurTreeGen(nn.Module):
         lv=0
         while True:
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
+            print("+++++++++++++++++++++++++++++++++++++++++++++++")
+            print("New Level: ", lv)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
@@ -1096,25 +1098,39 @@ class RecurTreeGen(nn.Module):
                 h_next_buf, c_next_buf = h_buf_list[lv + 1], c_buf_list[lv + 1]
             else:
                 h_next_buf = c_next_buf = None
+                
+            
+            print("Current State Size: ", cur_state[0].shape))
 
-            if self.has_edge_feats and self.method != "Test75":
+            if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                 if self.method == "Test75":
                     left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 else:
                     left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
-#                 if self.method != "Test75":
-                h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
+                if self.method != "Test75":
+                    h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
+                
+                print("~~~~~~~~~~~ EDGE INFO ~~~~~~~~~~~~~~~~~~~")
+                print("Edge IDX Shape: ", edge_idx.shape)
+                print("Is RCH shape: ", is_rch)
+                print("LEFT IDS 0: ", left_ids[0])
+                print("~~~~~~~~~~~!!!!!!!!!!!~~~~~~~~~~~~~~~~~~~")
+                
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
                 left_ids = tuple([None] + list(left_ids[1:]))
                 
-
+            
             left_subtree_states = tree_state_select(h_bot, c_bot,
                                                     h_next_buf, c_next_buf,
                                                     lambda: left_ids)
+            print("left subtree state: ", left_subtree_states[0].shape)
 
             has_right, num_right = TreeLib.GetChLabel(1, lv)
+            print("Has right: ", has_right)
+            print("Num right: ", num_right)
+            print("+++++++++++++++++++++++++++++++++++++++++++++++")
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
