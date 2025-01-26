@@ -266,8 +266,8 @@ class _tree_lib(object):
     
     def GetTopdownEdgeIdx(self, max_depth=-1, dtype=None):
         edge_idx = [None] * (max_depth + 2)
-        left_children_feats = None
-        right_children_feats = None
+        lch = None
+        rch = None
         print(edge_idx)
         print(len(edge_idx))
         for d in range(max_depth + 1, -1, -1): ##BACKWARDS....
@@ -284,8 +284,8 @@ class _tree_lib(object):
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
                 is_nonleaf = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
-                left_children_feats = np.array([-1] * num_internal_parents)
-                right_children_feats = np.array([-1] * num_internal_parents)
+                lch = np.array([-1] * num_internal_parents)
+                rch = np.array([-1] * num_internal_parents)
                 
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
@@ -294,15 +294,15 @@ class _tree_lib(object):
                 print(cur_edge_idx) 
                 print(is_nonleaf)
                 print(num_internal_parents) 
-                print(left_children_feats)
-                print(right_children_feats) 
+                print(lch)
+                print(rch) 
                 print(test_is_left)
                 print(test_is_right)
-                left_children_feats[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
-                right_children_feats[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
+                lch[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
+                rch[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
                 
-                print(left_children_feats)
-                print(right_children_feats)
+                print(lch)
+                print(rch)
                 
                 edge_idx[d] = edge_idx_it
             
