@@ -1180,6 +1180,7 @@ class RecurTreeGen(nn.Module):
             
             print("TEST: ", topdown_state[0].shape)
             print("HAS LEFT: ", has_left.shape)
+            print("HAS LEFT INFO: ", has_left)
             print("+++++++++++++++++++++++++++++++++++++++++++++++")
 #             if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
 #                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
