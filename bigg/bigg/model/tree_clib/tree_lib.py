@@ -266,6 +266,8 @@ class _tree_lib(object):
     
     def GetTopdownEdgeIdx(self, max_depth=-1, dtype=None):
         edge_idx = [None] * (max_depth + 2)
+        left_children_feats = None
+        right_children_feats = None
         print(edge_idx)
         print(len(edge_idx))
         for d in range(max_depth + 1, -1, -1): ##BACKWARDS....
@@ -275,8 +277,7 @@ class _tree_lib(object):
             num_leaves = np.sum(~is_nonleaf)
             
             edge_idx_it = np.zeros((num_internal, ), dtype=np.int32)
-            left_children_feats = None
-            right_children_feats = None
+
             
             if left_children_feats is None:
                 assert num_internal == 0
@@ -297,8 +298,8 @@ class _tree_lib(object):
                 print(right_children_feats) 
                 print(test_is_left)
                 print(test_is_right)
-                left_children_feats[test_is_left] = cur_edge_idx[test_is_left]
-                right_children_feats[test_is_right] = cur_edge_idx[test_is_right]
+                left_children_feats[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
+                right_children_feats[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
                 
                 print(left_children_feats)
                 print(right_children_feats)
