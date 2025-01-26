@@ -1001,7 +1001,7 @@ class RecurTreeGen(nn.Module):
             print("----------------------------")
         
         print("BIG TEEST MOMENT:", max_level)
-        test = GetTopdownEdgeIdx(max_level)
+        test = TreeLib.GetTopdownEdgeIdx(max_level)
         print(test)
         print(STOP)
         
