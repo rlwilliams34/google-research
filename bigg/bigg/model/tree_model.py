@@ -1010,7 +1010,7 @@ class RecurTreeGen(nn.Module):
             h_bot, c_bot = fn_hc_bot(d + 1)
             print("````````````````````````````````")
             print("D: ", d)
-            print(fn_ids)
+            print(all_ids[d])
             print("````````````````````````````````")
             if self.has_edge_feats and self.method != "Test75":
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
@@ -1115,7 +1115,7 @@ class RecurTreeGen(nn.Module):
                 h_next_buf = c_next_buf = None
                 
             
-            print("Current State Size: ", cur_state[0].shape)
+            print("Current State Size: ", cur_states[0].shape)
 
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
