@@ -470,10 +470,11 @@ class FenwickTree(nn.Module):
             print(list_last_edge[0].shape)
             print(list_last_edge[0])
             
-            cur_state = func(cur_state, weight_state)
-            row_embeds[-1] = cur_state
+            #cur_state = func(cur_state, weight_state)
+            #row_embeds[-1] = cur_state
 
         for i, all_ids in enumerate(tree_agg_ids):
+            print(all_ids)
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
             if i == 0 and (self.has_edge_feats or self.has_node_feats):
@@ -493,7 +494,7 @@ class FenwickTree(nn.Module):
             else:
                 new_states = lstm_func(None, None)
             row_embeds.append(new_states)
-        
+        print(STOP)
         h_list, c_list = zip(*row_embeds)
         joint_h = torch.cat(h_list, dim=1)
         joint_c = torch.cat(c_list, dim=1)
