@@ -1113,8 +1113,20 @@ class RecurTreeGen(nn.Module):
                 h_next_buf, c_next_buf = h_buf_list[lv + 1], c_buf_list[lv + 1]
             else:
                 h_next_buf = c_next_buf = None
-                
             
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            n = self.lib.NumInternalNodes(depth)
+            edge_idx_it = np.zeros((n,), dtype=np.int32)
+            if n == 0:
+                edge_idx[d] = []
+                print("N IS ZERO"")
+            else:
+                has_left, num_left = GetChLabel(-1, d + 1)
+                has_right, num_right = GetChLabel(1, d + 1)
+                print("has left: ", has_left.shape)
+                print("Has right: ", has_right.shape)
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                
             print("Current State Size: ", cur_states[0].shape)
 
             if self.has_edge_feats:
