@@ -278,7 +278,7 @@ class _tree_lib(object):
             
             if left_children_feats is None:
                 assert num_internal == 0
-                cur_edge_idx, _ = self.GetEdgeandLR(d)
+                cur_edge_idx, _ = self.GetEdgeAndLR(d)
                 num_parents = self.QueryNonleaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 left_children_feats = np.array([-1] * num_internal_parents)
@@ -306,11 +306,11 @@ class _tree_lib(object):
                     return edge_idx
                 
                 # edge_idx_it ==> WEIGHTS CORRESPONDING TO INTERNAL NODES
-                # cur_edge_idx, _ = GetEdgeandLR(d) ==> WEIGHTS CORRESPONDING TO LEAVES
+                # cur_edge_idx, _ = GetEdgeAndLR(d) ==> WEIGHTS CORRESPONDING TO LEAVES
                 
                 is_nonleaf = self.QueryNonLeaf(d)
                 cur_weights = np.zeros((len(is_nonleaf, )), dtype=np.int32)
-                cur_edge_idx, _ = self.GetEdgeandLR(d)
+                cur_edge_idx, _ = self.GetEdgeAndLR(d)
                 cur_weights[is_nonleaf] = edge_idx_it
                 cur_weights[~is_nonleaf] = cur_edge_idx
                 
