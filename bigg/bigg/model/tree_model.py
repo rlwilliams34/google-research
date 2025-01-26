@@ -33,35 +33,42 @@ from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
 
 
+# 
+# def get_max_deg(train_graphs):
+#     max_degrees = []
+#     for G in train_graphs:
+#         degrees = [deg for (node, deg) in G.degree()]
+#         max_degrees.append(np.max(degrees))
+#     return np.max(degrees)
+# 
+# def get_edge_feats_lstm(g, max_deg=-1, offset=0):
+#     if max_deg==-1:
+#         degrees = [deg for (node, deg) in g.degree()]
+#         max_deg = np.max(degrees)
+#     print("Max Degree: ", max_deg)
+#     list_of_edge_feats = []
+#     init_edge = []
+#     num_edge = 0
+#     for i in range(len(g.nodes())):
+#         x = list(g.edges(i, data=True))
+#         x = sorted(x, key= lambda y:y[1])
+#         weights = [x[2]['weight'] for x in x]
+#         num_new_edge = np.sum([x[0] > x[1] for x in x])
+#         if num_new_edge > 0:
+#             new_idx = np.arange(num_new_edge) + max_deg * i
+#             init_edge.append(new_idx)
+#         num_edge += num_new_edge
+#         
+#         weights = np.pad(np.array(weights), (0, max_deg - len(weights)), 'constant', constant_values=-1)
+#         list_of_edge_feats.append(weights[:, np.newaxis])
+#     return np.concatenate(list_of_edge_feats, -1), np.concatenate(init_edge)
+# 
+# test = [[k for k in list(g.neighbors(i)) if k < i] for i in range(len(g))]
+# test = [x for x in test if np.sum(x) > 0]
+# [k for k in list(g.neighbors(12)) if k < 12]
 
-def get_max_deg(train_graphs):
-    max_degrees = []
-    for G in train_graphs:
-        degrees = [deg for (node, deg) in G.degree()]
-        max_degrees.append(np.max(degrees))
-    return np.max(degrees)
-
-def get_edge_feats_lstm(g, max_deg=-1):
-    if max_deg==-1:
-        degrees = [deg for (node, deg) in g.degree()]
-        max_deg = np.max(degrees)
-    print("Max Degree: ", max_deg)
-    list_of_edge_feats = []
-    init_edge = []
-    for i in range(len(g.nodes())):
-        x = list(g.edges(i, data=True))
-        x = sorted(x, key= lambda y:y[1])
-        x = list(g.edges(i, data=True))
-        weights = [x[2]['weight'] for x in x]
-        init_idx = np.sum([x[0] > x[1] for x in x])
-        weights = np.pad(np.array(weights), (0, max_deg - len(weights)), 'constant', constant_values=-1)
-        list_of_edge_feats.append(weights[:, np.newaxis])
-        print(weights)
-        init_edge.append(init_edge)
-    return np.concatenate(list_of_edge_feats, -1), init_edge
-
-for i, j in list(g.edges()):
-    g[i][j]['weight'] = 1 / (i + j + 1)
+## RUN LSTM THROUGH EACH OF THESE SEQUENCES
+## THEN WILL NEED SOME INDEXING THAT GRABS EACH GET FROM THE CORRECT LIST
 
 
 degrees = [val for (node, val) in G.degree()]
