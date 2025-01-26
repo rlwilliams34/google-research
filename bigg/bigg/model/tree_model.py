@@ -990,6 +990,7 @@ class RecurTreeGen(nn.Module):
         c_buf_list = [None] * (len(all_ids) + 1)
 
         for d in range(len(all_ids) - 1, -1, -1):
+            print("THIS IS D: ", d)
             fn_ids = lambda i: all_ids[d][i]
             if d == max_level:
                 h_buf = c_buf = None
@@ -1138,6 +1139,12 @@ class RecurTreeGen(nn.Module):
             print("TEST: ", topdown_state[0].shape)
             print("HAS LEFT: ", has_left.shape)
             print("+++++++++++++++++++++++++++++++++++++++++++++++")
+            # if self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+                # has_left_states = (topdown_state[0][:, has_left], topdown_state[1][:, has_left]))
+                # left_feat = (edge_feats_embed[0][:, GET_INDEX_HERE], edge_feats_embed[1][:, GET_INDEX_HERE])
+                # has_left_states = self.update_wt(has_left_states, left_feat)
+                # topdown_state[0][:, has_left] = has_left_states[0]
+                # topdown_state[1][:, has_left] = has_left_states[1]
 #             if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
 #                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
 #                 left_feats_stand = self.standardize_edge_feats(edge_feats[edge_idx[~is_rch]])
