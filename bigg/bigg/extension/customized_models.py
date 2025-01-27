@@ -308,7 +308,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                                 edge_embed_c[:, idx_to_cur] = prev_state[1][:, mask]
                                 edge_feats_ret[:, idx_to_cur] = edge_feats[i, mask]
                         edge_embed = (edge_embed_h, edge_embed_c)
-                        print(edge_featS_ret)
+                        print(edge_feats_ret)
                         return edge_embed, edge_feats_ret.reshape(tot_edges, 1)
                 
                 else:
