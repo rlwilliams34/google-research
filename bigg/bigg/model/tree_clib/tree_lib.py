@@ -348,7 +348,14 @@ class _tree_lib(object):
                 print(rch)
                 print(test_is_left)
                 print(test_is_right)
-                
+                test = np.concatenate([np.array([x, y]) for x,y in zip(test_is_left, test_is_right)]
+                test = test.astype(int32)
+                test[test == 1] = cur_weights
+                print("Did it work: ", test)
+                test = test.reshape(len(test_is_left), 2)
+                lch, rch = test[0], test[1]
+                print(lch)
+                print(rch)
                 check = self.GetLeftRootStates(d - 1)
                 print(check)
                 lch[test_is_left.astype(bool)] = cur_weights[test_is_left.astype(bool)]
