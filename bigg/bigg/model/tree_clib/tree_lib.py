@@ -346,6 +346,8 @@ class _tree_lib(object):
                 cur_weights = np.zeros((len(is_nonleaf), ), dtype=np.int32)
                 mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
                 print("mrs before: ", mrs)
+                print("lch: ", lch)
+                print("rch: ", rch)
                 edge_idx_it = np.array(mrs, dtype=np.int32)
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
                 print("mrs after: ", mrs)
@@ -384,6 +386,13 @@ class _tree_lib(object):
             lch, rch = lr[:, 0], lr[:, 1]
             print("lch below: ", lch)
             print("rch below: ", rch)
+            # Goal
+            # Level 3: []
+            # Level 2: [4, -1, 1]
+            # Level 1: [-1, -1, -1, -1, -1]
+            # Level 0: SKIP
+            
+            ##
         
         return edge_idx
 
