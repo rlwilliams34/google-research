@@ -1125,27 +1125,27 @@ class RecurTreeGen(nn.Module):
 #                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
 #                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
 
-            if not self.test2 and not self.test and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
-                cur_topdown_edge_idx = topdown_edge_index[lv]
-                left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
-                has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
-                left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
-                has_left_states = self.update_wt(has_left_states, left_feat)
-                topdown_state[0][:, has_left.astype(bool)] = has_left_states[0]
-                topdown_state[1][:, has_left.astype(bool)] = has_left_states[1]
-            
-            elif not self.test2 and self.test and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
-                cur_topdown_edge_idx = topdown_edge_index[lv]
-                left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
-                has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
-                left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
-                has_left_states = self.update_wt(has_left_states, left_feat)
-                
-                topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
-                topdown_wt_state = (topdown_h, topdown_c)
-                
-                topdown_wt_state[0][:, has_left.astype(bool)] = has_left_states[0]
-                topdown_wt_state[1][:, has_left.astype(bool)] = has_left_states[1]
+#             if not self.test2 and not self.test and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+#                 cur_topdown_edge_idx = topdown_edge_index[lv]
+#                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
+#                 has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
+#                 left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
+#                 has_left_states = self.update_wt(has_left_states, left_feat)
+#                 topdown_state[0][:, has_left.astype(bool)] = has_left_states[0]
+#                 topdown_state[1][:, has_left.astype(bool)] = has_left_states[1]
+#             
+#             elif not self.test2 and self.test and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+#                 cur_topdown_edge_idx = topdown_edge_index[lv]
+#                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
+#                 has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
+#                 left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
+#                 has_left_states = self.update_wt(has_left_states, left_feat)
+#                 
+#                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
+#                 topdown_wt_state = (topdown_h, topdown_c)
+#                 
+#                 topdown_wt_state[0][:, has_left.astype(bool)] = has_left_states[0]
+#                 topdown_wt_state[1][:, has_left.astype(bool)] = has_left_states[1]
             
             ### Need most recent edge at this stage...
             if self.test:
