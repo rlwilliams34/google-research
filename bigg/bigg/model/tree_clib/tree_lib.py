@@ -306,7 +306,7 @@ class _tree_lib(object):
                     return edge_idx
                 
                 is_nonleaf = self.QueryNonLeaf(d)
-                cur_weights = np.zeros((len(is_nonleaf), )), dtype=np.int32)
+                cur_weights = np.zeros((len(is_nonleaf), ), dtype=np.int32)
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
                 cur_weights[is_nonleaf] = mrs
                 cur_weights[~is_nonleaf] = cur_edge_idx
