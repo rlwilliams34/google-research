@@ -359,13 +359,6 @@ class _tree_lib(object):
                 lch, rch = test[:, 0], test[:, 1]
                 print(lch)
                 print(rch)
-                check = self.GetLeftRootStates(d - 1)
-                print(check)
-                lch[test_is_left.astype(bool)] = cur_weights[test_is_left.astype(bool)]
-                rch[test_is_right.astype(bool)] = cur_weights[test_is_right.astype(bool)]
-                
-                print(lch)
-                print(rch)
                 print("END LEVEL")
         return edge_idx    
 
