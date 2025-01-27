@@ -780,7 +780,7 @@ if __name__ == '__main__':
         elif cmd_args.method == "Test75":
             if cmd_args.row_LSTM:
                 batch_indices = [0, 1]
-                edge_feats_lstm = [list_edge_feats[i] for i in batch_indices]
+                edge_feats_lstm = [list_edge_feats_lstm[i] for i in batch_indices]
                 max_len = np.max([x.shape[0] for x in edge_feats_lstm])
                 edge_feats_lstm = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats_lstm]
                 edge_feats_lstm = torch.cat(edge_feats_lstm, dim = -1)
@@ -929,9 +929,9 @@ if __name__ == '__main__':
                     if cmd_args.method == "Test75":
                         if cmd_args.row_LSTM:
                             edge_feats_lstm = [list_edge_feats_lstm[i] for i in batch_indices]
-                            max_len = np.max([x.shape[0] for x in edge_feats])
+                            max_len = np.max([x.shape[0] for x in edge_feats_lstm])
                             edge_feats_lstm = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats_lstm]
-                            edge_feats_lstm = torch.cat(edge_feats, dim = -1)
+                            edge_feats_lstm = torch.cat(edge_feats_lstm, dim = -1)
                         
                         list_last_edge = [last_edge_list[i] for i in batch_indices]
                         list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
