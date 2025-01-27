@@ -251,6 +251,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 idx_to = torch.sum(F.pad(Z[:,:-1], (1,0,0,0), mode='constant',value=0),dim=0)
                 edge_feats_normalized = edge_feats.clone()
                 edge_feats_normalized[edge_feats > -1] = self.standardize_edge_feats(edge_feats_normalized[edge_feats_normalized > -1])
+                print(edge_feats_normalized.shape)
             else:
                 B = edge_feats.shape[0]
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats)
@@ -294,10 +295,13 @@ class BiggWithEdgeLen(RecurTreeGen):
                         edge_embed_c = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
                         edge_feats_ret = torch.zeros(1, tot_edges).to(edge_feats.device)
                         
+                        print("L: ", L)
+                        
                         for i in range(L):
                             next_state = self.row_LSTM(edge_feats_normalized[i, :].unsqueeze(-1), prev_state)
                             prev_state = next_state
                             mask = (edge_feats[i, :] > 0)
+                            print(mask)
                             if torch.sum(1 - mask.float()) == 0:
                                 edge_embed_h[:, idx_to] = prev_state[0]
                                 edge_embed_c[:, idx_to] = prev_state[1]
