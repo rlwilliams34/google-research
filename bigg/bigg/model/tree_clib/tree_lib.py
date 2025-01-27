@@ -363,12 +363,12 @@ class _tree_lib(object):
             
             else:
                 assert num_internal == 0 #At the very deepest level, only leaves should exist
-                print("Test case: ", test_case)
                 cur_weights = cur_edge_idx
             
             edge_idx[d] = edge_idx_it
             if d == 0:
                 print(edge_idx)
+                print("Test case: ", test_case)
                 return edge_idx
             
             is_nonleaf = self.QueryNonLeaf(d - 1)
