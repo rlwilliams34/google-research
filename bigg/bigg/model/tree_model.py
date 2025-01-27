@@ -1001,7 +1001,7 @@ class RecurTreeGen(nn.Module):
         return row_states, next_states
 
     def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
-                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None, list_num_edges=None, db_info=None, list_last_edge=None):
+                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None, list_num_edges=None, db_info=None, list_last_edge=None, edge_feats_lstm=None):
         ll = 0.0
         ll_wt = 0.0
         noise = 0.0
@@ -1011,7 +1011,7 @@ class RecurTreeGen(nn.Module):
         
         if self.has_edge_feats:
             if self.row_LSTM:
-                edge_feats_embed, edge_feats = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
+                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info,edge_feats_lstm=edge_feats_lstm)
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
         

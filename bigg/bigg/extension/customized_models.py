@@ -235,7 +235,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             feats_pad = np.concatenate(list_feats_pad, axis = 1)
         return feats_pad
 
-    def embed_edge_feats(self, edge_feats, sigma=0.0, prev_state=None, list_num_edges=None, db_info=None):
+    def embed_edge_feats(self, edge_feats, sigma=0.0, prev_state=None, list_num_edges=None, db_info=None, edge_feats_lstm=None):
         if self.method != "Test12" and not self.row_LSTM: 
             B = edge_feats.shape[0]
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
@@ -243,14 +243,14 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         elif self.row_LSTM:
             if prev_state is None:
-                edge_feats = edge_feats.float()
-                L = edge_feats.shape[0]
-                B = edge_feats.shape[1]
-                tot_edges = torch.sum(edge_feats > 0).item()
-                Z = torch.cumsum((edge_feats > 0).int(), 1)
+                edge_feats_lstm = edge_feats_lstm.float()
+                L = edge_feats_lstm.shape[0]
+                B = edge_feats_lstm.shape[1]
+                tot_edges = torch.sum(edge_feats_lstm > 0).item()
+                Z = torch.cumsum((edge_feats_lstm > 0).int(), 1)
                 idx_to = torch.sum(F.pad(Z[:,:-1], (1,0,0,0), mode='constant',value=0),dim=0)
-                edge_feats_normalized = edge_feats.clone()
-                edge_feats_normalized[edge_feats > -1] = self.standardize_edge_feats(edge_feats_normalized[edge_feats_normalized > -1])
+                edge_feats_normalized = edge_feats_lstm.clone()
+                edge_feats_normalized[edge_feats_lstm > -1] = self.standardize_edge_feats(edge_feats_normalized[edge_feats_normalized > -1])
                 print(edge_feats_normalized.shape)
             else:
                 B = edge_feats.shape[0]
@@ -293,29 +293,23 @@ class BiggWithEdgeLen(RecurTreeGen):
                         prev_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
                         edge_embed_h = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
                         edge_embed_c = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
-                        edge_feats_ret = torch.zeros(1, tot_edges).to(edge_feats.device)
                         
-                        print("L: ", L)
-                        print(edge_feats[2, :])
                         for i in range(L):
                             next_state = self.row_LSTM(edge_feats_normalized[i, :].unsqueeze(-1), prev_state)
                             prev_state = next_state
                             cur_edge_feats = edge_feats[i, :]
                             mask = (cur_edge_feats > 0)
-                            print(cur_edge_feats)
 
                             if i == 0:
                                 edge_embed_h[:, idx_to] = prev_state[0]
                                 edge_embed_c[:, idx_to] = prev_state[1]
-                                edge_feats_ret[:, idx_to] = cur_edge_feats
                             else: 
                                 idx_to_cur = idx_to[mask] + i
                                 edge_embed_h[:, idx_to_cur] = prev_state[0][:, mask]
                                 edge_embed_c[:, idx_to_cur] = prev_state[1][:, mask]
-                                edge_feats_ret[:, idx_to_cur] = cur_edge_feats[idx_to_cur]
     
                         edge_embed = (edge_embed_h, edge_embed_c)
-                        return edge_embed, edge_feats_ret.reshape(tot_edges, 1)
+                        return edge_embed
                 
                 else:
                     edge_embed = self.leaf_LSTM(edge_feats_normalized)
