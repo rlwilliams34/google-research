@@ -388,6 +388,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     if edge_feats_lstm is not None:
         edge_feats = edge_feats_lstm
         list_num_edges=None
+        print(edge_feats.shape)
     
     else:
         list_num_edges = None
