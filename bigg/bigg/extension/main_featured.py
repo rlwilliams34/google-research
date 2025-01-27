@@ -37,6 +37,7 @@ from bigg.evaluation.graph_stats import *
 from bigg.evaluation.mmd import *
 from bigg.evaluation.mmd_stats import *
 from bigg.experiments.train_utils import get_node_dist
+from torch.nn import functional as F
 
 import gc
 torch.cuda.empty_cache()
