@@ -734,7 +734,7 @@ if __name__ == '__main__':
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
         elif cmd_args.method == "Test75":
-            batch_indices = [0]
+            batch_indices = [18]
             list_last_edge = [last_edge_list[i] for i in batch_indices]
             list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
             list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
