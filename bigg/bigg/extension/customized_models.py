@@ -38,6 +38,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.sampling_method = cmd_args.sampling_method
         self.row_LSTM = args.row_LSTM
         self.test_topdown = args.test_topdown
+        self.wt_mlp = args.wt_mlp
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75']
@@ -104,6 +105,10 @@ class BiggWithEdgeLen(RecurTreeGen):
                 self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             else:
                 self.weight_tree = FenwickTree(args)
+                
+            if if self.wt_mlp:
+                self.row_LSTM = MultiLSTMCell(args.wt_embed_dim, args.embed_dim, args.rnn_layers)
+                self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
         
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
@@ -286,7 +291,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             elif self.method in ["Test286", "Test75"]:
                 if self.row_LSTM:
                     if prev_state is not None:
-                        edge_embed = self.row_LSTM(edge_feats_normalized, prev_state)  
+                        if self.wt_mlp:
+                            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+                            edge_embed = self.row_LSTM(edge_embed, prev_state) 
+                        
+                        else:
+                            edge_embed = self.row_LSTM(edge_feats_normalized, prev_state)  
                         return edge_embed
                     
                     else:
@@ -295,7 +305,11 @@ class BiggWithEdgeLen(RecurTreeGen):
                         edge_embed_c = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
                         
                         for i in range(L):
-                            next_state = self.row_LSTM(edge_feats_normalized[i, :].unsqueeze(-1), prev_state)
+                            if self.wt_mlp:
+                                x_in = self.edgelen_encoding(edge_feats_normalized[i, :].unsqueeze(-1))
+                                next_state = self.row_LSTM(x_in, prev_state)
+                            else:
+                                next_state = self.row_LSTM(edge_feats_normalized[i, :].unsqueeze(-1), prev_state)
                             prev_state = next_state
                             cur_edge_feats = edge_feats_lstm[i, :]
                             mask = (cur_edge_feats > 0)

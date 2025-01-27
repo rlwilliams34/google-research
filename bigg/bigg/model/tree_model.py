@@ -951,11 +951,7 @@ class RecurTreeGen(nn.Module):
         c_buf_list = [None] * (len(all_ids) + 1)
         
         if self.method == "Test75":
-            left_feat_idx = [None] * (len(all_ids) + 1)
-        
-        if self.method == "Test75":
-            topdown_edge_index = TreeLib.GetTopdownEdgeIdx(max_level)
-        
+            topdown_edge_index = TreeLib.GetTopdownEdgeIdx(len(all_ids) + 1)
         
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]

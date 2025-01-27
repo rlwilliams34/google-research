@@ -264,11 +264,11 @@ class _tree_lib(object):
         return has_ch, num_ch
     
     
-    def GetTopdownEdgeIdx(self, max_depth=-1, dtype=None):
-        edge_idx = [None] * (max_depth + 2)
+    def GetTopdownEdgeIdx(self, max_depth, dtype=None):
+        edge_idx = [None] * max_depth
         lch = None
         rch = None
-        for d in range(max_depth + 1, -1, -1):
+        for d in range(max_depth - 1, -1, -1):
             is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
