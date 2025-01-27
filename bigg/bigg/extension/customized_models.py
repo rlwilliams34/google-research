@@ -307,8 +307,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                                 edge_embed_c[:, idx_to_cur] = prev_state[1][:, mask]
                                 edge_feats_ret[:, idx_to_cur] = edge_feats[i, mask].float()
                         edge_embed = (edge_embed_h, edge_embed_c)
-                        print(edge_feats_ret.shape)
-                        print(tot_edges)
                         return edge_embed, edge_feats_ret.reshape(tot_edges, 1)
                 
                 else:
@@ -461,7 +459,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
-        print(h.shape)
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         if edge_feats is None:
