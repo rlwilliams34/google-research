@@ -405,7 +405,7 @@ class _tree_lib(object):
             print(rch_b)
             num_chil = lch_b.astype(int) + rch_b.astype(int)
             print(num_chil)
-            idx_list = list(range(num_chil))
+            idx_list = list(range(len(num_chil)))
             test = [x for i, x in zip(num_chil, idx_list) for _ in range(i)]
             print("Test: ", test)
             is_nonleaf2 = self.QueryNonLeaf(d)
