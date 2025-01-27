@@ -55,7 +55,7 @@ def get_edge_feats_lstm(g, max_deg=-1, offset=0):
     lstm_lens = [len([k for _, k, in g.edges(i) if k < i]) for i in list(g.nodes())]
     if max_deg==-1:
         max_deg = np.max(lstm_lens)
-    #print("Max Degree: ", max_deg)
+    print("Max Degree: ", max_deg)
     list_of_edge_feats = []
     init_edge = []
     num_edge = 0
