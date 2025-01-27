@@ -415,7 +415,7 @@ class _tree_lib(object):
             
             
             ## NEED PARENT INDEX...
-            test_case[d] = [lch, test_sub]
+            test_case[d] = [lch, test]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
