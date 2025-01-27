@@ -1134,8 +1134,8 @@ class RecurTreeGen(nn.Module):
                 has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
                 left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
                 has_left_states = self.update_wt(has_left_states, left_feat)
-                topdown_state[0][:, has_left] = has_left_states[0]
-                topdown_state[1][:, has_left] = has_left_states[1]
+                topdown_state[0][:, has_left.astype(bool)] = has_left_states[0]
+                topdown_state[1][:, has_left.astype(bool)] = has_left_states[1]
             
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
