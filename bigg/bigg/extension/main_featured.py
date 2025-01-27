@@ -808,8 +808,8 @@ if __name__ == '__main__':
             if cmd_args.sigma:
                 batch_idx = np.concatenate([np.repeat(i, len(train_graphs[i])) for i in batch_indices])
             
-            if len(batch_indices) == 1:
-                print(train_graphs[batch_indices[0]].edges())
+#             if len(batch_indices) == 1:
+#                 print(train_graphs[batch_indices[0]].edges())
             
             if cmd_args.model == "BiGG_GCN":
                 feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
