@@ -297,7 +297,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                         for i in range(L):
                             next_state = self.row_LSTM(edge_feats_normalized[i, :].unsqueeze(-1), prev_state)
                             prev_state = next_state
-                            cur_edge_feats = edge_feats[i, :]
+                            cur_edge_feats = edge_feats_lstm[i, :]
                             mask = (cur_edge_feats > 0)
                             print(cur_edge_feats)
                             print(mask)
