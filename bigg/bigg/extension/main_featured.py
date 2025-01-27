@@ -768,35 +768,44 @@ if __name__ == '__main__':
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
         elif cmd_args.method == "Test75":
-            batch_indices = [0, 1]
-            list_last_edge = [last_edge_list[i] for i in batch_indices]
-            list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
-            list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
-            offset = 0
-            for k in range(len(list_last_edge)):
-                list_last_edge_k = list_last_edge[k]
-                list_last_edge_1_k = list_last_edge_1[k]
-                offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
-                offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
-                offset += list_offsets[k]
-                list_last_edge[k] = np.array(offset_list_last_edge_k)
-                list_last_edge_1[k] = np.array(offset_list_last_edge_1_k)
-            
-            list_last_edge = np.concatenate(list_last_edge, axis = 0)
-            list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
-            
-            
-            
-            last_edge_1_idx = []
-            id_ = 1
-            for b in batch_indices:
-                last_edge_1_idx.append(id_)
-                id_ += len(train_graphs[b])
-            list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
-            list_last_edge = (list_last_edge, list_last_edge_1)    
-            
-            edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
-            debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=list_last_edge)
+            if cmd_args.row_LSTM:
+                batch_indices = [0, 1]
+                edge_feats_lstm = [list_edge_feats[i] for i in batch_indices]
+                max_len = np.max([x[0].shape for x in edge_feats_lstm])
+                edge_feats_lstm = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats_lstm]
+                edge_feats_lstm = torch.cat(edge_deats_lstm, dim = -1)
+                debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=None, edge_feats_lstm=...)
+                
+            else:
+                batch_indices = [0, 1]
+                list_last_edge = [last_edge_list[i] for i in batch_indices]
+                list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
+                list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
+                offset = 0
+                for k in range(len(list_last_edge)):
+                    list_last_edge_k = list_last_edge[k]
+                    list_last_edge_1_k = list_last_edge_1[k]
+                    offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
+                    offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
+                    offset += list_offsets[k]
+                    list_last_edge[k] = np.array(offset_list_last_edge_k)
+                    list_last_edge_1[k] = np.array(offset_list_last_edge_1_k)
+                
+                list_last_edge = np.concatenate(list_last_edge, axis = 0)
+                list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
+                
+                
+                
+                last_edge_1_idx = []
+                id_ = 1
+                for b in batch_indices:
+                    last_edge_1_idx.append(id_)
+                    id_ += len(train_graphs[b])
+                list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
+                list_last_edge = (list_last_edge, list_last_edge_1)    
+                
+                edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
+                debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=list_last_edge)
         
         else:
             edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
@@ -879,7 +888,7 @@ if __name__ == '__main__':
                         if cmd_args.row_LSTM:
                             edge_feats = [list_edge_feats[i] for i in batch_indices]
                             max_len = np.max([x[0].shape for x in edge_feats])
-                            edge_feats = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_Feats]
+                            edge_feats = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats]
                             edge_feats = torch.cat(edge_deats, dim = -1)
                         
                         else:
