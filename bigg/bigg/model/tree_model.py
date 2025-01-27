@@ -1010,9 +1010,10 @@ class RecurTreeGen(nn.Module):
         edge_feats_embed = None
         
         if self.has_edge_feats:
-            edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
-            print(list_last_edge)
-            print(list_num_edges)
+            if self.row_LSTM:
+                edge_feats_embed, edge_feats = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
+            else:
+                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
         
         if self.method == "Test75":
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
