@@ -830,16 +830,9 @@ class RecurTreeGen(nn.Module):
 
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
-            ## Here, use an LSTM to update the topological left state prior with the most recent edge weight (left_Edge_feats[-1?]).  I think after topdown update
-            # if self.method == "Test75":
-                #left_state = self.update_wt(self.standardize_edge_feats(left_feats[-1]), left_state)
-#             if self.has_edge_feats and self.method == "Test75" and tree_node.lch.is_leaf and has_left:
-#                 ### Potentially ignore this for the topdown state updates....
-#                 left_edge_embed = self.standardize_edge_feats(left_edge_feats)
-#                 topdown_state = self.update_wt(left_edge_embed, topdown_state)
             
             if has_left and self.has_edge_feats and self.method == "Test75":
-                topdown_state = self.update_wt(topdown_state, prev_state) ##maybe..?
+                topdown_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
             rub = min(tree_node.rch.n_cols, ub - num_left)
@@ -938,7 +931,6 @@ class RecurTreeGen(nn.Module):
                 target_feat_embed = self.embed_node_feats(target_node_feats)
                 cur_state = self.row_tree.node_feat_update(target_feat_embed, cur_state)
             assert lb <= len(col_sm.indices) <= ub
-            
             
             controller_state = self.row_tree(cur_state)
             edges += [(i, x) for x in col_sm.indices]
@@ -1138,7 +1130,7 @@ class RecurTreeGen(nn.Module):
                          
             if self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
-                left_topdown_edge_idx = cur_topdown_edge_idx[has_left]
+                left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
                 has_left_states = (topdown_state[0][:, has_left], topdown_state[1][:, has_left])
                 left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
                 has_left_states = self.update_wt(has_left_states, left_feat)
