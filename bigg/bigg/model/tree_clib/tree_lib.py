@@ -299,8 +299,10 @@ class _tree_lib(object):
                 edge_idx[d] = edge_idx_it
             
             else:
+                print("LCH RCH BELOW")
                 print(lch)
                 print(rch)
+                print("LCH RCH ABOVE")
                 mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
                 edge_idx_it = np.array(mrs, dtype=np.int32)
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
