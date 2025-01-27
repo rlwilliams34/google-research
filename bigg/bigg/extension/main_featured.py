@@ -817,7 +817,7 @@ if __name__ == '__main__':
                 list_last_edge = (list_last_edge, list_last_edge_1)    
                 
                 
-                debug_model(model, [train_graphs[0], train_graphs[1]], None,edge_feats, True, info=None, info=list_last_edge, edge_feats_lstm=edge_feats_lstm)
+                debug_model(model, [train_graphs[0], train_graphs[1]], None,edge_feats, True, info=list_last_edge, edge_feats_lstm=edge_feats_lstm)
                 
             else:
                 batch_indices = [0, 1]
