@@ -301,7 +301,7 @@ class _tree_lib(object):
             else:
                 mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
                 edge_idx_it = np.array(mrs, dtype=np.int32)
-                mrs = [(rch[i] if lch[i] > -1 else rch[i]) for i in range(len(rch))]
+                mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
                 edge_idx[d] = edge_idx_it
                 if d == 0:
                     return edge_idx
