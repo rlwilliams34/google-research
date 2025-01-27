@@ -269,7 +269,6 @@ class _tree_lib(object):
         lch = None
         rch = None
         for d in range(max_depth + 1, -1, -1):
-            print("Current Level: ", d)
             is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
@@ -300,17 +299,11 @@ class _tree_lib(object):
                 edge_idx[d] = edge_idx_it
             
             else:
-                print("LCH RCH BELOW")
-                print(lch)
-                print(rch)
-                print("LCH RCH ABOVE")
                 mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
                 edge_idx_it = np.array(mrs, dtype=np.int32)
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
                 edge_idx[d] = edge_idx_it
                 if d == 0:
-                    print("Hello!")
-                    print(edge_idx)
                     return edge_idx
                 
                 is_nonleaf = self.QueryNonLeaf(d)
