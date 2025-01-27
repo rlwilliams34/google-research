@@ -774,7 +774,7 @@ if __name__ == '__main__':
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
         elif cmd_args.method == "Test75":
-            if cmd_args.:
+            if cmd_args.row_LSTM:
                 batch_indices = [0, 1]
                 edge_feats_lstm = [list_edge_feats[i] for i in batch_indices]
                 max_len = np.max([x[0].shape for x in edge_feats_lstm])
