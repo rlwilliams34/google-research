@@ -348,8 +348,8 @@ class _tree_lib(object):
                 cur_weights[is_nonleaf] = mrs
                 cur_weights[~is_nonleaf] = cur_edge_idx
             
-            elif lch is None:
-                assert num_internal == 0 #At the very deepest levels, only leaves
+            else:
+                assert num_internal == 0 #At the very deepest level, only leaves should exist
                 cur_weights = cur_edge_idx
             
             edge_idx[d] = edge_idx_it
