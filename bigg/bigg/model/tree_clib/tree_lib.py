@@ -274,7 +274,6 @@ class _tree_lib(object):
             num_leaves = np.sum(~is_nonleaf)
             
             edge_idx_it = np.zeros((num_internal, ), dtype=np.int32)
-
             
             if lch is None:
                 assert num_internal == 0

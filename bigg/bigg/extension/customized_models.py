@@ -103,6 +103,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.leaf_LSTM = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
             #self.update_wt = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
             self.update_wt = BinaryTreeLSTMCell(args.embed_dim)
+            self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
             #self.joint_lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
         
         self.embed_dim = args.embed_dim
@@ -267,6 +269,17 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = self.edgelen_encoding(edge_feats_normalized)
                 x_in = torch.cat([self.leaf_embed.repeat(B, 1), edge_embed], dim = -1)
                 edge_embed = self.leaf_LSTM(x_in)
+            
+            elif self.method == "Test75":
+                ### Here do the LSTM style updating...
+                if prev_state is not None:
+                    edge_embed = self.row_LSTM(edge_feats_normalized, prev_state)
+                    return edge_embed
+                
+                else:
+                    prev_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
+                    edge_embed = self.row_LSTM(edge_feats_normalized, prev_state)
+                    return edge_embed
             
             elif self.method in ["Test286", "Test75"]:
                 edge_embed = self.leaf_LSTM(edge_feats_normalized)
