@@ -1119,7 +1119,7 @@ class RecurTreeGen(nn.Module):
                 has_left_states = self.update_wt(has_left_states, left_feat)
                 
                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
-                topdown_wt_state = (topdownh, topdown_c)
+                topdown_wt_state = (topdown_h, topdown_c)
                 
                 topdown_wt_state[0][:, has_left.astype(bool)] = has_left_states[0]
                 topdown_wt_state[1][:, has_left.astype(bool)] = has_left_states[1]
