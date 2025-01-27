@@ -410,7 +410,7 @@ class _tree_lib(object):
             print("Test: ", test)
             is_nonleaf2 = self.QueryNonLeaf(d)
             test = test[is_nonleaf2]
-            print("Test sub")
+            print("Test sub", test)
             
             
             
