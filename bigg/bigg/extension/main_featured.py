@@ -719,11 +719,13 @@ if __name__ == '__main__':
         print("Generating Graph Stats")
         get_graph_stats(gen_graphs, gt_graphs, cmd_args.g_type)
         
-        print('saving graphs')
-        with open(cmd_args.model_dump + '.graphs-%s' % str(cmd_args.greedy_frac), 'wb') as f:
-            cp.dump(gen_graphs, f, cp.HIGHEST_PROTOCOL)
-        print('graph generation complete')
-        sys.exit()
+        save_graphs = False
+        if save_graphs:
+            print('saving graphs')
+            with open(cmd_args.model_dump + '.graphs-%s' % str(cmd_args.greedy_frac), 'wb') as f:
+                cp.dump(gen_graphs, f, cp.HIGHEST_PROTOCOL)
+            print('graph generation complete')
+            sys.exit()
     #########################################################################################################
     
     top_losses = []
@@ -901,7 +903,7 @@ if __name__ == '__main__':
                             edge_feats = [list_edge_feats[i] for i in batch_indices]
                             max_len = np.max([x[0].shape for x in edge_feats])
                             edge_feats = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats]
-                            edge_feats = torch.cat(edge_deats, dim = -1)
+                            edge_feats = torch.cat(edge_feats, dim = -1)
                         
                         else:
                             list_last_edge = [last_edge_list[i] for i in batch_indices]
