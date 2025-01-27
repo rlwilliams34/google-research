@@ -788,7 +788,36 @@ if __name__ == '__main__':
                 edge_feats_lstm = torch.cat(edge_feats_lstm, dim = -1)
                 edge_feats = [get_edge_feats(train_graphs[0]), get_edge_feats(train_graphs[1])]
                 edge_feats = [torch.from_numpy(x).to(cmd_args.device) for x in edge_feats]
-                debug_model(model, [train_graphs[0], train_graphs[1]], None,edge_feats, True, info=None, edge_feats_lstm=edge_feats_lstm)
+                
+                batch_indices = [0, 1]
+                list_last_edge = [last_edge_list[i] for i in batch_indices]
+                list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
+                list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
+                offset = 0
+                for k in range(len(list_last_edge)):
+                    list_last_edge_k = list_last_edge[k]
+                    list_last_edge_1_k = list_last_edge_1[k]
+                    offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
+                    offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
+                    offset += list_offsets[k]
+                    list_last_edge[k] = np.array(offset_list_last_edge_k)
+                    list_last_edge_1[k] = np.array(offset_list_last_edge_1_k)
+                
+                list_last_edge = np.concatenate(list_last_edge, axis = 0)
+                list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
+                
+                
+                
+                last_edge_1_idx = []
+                id_ = 1
+                for b in batch_indices:
+                    last_edge_1_idx.append(id_)
+                    id_ += len(train_graphs[b])
+                list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
+                list_last_edge = (list_last_edge, list_last_edge_1)    
+                
+                
+                debug_model(model, [train_graphs[0], train_graphs[1]], None,edge_feats, True, info=None, info=list_last_edge, edge_feats_lstm=edge_feats_lstm)
                 
             else:
                 batch_indices = [0, 1]
@@ -905,31 +934,30 @@ if __name__ == '__main__':
                             edge_feats = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats]
                             edge_feats = torch.cat(edge_feats, dim = -1)
                         
-                        else:
-                            list_last_edge = [last_edge_list[i] for i in batch_indices]
-                            list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
-                            list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
-                            offset = 0
-                            for k in range(len(list_last_edge)):
-                                list_last_edge_k = list_last_edge[k]
-                                list_last_edge_1_k = list_last_edge_1[k]
-                                offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
-                                offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
-                                offset += list_offsets[k]
-                                list_last_edge[k] = np.array(offset_list_last_edge_k)
-                                list_last_edge_1[k] = np.array(offset_list_last_edge_1_k)
-                            
-                            list_last_edge = np.concatenate(list_last_edge, axis = 0)
-                            list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
-                            
+                        list_last_edge = [last_edge_list[i] for i in batch_indices]
+                        list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
+                        list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
+                        offset = 0
+                        for k in range(len(list_last_edge)):
+                            list_last_edge_k = list_last_edge[k]
+                            list_last_edge_1_k = list_last_edge_1[k]
+                            offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
+                            offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
+                            offset += list_offsets[k]
+                            list_last_edge[k] = np.array(offset_list_last_edge_k)
+                            list_last_edge_1[k] = np.array(offset_list_last_edge_1_k)
                         
-                            last_edge_1_idx = []
-                            id_ = 1
-                            for b in batch_indices:
-                                last_edge_1_idx.append(id_)
-                                id_ += len(train_graphs[b])
-                            list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
-                            list_last_edge = (list_last_edge, list_last_edge_1)
+                        list_last_edge = np.concatenate(list_last_edge, axis = 0)
+                        list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
+                        
+                    
+                        last_edge_1_idx = []
+                        id_ = 1
+                        for b in batch_indices:
+                            last_edge_1_idx.append(id_)
+                            id_ += len(train_graphs[b])
+                        list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
+                        list_last_edge = (list_last_edge, list_last_edge_1)
                 
             if cmd_args.sigma:
                 batch_idx = np.concatenate([np.repeat(i, len(train_graphs[i])) for i in batch_indices])
