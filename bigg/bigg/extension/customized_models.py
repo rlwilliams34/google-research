@@ -246,7 +246,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 L = edge_feats.shape[0]
                 B = edge_feats.shape[1]
                 tot_edges = torch.sum(edge_feats > 0).item()
-                Z = torch.cumsum((edge_feats > 0).int(), 1, dim=0)
+                Z = torch.cumsum((edge_feats > 0).int(), 1)
                 idx_to = torch.sum(F.pad(Z[:,:-1], (1,0,0,0), mode='constant',value=0),dim=0)
                 edge_feats_normalized = edge_feats
                 edge_feats_normalized[edge_feats > -1] = self.standardize_edge_feats(edge_feats_normalized[edge_feats_normalized > -1])
