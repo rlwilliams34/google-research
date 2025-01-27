@@ -335,6 +335,8 @@ class _tree_lib(object):
         is_nonleaf = self.QueryNonLeaf(max_depth - 1)
         
         for d in range(max_depth - 1, -1, -1):
+            print("=============================================")
+            print("LEVEL: ", d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
             cur_edge_idx, _ = self.GetEdgeAndLR(d)
@@ -343,10 +345,17 @@ class _tree_lib(object):
             if lch is not None:
                 cur_weights = np.zeros((len(is_nonleaf), ), dtype=np.int32)
                 mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
+                print("mrs before: ", mrs)
                 edge_idx_it = np.array(mrs, dtype=np.int32)
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
+                print("mrs after: ", mrs)
+                test = [(lch[i] if lch[i]  > -1 else -1)]
+                print("Test: ", test)
+                print("=====================================")
+                
                 cur_weights[is_nonleaf] = mrs
                 cur_weights[~is_nonleaf] = cur_edge_idx
+                
             
             else:
                 assert num_internal == 0 #At the very deepest level, only leaves should exist

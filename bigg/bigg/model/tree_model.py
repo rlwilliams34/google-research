@@ -1115,6 +1115,9 @@ class RecurTreeGen(nn.Module):
                 left_subtree_states[0][:, has_left.astype(bool)] = has_left_states[0]
                 left_subtree_states[1][:, has_left.astype(bool)] = has_left_states[1]
             
+            #if self.test3 and lv > 0 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+                
+            
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
