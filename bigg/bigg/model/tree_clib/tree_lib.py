@@ -268,10 +268,7 @@ class _tree_lib(object):
         edge_idx = [None] * (max_depth + 2)
         lch = None
         rch = None
-        print(edge_idx)
-        print(len(edge_idx))
         for d in range(max_depth + 1, -1, -1): ##BACKWARDS....
-            print("Current level: ", d)
             is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
@@ -289,23 +286,12 @@ class _tree_lib(object):
                 
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
-                
-                print("~~~~~~ INFO ~~~~~~~~~")
-                print(cur_edge_idx) 
-                print(is_nonleaf)
-                print(num_internal_parents) 
-                print(lch)
-                print(rch) 
-                print(test_is_left)
-                print(test_is_right)
                 # Length of Current Edge Index is SIX (# Number of States in Level Above)
                 # For each edge index, need to know if this is the LEFT or RIGHT child of parent node
                 lch[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
                 rch[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
                 ## Error Here
                 # We have the weight indices in order for level 2. Now need to match them to left and right children lists
-                print(lch)
-                print(rch)
                 
                 edge_idx[d] = edge_idx_it
             
@@ -315,24 +301,14 @@ class _tree_lib(object):
                 edge_idx_it = np.array(mrs, dtype=np.int32)
                 mrs = [(rch[i] if lch[i] > -1 else rch[i]) for i in range(len(rch))]
                 edge_idx[d] = edge_idx_it
-                
-                #old_lch = lch
-                #old_rch = rch
-                
                 if d == 0:
                     return edge_idx
-                
-                # edge_idx_it ==> WEIGHTS CORRESPONDING TO INTERNAL NODES
-                # cur_edge_idx, _ = GetEdgeAndLR(d) ==> WEIGHTS CORRESPONDING TO LEAVES
                 
                 is_nonleaf = self.QueryNonLeaf(d)
                 cur_weights = np.zeros((len(is_nonleaf, )), dtype=np.int32)
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
                 cur_weights[is_nonleaf] = edge_idx_it
                 cur_weights[~is_nonleaf] = cur_edge_idx
-                print(cur_weights)
-                print(cur_edge_idx)
-                print(edge_idx_it)
                 
                 is_nonleaf = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
@@ -341,25 +317,14 @@ class _tree_lib(object):
                 
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
-                
-                print(is_nonleaf)
-                print(num_internal_parents)
-                print(lch)
-                print(rch)
-                print(test_is_left)
-                print(test_is_right)
                 test_is_left = lch * (1 - test_is_left) + test_is_left
                 test_is_right = rch * (1 - test_is_right) + test_is_right
                 
                 test = np.concatenate([np.array([x, y]) for x,y in zip(test_is_left, test_is_right)])
                 test = test.astype(np.int32)
                 test[test == 1] = cur_weights
-                print("Did it work: ", test)
                 test = test.reshape(len(test_is_left), 2)
                 lch, rch = test[:, 0], test[:, 1]
-                print(lch)
-                print(rch)
-                print("END LEVEL")
         return edge_idx    
 
     def QueryNonLeaf(self, depth):
