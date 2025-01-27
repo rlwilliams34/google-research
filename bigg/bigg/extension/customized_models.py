@@ -37,6 +37,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.method = args.method
         self.sampling_method = cmd_args.sampling_method
         self.row_LSTM = args.row_LSTM
+        self.test_topdown = args.test_topdown
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75']
@@ -285,7 +286,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             elif self.method in ["Test286", "Test75"]:
                 if self.row_LSTM:
                     if prev_state is not None:
-                        edge_embed = self.row_LSTM(edge_feats_normalized, prev_state) #(self.leaf_h0_wt, self.leaf_c0_wt))
+                        edge_embed = self.row_LSTM(edge_feats_normalized, prev_state)  
                         return edge_embed
                     
                     else:

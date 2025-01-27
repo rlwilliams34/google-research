@@ -798,7 +798,7 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
-            if has_left and self.has_edge_feats and self.method == "Test75":
+            if has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
                 topdown_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
@@ -1099,7 +1099,7 @@ class RecurTreeGen(nn.Module):
 #                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
 #                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
 
-            if self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+            if not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
                 has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
