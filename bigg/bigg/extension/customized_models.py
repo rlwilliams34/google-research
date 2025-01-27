@@ -303,12 +303,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                             if i == 0:
                                 edge_embed_h[:, idx_to] = prev_state[0]
                                 edge_embed_c[:, idx_to] = prev_state[1]
-                                edge_test[idx_to] = cur_edge_feats
+                                edge_test[idx_to, :] = cur_edge_feats
                             else: 
                                 idx_to_cur = idx_to[mask] + i
                                 edge_embed_h[:, idx_to_cur] = prev_state[0][:, mask]
                                 edge_embed_c[:, idx_to_cur] = prev_state[1][:, mask]
-                                edge_test[idx_to] = cur_edge_feats[mask, :]
+                                edge_test[idx_to, :] = cur_edge_feats[mask, :]
                         print(edge_test.shape)
                         print(edge_feats.shape)
                         diff = torch.square(torch.sub(edge_test, edge_feats)) 
