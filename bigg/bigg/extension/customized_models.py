@@ -309,7 +309,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                         edge_embed = (edge_embed_h, edge_embed_c)
                         print(edge_feats_ret.shape)
                         print(tot_edges)
-                        return edge_embed, edge_feats_ret
+                        return edge_embed, edge_feats_ret.reshape(1, len(edge_feats_ret))
                 
                 else:
                     edge_embed = self.leaf_LSTM(edge_feats_normalized)
