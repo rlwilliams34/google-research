@@ -268,7 +268,8 @@ class _tree_lib(object):
         edge_idx = [None] * (max_depth + 2)
         lch = None
         rch = None
-        for d in range(max_depth + 1, -1, -1): ##BACKWARDS....
+        for d in range(max_depth + 1, -1, -1):
+            print("Current Level: ", d)
             is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
