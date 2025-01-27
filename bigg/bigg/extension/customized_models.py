@@ -311,7 +311,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                                 edge_test[idx_to_cur] = cur_edge_feats[mask]
                         print(edge_test.shape)
                         print(edge_feats.shape)
-                        diff = torch.square(torch.sub(edge_test.unsqueeze(-1), edge_feats)) 
+                        diff = torch.sum(torch.square(torch.sub(edge_test.unsqueeze(-1), edge_feats)))
                         print(diff)
                         edge_embed = (edge_embed_h, edge_embed_c)
                         return edge_embed
