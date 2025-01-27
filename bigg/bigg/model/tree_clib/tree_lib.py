@@ -269,7 +269,6 @@ class _tree_lib(object):
         lch = None
         rch = None
         for d in range(max_depth + 1, -1, -1): ##BACKWARDS....
-            print("Current Level: ", d)
             is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
@@ -279,27 +278,14 @@ class _tree_lib(object):
             
             if lch is None:
                 assert num_internal == 0
-                print("Going in...")
-                print("is_nonleaf", is_nonleaf.shape)
-                print("um internal", num_internal)
-                print("num leaves", num_leaves)
-                
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
                 is_nonleaf = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 lch = np.array([-1] * num_internal_parents)
                 rch = np.array([-1] * num_internal_parents)
                 
-                print("cur edge idx", cur_edge_idx.shape)
-                print("is non leaf", is_nonleaf.shape)
-                print("num internal parents", num_internal_parents)
-                
-                
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
-                
-                print(np.sum(test_is_left) + np.sum(test_is_right))
-                print(cur_edge_idx.shape)
                 
                 test_is_left = lch * (1 - test_is_left) + test_is_left
                 test_is_right = rch * (1 - test_is_right) + test_is_right
@@ -309,15 +295,6 @@ class _tree_lib(object):
                 test[test == 1] = cur_edge_idx
                 test = test.reshape(len(test_is_left), 2)
                 lch, rch = test[:, 0], test[:, 1]
-                
-                # 
-#                 print("test left", test_is_left.shape)
-#                 print("test right", test_is_right.shape)
-#                 
-#                 lch[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
-#                 rch[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
-                ## Error Here
-                # We have the weight indices in order for level 2. Now need to match them to left and right children lists
                 
                 edge_idx[d] = edge_idx_it
             
