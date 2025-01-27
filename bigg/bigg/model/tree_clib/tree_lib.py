@@ -313,9 +313,8 @@ class _tree_lib(object):
                 is_nonleaf = self.QueryNonLeaf(d)
                 cur_weights = np.zeros((len(is_nonleaf, )), dtype=np.int32)
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
-                cur_weights[is_nonleaf] = edge_idx_it
+                cur_weights[is_nonleaf] = mrs
                 cur_weights[~is_nonleaf] = cur_edge_idx
-                
                 is_nonleaf = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 lch = np.array([-1] * num_internal_parents)
