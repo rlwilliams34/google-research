@@ -244,6 +244,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         elif self.row_LSTM:
             if prev_state is None:
                 edge_feats = edge_feats.float()
+                print(edge_feats.shape)
+                print(STOP)
                 L = edge_feats.shape[0]
                 B = edge_feats.shape[1]
                 tot_edges = torch.sum(edge_feats > 0).item()
