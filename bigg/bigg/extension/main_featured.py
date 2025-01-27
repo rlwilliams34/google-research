@@ -361,7 +361,7 @@ def get_last_edge(g):
 #     return weights, np.transpose(np.array(lr_seq))
 
 
-def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
+def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edge_feats_lstm=None):
     ll_t1 = 0
     ll_w1 = 0
     ll_t2 = 0
@@ -384,15 +384,21 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
         ll_t2 = ll + ll_t2
         ll_w2 = ll_wt + ll_w2
     
-    list_num_edges = None
-    if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
-        list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
     
-    if isinstance(edge_feats, list):
-        edge_feats = torch.cat(edge_feats, dim = 0)
+    if edge_feats_lstm is not None:
+        edge_feats = edge_feats_lstm
+        list_num_edges=None
     
-    elif method == "Test4":
-        print("Neeed to implement")
+    else:
+        list_num_edges = None
+        if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
+            list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
+        
+        if isinstance(edge_feats, list):
+            edge_feats = torch.cat(edge_feats, dim = 0)
+        
+        elif method == "Test4":
+            print("Neeed to implement")
     
     #print(info)
     
@@ -525,7 +531,7 @@ if __name__ == '__main__':
             list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)).to(cmd_args.device) for g in train_graphs]
             
             if cmd_args.row_LSTM:
-                list_edge_feats = [torch.from_numpy(get_edge_feats_lstm(g).to(cmd_args.device)) for g in train_graphs]
+                list_edge_feats = [torch.from_numpy(get_edge_feats_lstm(g)).to(cmd_args.device) for g in train_graphs]
             ### To pad: F.pad(input=g1t, pad=(0,0,0,MAX_DEG - SHAPE1),mode='constant',value=-1).shape
 
             last_edge_list = None
@@ -768,13 +774,15 @@ if __name__ == '__main__':
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
         elif cmd_args.method == "Test75":
-            if cmd_args.row_LSTM:
+            if cmd_args.:
                 batch_indices = [0, 1]
                 edge_feats_lstm = [list_edge_feats[i] for i in batch_indices]
                 max_len = np.max([x[0].shape for x in edge_feats_lstm])
                 edge_feats_lstm = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats_lstm]
-                edge_feats_lstm = torch.cat(edge_deats_lstm, dim = -1)
-                debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=None, edge_feats_lstm=...)
+                edge_feats_lstm = torch.cat(edge_feats_lstm, dim = -1)
+                edge_feats = [get_edge_feats(train_graphs[0]), get_edge_feats(train_graphs[1])]
+                edge_feats = [torch.from_numpy(x).to(cmd_args.device) for x in edge_feats]
+                debug_model(model, [train_graphs[0], train_graphs[1]], None,edge_feats, True, info=None, edge_feats_lstm=edge_feats_lstm)
                 
             else:
                 batch_indices = [0, 1]
