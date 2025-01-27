@@ -393,7 +393,8 @@ class _tree_lib(object):
             # When d is 3, we are getting level 2's
             print("lch below: ", lch)
             print("rch below: ", rch)
-            test_case[d] = [lch[is_nonleaf], rch[is_nonleaf]]
+            is_nonleaf2 = self.QueryNonLeaf(d)
+            test_case[d] = [lch[is_nonleaf2], rch[is_nonleaf2]]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
