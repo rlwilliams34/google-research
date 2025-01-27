@@ -831,6 +831,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
             if has_left and self.has_edge_feats and self.method == "Test75":
+                print("Hello!")
                 topdown_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
