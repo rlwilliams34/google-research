@@ -797,10 +797,11 @@ class RecurTreeGen(nn.Module):
 
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             
+            left_state_wt = left_state
             if self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
-                left_state = self.update_wt(left_state, prev_state)
+                left_state_wt = self.update_wt(left_state, prev_state)
             
-            topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
+            topdown_state = self.l2r_cell(state, (left_state_wt[0] + right_pos, left_state_wt[1] + right_pos), tree_node.depth)
             
             topdown_wt_state = None
             if not self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
