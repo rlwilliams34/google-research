@@ -269,6 +269,7 @@ class _tree_lib(object):
         lch = None
         rch = None
         for d in range(max_depth + 1, -1, -1): ##BACKWARDS....
+            print("Current Level: ", d)
             is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
@@ -286,8 +287,7 @@ class _tree_lib(object):
                 
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
-                # Length of Current Edge Index is SIX (# Number of States in Level Above)
-                # For each edge index, need to know if this is the LEFT or RIGHT child of parent node
+                
                 lch[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
                 rch[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
                 ## Error Here
