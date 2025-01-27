@@ -1103,9 +1103,7 @@ class RecurTreeGen(nn.Module):
                                                     lambda: left_ids)
             
             has_right, num_right = TreeLib.GetChLabel(1, lv)
-
             right_pos = self.tree_pos_enc(num_right)
-            left_subtree_states = [x + right_pos for x in left_subtree_states]
             
             if self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
@@ -1116,7 +1114,7 @@ class RecurTreeGen(nn.Module):
                 left_subtree_states[0][:, has_left.astype(bool)] = has_left_states[0]
                 left_subtree_states[1][:, has_left.astype(bool)] = has_left_states[1]
             
-            
+            left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
 #             if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
