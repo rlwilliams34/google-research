@@ -304,6 +304,8 @@ class _tree_lib(object):
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
                 edge_idx[d] = edge_idx_it
                 if d == 0:
+                    print("Hello!")
+                    print(edge_idx)
                     return edge_idx
                 
                 is_nonleaf = self.QueryNonLeaf(d)
@@ -326,8 +328,6 @@ class _tree_lib(object):
                 test[test == 1] = cur_weights
                 test = test.reshape(len(test_is_left), 2)
                 lch, rch = test[:, 0], test[:, 1]
-        print("Hello!")
-        print(edge_idx)
         return edge_idx    
 
     def QueryNonLeaf(self, depth):
