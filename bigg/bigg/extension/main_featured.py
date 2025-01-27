@@ -873,6 +873,7 @@ if __name__ == '__main__':
                 batch_idx = np.concatenate([np.repeat(i, len(train_graphs[i])) for i in batch_indices])
             
             if len(batch_indices) == 1:
+                print("BATCH: ", batch_indices)
                 print(train_graphs[batch_indices[0]].edges())
             
             if cmd_args.model == "BiGG_GCN":
