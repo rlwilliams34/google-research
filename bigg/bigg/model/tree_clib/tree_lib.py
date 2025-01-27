@@ -393,7 +393,10 @@ class _tree_lib(object):
             # When d is 3, we are getting level 2's
             print("lch below: ", lch)
             print("rch below: ", rch)
-            is_nonleaf2 = self.QueryNonLeaf(d)
+            if d == max_depth - 1:
+                is_nonleaf2 = np.array([False for _ in range(len(lch))])
+            else:
+                is_nonleaf2 = self.QueryNonLeaf(d+1)
             print("is nonleaf 2", is_nonleaf2)
             test_case[d] = [lch, is_nonleaf2]
             # Goal
