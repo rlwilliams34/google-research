@@ -333,6 +333,7 @@ class _tree_lib(object):
         lch = None
         rch = None
         for d in range(max_depth - 1, -1, -1):
+            print(d)
             is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
