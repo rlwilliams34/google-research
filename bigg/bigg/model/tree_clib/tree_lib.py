@@ -381,6 +381,7 @@ class _tree_lib(object):
             
             print("is left", is_left)
             print("is right", is_right)
+            print(is_left * is_right)
             
             is_left = lch * (1 - is_left) + is_left
             is_right = rch * (1 - is_right) + is_right
