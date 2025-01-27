@@ -381,6 +381,8 @@ class _tree_lib(object):
             lr[lr == 1] = cur_weights
             lr = lr.reshape(len(is_left), 2)
             lch, rch = lr[:, 0], lr[:, 1]
+            print("lch below: ", lch)
+            print("rch below: ", rch)
         
         return edge_idx
 
