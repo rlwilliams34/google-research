@@ -298,11 +298,24 @@ class _tree_lib(object):
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
                 
-                print("test left", test_is_left.shape)
-                print("test right", test_is_right.shape)
+                print(np.sum(test_is_left) + np.sum(test_is_right))
+                print(cur_edge_idx.shape)
                 
-                lch[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
-                rch[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
+                test_is_left = lch * (1 - test_is_left) + test_is_left
+                test_is_right = rch * (1 - test_is_right) + test_is_right
+                
+                test = np.concatenate([np.array([x, y]) for x,y in zip(test_is_left, test_is_right)])
+                test = test.astype(np.int32)
+                test[test == 1] = cur_edge_idx
+                test = test.reshape(len(test_is_left), 2)
+                lch, rch = test[:, 0], test[:, 1]
+                
+                # 
+#                 print("test left", test_is_left.shape)
+#                 print("test right", test_is_right.shape)
+#                 
+#                 lch[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
+#                 rch[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
                 ## Error Here
                 # We have the weight indices in order for level 2. Now need to match them to left and right children lists
                 
