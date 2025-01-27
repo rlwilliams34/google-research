@@ -101,8 +101,9 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.merge_top_wt = BinaryTreeLSTMCell(args.embed_dim)
             self.weight_tree = FenwickTree(args)
             self.leaf_LSTM = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
-            self.update_wt = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
-            self.joint_lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
+            #self.update_wt = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
+            self.update_wt = BinaryTreeLSTMCell(args.embed_dim)
+            #self.joint_lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
         
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
