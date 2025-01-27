@@ -391,6 +391,7 @@ class _tree_lib(object):
             lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
             lr = lr.astype(np.int32)
             print("lr", lr)
+            print(lr.shape)
             lr[lr == 1] = cur_weights
             lr = lr.reshape(len(is_left), 2)
             lch, rch = lr[:, 0], lr[:, 1]
