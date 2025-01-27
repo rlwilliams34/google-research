@@ -33,39 +33,7 @@ from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
 
 
-# 
-# def get_max_deg(train_graphs):
-#     max_degrees = []
-#     for G in train_graphs:
-#         degrees = [deg for (node, deg) in G.degree()]
-#         max_degrees.append(np.max(degrees))
-#     return np.max(degrees)
-# 
-# def get_edge_feats_lstm(g, max_deg=-1, offset=0):
-#     if max_deg==-1:
-#         degrees = [deg for (node, deg) in g.degree()]
-#         max_deg = np.max(degrees)
-#     print("Max Degree: ", max_deg)
-#     list_of_edge_feats = []
-#     init_edge = []
-#     num_edge = 0
-#     for i in range(len(g.nodes())):
-#         x = list(g.edges(i, data=True))
-#         x = sorted(x, key= lambda y:y[1])
-#         weights = [x[2]['weight'] for x in x]
-#         num_new_edge = np.sum([x[0] > x[1] for x in x])
-#         if num_new_edge > 0:
-#             new_idx = np.arange(num_new_edge) + max_deg * i
-#             init_edge.append(new_idx)
-#         num_edge += num_new_edge
-#         
-#         weights = np.pad(np.array(weights), (0, max_deg - len(weights)), 'constant', constant_values=-1)
-#         list_of_edge_feats.append(weights[:, np.newaxis])
-#     return np.concatenate(list_of_edge_feats, -1), np.concatenate(init_edge)
-# 
-# test = [[k for k in list(g.neighbors(i)) if k < i] for i in range(len(g))]
-# test = [x for x in test if np.sum(x) > 0]
-# [k for k in list(g.neighbors(12)) if k < 12]
+
 
 ## RUN LSTM THROUGH EACH OF THESE SEQUENCES
 ## THEN WILL NEED SOME INDEXING THAT GRABS EACH GET FROM THE CORRECT LIST
@@ -875,7 +843,7 @@ class RecurTreeGen(nn.Module):
         
         self.row_tree.reset(list_states)
         controller_state = self.row_tree()
-        if self.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
+        if self.method in ["Test285", "Test286", "Test287", "Test288", "Test75"] and not self.row_LSTM:
             self.weight_tree.reset([])
         
         if num_nodes is None:
@@ -891,10 +859,12 @@ class RecurTreeGen(nn.Module):
             prev_state = (self.leaf_h0, self.leaf_c0)
             
         
-        elif self.method == "Test75":
+        elif self.method == "Test75" and not self.row_LSTM:
             prev_state =  self.weight_tree()
         
         for i in pbar:
+            if self.row_LSTM:
+                prev_state = (self.leaf_h0_wt, self.leaf_c0_wt)
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
             else:
@@ -1074,6 +1044,7 @@ class RecurTreeGen(nn.Module):
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
+                ## For training: need the index of edge JUST before generating this one
                 edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
@@ -1083,6 +1054,7 @@ class RecurTreeGen(nn.Module):
             if batch_idx is not None:
                 batch_idx = batch_idx[is_nonleaf]
             
+            ## Need edge index at this stage 
             left_logits = self.pred_has_left(cur_states[0][-1], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
@@ -1133,6 +1105,7 @@ class RecurTreeGen(nn.Module):
                 topdown_state[0][:, has_left.astype(bool)] = has_left_states[0]
                 topdown_state[1][:, has_left.astype(bool)] = has_left_states[1]
             
+            ### Need most recent edge at this stage...
             right_logits = self.pred_has_right(topdown_state[0][-1], lv)
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)

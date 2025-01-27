@@ -35,6 +35,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         cmd_args.wt_drop = -1
         self.method = args.method
         self.sampling_method = cmd_args.sampling_method
+        self.row_LSTM = args.row_LSTM
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75']
@@ -46,12 +47,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
         self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 1], dropout = args.wt_drop)
-        #self.edgelen_mean = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
-        #self.edgelen_lvar = MLP(args.embed_dim, [2 * args.embed_dim, 4 * args.embed_dim, 1], dropout = args.wt_drop)
-        
-        
-        
-        
         
         if self.method != "Test75":
             self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
@@ -99,14 +94,14 @@ class BiggWithEdgeLen(RecurTreeGen):
         
         if self.method == "Test75":
             self.merge_top_wt = BinaryTreeLSTMCell(args.embed_dim)
-            self.weight_tree = FenwickTree(args)
-            self.leaf_LSTM = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
-            #self.update_wt = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
             self.update_wt = BinaryTreeLSTMCell(args.embed_dim)
-            self.row_LSTM = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
-            self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-            #self.joint_lr2p_cell = BinaryTreeLSTMCell(args.embed_dim)
+            self.leaf_LSTM = MultiLSTMCell(1, args.embed_dim, args.rnn_layers)
+            if args.row_LSTM:
+                self.row_LSTM = MultiLSTMCell(1, args.embed_dim, args.rnn_layers, squeeze_dim=-1)
+                self.leaf_h0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+                self.leaf_c0_wt = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+            else:
+                self.weight_tree = FenwickTree(args)
         
         self.embed_dim = args.embed_dim
         self.weight_embed_dim = args.weight_embed_dim
@@ -240,10 +235,24 @@ class BiggWithEdgeLen(RecurTreeGen):
         return feats_pad
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, prev_state=None, list_num_edges=None, db_info=None):
-        if self.method != "Test12":
+        if self.method != "Test12" and not self.row_LSTM: 
             B = edge_feats.shape[0]
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
             edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+        
+        elif self.row_LSTM:
+            if prev_state is None:
+                L = edge_feats.shape[0]
+                B = edge_feats.shape[1]
+                tot_edges = torch.sum(edge_feats > 0).item()
+                Z = torch.cumsum((edge_feats > 0).int(), 1), dim=0)
+                idx_to = torch.sum(F.pad(Z[:,:-1], (1,0,0,0), mode='constant',value=0),dim=0)
+                edge_feats_normalized = edge_feats
+                edge_feats_normalized[edge_feats > -1] = self.standardize_edge_feats(edge_feats_normalized[edge_feats_normalized > -1])
+            else:
+                B = edge_feats.shape[0]
+                edge_feats_normalized = self.standardize_edge_feats(edge_feats)
+                #edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
         
         if self.method == "MLP-Repeat":
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
@@ -271,19 +280,33 @@ class BiggWithEdgeLen(RecurTreeGen):
                 x_in = torch.cat([self.leaf_embed.repeat(B, 1), edge_embed], dim = -1)
                 edge_embed = self.leaf_LSTM(x_in)
             
-            elif self.method == "Test75":
-                ### Here do the LSTM style updating...
-                if prev_state is not None:
-                    edge_embed = self.row_LSTM(edge_feats_normalized, (self.leaf_h0_wt, self.leaf_c0_wt))
-                    return edge_embed
+            elif self.method in ["Test286", "Test75"]:
+                if self.row_LSTM:
+                    if prev_state is not None:
+                        edge_embed = self.row_LSTM(edge_feats_normalized, (self.leaf_h0_wt, self.leaf_c0_wt))
+                        return edge_embed
+                    
+                    else:
+                        prev_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
+                        edge_embed_h = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
+                        edge_embed_c = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
+                        
+                        for i in range(L):
+                            next_state = self.row_LSTM(edge_feats_normalized[i, :], prev_state)
+                            prev_state = next_state
+                            mask = (edge_feats[i, :] > 0)
+                            if torch.sum(1 - mask) == 0:
+                                edge_embed_h[idx_to] = prev_state[0]
+                                edge_embed_c[idx_to] = prev_state[1]
+                            else: 
+                                idx_to_cur = idx_to[mask] + i
+                                edge_embed_h[idx_to_cur] = prev_state[0][mask]
+                                edge_embed_c[idx_to_cur] = prev_state[1][mask]
+                        edge_embed = (edge_embed_h, edge_embed_c)
+                        return edge_embed
                 
                 else:
-                    prev_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
-                    edge_embed = self.row_LSTM(edge_feats_normalized, prev_state)
-                    return edge_embed
-            
-            elif self.method in ["Test286", "Test75"]:
-                edge_embed = self.leaf_LSTM(edge_feats_normalized)
+                    edge_embed = self.leaf_LSTM(edge_feats_normalized)
             
             elif self.method == "Test287":
                 # Just use MLP for init state"

@@ -65,12 +65,13 @@ def glorot_uniform(m):
 
 
 class MultiLSTMCell(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers):
+    def __init__(self, input_size, hidden_size, num_layers, squeeze_dim=0):
         super(MultiLSTMCell, self).__init__()
 
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers)
         self.hidden_size = hidden_size
         self.num_layers = num_layers
+        self.squeeze_dim = squeeze_dim
 
     def forward(self, x_input, states=None):
         if states is None:
@@ -81,7 +82,7 @@ class MultiLSTMCell(nn.Module):
             h, c = states
         
         if len(x_input.shape) != len(h.shape):
-            x_input = x_input.unsqueeze(0)
+            x_input = x_input.unsqueeze(self.squeeze_dim)
         
         _, new_states = self.lstm(x_input, (h, c))
 
