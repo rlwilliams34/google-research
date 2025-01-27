@@ -932,7 +932,6 @@ if __name__ == '__main__':
                             max_len = np.max([x.shape[0] for x in edge_feats_lstm])
                             edge_feats_lstm = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats_lstm]
                             edge_feats_lstm = torch.cat(edge_feats_lstm, dim = -1)
-                            print(edge_feats_lstm.shape)
                         
                         list_last_edge = [last_edge_list[i] for i in batch_indices]
                         list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
