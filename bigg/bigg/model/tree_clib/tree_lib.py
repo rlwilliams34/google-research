@@ -334,11 +334,12 @@ class _tree_lib(object):
         rch = None
         for d in range(max_depth - 1, -1, -1):
             print(d)
-            edge_idx_it = np.zeros((num_internal, ), dtype=np.int32)
             is_nonleaf = self.QueryNonLeaf(d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
             cur_edge_idx, _ = self.GetEdgeAndLR(d)
+            
+            edge_idx_it = np.zeros((num_internal, ), dtype=np.int32)
             
             
             if lch is not None:
