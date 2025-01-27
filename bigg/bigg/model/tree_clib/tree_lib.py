@@ -279,14 +279,27 @@ class _tree_lib(object):
             
             if lch is None:
                 assert num_internal == 0
+                print("Going in...")
+                print("is_nonleaf", is_nonleaf.shape)
+                print("um internal", num_internal)
+                print("num leaves", num_leaves)
+                
                 cur_edge_idx, _ = self.GetEdgeAndLR(d)
                 is_nonleaf = self.QueryNonLeaf(d - 1)
                 num_internal_parents = np.sum(is_nonleaf)
                 lch = np.array([-1] * num_internal_parents)
                 rch = np.array([-1] * num_internal_parents)
                 
+                print("cur edge idx", cur_edge_idx.shape)
+                print("is non leaf", is_nonleaf.shape)
+                print("num internal parents", num_internal_parents)
+                
+                
                 test_is_left, _ = self.GetChLabel(-1, d - 1)
                 test_is_right, _ = self.GetChLabel(1, d - 1)
+                
+                print("test left", test_is_left.shape)
+                print("test right", test_is_right.shape)
                 
                 lch[test_is_left.astype(bool)] = cur_edge_idx[test_is_left.astype(bool)]
                 rch[test_is_right.astype(bool)] = cur_edge_idx[test_is_right.astype(bool)]
