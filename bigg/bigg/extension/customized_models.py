@@ -245,7 +245,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         if self.method != "Test12" and not self.row_LSTM: 
             B = edge_feats.shape[0]
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
-            edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+            if sigma > 0:
+                edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
         
         elif self.row_LSTM:
             if prev_state is None:
@@ -256,7 +257,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                 Z = torch.cumsum((edge_feats_lstm > 0).int(), 1)
                 idx_to = torch.sum(F.pad(Z[:,:-1], (1,0,0,0), mode='constant',value=0),dim=0)
                 edge_feats_normalized = edge_feats_lstm.clone()
-                edge_feats_normalized[edge_feats_normalized > -1] = self.standardize_edge_feats(edge_feats_normalized[edge_feats_normalized > -1])
+                edge_idx = (edge_feats_normalized > -1)
+                edge_feats_normalized[edge_idx] = self.standardize_edge_feats(edge_feats_normalized[edge_idx])
+                
+                if sigma > 0:
+                    edge_feats_normalized[edge_idx] = edge_feats_normalized[edge_idx] + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+                
             else:
                 B = edge_feats.shape[0]
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats)
