@@ -333,6 +333,7 @@ class _tree_lib(object):
         lch = None
         rch = None
         is_nonleaf = self.QueryNonLeaf(max_depth - 1)
+        test_case = [None] * max_depth
         
         for d in range(max_depth - 1, -1, -1):
             print("=============================================")
@@ -362,6 +363,7 @@ class _tree_lib(object):
             
             else:
                 assert num_internal == 0 #At the very deepest level, only leaves should exist
+                print("Test case: ", test_case)
                 cur_weights = cur_edge_idx
             
             edge_idx[d] = edge_idx_it
@@ -391,6 +393,7 @@ class _tree_lib(object):
             # When d is 3, we are getting level 2's
             print("lch below: ", lch)
             print("rch below: ", rch)
+            test_case[d] = [lch, rch]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
