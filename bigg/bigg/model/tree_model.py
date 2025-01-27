@@ -838,8 +838,8 @@ class RecurTreeGen(nn.Module):
 #                 left_edge_embed = self.standardize_edge_feats(left_edge_feats)
 #                 topdown_state = self.update_wt(left_edge_embed, topdown_state)
             
-#             if has_left and self.has_edge_feats and self.method == "Test75":
-#                 topdown_state = self.update_wt(topdown_state, prev_state) ##maybe..?
+            if has_left and self.has_edge_feats and self.method == "Test75":
+                topdown_state = self.update_wt(topdown_state, prev_state) ##maybe..?
             
             rlb = max(0, lb - num_left)
             rub = min(tree_node.rch.n_cols, ub - num_left)
