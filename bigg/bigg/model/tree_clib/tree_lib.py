@@ -326,6 +326,7 @@ class _tree_lib(object):
                 test[test == 1] = cur_weights
                 test = test.reshape(len(test_is_left), 2)
                 lch, rch = test[:, 0], test[:, 1]
+        print("Hello!")
         print(edge_idx)
         return edge_idx    
 
