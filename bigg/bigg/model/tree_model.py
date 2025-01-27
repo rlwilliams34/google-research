@@ -1144,7 +1144,7 @@ class RecurTreeGen(nn.Module):
             
             if self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left]
-                has_left_states = (topdown_state[0][:, has_left], topdown_state[1][:, has_left]))
+                has_left_states = (topdown_state[0][:, has_left], topdown_state[1][:, has_left])
                 left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
                 has_left_states = self.update_wt(has_left_states, left_feat)
                 topdown_state[0][:, has_left] = has_left_states[0]
