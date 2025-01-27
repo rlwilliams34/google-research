@@ -328,7 +328,7 @@ class _tree_lib(object):
 #         return edge_idx
         
         
-        def GetTopdownEdgeIdx(self, max_depth, dtype=None):
+    def GetTopdownEdgeIdx(self, max_depth, dtype=None):
         edge_idx = [None] * max_depth
         lch = None
         rch = None
