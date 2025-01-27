@@ -300,7 +300,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                             if torch.sum(1 - mask.float()) == 0:
                                 edge_embed_h[:, idx_to] = prev_state[0]
                                 edge_embed_c[:, idx_to] = prev_state[1]
-                                edge_feats_ret[:, idx_to] = edge_feats[i]
+                                edge_feats_ret[:, idx_to] = edge_feats[i].float()
                             else: 
                                 idx_to_cur = idx_to[mask] + i
                                 edge_embed_h[:, idx_to_cur] = prev_state[0][:, mask]
