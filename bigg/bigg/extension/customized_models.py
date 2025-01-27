@@ -107,7 +107,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 self.weight_tree = FenwickTree(args)
                 
             if self.wt_mlp:
-                self.row_LSTM = MultiLSTMCell(args.wt_embed_dim, args.embed_dim, args.rnn_layers)
+                self.row_LSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
                 self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
         
         self.embed_dim = args.embed_dim
