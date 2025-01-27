@@ -369,6 +369,18 @@ class _tree_lib(object):
             if d == 0:
                 print(edge_idx)
                 print("Test case: ", test_case)
+                
+                for lv in range(1, max_lv - 1):
+                    print("LEVEL", lv)
+                    par_left, par_idx = test_case[lv]
+                    cur_left, cur_idx = test_case[lv + 1]
+                    print("par_left", par_left)
+                    print("par_idx", par_idx)
+                    print("cur left", cur_left)
+                    print("cur idx", cur_idx)
+                    print("sub par", par_left[par_idx])
+                    [-1, -1, -1, -1, -1]
+                
                 return edge_idx
             
             is_nonleaf = self.QueryNonLeaf(d - 1)
