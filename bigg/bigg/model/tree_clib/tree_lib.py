@@ -348,6 +348,9 @@ class _tree_lib(object):
                 print(rch)
                 print(test_is_left)
                 print(test_is_right)
+                test_is_left = lch * (1 - test_is_left) + test_is_left
+                test_is_right = rch * (1 - test_is_right) + test_is_right
+                
                 test = np.concatenate([np.array([x, y]) for x,y in zip(test_is_left, test_is_right)])
                 test = test.astype(np.int32)
                 test[test == 1] = cur_weights
