@@ -1139,8 +1139,8 @@ class RecurTreeGen(nn.Module):
 #                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
             
             cur_topdown_edge_idx = topdown_edge_index[lv]
-            print(cur_topdown_edge_idx)
-            print(has_left)
+            print("Cur topdown edge idx",  cur_topdown_edge_idx)
+            print("Has left",  has_left)
             
 #             if self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
 #                 
