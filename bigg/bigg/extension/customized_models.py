@@ -292,7 +292,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                         prev_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
                         edge_embed_h = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
                         edge_embed_c = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
-                        edge_test = torch.zeros(tot_edges)
+                        edge_test = torch.zeros(tot_edges).to(edge_feats.device)
                         
                         for i in range(L):
                             next_state = self.row_LSTM(edge_feats_normalized[i, :].unsqueeze(-1), prev_state)
