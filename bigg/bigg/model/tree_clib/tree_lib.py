@@ -370,7 +370,7 @@ class _tree_lib(object):
                 print(edge_idx)
                 print("Test case: ", test_case)
                 
-                for lv in range(1, max_lv - 1):
+                for lv in range(1, max_depth - 1):
                     print("LEVEL", lv)
                     par_left, par_idx = test_case[lv]
                     cur_left, cur_idx = test_case[lv + 1]
