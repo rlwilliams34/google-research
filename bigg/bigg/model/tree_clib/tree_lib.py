@@ -376,12 +376,14 @@ class _tree_lib(object):
             lch = np.array([-1] * num_internal_parents)
             rch = np.array([-1] * num_internal_parents)
             
-            is_left, _ = self.GetChLabel(-1, d - 1)
-            is_right, _ = self.GetChLabel(1, d - 1)
+            is_left, num_left = self.GetChLabel(-1, d - 1)
+            is_right, num_right = self.GetChLabel(1, d - 1)
             
             print("is left", is_left)
             print("is right", is_right)
             print(is_left * is_right)
+            print("num left", num_left)
+            print("num right", num_right)
             
             is_left = lch * (1 - is_left) + is_left
             is_right = rch * (1 - is_right) + is_right
