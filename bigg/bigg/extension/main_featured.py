@@ -386,9 +386,8 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     
     
     if edge_feats_lstm is not None:
-        edge_feats = edge_feats_lstm
-        list_num_edges=None
-        print(edge_feats.shape)
+        list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
+        edge_feats = edge_feats_lstms
     
     else:
         list_num_edges = None
@@ -919,7 +918,7 @@ if __name__ == '__main__':
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
                 if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
-                    list_num_edges = [len(list_edge_feats[i]) for i in batch_indices]
+                    list_num_edges = [len(train_graphs[i].edges()) for i in batch_indices]
                     if db_info is not None:
                         if cmd_args.g_type == "db":
                             i = batch_indices[0]
