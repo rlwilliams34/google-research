@@ -524,7 +524,7 @@ if __name__ == '__main__':
         if cmd_args.has_edge_feats:
             list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)).to(cmd_args.device) for g in train_graphs]
             
-            if cmd_args.row_lstm:
+            if cmd_args.row_LSTM:
                 list_edge_feats = [torch.from_numpy(get_edge_feats_lstm(g).to(cmd_args.device)) for g in train_graphs]
             ### To pad: F.pad(input=g1t, pad=(0,0,0,MAX_DEG - SHAPE1),mode='constant',value=-1).shape
 
