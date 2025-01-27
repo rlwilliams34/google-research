@@ -992,7 +992,7 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test75":
             left_feat_idx = [None] * (len(all_ids) + 1)
         
-        if self.method == "Test75"
+        if self.method == "Test75":
             topdown_edge_index = TreeLib.GetTopdownEdgeIdx(max_level)
         
         
