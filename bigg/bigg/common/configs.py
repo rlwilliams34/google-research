@@ -119,6 +119,7 @@ cmd_opt.add_argument('-update_ll', default=False, type=eval, help='computing tra
 cmd_opt.add_argument('-row_LSTM', default=False, type=eval, help='computing training times')
 cmd_opt.add_argument('-test_topdown', default=False, type=eval, help='computing training times')
 cmd_opt.add_argument('-wt_mlp', default=False, type=eval, help='computing training times')
+cmd_opt.add_argument('-test', default=False, type=eval, help='computing training times')
 
 
 cmd_args, _ = cmd_opt.parse_known_args()
