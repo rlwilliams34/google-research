@@ -929,7 +929,7 @@ if __name__ == '__main__':
                     if cmd_args.method == "Test75":
                         if cmd_args.row_LSTM:
                             edge_feats = [list_edge_feats[i] for i in batch_indices]
-                            max_len = np.max([x[0].shape for x in edge_feats])
+                            max_len = np.max([x.shape[0] for x in edge_feats])
                             edge_feats = [F.pad(input=x, pad = (0, 0, 0, max_len - x.shape[0]), mode='constant',value=-1) for x in edge_feats]
                             edge_feats = torch.cat(edge_feats, dim = -1)
                         
