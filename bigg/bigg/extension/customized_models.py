@@ -302,6 +302,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                             prev_state = next_state
                             mask = (edge_feats[i, :] > 0)
                             print(mask)
+                            print(mask.shape)
+                            print(torch.sum(mask.float()))
                             if torch.sum(mask.float()) == B:
                                 edge_embed_h[:, idx_to] = prev_state[0]
                                 edge_embed_c[:, idx_to] = prev_state[1]
