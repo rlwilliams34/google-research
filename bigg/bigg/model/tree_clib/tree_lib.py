@@ -398,6 +398,22 @@ class _tree_lib(object):
             # When d is 3, we are getting level 2's
             print("lch below: ", lch)
             print("rch below: ", rch)
+            print("TEST")
+            lch_b = (lch > -1)
+            rch_b = (rch > -1)
+            print(lch_b)
+            print(rch_b)
+            num_chil = lch_b + rch_b
+            print(num_chil)
+            idx_list = list(range(num_child))
+            test = [x for i, x in zip(num_chil, idx_list) for _ in range(i)]
+            print("Test: ", test)
+            is_nonleaf2 = self.QueryNonLeaf(d)
+            test = test[is_nonleaf2]
+            print("Test sub")
+            
+            
+            
             ## NEED PARENT INDEX...
             test_case[d] = [lch]
             # Goal
