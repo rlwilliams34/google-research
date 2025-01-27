@@ -387,6 +387,9 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     
     if edge_feats_lstm is not None:
         list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
+        
+        if isinstance(edge_feats, list):
+            edge_feats = torch.cat(edge_feats, dim = 0)
     
     else:
         list_num_edges = None
