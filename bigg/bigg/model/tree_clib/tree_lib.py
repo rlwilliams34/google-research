@@ -364,6 +364,7 @@ class _tree_lib(object):
             
             edge_idx[d] = edge_idx_it
             if d == 0:
+                print(edge_idx)
                 return edge_idx
             
             is_nonleaf = self.QueryNonLeaf(d - 1)
