@@ -250,7 +250,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 Z = torch.cumsum((edge_feats_lstm > 0).int(), 1)
                 idx_to = torch.sum(F.pad(Z[:,:-1], (1,0,0,0), mode='constant',value=0),dim=0)
                 edge_feats_normalized = edge_feats_lstm.clone()
-                edge_feats_normalized[edge_feats_lstm > -1] = self.standardize_edge_feats(edge_feats_normalized[edge_feats_normalized > -1])
+                edge_feats_normalized[edge_feats_normalized > -1] = self.standardize_edge_feats(edge_feats_normalized[edge_feats_normalized > -1])
             else:
                 B = edge_feats.shape[0]
                 edge_feats_normalized = self.standardize_edge_feats(edge_feats)
@@ -292,6 +292,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                         prev_state = (self.leaf_h0_wt.repeat(1, B, 1), self.leaf_c0_wt.repeat(1, B, 1))
                         edge_embed_h = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
                         edge_embed_c = torch.zeros(self.num_layers, tot_edges, self.embed_dim).to(edge_feats.device)
+                        edge_test = torch.zeros(tot_edges, 1)
                         
                         for i in range(L):
                             next_state = self.row_LSTM(edge_feats_normalized[i, :].unsqueeze(-1), prev_state)
@@ -302,11 +303,16 @@ class BiggWithEdgeLen(RecurTreeGen):
                             if i == 0:
                                 edge_embed_h[:, idx_to] = prev_state[0]
                                 edge_embed_c[:, idx_to] = prev_state[1]
+                                edge_test[idx_to] = cur_edge_feats
                             else: 
                                 idx_to_cur = idx_to[mask] + i
                                 edge_embed_h[:, idx_to_cur] = prev_state[0][:, mask]
                                 edge_embed_c[:, idx_to_cur] = prev_state[1][:, mask]
-    
+                                edge_test[idx_to] = cur_edge_feats[mask, :]
+                        print(edge_test.shape)
+                        print(edge_feats.shape)
+                        diff = torch.square(torch.sub(edge_test, edge_feats)) 
+                        print(diff)
                         edge_embed = (edge_embed_h, edge_embed_c)
                         return edge_embed
                 
