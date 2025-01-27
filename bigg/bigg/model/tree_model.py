@@ -1130,13 +1130,13 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
-                leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
-                left_leaf_feats = (edge_feats_embed[0][:, ~is_rch], edge_feats_embed[1][:, ~is_rch])
-                left_feats_stand = self.standardize_edge_feats(edge_feats[edge_idx[~is_rch]])
-                leaf_topdown_states = self.update_wt(left_feats_stand, leaf_topdown_states)
-                topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
-                topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
+#             if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
+#                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
+#                 left_leaf_feats = (edge_feats_embed[0][:, ~is_rch], edge_feats_embed[1][:, ~is_rch])
+#                 left_feats_stand = self.standardize_edge_feats(edge_feats[edge_idx[~is_rch]])
+#                 leaf_topdown_states = self.update_wt(left_feats_stand, leaf_topdown_states)
+#                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
+#                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
             
             cur_topdown_edge_idx = topdown_edge_index[lv]
             print(cur_topdown_edge_idx)
