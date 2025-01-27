@@ -376,6 +376,10 @@ class _tree_lib(object):
             
             is_left, _ = self.GetChLabel(-1, d - 1)
             is_right, _ = self.GetChLabel(1, d - 1)
+            
+            print("is left", is_left)
+            print("is right", is_right)
+            
             is_left = lch * (1 - is_left) + is_left
             is_right = rch * (1 - is_right) + is_right
             
@@ -384,6 +388,7 @@ class _tree_lib(object):
             lr[lr == 1] = cur_weights
             lr = lr.reshape(len(is_left), 2)
             lch, rch = lr[:, 0], lr[:, 1]
+            # When d is 3, we are getting level 2's
             print("lch below: ", lch)
             print("rch below: ", rch)
             # Goal
