@@ -1126,6 +1126,7 @@ class RecurTreeGen(nn.Module):
             
             print("Current Level: ", lv)
             print(has_left)
+            print(topdown_state[0].shape)
             if self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
                 print("INSIDE")
