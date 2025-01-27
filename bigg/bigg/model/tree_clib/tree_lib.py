@@ -394,6 +394,7 @@ class _tree_lib(object):
             print("lch below: ", lch)
             print("rch below: ", rch)
             is_nonleaf2 = self.QueryNonLeaf(d)
+            print("is nonleaf 2", is_nonleaf2)
             test_case[d] = [lch[is_nonleaf2], rch[is_nonleaf2]]
             # Goal
             # Level 3: []
