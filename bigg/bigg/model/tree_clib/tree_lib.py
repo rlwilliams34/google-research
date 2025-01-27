@@ -352,12 +352,14 @@ class _tree_lib(object):
             
             elif lch is None:
                 assert num_internal == 0
+                cur_weights = cur_edge_idx
             
             edge_idx[d] = edge_idx_it
             if d == 0:
                 return edge_idx
             
-            num_internal_parents = np.sum(self.QueryNonLeaf(d - 1))
+            is_nonleaf = self.QueryNonLeaf(d - 1)
+            num_internal_parents = np.sum(is_nonleaf)
             lch = np.array([-1] * num_internal_parents)
             rch = np.array([-1] * num_internal_parents)
             
@@ -368,7 +370,7 @@ class _tree_lib(object):
             
             lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
             lr = lr.astype(np.int32)
-            lr[lr == 1] = cur_edge_idx
+            lr[lr == 1] = cur_weights
             lr = lr.reshape(len(is_left), 2)
             lch, rch = lr[:, 0], lr[:, 1]
         
