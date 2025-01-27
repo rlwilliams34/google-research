@@ -992,16 +992,8 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test75":
             left_feat_idx = [None] * (len(all_ids) + 1)
         
-        for d in range(len(all_ids) -1, -1, -1):
-            print("----------------------------")
-            print("D")
-            edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
-            print("Edge idx shape: ", edge_idx.shape)
-            print("Is Rch shape: ", is_rch.shape)
-            print("----------------------------")
-        
-        print("BIG TEEST MOMENT:", max_level)
-        test = TreeLib.GetTopdownEdgeIdx(max_level)
+        if self.method == "Test75"
+            topdown_edge_index = TreeLib.GetTopdownEdgeIdx(max_level)
         
         
         for d in range(len(all_ids) - 1, -1, -1):
@@ -1012,10 +1004,6 @@ class RecurTreeGen(nn.Module):
                 h_buf = h_buf_list[d + 1]
                 c_buf = c_buf_list[d + 1]
             h_bot, c_bot = fn_hc_bot(d + 1)
-            print("````````````````````````````````")
-            print("D: ", d)
-            print(all_ids[d])
-            print("````````````````````````````````")
             if self.has_edge_feats and self.method != "Test75":
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
@@ -1039,6 +1027,9 @@ class RecurTreeGen(nn.Module):
             feat_dict['node'] = (node_feats, is_tree_trivial, t_lch, t_rch)
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
+        
+        if self.method == "Test75":
+            return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
     
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
@@ -1061,7 +1052,7 @@ class RecurTreeGen(nn.Module):
             edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
         
         if self.method == "Test75":
-            hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
+            hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
             cur_state = (h_buf_list[0], c_buf_list[0])
             weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
             cur_state = self.merge_top_wt(cur_state, weight_state)
@@ -1086,17 +1077,7 @@ class RecurTreeGen(nn.Module):
         
         lv=0
         while True:
-            if lv==3:
-                test_is_left, _ = TreeLib.GetChLabel(-1, lv - 1)
-                test_is_right, _ = TreeLib.GetChLabel(1, lv - 1)
-                ### ^ Use above to place edge indices in left and right state lists respecitvelly
-                print(test_is_left) # <-- Gives boolean for whether this is a LEFT or RIGHT child state
-                print(test_is_right)
-                print(is_nonleaf)
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
-            print("+++++++++++++++++++++++++++++++++++++++++++++++")
-            print("New Level: ", lv)
-            print("is_nonleaf: ", is_nonleaf)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
@@ -1125,33 +1106,6 @@ class RecurTreeGen(nn.Module):
                 h_next_buf, c_next_buf = h_buf_list[lv + 1], c_buf_list[lv + 1]
             else:
                 h_next_buf = c_next_buf = None
-            
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            n = TreeLib.lib.NumInternalNodes(lv)
-            edge_idx_it = np.zeros((n,), dtype=np.int32)
-            print("Cur state shape: ", cur_states[0].shape)
-            if n == 0:
-                edge_idx[d] = []
-                print("N IS ZERO")
-            else:
-                test_has_left, test_num_left = TreeLib.GetChLabel(-1, lv)
-                test_has_right, test_num_right = TreeLib.GetChLabel(1, lv)
-                print(n)
-                print("has left: ", test_has_left.shape)
-                print("Has right: ", test_has_right.shape)
-                print(test_has_left)
-                print(test_has_right)
-                print(is_nonleaf)
-                if lv > 1:
-                    test_is_left, _ = TreeLib.GetChLabel(-1, lv - 1)
-                    test_is_right, _ = TreeLib.GetChLabel(1, lv - 1)
-                    ### ^ Use above to place edge indices in left and right state lists respecitvelly
-                    print(test_is_left) # <-- Gives boolean for whether this is a LEFT or RIGHT child state
-                    print(test_is_right)
-                    print(is_nonleaf)
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                
-            print("Current State Size: ", cur_states[0].shape)
 
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
@@ -1163,46 +1117,33 @@ class RecurTreeGen(nn.Module):
                 if self.method != "Test75":
                     h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 
-                print("~~~~~~~~~~~ EDGE INFO ~~~~~~~~~~~~~~~~~~~")
-                print("Edge IDX Shape: ", edge_idx.shape)
-                print("Is RCH shape: ", is_rch.shape)
-                print("LEFT IDS 0 SHAPE: ", left_ids[0].shape)
-                print(cur_states[0].shape)
-                print("LEFT IDS: ", left_ids)
-                print("~~~~~~~~~~~!!!!!!!!!!!~~~~~~~~~~~~~~~~~~~")
-                
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
                 left_ids = tuple([None] + list(left_ids[1:]))
             
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            print("Left IDS before select", left_ids)
-            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
             left_subtree_states = tree_state_select(h_bot, c_bot,
                                                     h_next_buf, c_next_buf,
                                                     lambda: left_ids)
-            print("left subtree state: ", left_subtree_states[0].shape)
-
+            
             has_right, num_right = TreeLib.GetChLabel(1, lv)
-            print("Has right: ", has_right.shape)
-            print("Num right: ", num_right.shape)
 
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            print("TEST: ", topdown_state[0].shape)
-            print("HAS LEFT: ", has_left.shape)
-            print("HAS LEFT INFO: ", has_left)
-            print("+++++++++++++++++++++++++++++++++++++++++++++++")
-#             if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
-#                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
-#                 left_leaf_feats = (edge_feats_embed[0][:, ~is_rch], edge_feats_embed[1][:, ~is_rch])
-#                 left_feats_stand = self.standardize_edge_feats(edge_feats[edge_idx[~is_rch]])
-#                 leaf_topdown_states = self.update_wt(left_feats_stand, leaf_topdown_states)
-#                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
-#                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
+            if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
+                leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
+                left_leaf_feats = (edge_feats_embed[0][:, ~is_rch], edge_feats_embed[1][:, ~is_rch])
+                left_feats_stand = self.standardize_edge_feats(edge_feats[edge_idx[~is_rch]])
+                leaf_topdown_states = self.update_wt(left_feats_stand, leaf_topdown_states)
+                topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
+                topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
+            
+            cur_topdown_edge_idx = topdown_edge_index[lv]
+            print(cur_topdown_edge_idx)
+            print(has_left)
             
 #             if self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+#                 
 #                 has_left_states = (topdown_state[0][:, has_left], topdown_state[1][:, has_left]))
 #                 left_feat = (edge_feats_embed[0][:, GET_INDEX_HERE], edge_feats_embed[1][:, GET_INDEX_HERE])
 #                 has_left_states = self.update_wt(has_left_states, left_feat)
