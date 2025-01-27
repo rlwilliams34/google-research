@@ -390,15 +390,15 @@ class _tree_lib(object):
             
             lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
             lr = lr.astype(np.int32)
+            print("lr", lr)
             lr[lr == 1] = cur_weights
             lr = lr.reshape(len(is_left), 2)
             lch, rch = lr[:, 0], lr[:, 1]
             # When d is 3, we are getting level 2's
             print("lch below: ", lch)
             print("rch below: ", rch)
-            is_nonleaf2 = self.QueryNonLeaf(d)
-            print("is nonleaf 2", is_nonleaf2)
-            test_case[d] = [lch, is_nonleaf2]
+            ## NEED PARENT INDEX...
+            test_case[d] = [lch]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
