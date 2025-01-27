@@ -396,68 +396,68 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
     sys.exit()
 
 
-def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
-    ll_t1 = 0
-    ll_w1 = 0
-    ll_t2 = 0
-    ll_w2 = 0
-    
-    for i in range(0, 1):
-        g = graph[i]
-        edge_feats_i = (edge_feats[i] if edge_feats is not None else None)
-        edges = []
-        for e in g.edges():
-            if e[1] > e[0]:
-                e = (e[1], e[0])
-            edges.append(e)
-        edges = sorted(edges)
-        
-        if edge_feats_i is not None and not torch.is_tensor(edge_feats_i):
-            edge_feats_i = edge_feats_i[0]
-        
-        ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
-        ll_t2 = ll + ll_t2
-        ll_w2 = ll_wt + ll_w2
-    
-    list_num_edges = None
-    if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
-        #list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
-        list_num_edges = [len(edge_feats[0])]
-    
-    if isinstance(edge_feats, list):
-        #edge_feats = torch.cat(edge_feats, dim = 0)
-        edge_feats = edge_feats[0]
-    
-    #print(info)
-    
-    ll_t1, ll_w1, _, _, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info)
-    
-    print("=============================")
-    print("Fast Code Top+Wt Likelihoods: ")
-    print(ll_t1)
-    print(ll_w1)
-    print("Slow Code Top+Wt Likelihoods: ")
-    print(ll_t2)
-    print(ll_w2)
-    print("=============================")
-    
-    diff1 = abs(ll_t1 - ll_t2)
-    diff2 = abs(ll_w1 - ll_w2)
-
-    print("Absolute Differences: ")
-    print("diff top: ", diff1)
-    print("diff weight: ", diff2)
-    print("=============================")
-    
-    rel1 = (ll_t1 - ll_t2) / (ll_t1 + 1e-15)
-    rel2 = (ll_w1 - ll_w2) / (ll_w1 + 1e-15)
-    
-    print("Relative Differences (%): ")
-    print("rel diff top: ", rel1 * 100)
-    print("rel diff weight: ", rel2 * 100)
-    
-    import sys
-    sys.exit()
+# def debug_model(model, graph, node_feats, edge_feats, method=None, info=None):
+#     ll_t1 = 0
+#     ll_w1 = 0
+#     ll_t2 = 0
+#     ll_w2 = 0
+#     
+#     for i in range(0, 1):
+#         g = graph[i]
+#         edge_feats_i = (edge_feats[i] if edge_feats is not None else None)
+#         edges = []
+#         for e in g.edges():
+#             if e[1] > e[0]:
+#                 e = (e[1], e[0])
+#             edges.append(e)
+#         edges = sorted(edges)
+#         
+#         if edge_feats_i is not None and not torch.is_tensor(edge_feats_i):
+#             edge_feats_i = edge_feats_i[0]
+#         
+#         ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
+#         ll_t2 = ll + ll_t2
+#         ll_w2 = ll_wt + ll_w2
+#     
+#     list_num_edges = None
+#     if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
+#         #list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
+#         list_num_edges = [len(edge_feats[0])]
+#     
+#     if isinstance(edge_feats, list):
+#         #edge_feats = torch.cat(edge_feats, dim = 0)
+#         edge_feats = edge_feats[0]
+#     
+#     #print(info)
+#     
+#     ll_t1, ll_w1, _, _, _ = model.forward_train([0], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info)
+#     
+#     print("=============================")
+#     print("Fast Code Top+Wt Likelihoods: ")
+#     print(ll_t1)
+#     print(ll_w1)
+#     print("Slow Code Top+Wt Likelihoods: ")
+#     print(ll_t2)
+#     print(ll_w2)
+#     print("=============================")
+#     
+#     diff1 = abs(ll_t1 - ll_t2)
+#     diff2 = abs(ll_w1 - ll_w2)
+# 
+#     print("Absolute Differences: ")
+#     print("diff top: ", diff1)
+#     print("diff weight: ", diff2)
+#     print("=============================")
+#     
+#     rel1 = (ll_t1 - ll_t2) / (ll_t1 + 1e-15)
+#     rel2 = (ll_w1 - ll_w2) / (ll_w1 + 1e-15)
+#     
+#     print("Relative Differences (%): ")
+#     print("rel diff top: ", rel1 * 100)
+#     print("rel diff weight: ", rel2 * 100)
+#     
+#     import sys
+#     sys.exit()
 
 
 
@@ -734,9 +734,7 @@ if __name__ == '__main__':
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
         elif cmd_args.method == "Test75":
-            batch_indices = [18]
-            print("HEY")
-            print(train_graphs[18].edges())
+            batch_indices = [0, 1]
             list_last_edge = [last_edge_list[i] for i in batch_indices]
             list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
             list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
