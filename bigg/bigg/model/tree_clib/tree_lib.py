@@ -353,7 +353,7 @@ class _tree_lib(object):
                 test[test == 1] = cur_weights
                 print("Did it work: ", test)
                 test = test.reshape(len(test_is_left), 2)
-                lch, rch = test[0], test[1]
+                lch, rch = test[:, 0], test[:, 1]
                 print(lch)
                 print(rch)
                 check = self.GetLeftRootStates(d - 1)
