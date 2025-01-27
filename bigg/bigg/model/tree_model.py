@@ -771,7 +771,7 @@ class RecurTreeGen(nn.Module):
         if not tree_node.has_edge:  # an empty tree
             if self.method == "Test75":
                 return ll, ll_wt, self.get_empty_state(), 0, None, prev_state
-            return ll, ll_wt, self.get_empty_state(), 0, None, prev_state, None
+            return ll, ll_wt, self.get_empty_state(), 0, None, prev_state
 
         if tree_node.is_leaf:
             tree_node.bits_rep = [0]
@@ -825,7 +825,6 @@ class RecurTreeGen(nn.Module):
                 pred_edge_feats.append(left_edge_feats)
             else:
                 left_state = self.get_empty_state()
-                joint_left_state = self.get_empty_state()
                 num_left = 0
 
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
@@ -1101,10 +1100,7 @@ class RecurTreeGen(nn.Module):
 
             if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
-                if self.method == "Test75":
-                    left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
-                else:
-                    left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
+                left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
                 if self.method != "Test75":
                     h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
@@ -1129,8 +1125,10 @@ class RecurTreeGen(nn.Module):
                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
             
             print("Current Level: ", lv)
+            print(has_left)
             if self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
+                print("INSIDE")
                 print(has_left)
                 
                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
