@@ -403,7 +403,8 @@ class _tree_lib(object):
             rch_b = (rch > -1)
             print(lch_b)
             print(rch_b)
-            num_chil = lch_b + rch_b
+            num_chil = lch_b.int() + rch_b.int()
+            num_chil = l
             print(num_chil)
             idx_list = list(range(num_chil))
             test = [x for i, x in zip(num_chil, idx_list) for _ in range(i)]
