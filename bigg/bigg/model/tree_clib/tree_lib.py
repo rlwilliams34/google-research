@@ -422,6 +422,7 @@ class _tree_lib(object):
             print("is right", is_right)
             print("lch: ", lch)
             print("rch: ", rch)
+            print("is_lch: ", is_lch)
             
             
             print("=====================")
@@ -431,7 +432,7 @@ class _tree_lib(object):
             print(rch)
             print(cur_weights)
             print("is_lch", is_lch)
-            test_case[d] = [lch, test, is_lch]
+            test_case[d] = [lch, rch, test, is_lch]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
