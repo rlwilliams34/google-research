@@ -409,6 +409,7 @@ class _tree_lib(object):
             
             ## NEED PARENT INDEX...
             print("lch: ", lch)
+            print("rch: ", rch)
             test_case[d] = [lch, test, is_lch]
             # Goal
             # Level 3: []
