@@ -372,6 +372,7 @@ class _tree_lib(object):
                     next_parent_state[~is_left] = sub_par[~is_left]  
                     left_idx[lv] = next_parent_state      
                     prior_parent_state = next_parent_state
+                    print("Par left: ", par_left)
                 
                 return edge_idx, left_idx
             
@@ -407,7 +408,7 @@ class _tree_lib(object):
             
             
             ## NEED PARENT INDEX...
-            test_case[d] = [np.array([(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]), test, is_lch]
+            test_case[d] = [lch, test, is_lch]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
