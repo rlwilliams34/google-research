@@ -407,7 +407,7 @@ class _tree_lib(object):
             
             
             ## NEED PARENT INDEX...
-            test_case[d] = [[(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))], test, is_lch]
+            test_case[d] = [np.array([(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]), test, is_lch]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
