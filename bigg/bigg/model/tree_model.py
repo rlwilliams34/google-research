@@ -1185,6 +1185,7 @@ class RecurTreeGen(nn.Module):
             ## Need edge index at this stage 
             if self.test_sep:
                 cur_left_updates = topdown_edge_index[0][lv]
+                print(topdown_edge_index)
                 cur_states_wt_h = cur_states[0].clone()
                 cur_states_wt_c = cur_states[1].clone()
                 cur_states_wt = (cur_states_wt_h, cur_states_wt_c)
