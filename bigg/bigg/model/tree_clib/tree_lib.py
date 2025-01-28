@@ -372,7 +372,7 @@ class _tree_lib(object):
             
             up_level_lr = np.array([[l, r] for l, r in zip(lch, rch)])
             mre = np.array([x[1] if x[1] != -1 else x[0] for x in up_level_lr])
-            most_recent_edge_list[d - 1] = mre
+            most_recent_edge_list[d - 1] = up_level_lr
         return most_recent_edge_list
             
         
