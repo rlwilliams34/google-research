@@ -327,6 +327,8 @@ class _tree_lib(object):
 #                 lch, rch = lr[:, 0], lr[:, 1]
 #         return edge_idx
     
+
+    
     def GetMostRecentWeight(self, max_depth, dtype=None):
         most_recent_edge_list = [None] * max_depth
         for d in range(max_depth - 1, -1, -1):
@@ -350,7 +352,37 @@ class _tree_lib(object):
                 cur_is_right = None
             
             if d == 0:
-                print(most_recent_edge_list)
+                left_idx = [None] * max_depth
+                right_idx = [None] * max_depth
+#                 for lv in range(0, max_depth):
+#                     if lv == max_depth - 1:
+#                         print("Left idx: ",  left_idx)
+#                         print("Right idx: ", right_idx)
+#                         return (left_idx, right_idx)
+#                 
+#                 
+#                 
+#                     par_left, par_idx, is_left  = test_case[lv]
+#                     cur_left, cur_idx, _ = test_case[lv + 1]
+#                     sub_par = par_left[par_idx]
+#                     if lv == 1:
+#                         prior_parent_state = -1 * np.ones(len(sub_par))
+#                     else:
+#                         prior_parent_state = prior_parent_state[par_idx]
+#                     print("LEVEL: ", lv)
+#                     print("par left", par_left)
+#                     print("sub par", sub_par)
+#                     print("par idx", par_idx)
+#                     print("is left", is_left)
+#                     print("prior parent state: ", prior_parent_state)
+#                     #print("prior parent state indexed; ", prior_parent_state[par_idx])
+#                     print("======================================")
+#                     next_parent_state = np.zeros(len(sub_par))
+#                     next_parent_state[is_left] = prior_parent_state[is_left]
+#                     next_parent_state[~is_left] = sub_par[~is_left]  
+#                     left_idx[lv] = next_parent_state      
+#                     prior_parent_state = next_parent_state
+#                 print(left_idx)
                 return most_recent_edge_list
             
             up_lv_nonleaf = self.QueryNonLeaf(d - 1)
@@ -373,7 +405,68 @@ class _tree_lib(object):
             up_level_lr = np.array([[l, r] for l, r in zip(lch, rch)])
             mre = np.array([x[1] if x[1] != -1 else x[0] for x in up_level_lr])
             most_recent_edge_list[d - 1] = up_level_lr
+            
+            print("TEST SECTION")
+            lch_b = (lch > -1)
+            rch_b = (rch > -1)
+            num_chil = lch_b.astype(int) + rch_b.astype(int)
+            idx_list = list(range(len(num_chil)))
+            test = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
+            test = test[cur_lv_nonleaf]
+            print("Level: ", d)
+            print("Test: ", test)
+
         return most_recent_edge_list
+
+#     def GetMostRecentWeight(self, max_depth, dtype=None):
+#         most_recent_edge_list = [None] * max_depth
+#         for d in range(max_depth - 1, -1, -1):
+#             cur_lv_nonleaf = self.QueryNonLeaf(d)
+#             cur_lv_edge, _ = self.GetEdgeAndLR(d)
+#             
+#             if d == max_depth - 1:
+#                 cur_weights = cur_lv_edge
+#             
+#             else:
+#                 cur_weights = np.zeros(len(cur_lv_nonleaf))
+#                 cur_weights[~cur_lv_nonleaf] = cur_lv_edge
+#                 cur_weights[cur_lv_nonleaf] = mre
+#             
+#             if d != max_depth - 1:
+#                 cur_is_left, _ =  self.GetChLabel(-1, d)
+#                 cur_is_right, _ =  self.GetChLabel(1, d)
+#             
+#             else:
+#                 cur_is_left = None
+#                 cur_is_right = None
+#             
+#             if d == 0:
+#                 ## This is done. We now have a list of most recent Left and Right edges (-1 being no edge)
+#                 ## But would need some indexing...
+#                 return most_recent_edge_list
+#             
+#             up_lv_nonleaf = self.QueryNonLeaf(d - 1)
+#             up_is_left, _ = self.GetChLabel(-1, d - 1)
+#             up_is_right, _ = self.GetChLabel(1, d - 1)
+#             
+#             num_internal_parents = np.sum(up_lv_nonleaf)
+#             lch = np.array([-1] * num_internal_parents)
+#             rch = np.array([-1] * num_internal_parents)
+#             
+#             up_is_left = lch * (1 - up_is_left) + up_is_left
+#             up_is_right = rch * (1 - up_is_right) + up_is_right
+# 
+#             lr = np.concatenate([np.array([x, y]) for x,y in zip(up_is_left, up_is_right)])
+#             lr = lr.astype(np.int32)
+#             lr[lr == 1] = cur_weights
+#             lr = lr.reshape(len(up_is_left), 2)
+#             lch, rch = lr[:, 0], lr[:, 1]
+#             
+#             up_level_lr = np.array([[l, r] for l, r in zip(lch, rch)])
+#             mre = np.array([x[1] if x[1] != -1 else x[0] for x in up_level_lr])
+#             most_recent_edge_list[d - 1] = up_level_lr
+#         
+#         return most_recent_edge_list
             
         
 #     def GetTopdownEdgeIdx(self, max_depth, dtype=None):
