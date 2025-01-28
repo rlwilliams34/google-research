@@ -776,7 +776,7 @@ class RecurTreeGen(nn.Module):
             print(self.num_edge)
             if self.test3 and self.num_edge > 0:
                 print(self.num_edge)
-                state_update = self.update_wt(topdown_state, prev_state)
+                state_update = self.update_wt(state, prev_state)
                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
             
             else:
