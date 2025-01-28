@@ -761,9 +761,10 @@ class RecurTreeGen(nn.Module):
                         
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                         prev_state = edge_embed
+                        self.num_edge += 1
                         
                         return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
-                            
+                    
                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state, None
                     
                 else:
@@ -772,7 +773,13 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
+            
+            if self.test3 and self.num_edge > 0:
+                state_update = self.update_wt(topdown_state, prev_state)
+                left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
+            
+            else:
+                left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
 
             if col_sm.supervised:
                 has_left = col_sm.next_edge < mid
@@ -805,7 +812,7 @@ class RecurTreeGen(nn.Module):
             
             topdown_wt_state = None
             if not self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
-                if self.test:
+                if self.test or self.test3:
                     topdown_wt_state = self.update_wt(topdown_state, prev_state)
                 else:
                     topdown_state = self.update_wt(topdown_state, prev_state)
@@ -892,6 +899,7 @@ class RecurTreeGen(nn.Module):
             ub = cur_row.root.n_cols if ub_list is None else ub_list[i]
             cur_pos_embed = self.row_tree.pos_enc([num_nodes - i])
             controller_state = [x + cur_pos_embed for x in controller_state]
+            self.num_edge = 0
             
             if self.has_node_feats:
                 target_node_feats = None if node_feats is None else node_feats[[i]]
@@ -1072,9 +1080,7 @@ class RecurTreeGen(nn.Module):
             
             ## Need edge index at this stage 
             cur_left_updates = left_idx[lv]
-            test3=True
-            
-            if test3 and cur_left_updates is not None:
+            if self.test3 and cur_left_updates is not None:
                 cur_states_wt = cur_states
                 cur_left_idx = (cur_left_updates != -1)
                 left_has_wt_states = (cur_states_wt[0][:, cur_left_idx], cur_states_wt[1][:, cur_left_idx])
