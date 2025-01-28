@@ -526,7 +526,7 @@ if __name__ == '__main__':
     print(train_graphs[1].edges())
     
     if True:
-        g = nx.Graph([(1, 7, {'weight': 0.1}), (5, 7, {'weight': 0.2}), (6, 7, {'weight': 0.3}), (0, 2, {'weight': 0.2}), (3, 4, {'weight': 0.5})])
+        g = nx.Graph([(0, 1, {'weight': 0.1}), (1, 2, {'weight': 0.2}), (2, 3, {'weight': 0.3}), (3, 4, {'weight': 0.2}), (4, 5, {'weight': 0.5}), (5, 6, {'weight': 0.6}), (6, 7, {'weight': 0.7}), (1, 7, {'weight': 0.8}), (5, 7, {'weight': 0.9}), (6, 7, {'weight': 1.0})])
         print(g.nodes())
         train_graphs = [g]
         print(train_graphs)
