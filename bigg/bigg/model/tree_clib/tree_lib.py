@@ -369,9 +369,10 @@ class _tree_lib(object):
                         prior_parent_state = prior_parent_state[par_idx]
                     next_parent_state = np.zeros(len(sub_par))
                     next_parent_state[is_left] = prior_parent_state[is_left]
-                    next_parent_state[~is_left] = sub_par[~is_left]        
+                    next_parent_state[~is_left] = sub_par[~is_left]  
+                    left_idx[lv] = next_parent_state      
                     prior_parent_state = next_parent_state
-                    left_idx[d] = next_parent_state
+                    
                     
                 print(left_idx)
                 return edge_idx
