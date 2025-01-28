@@ -394,7 +394,8 @@ class _tree_lib(object):
                     print("par_idx", par_idx)
                     print("cur left", cur_left)
                     print("cur idx", cur_idx)
-                    print("sub par", par_left[par_idx])
+                    print("sub par (MRLC)", par_left[par_idx]) #MRLC
+                    print("prior parent state", prior_parent_state)
                     [-1, -1, -1, -1, -1]
                 
                 return edge_idx
