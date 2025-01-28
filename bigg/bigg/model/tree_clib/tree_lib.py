@@ -380,14 +380,18 @@ class _tree_lib(object):
                         # if the node is a left child, the left state will be the PARENTS
                         cur_left_states = np.array([-1] * len(cur_edge))
                         cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
-                        cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]##need to grab the most recent left edge from parent list
+                        cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
+                        
+                        cur_right_states = par_right_states[cur_par_idx]
+                        par_right_states = cur_right_states
                         
                         par_left_edge = np.array([x[0] for x in cur_edge])
                         par_left_states = cur_left_states
+                        
                     
                     print("===============")
                     print("Level: ", lv)
-                    print("cur left states: ", cur_left_states)
+                    print("cur left states: ", cur_right_states)
                     print("===============")
                 return most_recent_edge_list
             
