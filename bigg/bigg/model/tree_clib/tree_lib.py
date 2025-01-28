@@ -348,11 +348,6 @@ class _tree_lib(object):
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
                 ## For each level: get prior parent idx and most recent state index...
                 ## If is left, take parent idx. Else take most recent state index
-                print("cur weights", cur_weights)
-                print("mrs", mrs)
-                print("edge_idx_it", edge_idx_it)
-                print("is nonleaf: ", is_nonleaf)
-                print("cur edge idx: ", cur_edge_idx)
                 
                 
                 cur_weights[is_nonleaf] = mrs
@@ -380,6 +375,7 @@ class _tree_lib(object):
                     next_parent_state[~is_left] = sub_par[~is_left]  
                     left_idx[lv] = next_parent_state      
                     prior_parent_state = next_parent_state
+                print(left_idx)
                 return edge_idx, left_idx
             
             is_nonleaf = self.QueryNonLeaf(d - 1)
