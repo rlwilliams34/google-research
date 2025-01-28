@@ -367,8 +367,8 @@ class _tree_lib(object):
                     print("LEVEL", lv)
                     
                     
-                    par_left, par_idx, is_left, _ = test_case[lv]
-                    cur_left, cur_idx, _, _ = test_case[lv + 1]
+                    par_left, par_idx, is_left  = test_case[lv]
+                    cur_left, cur_idx, _ = test_case[lv + 1]
                     
                     sub_par = par_left[par_idx]
                     
@@ -426,7 +426,7 @@ class _tree_lib(object):
             
             
             ## NEED PARENT INDEX...
-            test_case[d] = [lch, test]
+            test_case[d] = [lch, test, is_left]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
