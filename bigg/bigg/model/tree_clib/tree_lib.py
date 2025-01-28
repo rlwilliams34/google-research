@@ -337,8 +337,8 @@ class _tree_lib(object):
             
             else:
                 cur_weights = np.zeros(len(cur_lv_nonleaf))
-                cur_weights[~is_nonleaf] = cur_lv_edge
-                cur_weights[is_nonleaf] = mre
+                cur_weights[~cur_lv_nonleaf] = cur_lv_edge
+                cur_weights[cur_lv_nonleaf] = mre
             
             if d != max_depth - 1:
                 cur_is_left, _ =  self.GetChLabel(-1, d)
