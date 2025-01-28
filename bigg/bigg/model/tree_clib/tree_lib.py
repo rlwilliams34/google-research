@@ -356,11 +356,15 @@ class _tree_lib(object):
             if d == 0:
                 left_idx = [None] * max_depth
                 right_idx = [None] * max_depth
+                
+                print("Current edge list:", most_recent_edge_list)
+                print("par idx: ", parent_indices)
+                print("is lch: ", is_lch_list)
+                
                 for lv in range(0, max_depth):
                     cur_par_idx = parent_indices[lv]
                     cur_edge = most_recent_edge_list[lv]
                     cur_is_lch = is_lch_list[lv]
-                    
                     if lv == 0:
                         cur_left_states = np.array([-1] * len(cur_edge))
                         cur_right_states = np.array([x[0] for x in cur_edge])
