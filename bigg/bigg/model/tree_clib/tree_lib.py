@@ -356,56 +356,33 @@ class _tree_lib(object):
             if d == 0:
                 left_idx = [None] * max_depth
                 right_idx = [None] * max_depth
-                print("parent indices", parent_indices)
-                print("edge list: ", most_recent_edge_list)
-                print("is lch: ", is_lch_list)
                 for lv in range(0, max_depth):
-                    cur_par = parent_indices[lv]
+                    cur_par_idx = parent_indices[lv]
                     cur_edge = most_recent_edge_list[lv]
+                    cur_is_lch = is_lch_list[lv]
                     
-                    if cur_par is None:
-                        cur_par = np.array([-1] * len(cur_edge))
+                    if lv == 0:
+                        cur_left_states = np.array([-1] * len(cur_edge))
+                        cur_right_states = np.array([x[0] for x in cur_edge])
+                        left_idx[d] = cur_left_states
+                        left_idx[d] = cur_right_states
+                        par_left_edge = np.array([x[0] for x in cur_edge])
+                        par_left_states = cur_left_states
+                        par_right_states = cur_right_states
                     
-                    elif len(cur_par) == 0:
-                        continue
+                    else:
+                        # if the node is a left child, the left state will be the PARENTS
+                        cur_left_states = np.array([-1] * len(cur_edge))
+                        cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
+                        cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]##need to grab the most recent left edge from parent list
+                        
+                        par_left_edge = np.array([x[0] for x in cur_edge])
+                        par_left_states = cur_left_states
                     
-                    print("===================")
-                    print("lv: ", lv)
-                    print("cur par: ", cur_par)
-                    print("cur edge: ", cur_edge)
-                    print("===================")
-                    
-                    
-                    
-                    
-#                     if lv == max_depth - 1:
-#                         print("Left idx: ",  left_idx)
-#                         print("Right idx: ", right_idx)
-#                         return (left_idx, right_idx)
-#                 
-#                 
-#                 
-#                     par_left, par_idx, is_left  = test_case[lv]
-#                     cur_left, cur_idx, _ = test_case[lv + 1]
-#                     sub_par = par_left[par_idx]
-#                     if lv == 1:
-#                         prior_parent_state = -1 * np.ones(len(sub_par))
-#                     else:
-#                         prior_parent_state = prior_parent_state[par_idx]
-#                     print("LEVEL: ", lv)
-#                     print("par left", par_left)
-#                     print("sub par", sub_par)
-#                     print("par idx", par_idx)
-#                     print("is left", is_left)
-#                     print("prior parent state: ", prior_parent_state)
-#                     #print("prior parent state indexed; ", prior_parent_state[par_idx])
-#                     print("======================================")
-#                     next_parent_state = np.zeros(len(sub_par))
-#                     next_parent_state[is_left] = prior_parent_state[is_left]
-#                     next_parent_state[~is_left] = sub_par[~is_left]  
-#                     left_idx[lv] = next_parent_state      
-#                     prior_parent_state = next_parent_state
-#                 print(left_idx)
+                    print("===============")
+                    print("Level: ", lv)
+                    print("cur left states: ", cur_left_states)
+                    print("===============")
                 return most_recent_edge_list
             
             up_lv_nonleaf = self.QueryNonLeaf(d - 1)
