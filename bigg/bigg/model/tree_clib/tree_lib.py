@@ -332,6 +332,7 @@ class _tree_lib(object):
     def GetMostRecentWeight(self, max_depth, dtype=None):
         most_recent_edge_list = [None] * max_depth
         parent_indices = [None] * max_depth
+        is_lch_list = [None] * max_depth
         for d in range(max_depth - 1, -1, -1):
             cur_lv_nonleaf = self.QueryNonLeaf(d)
             cur_lv_edge, _ = self.GetEdgeAndLR(d)
@@ -354,9 +355,10 @@ class _tree_lib(object):
             
             if d == 0:
                 left_idx = [None] * max_depth
-                right_idx = [None] * max_depth# 
-#                 print(parent_indices)
-#                 print(most_recent_edge_list)
+                right_idx = [None] * max_depth
+                print("parent indices", parent_indices)
+                print("edge list: ", most_recent_edge_list)
+                print("is lch: ", is_lch_list)
                 for lv in range(0, max_depth):
                     cur_par = parent_indices[lv]
                     cur_edge = most_recent_edge_list[lv]
@@ -372,6 +374,10 @@ class _tree_lib(object):
                     print("cur par: ", cur_par)
                     print("cur edge: ", cur_edge)
                     print("===================")
+                    
+                    
+                    
+                    
 #                     if lv == max_depth - 1:
 #                         print("Left idx: ",  left_idx)
 #                         print("Right idx: ", right_idx)
@@ -414,6 +420,12 @@ class _tree_lib(object):
             up_is_right = rch * (1 - up_is_right) + up_is_right
 
             lr = np.concatenate([np.array([x, y]) for x,y in zip(up_is_left, up_is_right)])
+
+            is_lch = np.array([True, False]*len(up_is_left))
+            is_lch = is_lch[lr != -1]
+            is_lch = is_lch[cur_lv_nonleaf]
+            is_lch_list[d] = is_lch
+            
             lr = lr.astype(np.int32)
             lr[lr == 1] = cur_weights
             lr = lr.reshape(len(up_is_left), 2)
@@ -430,6 +442,11 @@ class _tree_lib(object):
             par_idx = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
             par_idx = par_idx[cur_lv_nonleaf]
             parent_indices[d] = par_idx
+            
+            
+            
+            
+            
 
         return most_recent_edge_list
 
