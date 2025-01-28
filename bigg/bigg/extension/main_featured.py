@@ -527,10 +527,10 @@ if __name__ == '__main__':
     
     if True:
         g = nx.Graph([(1, 8, {'weight': 0.1}), (5, 8, {'weight': 0.2}), (6, 8, {'weight': 0.3})])
-        g.add_node(2)
-        g.add_node(3)
-        g.add_node(4)
-        g.add_node(7)
+#         g.add_node(2)
+#         g.add_node(3)
+#         g.add_node(4)
+#         g.add_node(7)
         train_graphs = [g]
         print(train_graphs)
         print(train_graphs[0].edges())
