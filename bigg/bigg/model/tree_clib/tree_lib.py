@@ -362,9 +362,11 @@ class _tree_lib(object):
                 print("is lch: ", is_lch_list)
                 
                 for lv in range(0, max_depth):
+                    print("Level: ", lv)
                     cur_par_idx = parent_indices[lv]
                     cur_edge = most_recent_edge_list[lv]
                     cur_is_lch = is_lch_list[lv]
+                    
                     if lv == 0:
                         cur_left_states = np.array([-1] * len(cur_edge))
                         cur_right_states = np.array([x[0] for x in cur_edge])
@@ -374,7 +376,7 @@ class _tree_lib(object):
                         par_left_states = cur_left_states
                         par_right_states = cur_right_states
                     
-                    else:
+                    elif cur_edge is not None:
                         # if the node is a left child, the left state will be the PARENTS
                         cur_left_states = np.array([-1] * len(cur_edge))
                         cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
