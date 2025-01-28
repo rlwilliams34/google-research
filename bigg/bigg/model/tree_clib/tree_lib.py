@@ -405,6 +405,7 @@ class _tree_lib(object):
             is_right = rch * (1 - is_right) + is_right
             
             lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
+            print("lr", lr)
             lr = lr.astype(np.int32)
             lr[lr == 1] = cur_weights
             lr = lr.reshape(len(is_left), 2)
