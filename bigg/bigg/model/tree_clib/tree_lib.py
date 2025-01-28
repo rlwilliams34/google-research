@@ -335,8 +335,8 @@ class _tree_lib(object):
             is_nonleaf = self.QueryNonLeaf(d)
             cur_edge_idx, _ = self.GetEdgeAndLR(d)
             if d != max_depth - 1:
-                lch = self.GetChLabel(-1, d)
-                rch = self.GetChLabel(-1, d)
+                lch, _ = self.GetChLabel(-1, d)
+                rch, _ = self.GetChLabel(-1, d)
             
             else:
                 lch = None
@@ -352,8 +352,8 @@ class _tree_lib(object):
             print("ONE LEVEL DOWN INFO")
             is_nonleaf = self.QueryNonLeaf(d - 1)
             cur_edge_idx, _ = self.GetEdgeAndLR(d - 1)
-            lch = self.GetChLabel(-1, d - 1)
-            rch = self.GetChLabel(-1, d - 1)
+            lch, _ = self.GetChLabel(-1, d - 1)
+            rch, _ = self.GetChLabel(-1, d - 1)
             print("is nonleaf", is_nonleaf)
             print("cur edge idx", cur_edge_idx)
             print("lch", lch)
