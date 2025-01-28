@@ -869,7 +869,6 @@ class RecurTreeGen(nn.Module):
         prev_state = None
         if self.method == "Test12":
             prev_state = (self.leaf_h0, self.leaf_c0)
-            
         
         elif self.method == "Test75" and not self.row_LSTM:
             prev_state =  self.weight_tree()
@@ -964,6 +963,8 @@ class RecurTreeGen(nn.Module):
         
         if self.method == "Test75":
             topdown_edge_index, _= TreeLib.GetTopdownEdgeIdx(len(all_ids) + 1)
+            if self.g_type == "er":
+                x = self.GetMostRecentWeight(len(all_ids) + 1)
         
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]

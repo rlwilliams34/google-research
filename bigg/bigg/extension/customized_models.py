@@ -43,6 +43,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.test2 = args.test2
         self.test3 = args.test3
         self.num_edge = 0
+        self.g_type = args.g_type
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75']

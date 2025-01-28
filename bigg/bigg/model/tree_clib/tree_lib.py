@@ -326,7 +326,36 @@ class _tree_lib(object):
 #                 lr = lr.reshape(len(is_left), 2)
 #                 lch, rch = lr[:, 0], lr[:, 1]
 #         return edge_idx
-        
+    
+    def GetMostRecentWeight(self, max_depth, dtype=None):
+        for d in range(max_depth - 1, -1, -1):
+            print("===============================")
+            print("Current Level: ", d)
+            print("LEVEL D INFO: ")
+            is_nonleaf = self.QueryNonLeaf(d))
+            cur_edge_idx, _ = self.GetEdgeAndLR(d)
+            lch = self.GetChLabel(-1, d)
+            rch = self.GetChLabel(-1, d)
+            print("is nonleaf", is_nonleaf)
+            print("cur edge idx", cur_edge_idx)
+            print("lch", lch)
+            print("rch", rch)
+            
+            if d == 0:
+                return 0
+            
+            print("ONE LEVEL DOWN INFO")
+            is_nonleaf = self.QueryNonLeaf(d - 1))
+            cur_edge_idx, _ = self.GetEdgeAndLR(d - 1)
+            lch = self.GetChLabel(-1, d - 1)
+            rch = self.GetChLabel(-1, d - 1)
+            print("is nonleaf", is_nonleaf)
+            print("cur edge idx", cur_edge_idx)
+            print("lch", lch)
+            print("rch", rch)
+            print("===============================")
+        return 0
+            
         
 #     def GetTopdownEdgeIdx(self, max_depth, dtype=None):
 #         edge_idx = [None] * max_depth
@@ -336,6 +365,7 @@ class _tree_lib(object):
 #         test_case = [None] * max_depth
 #         
 #         for d in range(max_depth - 1, -1, -1):
+#             
 #             num_internal = np.sum(is_nonleaf)
 #             num_leaves = np.sum(~is_nonleaf)
 #             cur_edge_idx, _ = self.GetEdgeAndLR(d)
@@ -416,23 +446,6 @@ class _tree_lib(object):
 #             is_nonleaf2 = self.QueryNonLeaf(d)
 #             test = test[is_nonleaf2]
 #             
-#             print("=====================")
-#             print("level: ", d)
-#             print("is left", is_left)
-#             print("is right", is_right)
-#             print("lch: ", lch)
-#             print("rch: ", rch)
-#             print("is_lch: ", is_lch)
-#             print("test: ", test)
-#             
-#             
-#             print("=====================")
-#             
-#             
-#             print(lch)
-#             print(rch)
-#             print(cur_weights)
-#             print("is_lch", is_lch)
 #             test_case[d] = [lch, rch, test, is_lch]
 #             # Goal
 #             # Level 3: []
