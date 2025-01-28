@@ -332,14 +332,15 @@ class _tree_lib(object):
             print("===============================")
             print("Current Level: ", d)
             print("LEVEL D INFO: ")
-            print("A")
             is_nonleaf = self.QueryNonLeaf(d)
-            print("B")
             cur_edge_idx, _ = self.GetEdgeAndLR(d)
-            print("C")
-            lch = self.GetChLabel(-1, d)
-            print("D")
-            rch = self.GetChLabel(-1, d)
+            if d != max_depth - 1:
+                lch = self.GetChLabel(-1, d)
+                rch = self.GetChLabel(-1, d)
+            
+            else:
+                lch = None
+                rch = None
             print("is nonleaf", is_nonleaf)
             print("cur edge idx", cur_edge_idx)
             print("lch", lch)
