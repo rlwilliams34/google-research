@@ -356,7 +356,8 @@ class _tree_lib(object):
                 
                 
                 cur_weights[is_nonleaf] = mrs
-                cur_weights[~is_nonleaf] = cur_edge_idx
+                if cur_edge_idx is not None:
+                    cur_weights[~is_nonleaf] = cur_edge_idx
                 
             
             else:
