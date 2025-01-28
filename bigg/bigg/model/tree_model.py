@@ -1090,7 +1090,8 @@ class RecurTreeGen(nn.Module):
                 cur_states_wt[0][:, cur_left_idx] = left_has_wt_states[0]
                 cur_states_wt[1][:, cur_left_idx] = left_has_wt_states[1]
                 ### Here update cur_states with most recent edge of PARENT node...
-            
+                left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
+                
             else:
                 left_logits = self.pred_has_left(cur_states[0][-1], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
