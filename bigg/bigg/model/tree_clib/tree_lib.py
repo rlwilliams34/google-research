@@ -415,7 +415,11 @@ class _tree_lib(object):
             test = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
             is_nonleaf2 = self.QueryNonLeaf(d)
             test = test[is_nonleaf2]
-            print("lch", lch)
+            
+            print(lch)
+            print(rch)
+            print(cur_weights)
+            print("is_lch", is_lch)
             test_case[d] = [lch, test, is_lch]
             # Goal
             # Level 3: []
