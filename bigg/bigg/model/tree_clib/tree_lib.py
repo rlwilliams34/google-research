@@ -405,7 +405,12 @@ class _tree_lib(object):
             is_right = rch * (1 - is_right) + is_right
             
             lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
-            print("lr", lr)
+            lr = np.array([1, -1, 1, -1, 1, 1, -1, 1, -1, 1])
+            is_lch = np.array([True, False]*len(is_left))
+            is_lch = is_lch[lr != -1]
+            print("is nonleaf:", is_nonleaf)
+            print("is lch", is_lch)
+            
             lr = lr.astype(np.int32)
             lr[lr == 1] = cur_weights
             lr = lr.reshape(len(is_left), 2)
@@ -428,7 +433,7 @@ class _tree_lib(object):
             
             
             ## NEED PARENT INDEX...
-            test_case[d] = [lch, test, is_left]
+            test_case[d] = [lch, test, is_lch]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
