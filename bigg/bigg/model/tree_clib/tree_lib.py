@@ -328,123 +328,6 @@ class _tree_lib(object):
 #         return edge_idx
         
         
-    def GetTopdownEdgeIdx(self, max_depth, dtype=None):
-        edge_idx = [None] * max_depth
-        lch = None
-        rch = None
-        is_nonleaf = self.QueryNonLeaf(max_depth - 1)
-        test_case = [None] * max_depth
-        
-        for d in range(max_depth - 1, -1, -1):
-            num_internal = np.sum(is_nonleaf)
-            num_leaves = np.sum(~is_nonleaf)
-            cur_edge_idx, _ = self.GetEdgeAndLR(d)
-            edge_idx_it = np.zeros((num_internal, ), dtype=np.int32)
-            
-            if lch is not None:
-                cur_weights = np.zeros((len(is_nonleaf), ), dtype=np.int32)
-                mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
-                edge_idx_it = np.array(mrs, dtype=np.int32)
-                mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
-                ## For each level: get prior parent idx and most recent state index...
-                ## If is left, take parent idx. Else take most recent state index
-                
-                
-                cur_weights[is_nonleaf] = mrs
-                if cur_edge_idx is not None:
-                    cur_weights[~is_nonleaf] = cur_edge_idx
-                
-            
-            else:
-                assert num_internal == 0 #At the very deepest level, only leaves should exist
-                cur_weights = cur_edge_idx
-            
-            edge_idx[d] = edge_idx_it
-            if d == 0:
-                left_idx = [None] * max_depth
-                for lv in range(1, max_depth - 1):
-                    par_left, par_idx, is_left  = test_case[lv]
-                    cur_left, cur_idx, _ = test_case[lv + 1]
-                    sub_par = par_left[par_idx]
-                    if lv == 1:
-                        prior_parent_state = -1 * np.ones(len(sub_par))
-                    else:
-                        prior_parent_state = prior_parent_state[par_idx]
-                    print("LEVEL: ", lv)
-                    print("par left", par_left)
-                    print("sub par", sub_par)
-                    print("par idx", par_idx)
-                    print("is left", is_left)
-                    print("prior parent state: ", prior_parent_state)
-                    #print("prior parent state indexed; ", prior_parent_state[par_idx])
-                    print("======================================")
-                    next_parent_state = np.zeros(len(sub_par))
-                    next_parent_state[is_left] = prior_parent_state[is_left]
-                    next_parent_state[~is_left] = sub_par[~is_left]  
-                    left_idx[lv] = next_parent_state      
-                    prior_parent_state = next_parent_state
-                print(left_idx)
-                return edge_idx, left_idx
-            
-            is_nonleaf = self.QueryNonLeaf(d - 1)
-            num_internal_parents = np.sum(is_nonleaf)
-            lch = np.array([-1] * num_internal_parents)
-            rch = np.array([-1] * num_internal_parents)
-            
-            is_left, num_left = self.GetChLabel(-1, d - 1)
-            is_right, num_right = self.GetChLabel(1, d - 1)
-            
-            is_left = lch * (1 - is_left) + is_left
-            is_right = rch * (1 - is_right) + is_right
-            
-            lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
-            is_lch = np.array([True, False]*len(is_left))
-            is_lch = is_lch[lr != -1]
-            is_nonleaf2 = self.QueryNonLeaf(d)
-            is_lch = is_lch[is_nonleaf2]
-            
-            lr = lr.astype(np.int32)
-            lr[lr == 1] = cur_weights
-            lr = lr.reshape(len(is_left), 2)
-            lch, rch = lr[:, 0], lr[:, 1]
-            # When d is 3, we are getting level 2's
-            lch_b = (lch > -1)
-            rch_b = (rch > -1)
-            num_chil = lch_b.astype(int) + rch_b.astype(int)
-            idx_list = list(range(len(num_chil)))
-            test = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
-            is_nonleaf2 = self.QueryNonLeaf(d)
-            test = test[is_nonleaf2]
-            
-            print("=====================")
-            print("level: ", d)
-            print("is left", is_left)
-            print("is right", is_right)
-            print("lch: ", lch)
-            print("rch: ", rch)
-            print("is_lch: ", is_lch)
-            print("test: ", test)
-            
-            
-            print("=====================")
-            
-            
-            print(lch)
-            print(rch)
-            print(cur_weights)
-            print("is_lch", is_lch)
-            test_case[d] = [lch, rch, test, is_lch]
-            # Goal
-            # Level 3: []
-            # Level 2: [4, -1, 1]
-            # Level 1: [-1, -1, -1, -1, -1]
-            # Level 0: SKIP
-            
-            ##
-        
-        return edge_idx
-
-        
 #     def GetTopdownEdgeIdx(self, max_depth, dtype=None):
 #         edge_idx = [None] * max_depth
 #         lch = None
@@ -463,17 +346,45 @@ class _tree_lib(object):
 #                 mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
 #                 edge_idx_it = np.array(mrs, dtype=np.int32)
 #                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
+#                 ## For each level: get prior parent idx and most recent state index...
+#                 ## If is left, take parent idx. Else take most recent state index
+#                 
+#                 
 #                 cur_weights[is_nonleaf] = mrs
 #                 if cur_edge_idx is not None:
 #                     cur_weights[~is_nonleaf] = cur_edge_idx
 #                 
+#             
 #             else:
 #                 assert num_internal == 0 #At the very deepest level, only leaves should exist
 #                 cur_weights = cur_edge_idx
 #             
 #             edge_idx[d] = edge_idx_it
 #             if d == 0:
-#                 return edge_idx, _
+#                 left_idx = [None] * max_depth
+#                 for lv in range(1, max_depth - 1):
+#                     par_left, par_idx, is_left  = test_case[lv]
+#                     cur_left, cur_idx, _ = test_case[lv + 1]
+#                     sub_par = par_left[par_idx]
+#                     if lv == 1:
+#                         prior_parent_state = -1 * np.ones(len(sub_par))
+#                     else:
+#                         prior_parent_state = prior_parent_state[par_idx]
+#                     print("LEVEL: ", lv)
+#                     print("par left", par_left)
+#                     print("sub par", sub_par)
+#                     print("par idx", par_idx)
+#                     print("is left", is_left)
+#                     print("prior parent state: ", prior_parent_state)
+#                     #print("prior parent state indexed; ", prior_parent_state[par_idx])
+#                     print("======================================")
+#                     next_parent_state = np.zeros(len(sub_par))
+#                     next_parent_state[is_left] = prior_parent_state[is_left]
+#                     next_parent_state[~is_left] = sub_par[~is_left]  
+#                     left_idx[lv] = next_parent_state      
+#                     prior_parent_state = next_parent_state
+#                 print(left_idx)
+#                 return edge_idx, left_idx
 #             
 #             is_nonleaf = self.QueryNonLeaf(d - 1)
 #             num_internal_parents = np.sum(is_nonleaf)
@@ -496,7 +407,96 @@ class _tree_lib(object):
 #             lr[lr == 1] = cur_weights
 #             lr = lr.reshape(len(is_left), 2)
 #             lch, rch = lr[:, 0], lr[:, 1]
-#         return edge_idx, _
+#             # When d is 3, we are getting level 2's
+#             lch_b = (lch > -1)
+#             rch_b = (rch > -1)
+#             num_chil = lch_b.astype(int) + rch_b.astype(int)
+#             idx_list = list(range(len(num_chil)))
+#             test = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
+#             is_nonleaf2 = self.QueryNonLeaf(d)
+#             test = test[is_nonleaf2]
+#             
+#             print("=====================")
+#             print("level: ", d)
+#             print("is left", is_left)
+#             print("is right", is_right)
+#             print("lch: ", lch)
+#             print("rch: ", rch)
+#             print("is_lch: ", is_lch)
+#             print("test: ", test)
+#             
+#             
+#             print("=====================")
+#             
+#             
+#             print(lch)
+#             print(rch)
+#             print(cur_weights)
+#             print("is_lch", is_lch)
+#             test_case[d] = [lch, rch, test, is_lch]
+#             # Goal
+#             # Level 3: []
+#             # Level 2: [4, -1, 1]
+#             # Level 1: [-1, -1, -1, -1, -1]
+#             # Level 0: SKIP
+#             
+#             ##
+#         
+#         return edge_idx
+
+        
+    def GetTopdownEdgeIdx(self, max_depth, dtype=None):
+        edge_idx = [None] * max_depth
+        lch = None
+        rch = None
+        is_nonleaf = self.QueryNonLeaf(max_depth - 1)
+        test_case = [None] * max_depth
+        
+        for d in range(max_depth - 1, -1, -1):
+            num_internal = np.sum(is_nonleaf)
+            num_leaves = np.sum(~is_nonleaf)
+            cur_edge_idx, _ = self.GetEdgeAndLR(d)
+            edge_idx_it = np.zeros((num_internal, ), dtype=np.int32)
+            
+            if lch is not None:
+                cur_weights = np.zeros((len(is_nonleaf), ), dtype=np.int32)
+                mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
+                edge_idx_it = np.array(mrs, dtype=np.int32)
+                mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
+                cur_weights[is_nonleaf] = mrs
+                if cur_edge_idx is not None:
+                    cur_weights[~is_nonleaf] = cur_edge_idx
+                
+            else:
+                assert num_internal == 0 #At the very deepest level, only leaves should exist
+                cur_weights = cur_edge_idx
+            
+            edge_idx[d] = edge_idx_it
+            if d == 0:
+                return edge_idx, _
+            
+            is_nonleaf = self.QueryNonLeaf(d - 1)
+            num_internal_parents = np.sum(is_nonleaf)
+            lch = np.array([-1] * num_internal_parents)
+            rch = np.array([-1] * num_internal_parents)
+            
+            is_left, num_left = self.GetChLabel(-1, d - 1)
+            is_right, num_right = self.GetChLabel(1, d - 1)
+            
+            is_left = lch * (1 - is_left) + is_left
+            is_right = rch * (1 - is_right) + is_right
+            
+            lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
+            is_lch = np.array([True, False]*len(is_left))
+            is_lch = is_lch[lr != -1]
+            is_nonleaf2 = self.QueryNonLeaf(d)
+            is_lch = is_lch[is_nonleaf2]
+            
+            lr = lr.astype(np.int32)
+            lr[lr == 1] = cur_weights
+            lr = lr.reshape(len(is_left), 2)
+            lch, rch = lr[:, 0], lr[:, 1]
+        return edge_idx, _
 
 
 
