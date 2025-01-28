@@ -329,36 +329,83 @@ class _tree_lib(object):
     
     def GetMostRecentWeight(self, max_depth, dtype=None):
         for d in range(max_depth - 1, -1, -1):
-            print("===============================")
-            print("Current Level: ", d)
-            print("LEVEL D INFO: ")
-            is_nonleaf = self.QueryNonLeaf(d)
-            cur_edge_idx, _ = self.GetEdgeAndLR(d)
-            if d != max_depth - 1:
-                lch, _ = self.GetChLabel(-1, d)
-                rch, _ = self.GetChLabel(1, d)
+            cur_lv_nonleaf = self.QueryNonLeaf(d)
+            cur_lv_edge, _ = self.GetEdgeAndLR(d)
+            
+            if d == max_depth - 1:
+                cur_weights = cur_lv_edge
             
             else:
-                lch = None
-                rch = None
-            print("is nonleaf", is_nonleaf)
-            print("cur edge idx", cur_edge_idx)
-            print("lch", lch)
-            print("rch", rch)
+                cur_weights = np.zeros(len(cur_lv_nonleaf))
+                cur_weights[~is_nonleaf] = cur_lv_edge
+                cur_weights[is_nonleaf] = mre
+            
+            if d != max_depth - 1:
+                cur_is_left, _ =  self.GetChLabel(-1, d)
+                cur_is_right, _ =  self.GetChLabel(1, d)
+            
+            else:
+                cur_is_left = None
+                cur_is_right = None
             
             if d == 0:
                 return 0
             
-            print("ONE LEVEL DOWN INFO")
-            is_nonleaf = self.QueryNonLeaf(d - 1)
-            cur_edge_idx, _ = self.GetEdgeAndLR(d - 1)
-            lch, _ = self.GetChLabel(-1, d - 1)
-            rch, _ = self.GetChLabel(1, d - 1)
-            print("is nonleaf", is_nonleaf)
-            print("cur edge idx", cur_edge_idx)
-            print("lch", lch)
-            print("rch", rch)
+            up_lv_nonleaf = self.QueryNonLeaf(d - 1)
+            up_is_left, _ = self.GetChLabel(-1, d - 1)
+            up_is_right, _ = self.GetChLabel(1, d - 1)
+            
+            num_internal_parents = np.sum(up_lv_nonleaf)
+            lch = np.array([-1] * num_internal_parents)
+            rch = np.array([-1] * num_internal_parents)
+            
+            up_is_left = lch * (1 - up_is_left) + is_left
+            up_is_right = rch * (1 - up_is_right) + is_right
+
+            lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
+            lr = lr.astype(np.int32)
+            lr[lr == 1] = cur_weights
+            lr = lr.reshape(len(is_left), 2)
+            lch, rch = lr[:, 0], lr[:, 1]
+            
+            up_level_lr = np.array([[l, r] for l, r in zip(lch, rch)])
+            mre = np.array([x[1] if x[1] != -1 else x[0]])
             print("===============================")
+            print("Cur Level: ", d)
+            print("Up level lr: ", up_level_lr)
+            print("MRE: ", mre)
+            print("===============================")
+#             
+#             print("===============================")
+#             print("Current Level: ", d)
+#             print("LEVEL D INFO: ")
+#             is_nonleaf = self.QueryNonLeaf(d)
+#             cur_edge_idx, _ = self.GetEdgeAndLR(d)
+#             if d != max_depth - 1:
+#                 lch, _ = self.GetChLabel(-1, d)
+#                 rch, _ = self.GetChLabel(1, d)
+#             
+#             else:
+#                 lch = None
+#                 rch = None
+#             print("is nonleaf", is_nonleaf)
+#             print("cur edge idx", cur_edge_idx)
+#             print("lch", lch)
+#             print("rch", rch)
+#             
+#             if d == 0:
+#                 return 0
+#             
+#             print("ONE LEVEL DOWN INFO")
+#             is_nonleaf = self.QueryNonLeaf(d - 1)
+#             cur_edge_idx, _ = self.GetEdgeAndLR(d - 1)
+#             lch, _ = self.GetChLabel(-1, d - 1)
+#             rch, _ = self.GetChLabel(1, d - 1)
+#             print("is nonleaf", is_nonleaf)
+#             print("cur edge idx", cur_edge_idx)
+#             print("lch", lch)
+#             print("rch", rch)
+#             print("===============================")
         return 0
             
         
