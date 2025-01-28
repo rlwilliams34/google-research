@@ -357,12 +357,9 @@ class _tree_lib(object):
                 left_idx = [None] * max_depth
                 right_idx = [None] * max_depth
                 
-                print("Current edge list:", most_recent_edge_list)
-                print("par idx: ", parent_indices)
-                print("is lch: ", is_lch_list)
-                
                 for lv in range(0, max_depth):
-                    print("Level: ", lv)
+                    cur_left_states = None
+                    cur_right_states = None
                     cur_par_idx = parent_indices[lv]
                     cur_edge = most_recent_edge_list[lv]
                     cur_is_lch = is_lch_list[lv]
@@ -381,18 +378,16 @@ class _tree_lib(object):
                         cur_left_states = np.array([-1] * len(cur_edge))
                         cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
                         cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
-                        
                         cur_right_states = np.array([x[0] for x in cur_edge])
-                        
-                        
                         par_left_edge = np.array([x[0] for x in cur_edge])
                         par_left_states = cur_left_states
-                        
                     
-                    print("===============")
-                    print("Level: ", lv)
-                    print("cur right states: ", cur_right_states)
-                    print("===============")
+                    left_idx[lv] = cur_left_states
+                    right_idx[lv] = cur_right_states
+                
+                print("DONE.")
+                print("LEFT: ", left_idx)
+                print("RIGHT: ", right_idx)
                 return most_recent_edge_list
             
             up_lv_nonleaf = self.QueryNonLeaf(d - 1)
