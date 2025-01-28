@@ -370,11 +370,13 @@ class _tree_lib(object):
                         prior_parent_state = -1 * np.ones(len(sub_par))
                     else:
                         prior_parent_state = prior_parent_state[par_idx]
-                    
+                    print("LEVEL: ", lv)
                     print("par left", par_left)
                     print("par idx", par_idx)
                     print("is left", is_left)
                     print("prior parent state: ", prior_parent_state)
+                    print("prior parent state indexed; ", prior_parent_state[par_idx])
+                    print("======================================")
                     next_parent_state = np.zeros(len(sub_par))
                     next_parent_state[is_left] = prior_parent_state[is_left]
                     next_parent_state[~is_left] = sub_par[~is_left]  
