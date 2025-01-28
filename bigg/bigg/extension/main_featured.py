@@ -532,6 +532,8 @@ if __name__ == '__main__':
         g.add_node(4)
         g.add_node(7)
         train_graphs = [g]
+        print(train_graphs)
+        print(train_graphs[0].edges())
     
     if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
