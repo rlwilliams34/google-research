@@ -1073,12 +1073,9 @@ class RecurTreeGen(nn.Module):
         
         if self.method == "Test75":
             topdown_edge_index, _= TreeLib.GetTopdownEdgeIdx(len(all_ids) + 1)
-            print("Hi 1")
-            print(self.test_sep)
             if self.test_sep:
-                print("Hi 2")
                 left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1)
-                topdown_edge_idx = (left_idx, right_idx)
+                topdown_edge_index = (left_idx, right_idx)
         
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]
