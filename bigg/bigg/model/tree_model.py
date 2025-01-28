@@ -773,7 +773,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            
+            print(self.num_edge)
             if self.test3 and self.num_edge > 0:
                 print(self.num_edge)
                 state_update = self.update_wt(topdown_state, prev_state)
