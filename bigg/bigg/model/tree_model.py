@@ -916,7 +916,7 @@ class RecurTreeGen(nn.Module):
                     topdown_wt_state = self.update_wt(topdown_state, prev_state)
                 else:
                     topdown_state = self.update_wt(topdown_state, prev_state)
-            elif self.test_sep and self.num_edge > 0:
+            elif False and self.test_sep and self.num_edge > 0:
                 topdown_wt_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
@@ -1272,7 +1272,7 @@ class RecurTreeGen(nn.Module):
                 topdown_wt_state[1][:, has_left.astype(bool)] = has_left_states[1]
             
             ### Need most recent edge at this stage...
-            if self.test_sep:
+            if False and self.test_sep:
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
                 topdown_wt_state = (topdown_h, topdown_c)
