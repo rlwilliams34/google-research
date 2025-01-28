@@ -265,6 +265,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_feats_normalized[edge_idx] = self.standardize_edge_feats(edge_feats_normalized[edge_idx])
                 
                 if sigma > 0:
+                    print(edge_idx.shape)
+                    print(edge_feats_normalized.shape)
                     edge_feats_normalized[edge_idx] = edge_feats_normalized[edge_idx] + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
                 
             else:
