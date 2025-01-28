@@ -748,6 +748,12 @@ if __name__ == '__main__':
     if cmd_args.epoch_plateu > -1:
         epoch_lr_decrease = cmd_args.epoch_plateu
     
+    if cmd_args.g_type == 'db':
+        offset = 1000
+    
+    else:
+        offset = 100
+    
     batch_loss = 0.0
     sigma_t = 1.0
     sigma_w = 1.0
@@ -774,7 +780,7 @@ if __name__ == '__main__':
     
     if cmd_args.epoch_load >= epoch_lr_decrease:
         cmd_args.learning_rate = 1e-4
-        if cmd_args.epoch_load >= epoch_lr_decrease + 100:
+        if cmd_args.epoch_load >= epoch_lr_decrease + offset:
             cmd_args.learning_rate = 1e-5
     
     print("Current Learning Rate is: ", cmd_args.learning_rate)
@@ -893,10 +899,9 @@ if __name__ == '__main__':
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
         
-        elif epoch >= epoch_lr_decrease + 100 and cmd_args.learning_rate == 1e-4:
+        elif epoch >= epoch_lr_decrease + offset and cmd_args.learning_rate == 1e-4:
             cmd_args.learning_rate = cmd_args.learning_rate / 10
             print("Lowering Larning Rate to: ", cmd_args.learning_rate)
-            epoch_lr_decrease += 100
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
         edge_feats_embed = None
