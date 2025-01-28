@@ -346,16 +346,8 @@ class _tree_lib(object):
             if lch is not None:
                 cur_weights = np.zeros((len(is_nonleaf), ), dtype=np.int32)
                 mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
-                print("mrs before: ", mrs)
-                print("lch: ", lch)
-                print("rch: ", rch)
                 edge_idx_it = np.array(mrs, dtype=np.int32)
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
-                print("mrs after: ", mrs)
-                test = [(lch[i] if lch[i]  > -1 else 0) for i in range(len(lch))]
-                test = [x - 1  for x in test]
-                print("Test: ", test)
-                print("=====================================")
                 ## For each level: get prior parent idx and most recent state index...
                 ## If is left, take parent idx. Else take most recent state index
                 cur_weights[is_nonleaf] = mrs
@@ -397,8 +389,7 @@ class _tree_lib(object):
                     print("cur idx", cur_idx)
                     print("sub par (MRLC)", par_left[par_idx]) #MRLC
                     print("prior parent state", prior_parent_state)
-                    print("IS LEFT: ", is_left[par_idx])
-                    [-1, -1, -1, -1, -1]
+                    print("IS LEFT: ", is_left[par_idx]) #Not correct... :need to know if child is a left or right child
                 
                 return edge_idx
             
@@ -410,43 +401,32 @@ class _tree_lib(object):
             is_left, num_left = self.GetChLabel(-1, d - 1)
             is_right, num_right = self.GetChLabel(1, d - 1)
             
-            print("is left", is_left)
-            print("is right", is_right)
-            print(is_left * is_right)
-            print("num left", num_left)
-            print("num right", num_right)
-            
             is_left = lch * (1 - is_left) + is_left
             is_right = rch * (1 - is_right) + is_right
             
             lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
             lr = lr.astype(np.int32)
-            print("lr", lr)
-            print(lr.shape)
             lr[lr == 1] = cur_weights
             lr = lr.reshape(len(is_left), 2)
             lch, rch = lr[:, 0], lr[:, 1]
             # When d is 3, we are getting level 2's
-            print("lch below: ", lch)
-            print("rch below: ", rch)
-            print("TEST")
             lch_b = (lch > -1)
             rch_b = (rch > -1)
-            print(lch_b)
-            print(rch_b)
             num_chil = lch_b.astype(int) + rch_b.astype(int)
-            print(num_chil)
             idx_list = list(range(len(num_chil)))
             test = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
-            print("Test: ", test)
             is_nonleaf2 = self.QueryNonLeaf(d)
             test = test[is_nonleaf2]
-            print("Test sub", test)
-            
+            print("Test sub", test) ## This is giving you the indices corresponding to parents
+            print("Now is there a way to get whether the internal node is a LEFT or a RIGHT CHILD")
+            print("lch: ", lch)
+            print("rch: ", rch)
+            print("is_left", is_left)
+            print("is_right", is_right)
             
             
             ## NEED PARENT INDEX...
-            test_case[d] = [lch, test, is_left, is_right]
+            test_case[d] = [lch, test]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
