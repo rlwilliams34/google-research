@@ -356,7 +356,19 @@ class _tree_lib(object):
                 left_idx = [None] * max_depth
                 right_idx = [None] * max_depth
                 print(parent_indices)
+                print(most_recent_edge_list)
 #                 for lv in range(0, max_depth):
+#                     cur_par = parent_indices[lv]
+#                     cur_edge = most_recent_edge_list[lv]
+#                     
+#                     
+#                     if cur_par is None:
+#                         cur_par = -1's
+#                     
+#                     elif len(cur_par) == 0:
+#                         continue
+#                 
+#                 
 #                     if lv == max_depth - 1:
 #                         print("Left idx: ",  left_idx)
 #                         print("Right idx: ", right_idx)
