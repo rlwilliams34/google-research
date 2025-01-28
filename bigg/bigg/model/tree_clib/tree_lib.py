@@ -408,7 +408,7 @@ class _tree_lib(object):
             is_lch = np.array([True, False]*len(is_left))
             is_lch = is_lch[lr != -1]
             is_nonleaf2 = self.QueryNonLeaf(d + 1)
-            print("is nonleaf:", is_nonleaf)
+            print("is nonleaf:", is_nonleaf2)
             print("is lch", is_lch)
             
             lr = lr.astype(np.int32)
