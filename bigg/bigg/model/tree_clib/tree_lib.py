@@ -336,8 +336,6 @@ class _tree_lib(object):
         test_case = [None] * max_depth
         
         for d in range(max_depth - 1, -1, -1):
-            print("=============================================")
-            print("LEVEL: ", d)
             num_internal = np.sum(is_nonleaf)
             num_leaves = np.sum(~is_nonleaf)
             cur_edge_idx, _ = self.GetEdgeAndLR(d)
@@ -360,47 +358,22 @@ class _tree_lib(object):
             
             edge_idx[d] = edge_idx_it
             if d == 0:
-                print(edge_idx)
-                print("Test case: ", test_case)
                 left_idx = [None] * max_depth
                 for lv in range(1, max_depth - 1):
-                    print("LEVEL", lv)
-                    
-                    
                     par_left, par_idx, is_left  = test_case[lv]
                     cur_left, cur_idx, _ = test_case[lv + 1]
-                    
                     sub_par = par_left[par_idx]
-                    
                     if lv == 1:
                         prior_parent_state = -1 * np.ones(len(sub_par))
-                    
                     else:
                         prior_parent_state = prior_parent_state[par_idx]
-                    
-                    
                     next_parent_state = np.zeros(len(sub_par))
-                    
                     next_parent_state[is_left] = prior_parent_state[is_left]
-                    next_parent_state[~is_left] = sub_par[~is_left]
-                    print("next state: ", next_parent_state)
-                    
+                    next_parent_state[~is_left] = sub_par[~is_left]        
                     prior_parent_state = next_parent_state
+                    left_idx[d] = next_parent_state
                     
-                    
-                    print(prior_parent_state)
-                    print(sub_par)
-                    
-                    # need is_lch is_rch
-                    
-                    print("par_left", par_left)
-                    print("par_idx", par_idx)
-                    print("cur left", cur_left)
-                    print("cur idx", cur_idx)
-                    print("sub par (MRLC)", par_left[par_idx]) #MRLC
-                    print("prior parent state", prior_parent_state)
-                    print("IS LEFT: ", is_left) #Not correct... :need to know if child is a left or right child
-                
+                print(left_idx)
                 return edge_idx
             
             is_nonleaf = self.QueryNonLeaf(d - 1)
