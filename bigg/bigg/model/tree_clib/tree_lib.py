@@ -369,7 +369,7 @@ class _tree_lib(object):
             lch, rch = lr[:, 0], lr[:, 1]
             
             up_level_lr = np.array([[l, r] for l, r in zip(lch, rch)])
-            mre = np.array([x[1] if x[1] != -1 else x[0]])
+            mre = np.array([x[1] if x[1] != -1 else x[0]] for x in up_level_lr)
             print("===============================")
             print("Cur Level: ", d)
             print("Up level lr: ", up_level_lr)
