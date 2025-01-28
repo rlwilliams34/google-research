@@ -1126,14 +1126,14 @@ class RecurTreeGen(nn.Module):
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             
-            if not self.test3 and self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
-                cur_topdown_edge_idx = topdown_edge_index[lv]
-                left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
-                has_left_states = (left_subtree_states[0][:, has_left.astype(bool)], left_subtree_states[1][:, has_left.astype(bool)])
-                left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
-                has_left_states = self.update_wt(has_left_states, left_feat)
-                left_subtree_states[0][:, has_left.astype(bool)] = has_left_states[0]
-                left_subtree_states[1][:, has_left.astype(bool)] = has_left_states[1]
+#             if not self.test3 and self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+#                 cur_topdown_edge_idx = topdown_edge_index[lv]
+#                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
+#                 has_left_states = (left_subtree_states[0][:, has_left.astype(bool)], left_subtree_states[1][:, has_left.astype(bool)])
+#                 left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
+#                 has_left_states = self.update_wt(has_left_states, left_feat)
+#                 left_subtree_states[0][:, has_left.astype(bool)] = has_left_states[0]
+#                 left_subtree_states[1][:, has_left.astype(bool)] = has_left_states[1]
                             
             
             left_subtree_states = [x + right_pos for x in left_subtree_states]
