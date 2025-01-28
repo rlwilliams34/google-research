@@ -1071,7 +1071,7 @@ class RecurTreeGen(nn.Module):
                 batch_idx = batch_idx[is_nonleaf]
             
             ## Need edge index at this stage 
-            cur_left_updates = left_idx[i]
+            cur_left_updates = left_idx[lv]
             test3=True
             print("cur left updates")
             if test3 and cur_left_updates is not None:
