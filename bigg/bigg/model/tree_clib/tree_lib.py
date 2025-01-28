@@ -331,7 +331,7 @@ class _tree_lib(object):
     
     def GetMostRecentWeight(self, max_depth, dtype=None):
         most_recent_edge_list = [None] * max_depth
-        parent_indices = []
+        parent_indices = [None] * max_depth
         for d in range(max_depth - 1, -1, -1):
             cur_lv_nonleaf = self.QueryNonLeaf(d)
             cur_lv_edge, _ = self.GetEdgeAndLR(d)
@@ -414,9 +414,7 @@ class _tree_lib(object):
             idx_list = list(range(len(num_chil)))
             par_idx = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
             par_idx = par_idx[cur_lv_nonleaf]
-            print("level: ", d)
-            print("par idx: ", par_idx)
-            parent_indices.append(par_idx)
+            parent_indices[d-1] = par_idx
 
         return most_recent_edge_list
 
