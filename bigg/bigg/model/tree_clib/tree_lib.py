@@ -345,7 +345,7 @@ class _tree_lib(object):
                 return 0
             
             print("ONE LEVEL DOWN INFO")
-            is_nonleaf = self.QueryNonLeaf(d - 1))
+            is_nonleaf = self.QueryNonLeaf(d - 1)
             cur_edge_idx, _ = self.GetEdgeAndLR(d - 1)
             lch = self.GetChLabel(-1, d - 1)
             rch = self.GetChLabel(-1, d - 1)
