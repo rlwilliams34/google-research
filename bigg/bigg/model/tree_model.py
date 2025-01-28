@@ -1073,7 +1073,7 @@ class RecurTreeGen(nn.Module):
             ## Need edge index at this stage 
             cur_left_updates = left_idx[lv]
             test3=True
-            print("cur left updates")
+            print("cur left updates", cur_left_updates)
             if test3 and cur_left_updates is not None:
                 print(cur_states[0].shape)
                 ### Here update cur_states with most recent edge of PARENT node...
