@@ -408,8 +408,7 @@ class _tree_lib(object):
             is_lch = np.array([True, False]*len(is_left))
             is_lch = is_lch[lr != -1]
             is_nonleaf2 = self.QueryNonLeaf(d)
-            print("is nonleaf:", is_nonleaf2)
-            print("is lch", is_lch)
+            is_lch = is_lch[is_nonleaf2]
             
             lr = lr.astype(np.int32)
             lr[lr == 1] = cur_weights
@@ -423,13 +422,6 @@ class _tree_lib(object):
             test = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
             is_nonleaf2 = self.QueryNonLeaf(d)
             test = test[is_nonleaf2]
-            print("Test sub", test) ## This is giving you the indices corresponding to parents
-            print("Now is there a way to get whether the internal node is a LEFT or a RIGHT CHILD")
-            print("lch: ", lch)
-            print("rch: ", rch)
-            print("is_left", is_left)
-            print("is_right", is_right)
-            print("lr", lr)
             
             
             ## NEED PARENT INDEX...
