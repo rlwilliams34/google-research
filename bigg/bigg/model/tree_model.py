@@ -874,7 +874,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            if self.test_sep and self.num_edge > 0:
+            if False and self.test_sep and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
             
@@ -1183,7 +1183,7 @@ class RecurTreeGen(nn.Module):
                 batch_idx = batch_idx[is_nonleaf]
             
             ## Need edge index at this stage 
-            if self.test_sep:
+            if False and self.test_sep:
                 cur_left_updates = topdown_edge_index[0][lv]
                 cur_states_wt_h = cur_states[0].clone()
                 cur_states_wt_c = cur_states[1].clone()
