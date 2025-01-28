@@ -1192,6 +1192,9 @@ class RecurTreeGen(nn.Module):
                 left_has_wt_states = (cur_states_wt[0][:, cur_left_idx], cur_states_wt[1][:, cur_left_idx])
                 cur_edge_idx = cur_left_updates[cur_left_idx]
                 left_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+                print("lv: ", lv)
+                print(left_feat[0].shape)
+                print(left_has_wt_states[0].shape)
                 left_has_wt_states = self.update_wt(left_has_wt_states, left_feat)
                 cur_states_wt[0][:, cur_left_idx] = left_has_wt_states[0]
                 cur_states_wt[1][:, cur_left_idx] = left_has_wt_states[1]
