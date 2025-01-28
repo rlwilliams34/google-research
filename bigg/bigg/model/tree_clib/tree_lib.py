@@ -356,7 +356,8 @@ class _tree_lib(object):
                 test = [x - 1  for x in test]
                 print("Test: ", test)
                 print("=====================================")
-                
+                ## For each level: get prior parent idx and most recent state index...
+                ## If is left, take parent idx. Else take most recent state index
                 cur_weights[is_nonleaf] = mrs
                 cur_weights[~is_nonleaf] = cur_edge_idx
                 
@@ -369,11 +370,26 @@ class _tree_lib(object):
             if d == 0:
                 print(edge_idx)
                 print("Test case: ", test_case)
-                
                 for lv in range(1, max_depth - 1):
                     print("LEVEL", lv)
+                    
+                    
                     par_left, par_idx = test_case[lv]
                     cur_left, cur_idx = test_case[lv + 1]
+                    
+                    sub_par = par_left[par_idx]
+                    
+                    if lv == 1:
+                        prior_parent_state = -1 * np.ones(len(sub_par))
+                    
+                    else:
+                        prior_parent_state = prior_parent_state[par_idx]
+                    
+                    print(prior_parent_state)
+                    print(sub_par)
+                    
+                    # need is_lch is_rch
+                    
                     print("par_left", par_left)
                     print("par_idx", par_idx)
                     print("cur left", cur_left)
@@ -427,7 +443,7 @@ class _tree_lib(object):
             
             
             ## NEED PARENT INDEX...
-            test_case[d] = [lch, test]
+            test_case[d] = [lch, test, is_left, is_right]
             # Goal
             # Level 3: []
             # Level 2: [4, -1, 1]
