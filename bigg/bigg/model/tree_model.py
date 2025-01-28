@@ -774,7 +774,7 @@ class RecurTreeGen(nn.Module):
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
             
-            if self.test3 and self.num_edge > 0:
+            if False and self.test3 and self.num_edge > 0:
                 state_update = self.update_wt(topdown_state, prev_state)
                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
             
@@ -1125,14 +1125,14 @@ class RecurTreeGen(nn.Module):
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             
-            if not self.test3 and self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
-                cur_topdown_edge_idx = topdown_edge_index[lv]
-                left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
-                has_left_states = (left_subtree_states[0][:, has_left.astype(bool)], left_subtree_states[1][:, has_left.astype(bool)])
-                left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
-                has_left_states = self.update_wt(has_left_states, left_feat)
-                left_subtree_states[0][:, has_left.astype(bool)] = has_left_states[0]
-                left_subtree_states[1][:, has_left.astype(bool)] = has_left_states[1]
+#             if not self.test3 and self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+#                 cur_topdown_edge_idx = topdown_edge_index[lv]
+#                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
+#                 has_left_states = (left_subtree_states[0][:, has_left.astype(bool)], left_subtree_states[1][:, has_left.astype(bool)])
+#                 left_feat = (edge_feats_embed[0][:, left_topdown_edge_idx], edge_feats_embed[1][:, left_topdown_edge_idx])
+#                 has_left_states = self.update_wt(has_left_states, left_feat)
+#                 left_subtree_states[0][:, has_left.astype(bool)] = has_left_states[0]
+#                 left_subtree_states[1][:, has_left.astype(bool)] = has_left_states[1]
             
             #if self.test3 and lv > 0 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 
