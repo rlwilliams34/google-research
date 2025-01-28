@@ -389,7 +389,7 @@ class _tree_lib(object):
                     print("cur idx", cur_idx)
                     print("sub par (MRLC)", par_left[par_idx]) #MRLC
                     print("prior parent state", prior_parent_state)
-                    print("IS LEFT: ", is_left[par_idx]) #Not correct... :need to know if child is a left or right child
+                    print("IS LEFT: ", is_left) #Not correct... :need to know if child is a left or right child
                 
                 return edge_idx
             
