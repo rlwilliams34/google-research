@@ -359,7 +359,6 @@ class _tree_lib(object):
             edge_idx[d] = edge_idx_it
             if d == 0:
                 left_idx = [None] * max_depth
-                print(edge_idx)
                 for lv in range(1, max_depth - 1):
                     par_left, par_idx, is_left  = test_case[lv]
                     cur_left, cur_idx, _ = test_case[lv + 1]
@@ -373,7 +372,6 @@ class _tree_lib(object):
                     next_parent_state[~is_left] = sub_par[~is_left]  
                     left_idx[lv] = next_parent_state      
                     prior_parent_state = next_parent_state
-                print(left_idx)
                 return edge_idx, left_idx
             
             is_nonleaf = self.QueryNonLeaf(d - 1)
@@ -406,10 +404,6 @@ class _tree_lib(object):
             is_nonleaf2 = self.QueryNonLeaf(d)
             test = test[is_nonleaf2]
             
-            
-            ## NEED PARENT INDEX...
-            print("lch: ", lch)
-            print("rch: ", rch)
             test_case[d] = [lch, test, is_lch]
             # Goal
             # Level 3: []
