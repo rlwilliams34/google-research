@@ -1080,7 +1080,7 @@ class RecurTreeGen(nn.Module):
             
             ## Need edge index at this stage 
             cur_left_updates = left_idx[lv]
-            if self.test3 and cur_left_updates is not None:
+            if False and self.test3 and cur_left_updates is not None:
                 cur_states_wt = cur_states
                 cur_left_idx = (cur_left_updates != -1)
                 left_has_wt_states = (cur_states_wt[0][:, cur_left_idx], cur_states_wt[1][:, cur_left_idx])
