@@ -383,7 +383,7 @@ class _tree_lib(object):
                         cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
                         
                         cur_right_states = par_right_states[cur_par_idx]
-                        par_right_states = cur_right_states
+                        par_right_states = np.array([x[0] for x in cur_edge])
                         
                         par_left_edge = np.array([x[0] for x in cur_edge])
                         par_left_states = cur_left_states
@@ -391,7 +391,7 @@ class _tree_lib(object):
                     
                     print("===============")
                     print("Level: ", lv)
-                    print("cur left states: ", cur_right_states)
+                    print("cur right states: ", cur_right_states)
                     print("===============")
                 return most_recent_edge_list
             
