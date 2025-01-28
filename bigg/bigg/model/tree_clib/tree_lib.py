@@ -351,6 +351,7 @@ class _tree_lib(object):
                 print("cur weights", cur_weights)
                 print("mrs", mrs)
                 print("edge_idx_it", edge_idx_it)
+                print("is nonleaf: ", is_nonleaf)
                 
                 
                 cur_weights[is_nonleaf] = mrs
