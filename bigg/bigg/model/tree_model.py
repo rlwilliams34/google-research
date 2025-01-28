@@ -713,6 +713,107 @@ class RecurTreeGen(nn.Module):
             p += self.greedy_frac
         return p
 
+
+
+
+
+
+#             tree_node.split()
+# 
+#             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
+#             
+
+
+#             left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
+#             if col_sm.supervised:
+#                 has_left = col_sm.next_edge < mid
+#             else:
+#                 has_left = np.random.rand() < self.get_prob_fix(left_prob.item())
+#                 if ub == 0:
+#                     has_left = False
+#                 if lb > tree_node.rch.n_cols:
+#                     has_left = True
+#             ll = ll + (torch.log(left_prob) if has_left else torch.log(1 - left_prob))
+#             left_pos = self.tree_pos_enc([tree_node.lch.n_cols])
+#             state = self.cell_topdown(self.topdown_left_embed[[int(has_left)]] + left_pos, state, tree_node.depth)
+#             pred_edge_feats = []
+#             if has_left:
+#                 lub = min(tree_node.lch.n_cols, ub)
+#                 llb = max(0, lb - tree_node.rch.n_cols)
+#                 ll, ll_wt, left_state, num_left, left_edge_feats, prev_state = self.gen_row(ll, ll_wt, state, tree_node.lch, col_sm, llb, lub, edge_feats, row=row, prev_state=prev_state)
+#                 pred_edge_feats.append(left_edge_feats)
+#             else:
+#                 left_state = self.get_empty_state()
+#                 num_left = 0
+# 
+#             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
+#             
+#             left_state_wt = left_state
+# #             if not self.test3 and self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
+# #                 left_state_wt = self.update_wt(left_state, prev_state)
+# #             
+#             topdown_state = self.l2r_cell(state, (left_state_wt[0] + right_pos, left_state_wt[1] + right_pos), tree_node.depth)
+#             
+#             topdown_wt_state = None
+# #             if not self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
+# #                 if self.test or self.test3:
+# #                     topdown_wt_state = self.update_wt(topdown_state, prev_state)
+# #                 else:
+# #                     topdown_state = self.update_wt(topdown_state, prev_state)
+# #             
+#             rlb = max(0, lb - num_left)
+#             rub = min(tree_node.rch.n_cols, ub - num_left)
+#             if not has_left:
+#                 has_right = True
+#             else:
+#                 if topdown_wt_state is not None:
+#                     right_prob = torch.sigmoid(self.pred_has_right(topdown_wt_state[0][-1], tree_node.depth))
+#                 else:
+#                     right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0][-1], tree_node.depth))
+#                 if col_sm.supervised:
+#                     has_right = col_sm.has_edge(mid, tree_node.col_range[1])
+#                 else:
+#                     has_right = np.random.rand() < self.get_prob_fix(right_prob.item())
+#                     if rub == 0:
+#                         has_right = False
+#                     if rlb:
+#                         has_right = True
+#                 ll = ll + (torch.log(right_prob) if has_right else torch.log(1 - right_prob))
+#             
+#             topdown_state = self.cell_topright(self.topdown_right_embed[[int(has_right)]], topdown_state, tree_node.depth)
+# 
+#             if has_right:  # has edge in right child
+#                 ll, ll_wt, right_state, num_right, right_edge_feats, prev_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, row=row, prev_state=prev_state)
+#                 pred_edge_feats.append(right_edge_feats)
+#             else:
+#                 right_state = self.get_empty_state()
+#                 joint_right_state = self.get_empty_state()
+#                 num_right = 0
+#             if tree_node.col_range[1] - tree_node.col_range[0] <= self.bits_compress:
+#                 summary_state = self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols)
+#             else:
+#                 summary_state = self.lr2p_cell(left_state, right_state)
+#             if self.has_edge_feats:
+#                 edge_feats = torch.cat(pred_edge_feats, dim=0)
+#             return ll, ll_wt, summary_state, num_left + num_right, edge_feats, prev_state
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None):
         assert lb <= ub
         if tree_node.is_root:
@@ -757,6 +858,7 @@ class RecurTreeGen(nn.Module):
                         if self.method == "Test75":
                             edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                             prev_state = edge_embed
+                            self.num_edge += 1
                             return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                         
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
@@ -772,7 +874,12 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
+            if self.test_sep and self.num_edge > 0:
+                state_update = self.update_wt(state, prev_state)
+                left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
+            
+            else:
+                left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
 
             if col_sm.supervised:
                 has_left = col_sm.next_edge < mid
@@ -798,17 +905,19 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
             
             left_state_wt = left_state
-            if self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
+            if not self.test_sep and self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
                 left_state_wt = self.update_wt(left_state, prev_state)
             
             topdown_state = self.l2r_cell(state, (left_state_wt[0] + right_pos, left_state_wt[1] + right_pos), tree_node.depth)
             
             topdown_wt_state = None
-            if not self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
+            if not self.test_sep and not self.test2 and has_left and self.has_edge_feats and self.method == "Test75" and not self.test_topdown:
                 if self.test:
                     topdown_wt_state = self.update_wt(topdown_state, prev_state)
                 else:
                     topdown_state = self.update_wt(topdown_state, prev_state)
+            elif self.test_sep and self.num_edge > 0:
+                topdown_wt_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
             rub = min(tree_node.rch.n_cols, ub - num_left)
@@ -874,6 +983,7 @@ class RecurTreeGen(nn.Module):
             prev_state =  self.weight_tree()
         
         for i in pbar:
+            self.num_edge = 0
             if self.row_LSTM:
                 prev_state = (self.leaf_h0_wt, self.leaf_c0_wt)
             if edge_list is None:
@@ -963,8 +1073,9 @@ class RecurTreeGen(nn.Module):
         
         if self.method == "Test75":
             topdown_edge_index, _= TreeLib.GetTopdownEdgeIdx(len(all_ids) + 1)
-            if self.g_type == "er":
-                x = TreeLib.GetMostRecentWeight(len(all_ids) + 1)
+            if self.test_sep:
+                left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1)
+                topdown_edge_idx = (left_idx, right_idx)
         
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]
@@ -1072,10 +1183,23 @@ class RecurTreeGen(nn.Module):
                 batch_idx = batch_idx[is_nonleaf]
             
             ## Need edge index at this stage 
-            if self.test:
-                ### Here update cur_states with most recent edge of PARENT node...
-                cur_states = cur_states
-            left_logits = self.pred_has_left(cur_states[0][-1], lv)
+            if self.test_sep:
+                cur_left_updates = topdown_edge_index[0][lv]
+                cur_states_wt_h = cur_states[0].clone()
+                cur_states_wt_c = cur_states[1].clone()
+                cur_states_wt = (cur_states_wt_h, cur_states_wt_c)
+                cur_left_idx = (cur_left_updates != -1)
+                left_has_wt_states = (cur_states_wt[0][:, cur_left_idx], cur_states_wt[1][:, cur_left_idx])
+                cur_edge_idx = cur_left_updates[cur_left_idx]
+                left_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+                left_has_wt_states = self.update_wt(left_has_wt_states, left_feat)
+                cur_states_wt[0][:, cur_left_idx] = left_has_wt_states[0]
+                cur_states_wt[1][:, cur_left_idx] = left_has_wt_states[1]
+                left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
+            
+            else:
+                left_logits = self.pred_has_left(cur_states[0][-1], lv)
+            
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left, ll_batch = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
@@ -1107,7 +1231,7 @@ class RecurTreeGen(nn.Module):
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             
-            if self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+            if not self.test_sep and self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
                 has_left_states = (left_subtree_states[0][:, has_left.astype(bool)], left_subtree_states[1][:, has_left.astype(bool)])
@@ -1125,7 +1249,7 @@ class RecurTreeGen(nn.Module):
 #                 topdown_state[0][:, left_wt_ids] = leaf_topdown_states[0]
 #                 topdown_state[1][:, left_wt_ids] = leaf_topdown_states[1]
 
-            if not self.test2 and not self.test and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+            if not self.test_sep and not self.test2 and not self.test and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
                 has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
@@ -1134,7 +1258,7 @@ class RecurTreeGen(nn.Module):
                 topdown_state[0][:, has_left.astype(bool)] = has_left_states[0]
                 topdown_state[1][:, has_left.astype(bool)] = has_left_states[1]
             
-            elif not self.test2 and self.test and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+            elif not self.test_sep and not self.test2 and self.test and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
                 has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
@@ -1148,11 +1272,22 @@ class RecurTreeGen(nn.Module):
                 topdown_wt_state[1][:, has_left.astype(bool)] = has_left_states[1]
             
             ### Need most recent edge at this stage...
-            if self.test:
+            if self.test_sep:
+                cur_right_updates = topdown_edge_index[1][lv]
+                topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
+                topdown_wt_state = (topdown_h, topdown_c)
+                cur_right_index = (cur_right_updates != -1)
+                right_has_wt_states = (topdown_wt_state[0][:, cur_right_idx], topdown_wt_state[1][:, cur_right_idx])
+                cur_edge_idx = cur_right_updates[cur_right_idx]
+                right_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+                right_has_wt_states = self.update_wt(right_has_wt_states, right_feat)
+                topdown_wt_state[0][:, cur_right_idx] = right_has_wt_states[0]
+                topdown_wt_state[1][:, cur_right_idx] = right_has_wt_states[1]
                 right_logits = self.pred_has_right(topdown_wt_state[0][-1], lv)
                 
             else:
                 right_logits = self.pred_has_right(topdown_state[0][-1], lv)
+            
             right_update = self.topdown_right_embed[has_right]
             topdown_state = self.cell_topright(right_update, topdown_state, lv)
             right_ll, _ = self.binary_ll(right_logits, has_right, reduction='none')

@@ -385,10 +385,7 @@ class _tree_lib(object):
                     left_idx[lv] = cur_left_states
                     right_idx[lv] = cur_right_states
                 
-                print("DONE.")
-                print("LEFT: ", left_idx)
-                print("RIGHT: ", right_idx)
-                return most_recent_edge_list
+                return left_idx, right_idx
             
             up_lv_nonleaf = self.QueryNonLeaf(d - 1)
             up_is_left, _ = self.GetChLabel(-1, d - 1)
@@ -424,12 +421,6 @@ class _tree_lib(object):
             par_idx = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
             par_idx = par_idx[cur_lv_nonleaf]
             parent_indices[d] = par_idx
-            
-            
-            
-            
-            
-
         return most_recent_edge_list
 
 #     def GetMostRecentWeight(self, max_depth, dtype=None):

@@ -122,6 +122,7 @@ cmd_opt.add_argument('-wt_mlp', default=False, type=eval, help='computing traini
 cmd_opt.add_argument('-test', default=False, type=eval, help='computing training times')
 cmd_opt.add_argument('-test2', default=False, type=eval, help='computing training times')
 cmd_opt.add_argument('-test3', default=False, type=eval, help='computing training times')
+cmd_opt.add_argument('-test_sep', default=False, type=eval, help='computing training times')
 
 
 cmd_args, _ = cmd_opt.parse_known_args()
