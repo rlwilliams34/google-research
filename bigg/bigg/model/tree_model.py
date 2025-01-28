@@ -1073,27 +1073,21 @@ class RecurTreeGen(nn.Module):
             ## Need edge index at this stage 
             cur_left_updates = left_idx[lv]
             test3=True
-            print("cur left updates", cur_left_updates)
+            
             if test3 and cur_left_updates is not None:
-                print(cur_states[0].shape)
                 cur_states_wt = cur_states
                 cur_left_idx = (cur_left_updates != -1)
-                
                 left_has_wt_states = (cur_states_wt[0][:, cur_left_idx], cur_states_wt[1][:, cur_left_idx])
-                
                 cur_edge_idx = cur_left_updates[cur_left_idx]
-                
                 left_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-                
                 left_has_wt_states = self.update_wt(left_has_wt_states, left_feat)
-                
                 cur_states_wt[0][:, cur_left_idx] = left_has_wt_states[0]
                 cur_states_wt[1][:, cur_left_idx] = left_has_wt_states[1]
-                ### Here update cur_states with most recent edge of PARENT node...
                 left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
                 
             else:
                 left_logits = self.pred_has_left(cur_states[0][-1], lv)
+            
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left, ll_batch = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
@@ -1125,7 +1119,7 @@ class RecurTreeGen(nn.Module):
             has_right, num_right = TreeLib.GetChLabel(1, lv)
             right_pos = self.tree_pos_enc(num_right)
             
-            if self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+            if not self.test3 and self.test2 and not self.test_topdown and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
                 has_left_states = (left_subtree_states[0][:, has_left.astype(bool)], left_subtree_states[1][:, has_left.astype(bool)])
@@ -1155,7 +1149,7 @@ class RecurTreeGen(nn.Module):
                 topdown_state[0][:, has_left.astype(bool)] = has_left_states[0]
                 topdown_state[1][:, has_left.astype(bool)] = has_left_states[1]
             
-            elif not self.test2 and self.test and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
+            elif not self.test2 and (self.test or self.test3) and self.has_edge_feats and self.method == "Test75" and np.sum(has_left) > 0:
                 cur_topdown_edge_idx = topdown_edge_index[lv]
                 left_topdown_edge_idx = cur_topdown_edge_idx[has_left.astype(bool)]
                 has_left_states = (topdown_state[0][:, has_left.astype(bool)], topdown_state[1][:, has_left.astype(bool)])
@@ -1169,7 +1163,7 @@ class RecurTreeGen(nn.Module):
                 topdown_wt_state[1][:, has_left.astype(bool)] = has_left_states[1]
             
             ### Need most recent edge at this stage...
-            if self.test:
+            if self.test or self.test3:
                 right_logits = self.pred_has_right(topdown_wt_state[0][-1], lv)
                 
             else:
