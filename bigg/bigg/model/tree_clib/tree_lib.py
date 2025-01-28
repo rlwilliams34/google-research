@@ -405,7 +405,6 @@ class _tree_lib(object):
             is_right = rch * (1 - is_right) + is_right
             
             lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
-            lr = np.array([1, -1, 1, -1, 1, 1, -1, 1, -1, 1])
             is_lch = np.array([True, False]*len(is_left))
             is_lch = is_lch[lr != -1]
             print("is nonleaf:", is_nonleaf)
