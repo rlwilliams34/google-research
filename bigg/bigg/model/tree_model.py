@@ -757,11 +757,11 @@ class RecurTreeGen(nn.Module):
                         if self.method == "Test75":
                             edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                             prev_state = edge_embed
+                            self.num_edge += 1
                             return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                         
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                         prev_state = edge_embed
-                        self.num_edge += 1
                         
                         return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                     
