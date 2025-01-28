@@ -344,7 +344,6 @@ class _tree_lib(object):
             if lch is not None:
                 cur_weights = np.zeros((len(is_nonleaf), ), dtype=np.int32)
                 mrs = [(lch[i] if lch[i] > -1 else rch[i]) for i in range(len(lch))]
-                print("mrs: ", mrs)
                 edge_idx_it = np.array(mrs, dtype=np.int32)
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
                 ## For each level: get prior parent idx and most recent state index...
@@ -409,6 +408,7 @@ class _tree_lib(object):
             
             
             ## NEED PARENT INDEX...
+            print("lch: ", lch)
             test_case[d] = [lch, test, is_lch]
             # Goal
             # Level 3: []
