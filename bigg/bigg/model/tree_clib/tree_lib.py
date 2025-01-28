@@ -374,7 +374,7 @@ class _tree_lib(object):
                     print("LEVEL", lv)
                     
                     
-                    par_left, par_idx, _, _ = test_case[lv]
+                    par_left, par_idx, is_left, _ = test_case[lv]
                     cur_left, cur_idx, _, _ = test_case[lv + 1]
                     
                     sub_par = par_left[par_idx]
@@ -396,6 +396,7 @@ class _tree_lib(object):
                     print("cur idx", cur_idx)
                     print("sub par (MRLC)", par_left[par_idx]) #MRLC
                     print("prior parent state", prior_parent_state)
+                    print("IS LEFT: ", is_left)
                     [-1, -1, -1, -1, -1]
                 
                 return edge_idx
