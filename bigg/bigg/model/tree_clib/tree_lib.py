@@ -359,13 +359,13 @@ class _tree_lib(object):
             lch = np.array([-1] * num_internal_parents)
             rch = np.array([-1] * num_internal_parents)
             
-            up_is_left = lch * (1 - up_is_left) + is_left
-            up_is_right = rch * (1 - up_is_right) + is_right
+            up_is_left = lch * (1 - up_is_left) + up_is_left
+            up_is_right = rch * (1 - up_is_right) + up_is_right
 
-            lr = np.concatenate([np.array([x, y]) for x,y in zip(is_left, is_right)])
+            lr = np.concatenate([np.array([x, y]) for x,y in zip(up_is_left, up_is_right)])
             lr = lr.astype(np.int32)
             lr[lr == 1] = cur_weights
-            lr = lr.reshape(len(is_left), 2)
+            lr = lr.reshape(len(up_is_left), 2)
             lch, rch = lr[:, 0], lr[:, 1]
             
             up_level_lr = np.array([[l, r] for l, r in zip(lch, rch)])
