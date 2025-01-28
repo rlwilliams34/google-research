@@ -423,6 +423,7 @@ class _tree_lib(object):
             print("rch: ", rch)
             print("is_left", is_left)
             print("is_right", is_right)
+            print("lr", lr)
             
             
             ## NEED PARENT INDEX...
