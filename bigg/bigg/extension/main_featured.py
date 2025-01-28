@@ -783,7 +783,7 @@ if __name__ == '__main__':
         print("Hello")
         for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
-        if cmd_args.epoch_load >= epoch_lr_decrease + offset:
+        if cmd_args.epoch_load >= epoch_lr_decrease + offset_val:
             print("Hello 2")
             cmd_args.learning_rate = 1e-5
             for param_group in optimizer.param_groups:
