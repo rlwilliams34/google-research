@@ -413,7 +413,7 @@ class _tree_lib(object):
             num_chil = lch_b.astype(int) + rch_b.astype(int)
             idx_list = list(range(len(num_chil)))
             par_idx = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
-            par_idx = test[cur_lv_nonleaf]
+            par_idx = par_idx[cur_lv_nonleaf]
             parent_indices.append(par_idx)
 
         return most_recent_edge_list
