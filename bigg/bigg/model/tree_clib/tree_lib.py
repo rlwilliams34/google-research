@@ -348,6 +348,11 @@ class _tree_lib(object):
                 mrs = [(rch[i] if rch[i] > -1 else lch[i]) for i in range(len(rch))]
                 ## For each level: get prior parent idx and most recent state index...
                 ## If is left, take parent idx. Else take most recent state index
+                print("cur weights", cur_weights)
+                print("mrs", mrs)
+                print("edge_idx_it", edge_idx_it)
+                
+                
                 cur_weights[is_nonleaf] = mrs
                 cur_weights[~is_nonleaf] = cur_edge_idx
                 
