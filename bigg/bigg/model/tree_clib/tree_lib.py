@@ -372,6 +372,7 @@ class _tree_lib(object):
                         prior_parent_state = prior_parent_state[par_idx]
                     print("LEVEL: ", lv)
                     print("par left", par_left)
+                    print("sub par", sub_par)
                     print("par idx", par_idx)
                     print("is left", is_left)
                     print("prior parent state: ", prior_parent_state)
