@@ -268,6 +268,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                     print(edge_idx.shape)
                     print(edge_feats_normalized.shape)
                     print(edge_idx)
+                    print(edge_feats.shape)
                     edge_feats_normalized[edge_idx] = edge_feats_normalized[edge_idx] + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
                 
             else:
