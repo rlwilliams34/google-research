@@ -416,6 +416,17 @@ class _tree_lib(object):
             is_nonleaf2 = self.QueryNonLeaf(d)
             test = test[is_nonleaf2]
             
+            print("=====================")
+            print("level: ", d)
+            print("is left", is_left)
+            print("is right", is_right)
+            print("lch: ", lch)
+            print("rch: ", rch)
+            
+            
+            print("=====================")
+            
+            
             print(lch)
             print(rch)
             print(cur_weights)
