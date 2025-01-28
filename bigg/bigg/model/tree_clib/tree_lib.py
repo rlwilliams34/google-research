@@ -382,6 +382,9 @@ class _tree_lib(object):
                         cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
                         cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
                         
+                        print("par right states: ", par_right_states)
+                        
+                        
                         cur_right_states = par_right_states[cur_par_idx]
                         par_right_states = np.array([x[0] for x in cur_edge])
                         
