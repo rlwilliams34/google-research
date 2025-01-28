@@ -378,6 +378,16 @@ class _tree_lib(object):
                     else:
                         prior_parent_state = prior_parent_state[par_idx]
                     
+                    
+                    next_parent_state = np.zeros(len(sub_par))
+                    
+                    next_parent_state[is_left] = prior_parent_state[is_left]
+                    next_parent_state[~is_left] = sub_par[~is_left]
+                    print("next state: ", next_parent_state)
+                    
+                    prior_parent_state = next_parent_state
+                    
+                    
                     print(prior_parent_state)
                     print(sub_par)
                     
