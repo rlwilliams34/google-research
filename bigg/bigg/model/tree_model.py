@@ -1185,7 +1185,6 @@ class RecurTreeGen(nn.Module):
             ## Need edge index at this stage 
             if self.test_sep:
                 cur_left_updates = topdown_edge_index[0][lv]
-                print(topdown_edge_index)
                 cur_states_wt_h = cur_states[0].clone()
                 cur_states_wt_c = cur_states[1].clone()
                 cur_states_wt = (cur_states_wt_h, cur_states_wt_c)
@@ -1193,10 +1192,6 @@ class RecurTreeGen(nn.Module):
                 left_has_wt_states = (cur_states_wt[0][:, cur_left_idx], cur_states_wt[1][:, cur_left_idx])
                 cur_edge_idx = cur_left_updates[cur_left_idx]
                 left_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-                print("lv: ", lv)
-                print(cur_left_updates)
-                print(left_feat[0].shape)
-                print(left_has_wt_states[0].shape)
                 left_has_wt_states = self.update_wt(left_has_wt_states, left_feat)
                 cur_states_wt[0][:, cur_left_idx] = left_has_wt_states[0]
                 cur_states_wt[1][:, cur_left_idx] = left_has_wt_states[1]
@@ -1281,7 +1276,7 @@ class RecurTreeGen(nn.Module):
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
                 topdown_wt_state = (topdown_h, topdown_c)
-                cur_right_index = (cur_right_updates != -1)
+                cur_right_idx = (cur_right_updates != -1)
                 right_has_wt_states = (topdown_wt_state[0][:, cur_right_idx], topdown_wt_state[1][:, cur_right_idx])
                 cur_edge_idx = cur_right_updates[cur_right_idx]
                 right_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
