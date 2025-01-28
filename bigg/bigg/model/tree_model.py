@@ -963,7 +963,7 @@ class RecurTreeGen(nn.Module):
         c_buf_list = [None] * (len(all_ids) + 1)
         
         if self.method == "Test75":
-            topdown_edge_index = TreeLib.GetTopdownEdgeIdx(len(all_ids) + 1)
+            topdown_edge_index, left_idx = TreeLib.GetTopdownEdgeIdx(len(all_ids) + 1)
         
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]
@@ -998,7 +998,7 @@ class RecurTreeGen(nn.Module):
             hc_bot = (hc_bot, feat_dict)
         
         if self.method == "Test75":
-            return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index
+            return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index, left_idx
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
     
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
@@ -1024,7 +1024,7 @@ class RecurTreeGen(nn.Module):
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
         
         if self.method == "Test75":
-            hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
+            hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index, left_idx = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
             cur_state = (h_buf_list[0], c_buf_list[0])
             weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
             cur_state = self.merge_top_wt(cur_state, weight_state)
@@ -1071,7 +1071,11 @@ class RecurTreeGen(nn.Module):
                 batch_idx = batch_idx[is_nonleaf]
             
             ## Need edge index at this stage 
-            if self.test:
+            cur_left_updates = left_idx[i]
+            test3=True
+            print("cur left updates")
+            if test3 and cur_left_updates is not None:
+                print(cur_states[0].shape)
                 ### Here update cur_states with most recent edge of PARENT node...
                 cur_states = cur_states
             left_logits = self.pred_has_left(cur_states[0][-1], lv)

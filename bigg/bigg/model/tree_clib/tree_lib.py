@@ -372,10 +372,8 @@ class _tree_lib(object):
                     next_parent_state[~is_left] = sub_par[~is_left]  
                     left_idx[lv] = next_parent_state      
                     prior_parent_state = next_parent_state
-                    
-                    
-                print(left_idx)
-                return edge_idx
+                
+                return edge_idx, left_idx
             
             is_nonleaf = self.QueryNonLeaf(d - 1)
             num_internal_parents = np.sum(is_nonleaf)
