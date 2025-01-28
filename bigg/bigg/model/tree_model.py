@@ -1076,9 +1076,23 @@ class RecurTreeGen(nn.Module):
             print("cur left updates", cur_left_updates)
             if test3 and cur_left_updates is not None:
                 print(cur_states[0].shape)
+                cur_states_wt = cur_states
+                cur_left_idx = (cur_left_updates != -1)
+                
+                left_has_wt_states = (cur_states_wt[0][:, cur_left_idx], cur_states_wt[1][:, cur_left_idx])
+                
+                cur_edge_idx = cur_left_updates[cur_left_idx]
+                
+                left_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+                
+                left_has_wt_states = self.update_wt(left_has_wt_states, left_feat)
+                
+                cur_states_wt[0][:, cur_left_idx] = left_has_wt_states[0]
+                cur_states_wt[1][:, cur_left_idx] = left_has_wt_states[1]
                 ### Here update cur_states with most recent edge of PARENT node...
-                cur_states = cur_states
-            left_logits = self.pred_has_left(cur_states[0][-1], lv)
+            
+            else:
+                left_logits = self.pred_has_left(cur_states[0][-1], lv)
             has_left, num_left = TreeLib.GetChLabel(-1, lv)
             left_update = self.topdown_left_embed[has_left] + self.tree_pos_enc(num_left)
             left_ll, float_has_left, ll_batch = self.binary_ll(left_logits, has_left, need_label=True, reduction='sum')
