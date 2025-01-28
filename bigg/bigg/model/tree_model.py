@@ -1139,6 +1139,7 @@ class RecurTreeGen(nn.Module):
             
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
+            topdown_wt_state = topdown_state
             
 #             if self.has_edge_feats and self.method == "Test75" and len(left_wt_ids) > 0:
 #                 leaf_topdown_states = (topdown_state[0][:, left_wt_ids], topdown_state[1][:, left_wt_ids])
