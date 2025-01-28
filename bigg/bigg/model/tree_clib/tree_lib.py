@@ -374,8 +374,8 @@ class _tree_lib(object):
                     print("LEVEL", lv)
                     
                     
-                    par_left, par_idx = test_case[lv]
-                    cur_left, cur_idx = test_case[lv + 1]
+                    par_left, par_idx, _, _ = test_case[lv]
+                    cur_left, cur_idx, _, _ = test_case[lv + 1]
                     
                     sub_par = par_left[par_idx]
                     
