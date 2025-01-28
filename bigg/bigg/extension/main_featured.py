@@ -525,6 +525,14 @@ if __name__ == '__main__':
     
     print(train_graphs[1].edges())
     
+    if True:
+        g = nx.Graph([(1, 8, {'weight': 0.1}), (5, 8, {'weight': 0.2}), (6, 8, {'weight': 0.3})])
+        g.add_node(2)
+        g.add_node(3)
+        g.add_node(4)
+        g.add_node(7)
+        train_graphs = [g]
+    
     if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
         list_node_feats = ([torch.from_numpy(get_node_feats(g)).to(cmd_args.device) for g in train_graphs] if cmd_args.has_node_feats else None)
