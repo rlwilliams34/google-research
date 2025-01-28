@@ -370,6 +370,7 @@ class _tree_lib(object):
             if d == 0:
                 print(edge_idx)
                 print("Test case: ", test_case)
+                left_idx = [None] * max_depth
                 for lv in range(1, max_depth - 1):
                     print("LEVEL", lv)
                     
@@ -396,7 +397,7 @@ class _tree_lib(object):
                     print("cur idx", cur_idx)
                     print("sub par (MRLC)", par_left[par_idx]) #MRLC
                     print("prior parent state", prior_parent_state)
-                    print("IS LEFT: ", is_left)
+                    print("IS LEFT: ", is_left[par_idx])
                     [-1, -1, -1, -1, -1]
                 
                 return edge_idx
