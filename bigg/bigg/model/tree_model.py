@@ -983,18 +983,23 @@ class RecurTreeGen(nn.Module):
             return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
     
-    def merge_states(self, update_idx, top_states, edge_feats_embed):     
-        update_bool = (update_idx != -1)
+    def merge_states(self, update_idx, top_states, edge_feats_embed, predict_top=False):
+        if predict_top:
+            update_bool = (update_idx != -1)
+            cur_edge_idx = update_idx[update_bool]
+        else:
+            update_bool = update_idx[0]
+            cur_edge_idx = update_idx[1]
+            
         cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
         top_states_wt = (cur_top_h, cur_top_c)
         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
-        cur_edge_idx = update_idx[update_bool]
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         top_has_wt_states = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states[0]
         top_states_wt[1][:, update_bool] = top_has_wt_states[1]
         return top_states_wt
-    
+        
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
                              list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
         hc_bot, _, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats,
@@ -1039,18 +1044,6 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-#         if self.method in ["Test75", "Test85"]:
-#             cur_row_updates = batch_last_edges
-#             cur_row_idx = (batch_last_edges != -1)
-#             cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
-#             row_states_wt = (cur_row_wt_h, cur_row_wt_c)
-#             row_has_wt_states = (row_states_wt[0][:, cur_row_idx], row_states_wt[1][:, cur_row_idx])
-#             cur_edge_idx = cur_row_updates[cur_row_idx]
-#             row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-#             row_has_wt_states = self.update_wt(row_has_wt_states, row_feats)
-#             row_states_wt[0][:, cur_row_idx] = row_has_wt_states[0]
-#             row_states_wt[1][:, cur_row_idx] = row_has_wt_states[1]
-#             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         if self.method in ["Test75", "Test85"]:
             row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
@@ -1063,8 +1056,8 @@ class RecurTreeGen(nn.Module):
         ll = ll + ll_cur
         cur_states = (row_states[0][:, has_ch], row_states[1][:, has_ch])
         if batch_idx is not None:
-            batch_idx = batch_idx[has_ch]
-        
+            batch_idx = batch_idx[has_ch]  
+                    
         lv=0
         while True:
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
@@ -1078,19 +1071,21 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = edge_of_lv[has_prev]
                 edge_of_lv = edge_of_lv - 1
                 
+#                 if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
+#                     edge_state_wt_h, edge_state_wt_c = edge_state[0].clone(), edge_state[1].clone()
+#                     edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
+#                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
+#                     prev_feat = (edge_feats_embed[0][:, edge_of_lv], edge_feats_embed[1][:, edge_of_lv])
+#                     edge_state_wt_has_prev = self.update_wt(edge_state_wt_has_prev, prev_feat)
+#                     edge_state_wt[0][:, has_prev] = edge_state_wt_has_prev[0]
+#                     edge_state_wt[1][:, has_prev] = edge_state_wt_has_prev[1]
+#                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
-                    edge_state_wt_h, edge_state_wt_c = edge_state[0].clone(), edge_state[1].clone()
-                    edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
-                    edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
-                    prev_feat = (edge_feats_embed[0][:, edge_of_lv], edge_feats_embed[1][:, edge_of_lv])
-                    edge_state_wt_has_prev = self.update_wt(edge_state_wt_has_prev, prev_feat)
-                    edge_state_wt[0][:, has_prev] = edge_state_wt_has_prev[0]
-                    edge_state_wt[1][:, has_prev] = edge_state_wt_has_prev[1]
+                    edge_state_wt = self.merge_states([has_prev, edge_of_lv], edge_state, edge_feats_embed)
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
-                
                 else:
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
-                    
+                
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
@@ -1099,19 +1094,6 @@ class RecurTreeGen(nn.Module):
             if batch_idx is not None:
                 batch_idx = batch_idx[is_nonleaf]        
             
-#             if self.method in ["Test75", "Test85"]:
-#                 cur_left_updates = topdown_edge_index[0][lv]
-#                 cur_states_wt_h = cur_states[0].clone()
-#                 cur_states_wt_c = cur_states[1].clone()
-#                 cur_states_wt = (cur_states_wt_h, cur_states_wt_c)
-#                 cur_left_idx = (cur_left_updates != -1)
-#                 left_has_wt_states = (cur_states_wt[0][:, cur_left_idx], cur_states_wt[1][:, cur_left_idx])
-#                 cur_edge_idx = cur_left_updates[cur_left_idx]
-#                 left_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-#                 left_has_wt_states = self.update_wt(left_has_wt_states, left_feat)
-#                 cur_states_wt[0][:, cur_left_idx] = left_has_wt_states[0]
-#                 cur_states_wt[1][:, cur_left_idx] = left_has_wt_states[1]
-#                 left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
             if self.method in ["Test75", "Test85"]:
                 cur_left_updates = topdown_edge_index[0][lv]
                 cur_states_wt = self.merge_states(cur_left_updates, cur_states, edge_feats_embed)
@@ -1139,8 +1121,6 @@ class RecurTreeGen(nn.Module):
                     edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                     left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                     h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
-                
-                #left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
                 left_ids = tuple([None] + list(left_ids[1:]))
             
             left_subtree_states = tree_state_select(h_bot, c_bot,
@@ -1151,19 +1131,6 @@ class RecurTreeGen(nn.Module):
             right_pos = self.tree_pos_enc(num_right)
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
-            
-#             if  self.method in ["Test75", "Test85"]:
-#                 cur_right_updates = topdown_edge_index[1][lv]
-#                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
-#                 topdown_wt_state = (topdown_h, topdown_c)
-#                 cur_right_idx = (cur_right_updates != -1)
-#                 right_has_wt_states = (topdown_wt_state[0][:, cur_right_idx], topdown_wt_state[1][:, cur_right_idx])
-#                 cur_edge_idx = cur_right_updates[cur_right_idx]
-#                 right_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-#                 right_has_wt_states = self.update_wt(right_has_wt_states, right_feat)
-#                 topdown_wt_state[0][:, cur_right_idx] = right_has_wt_states[0]
-#                 topdown_wt_state[1][:, cur_right_idx] = right_has_wt_states[1]
-#                 right_logits = self.pred_has_right(topdown_wt_state[0][-1], lv)
             
             if self.method in ["Test75", "Test85"]:
                 cur_right_updates = topdown_edge_index[1][lv]
