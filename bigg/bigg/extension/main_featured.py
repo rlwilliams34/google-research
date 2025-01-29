@@ -373,7 +373,7 @@ def get_last_edge_2(g):
     return np.array(last_edges)
 
 
-def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edge_feats_lstm=None,batch_last_edges=None):
+def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edge_feats_lstm=None,batch_last_edges=None,rc=None):
     ll_t1 = 0
     ll_w1 = 0
     ll_t2 = 0
@@ -420,7 +420,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     
     #print(info)
     
-    ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info, edge_feats_lstm=edge_feats_lstm, batch_last_edges=batch_last_edges)
+    ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info, edge_feats_lstm=edge_feats_lstm, batch_last_edges=batch_last_edges,rc=rc)
     
     print("=============================")
     print("Fast Code Top+Wt Likelihoods: ")
@@ -845,9 +845,9 @@ if __name__ == '__main__':
                     id_ += len(train_graphs[b])
                 list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
                 list_last_edge = (list_last_edge, list_last_edge_1)    
+                rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
                 
-                
-                debug_model(model, [train_graphs[0], train_graphs[1]], None,edge_feats, True, info=list_last_edge, edge_feats_lstm=edge_feats_lstm)
+                debug_model(model, [train_graphs[0], train_graphs[1]], None,edge_feats, True, info=list_last_edge, edge_feats_lstm=edge_feats_lstm, rc=rc)
                 
             else:
                 batch_indices = [0, 1]
