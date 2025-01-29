@@ -704,7 +704,7 @@ class RecurTreeGen(nn.Module):
     def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None):
         assert lb <= ub
         if tree_node.is_root:
-            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
                 
@@ -774,7 +774,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
             
@@ -1046,7 +1046,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        if self.method in ["Test75", "Test85"]:
+        if False and self.method in ["Test75", "Test85"]:
             cur_row_updates = batch_last_edges
             cur_row_idx = (batch_last_edges != -1)
             cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
@@ -1082,7 +1082,7 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = edge_of_lv[has_prev]
                 edge_of_lv = edge_of_lv - 1
                 
-                if False and self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
+                if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt_h, edge_state_wt_c = edge_state[0].clone(), edge_state[1].clone()
                     edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
