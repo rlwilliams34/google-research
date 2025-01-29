@@ -303,6 +303,49 @@ def get_last_edge(g):
     last_edges = []
     last_edges_1 = []
     idx = -1
+    idx_count = 0
+    for r in g.nodes():
+        neighbors = [n for n in list(g.neighbors(r)) if n < r]
+        idx_count += len(neighbors)
+        if len(neighbors) > 0:
+            c = max(neighbors)
+            idx = idx_count
+            if r == 1:
+                last_edges_1.append(idx)
+            elif r > 1:
+                last_edges.append(idx)
+    return np.array(last_edges), np.array(last_edges_1)
+
+
+def get_last_edge_2(g):
+    last_edges = []
+    last_edges_1 = []
+    idx = -1
+    idx_count = -1
+    for r in sorted(g.nodes()):
+        neighbors = [n for n in list(g.neighbors(r)) if n < r]
+        idx_count += len(neighbors)
+        if len(neighbors) > 0:
+            c = max(neighbors)
+            idx = idx_count
+            if r == 1:
+                last_edges_1.append(idx)
+            last_edges.append(idx)
+        else:
+            if r == 0:
+                last_edges.append(-1)
+            else:
+                last_edges.append(last_edges[-1])
+    
+    last_edges = [-1] + last_edges[:-1]
+    return np.array(last_edges)
+
+
+
+def get_last_edge_2(g):
+    last_edges = []
+    last_edges_1 = []
+    idx = -1
     idx_count = -1
     for r in sorted(g.nodes()):
         neighbors = [n for n in list(g.neighbors(r)) if n < r]
@@ -551,7 +594,7 @@ if __name__ == '__main__':
                 list_edge_feats_lstm = [torch.from_numpy(get_edge_feats_lstm(g)).to(cmd_args.device) for g in train_graphs]
             
             list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)).to(cmd_args.device) for g in train_graphs]
-            list_last_edges = [get_last_edge(g) for g in train_graphs]
+            list_last_edges = [get_last_edge2(g) for g in train_graphs]
             
             ### To pad: F.pad(input=g1t, pad=(0,0,0,MAX_DEG - SHAPE1),mode='constant',value=-1).shape
 
