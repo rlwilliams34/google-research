@@ -278,7 +278,6 @@ def selective_update_hc(h, c, zero_one, feats):
     local_edge_feats_h = scatter(feats[0], nz_idx, dim=1, dim_size=h.shape[1])
     local_edge_feats_c = scatter(feats[1], nz_idx, dim=1, dim_size=h.shape[1])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
-    print(zero_one)
     h = torch.where(zero_one, local_edge_feats_h, h)
     c = torch.where(zero_one, local_edge_feats_c, c)
     return h, c
@@ -999,8 +998,14 @@ class RecurTreeGen(nn.Module):
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
+        
+        zero_one = torch.tensor(update_bool, dtype=torch.bool).to(cur_top_h.device).unsqueeze(1)
+        cur_top_h = torch.where(zero_one, top_has_wt_states_h, cur_top_h)
+        #c = torch.where(zero_one, local_edge_feats_c, c)
+        
+        
         #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
-        return top_states_wt
+        return cur_top_h, _
         
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
                              list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
