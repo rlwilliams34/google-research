@@ -1018,10 +1018,8 @@ class RecurTreeGen(nn.Module):
         
         print(list_num_edges)
         first_edge = [0]
-        offset = 0
         for i in range(len(list_num_edges) - 1):
-            offset = offset + list_num_edges[i]
-            first_edge += [first_edge[-1] + offset]
+            first_edge += [first_edge[-1] + list_num_edges[i]]
         print(first_edge)
         
         if self.has_edge_feats:
