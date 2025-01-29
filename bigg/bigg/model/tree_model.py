@@ -1013,6 +1013,10 @@ class RecurTreeGen(nn.Module):
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
         
+        if rc is not None:
+            if len(rc.shape) == 3:
+                rc = rc.reshape(rc.shape[0], rc.shape[2])
+        
         first_edge = [0]
         for i in range(len(list_num_edges) - 1):
             first_edge += [first_edge[-1] + list_num_edges[i]]
