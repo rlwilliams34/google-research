@@ -887,7 +887,10 @@ if __name__ == '__main__':
                         offset += len(batch_last_edges[b])
                 batch_last_edges = np.concatenate(batch_last_edges)
                 
-                debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=list_last_edge, batch_last_edges=batch_last_edges)
+                
+                rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
+                debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=list_last_edge, batch_last_edges=batch_last_edges, rc=rc)
+                
         
         else:
             edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
