@@ -261,8 +261,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
         
         elif self.row_LSTM:
-            print(self.row_LSTM)
-            print("SHouldnt be herte?")
             if prev_state is None:
                 edge_feats_lstm = edge_feats_lstm.float()
                 L = edge_feats_lstm.shape[0]
