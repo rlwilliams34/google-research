@@ -300,8 +300,9 @@ def get_edge_feats(g, method=None):
 
 
 def get_rc(g):
+    num_nodes = len(g.nodes())
     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
-    rc = [[x[0], x[1]] for x in edges]
+    rc = [num_nodes - [x[0], num_nodes - x[1]] for x in edges]
     return np.expand_dims(np.array(rc, dtype=np.float32), axis=1)
 
 

@@ -701,7 +701,7 @@ class RecurTreeGen(nn.Module):
             p += self.greedy_frac
         return p
 
-    def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None):
+    def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None, , num_nodes=None):
         assert lb <= ub
         if tree_node.is_root:
             if self.method in ["Test75", "Test85"] and self.num_edge > 0:
@@ -741,7 +741,7 @@ class RecurTreeGen(nn.Module):
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     col = tree_node.col_range[0]
-                    rc = np.array([col, row]).reshape(1, 2)
+                    rc = np.array([num_nodes - col, num_nodes - row]).reshape(1, 2)
                     if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         state_update = self.update_wt(state, prev_state)
                         edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)
@@ -794,7 +794,7 @@ class RecurTreeGen(nn.Module):
             if has_left:
                 lub = min(tree_node.lch.n_cols, ub)
                 llb = max(0, lb - tree_node.rch.n_cols)
-                ll, ll_wt, left_state, num_left, left_edge_feats, prev_state = self.gen_row(ll, ll_wt, state, tree_node.lch, col_sm, llb, lub, edge_feats, row=row, prev_state=prev_state)
+                ll, ll_wt, left_state, num_left, left_edge_feats, prev_state = self.gen_row(ll, ll_wt, state, tree_node.lch, col_sm, llb, lub, edge_feats, row=row, prev_state=prev_state, num_nodes=num_nodes)
                 pred_edge_feats.append(left_edge_feats)
             else:
                 left_state = self.get_empty_state()
@@ -829,7 +829,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.cell_topright(self.topdown_right_embed[[int(has_right)]], topdown_state, tree_node.depth)
 
             if has_right:  # has edge in right child
-                ll, ll_wt, right_state, num_right, right_edge_feats, prev_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, row=row, prev_state=prev_state)
+                ll, ll_wt, right_state, num_right, right_edge_feats, prev_state = self.gen_row(ll, ll_wt, topdown_state, tree_node.rch, col_sm, rlb, rub, edge_feats, row=row, prev_state=prev_state, num_nodes=num_nodes)
                 pred_edge_feats.append(right_edge_feats)
             else:
                 right_state = self.get_empty_state()
@@ -895,7 +895,7 @@ class RecurTreeGen(nn.Module):
                 target_edge_feats = None if edge_feats is None else edge_feats[len(edges) : len(edges) + len(col_sm)]
             else:
                 target_edge_feats = None
-            ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state)
+            ll, ll_wt, cur_state, _, target_edge_feats, prev_state = self.gen_row(0, 0, controller_state, cur_row.root, col_sm, lb, ub, target_edge_feats, row=i, prev_state=prev_state, num_nodes=num_nodes)
             if target_edge_feats is not None and target_edge_feats.shape[0]:
                 list_pred_edge_feats.append(target_edge_feats)
             
