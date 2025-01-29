@@ -347,6 +347,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 else:
                     if self.method == "Test85":
                         edge_embed = self.edgelen_encoding(edge_feats_normalized)
+                        print(rc.shape)
                         edge_row = rc[:, 0]
                         edge_col = rc[:, 1]
                         row_pos = self.edge_pos_enc(edge_row.tolist())
