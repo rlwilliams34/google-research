@@ -958,7 +958,7 @@ if __name__ == '__main__':
             
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
-                rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
+                rc = (np.concatenate([list_rc[i] for i in batch_indices], axis=0) if cmd_args.has_edge_feats else None)
                 
                 if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
                     list_num_edges = [len(train_graphs[i].edges()) for i in batch_indices]
