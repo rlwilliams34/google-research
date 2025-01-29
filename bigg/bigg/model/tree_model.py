@@ -1076,7 +1076,7 @@ class RecurTreeGen(nn.Module):
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
                 print(edge_of_lv)
-                print(fist_edge)
+                print(first_edge)
                 
                 
                 ## For training: need the index of edge JUST before generating this one
