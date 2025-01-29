@@ -959,6 +959,8 @@ if __name__ == '__main__':
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
                 rc = (np.concatenate([list_rc[i] for i in batch_indices], axis=0) if cmd_args.has_edge_feats else None)
+                batch_last_edges = None
+                list_last_edge = None
                 
                 if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
                     list_num_edges = [len(train_graphs[i].edges()) for i in batch_indices]
@@ -968,7 +970,6 @@ if __name__ == '__main__':
                             db_info_it = db_info[i]
                         elif cmd_args.g_type == "tree":
                             db_info_it = db_info
-                        
                     if cmd_args.method in ["Test75", "Test85"]:
                         if cmd_args.row_LSTM:
                             edge_feats_lstm = [list_edge_feats_lstm[i] for i in batch_indices]
