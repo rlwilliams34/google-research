@@ -370,6 +370,10 @@ class _tree_lib(object):
                         
                         else:
                             has_ch = self.GetChLabel(0, dtype=bool)
+                            print(has_ch)
+                            print(has_ch.shape)
+                            print(batch_last_edges)
+                            print(batch_last_edges.shape)
                             cur_left_states = batch_last_edges[has_ch]
                         cur_right_states = np.array([x[0] for x in cur_edge])
                         left_idx[d] = cur_left_states
