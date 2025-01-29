@@ -989,7 +989,8 @@ class RecurTreeGen(nn.Module):
             cur_edge_idx = update_idx[update_bool]
         else:
             update_bool = update_idx[0]
-            cur_edge_idx = update_idx[1]
+            edge_of_lv = update_idx[1]
+            cur_edge_idx = edge_of_lv[update_bool] - 1
             
         cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
         top_states_wt = (cur_top_h, cur_top_c)
@@ -1066,20 +1067,8 @@ class RecurTreeGen(nn.Module):
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
-                
                 has_prev = np.array([k not in first_edge for k in edge_of_lv])
-                edge_of_lv = edge_of_lv[has_prev]
-                edge_of_lv = edge_of_lv - 1
                 
-#                 if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
-#                     edge_state_wt_h, edge_state_wt_c = edge_state[0].clone(), edge_state[1].clone()
-#                     edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
-#                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
-#                     prev_feat = (edge_feats_embed[0][:, edge_of_lv], edge_feats_embed[1][:, edge_of_lv])
-#                     edge_state_wt_has_prev = self.update_wt(edge_state_wt_has_prev, prev_feat)
-#                     edge_state_wt[0][:, has_prev] = edge_state_wt_has_prev[0]
-#                     edge_state_wt[1][:, has_prev] = edge_state_wt_has_prev[1]
-#                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt = self.merge_states([has_prev, edge_of_lv], edge_state, edge_feats_embed, False)
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
