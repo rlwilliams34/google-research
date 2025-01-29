@@ -805,7 +805,7 @@ class RecurTreeGen(nn.Module):
                 num_left = 0
 
             right_pos = self.tree_pos_enc([tree_node.rch.n_cols])
-            topdown_state = self.l2r_cell(state, (left_state_wt[0] + right_pos, left_state_wt[1] + right_pos), tree_node.depth)
+            topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
             topdown_wt_state = None
             if self.method == "Test75" and self.num_edge > 0:
