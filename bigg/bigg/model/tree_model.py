@@ -743,7 +743,7 @@ class RecurTreeGen(nn.Module):
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
-                    if self.method == in ["Test75", "Test85"] and self.num_edge > 0:
+                    if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         rc = None
                         if self.method == "Test85":
                             col = tree_node.col_range[0]
