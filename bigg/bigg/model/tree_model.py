@@ -716,7 +716,7 @@ class RecurTreeGen(nn.Module):
     def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None):
         assert lb <= ub
         if tree_node.is_root:
-            if self.method == "Test75" and self.num_edge > 0:
+            if False and self.method == "Test75" and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
                 
@@ -1012,7 +1012,6 @@ class RecurTreeGen(nn.Module):
         ll_batch = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
-        print(list_last_edge)
         
         if self.has_edge_feats:
             if self.row_LSTM:
@@ -1038,7 +1037,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        if self.method == "Test75":
+        if False and self.method == "Test75":
             cur_row_updates = batch_last_edges
             cur_row_idx = (batch_last_edges != -1)
             cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
