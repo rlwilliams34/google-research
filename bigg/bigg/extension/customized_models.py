@@ -78,6 +78,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             if self.wt_mlp:
                 self.leaf_LSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
                 self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
+                self.edge_pos_enc = PosEncoding(args.weight_embed_dim, args.device, args.pos_base)
             
             if self.method == "Test85":
                 self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
@@ -268,6 +269,11 @@ class BiggWithEdgeLen(RecurTreeGen):
                 else:
                     if self.wt_mlp:
                         edge_embed = self.edgelen_encoding(edge_feats_normalized)
+                        edge_row = rc[:, 0]
+                        edge_col = rc[:, 1]
+                        row_pos = self.edge_pos_enc(edge_row.tolist())
+                        col_pos = self.edge_pos_enc(edge_col.tolist())
+                        edge_embed = torch.cat([edge_embed, row_pos, col_pos], dim = -1)
                         edge_embed = self.leaf_LSTM(edge_embed)
                     else:
                         edge_embed = self.leaf_LSTM(edge_feats_normalized)
