@@ -982,6 +982,8 @@ class RecurTreeGen(nn.Module):
     def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None, batch_last_edges=None):
         TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
         # embed trees
+        if self.method in ["Test75", "Test85"]:
+            edge_feats=None
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
@@ -1021,7 +1023,7 @@ class RecurTreeGen(nn.Module):
             c_buf_list[d] = new_c
         hc_bot = fn_hc_bot(0)
         feat_dict = {}
-        if self.has_edge_feats:
+        if self.has_edge_feats and self.method not in ["Test75", "Test85"]:
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(0)
             local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
             feat_dict['edge'] = (local_edge_feats, is_rch)
