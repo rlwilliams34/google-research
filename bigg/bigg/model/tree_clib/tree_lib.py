@@ -376,6 +376,7 @@ class _tree_lib(object):
                             print(batch_last_edges.shape)
                             cur_left_states = batch_last_edges[has_ch]
                             print(cur_left_states.shape)
+                            print(len(cur_edge))
                             
                             assert len(cur_left_states) == len(cur_edge)
                             
