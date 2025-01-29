@@ -370,6 +370,8 @@ class _tree_lib(object):
                         
                         else:
                             has_ch, _ = self.GetChLabel(0, dtype=bool)
+                            cur_lv_nonleaf = self.QueryNonLeaf(lv)
+                            print(cur_lv_nonleaf)
                             print(has_ch)
                             print(has_ch.shape)
                             print(batch_last_edges)
