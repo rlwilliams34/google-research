@@ -1014,6 +1014,7 @@ class RecurTreeGen(nn.Module):
         ll_batch = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
+        print(list_last_edge)
         
         if self.has_edge_feats:
             if self.row_LSTM:
