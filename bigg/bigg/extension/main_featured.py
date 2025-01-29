@@ -304,10 +304,7 @@ def get_rc(g):
     rc = [[x[0], x[1]] for x in edges]
     return np.expand_dims(np.array(rc, dtype=np.float32), axis=1)
 
-def get_rc(g):
-    edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
-    row, col = np.array([x[0] for x in edges]), np.array([x[1] for x in edges])
-    
+
 
 def get_last_edge(g):
     last_edges = []
@@ -555,7 +552,7 @@ if __name__ == '__main__':
             
             list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)).to(cmd_args.device) for g in train_graphs]
             list_last_edges = [get_last_edge2(g) for g in train_graphs]
-            list_edge_rc = [get_rc(g) for g in train_graphs]
+            list_rc = [get_rc(g) for g in train_graphs]
             
             ### To pad: F.pad(input=g1t, pad=(0,0,0,MAX_DEG - SHAPE1),mode='constant',value=-1).shape
 
