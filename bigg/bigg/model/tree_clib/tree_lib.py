@@ -392,7 +392,6 @@ class _tree_lib(object):
                     
                     left_idx[lv] = cur_left_states
                     right_idx[lv] = cur_right_states
-                print("Left index: ", left_idx)
                 return left_idx, right_idx
             
             up_lv_nonleaf = self.QueryNonLeaf(d - 1)
