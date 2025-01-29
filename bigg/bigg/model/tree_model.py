@@ -447,12 +447,15 @@ class FenwickTree(nn.Module):
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
-            if i == 0 and (self.has_edge_feats or self.has_node_feats):
+            if self.method == "Test75":
+                has_edge_feats = False
+            
+            if i == 0 and (has_edge_feats or self.has_node_feats):
                 lstm_func = featured_batch_tree_lstm3
             lstm_func = partial(lstm_func, h_buf=row_embeds[-1][0], c_buf=row_embeds[-1][1],
                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
             if i == 0:
-                if self.has_edge_feats or self.has_node_feats:
+                if has_edge_feats or self.has_node_feats:
                     if self.method == "Test75":
                         method = "Spepojijcial"
                     
