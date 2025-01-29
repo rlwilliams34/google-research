@@ -312,9 +312,18 @@ def get_last_edge(g):
             idx = idx_count
             if r == 1:
                 last_edges_1.append(idx)
-            elif r > 1:
-                last_edges.append(idx)
-    return np.array(last_edges), np.array(last_edges_1)
+            last_edges.append(idx)
+        else:
+            if r == 0:
+                last_edges.append(-1)
+            else:
+                last_edges.append(last_edges[-1])
+    
+    last_edges = [-1] + last_edges[:-1]
+    return np.array(last_edges)#, np.array(last_edges_1)
+    #return np.array(last_edges), np.array(last_edges_1
+
+
 # 
 # 
 # def lr_gen(idx_list, y):    
@@ -542,7 +551,7 @@ if __name__ == '__main__':
                 list_edge_feats_lstm = [torch.from_numpy(get_edge_feats_lstm(g)).to(cmd_args.device) for g in train_graphs]
             
             list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)).to(cmd_args.device) for g in train_graphs]
-            
+            list_last_edges = [get_last_edge(g) for g in train_graphs]
             
             ### To pad: F.pad(input=g1t, pad=(0,0,0,MAX_DEG - SHAPE1),mode='constant',value=-1).shape
 
@@ -977,7 +986,14 @@ if __name__ == '__main__':
                             id_ += len(train_graphs[b])
                         list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
                         list_last_edge = (list_last_edge, list_last_edge_1)
-                
+                        
+                        batch_last_edges = [list_last_edges[i] for i in batch_indices]
+                        offset = 0
+                        for b in range(len(batch_last_edges)):
+                            if offset > 0:
+                                batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
+                                offset += len(batch_last_edges[b])
+            
             if cmd_args.sigma:
                 batch_idx = np.concatenate([np.repeat(i, len(train_graphs[i])) for i in batch_indices])
             
@@ -990,7 +1006,7 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it, list_last_edge=list_last_edge, edge_feats_lstm=edge_feats_lstm)
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it, list_last_edge=list_last_edge, edge_feats_lstm=edge_feats_lstm, batch_last_edges=batch_last_edges)
                 
             
             loss_top = -ll / num_nodes
