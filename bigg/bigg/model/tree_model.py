@@ -1017,6 +1017,12 @@ class RecurTreeGen(nn.Module):
         edge_feats_embed = None
         
         print(list_num_edges)
+        first_edge = [0]
+        offset = 0
+        for i in range(len(list_edge_start) - 1):
+            offset = offset + list_edge_start[i]
+            first_edge += [first_edge[-1] + offset]
+        print(first_edge)
         
         if self.has_edge_feats:
             if self.row_LSTM:
