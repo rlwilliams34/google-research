@@ -1025,7 +1025,12 @@ class RecurTreeGen(nn.Module):
         if self.method == "Test75":
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
             cur_state = (h_buf_list[0], c_buf_list[0])
-            row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[1], *prev_rowsum_states)
+            #weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
+            #cur_state = self.merge_top_wt(cur_state, weight_state)
+            
+            #edge_embed_idx = list_last_edge[1][0]
+            #weight_state = (edge_feats_embed[0][:, edge_embed_idx], edge_feats_embed[1][:, edge_embed_idx])
+            row_states, next_states = self.row_tree.forward_train(*hc_bot, cur_state[0], cur_state[1], *prev_rowsum_states, None, None)
         
         else:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
@@ -1128,7 +1133,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
             ### Need most recent edge at this stage...
-            if False and self.method == "Test75":
+            if self.method == "Test75":
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
                 topdown_wt_state = (topdown_h, topdown_c)
