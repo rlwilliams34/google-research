@@ -278,6 +278,7 @@ def selective_update_hc(h, c, zero_one, feats):
     local_edge_feats_h = scatter(feats[0], nz_idx, dim=1, dim_size=h.shape[1])
     local_edge_feats_c = scatter(feats[1], nz_idx, dim=1, dim_size=h.shape[1])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
+    print(zero_one)
     h = torch.where(zero_one, local_edge_feats_h, h)
     c = torch.where(zero_one, local_edge_feats_c, c)
     return h, c
