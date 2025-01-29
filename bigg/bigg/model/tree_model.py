@@ -752,7 +752,7 @@ class RecurTreeGen(nn.Module):
                             rc = np.array([col, row]).reshape(1, 1, 2)
                         state_update = self.update_wt(state, prev_state)
                         edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)
-                        edge_embed = self.embed_edge_feats(cur_feats)
+                        edge_embed = self.embed_edge_feats(cur_feats, rc=rc)
                         prev_state = edge_embed
                         
                         return ll, ll_wt, edge_embed, 1, cur_feats, prev_state, None
