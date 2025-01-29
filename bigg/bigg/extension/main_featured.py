@@ -580,7 +580,7 @@ if __name__ == '__main__':
     cmd_args.max_num_nodes = max_num_nodes
     
     print(train_graphs[1].edges())
-    
+    print(train_graphs[1].edges(data=True))
 #     if cmd_args.g_type == 'er':
 #         #g = nx.Graph([(0, 1, {'weight': 0.1}), (1, 2, {'weight': 0.2}), (2, 3, {'weight': 0.3}), (3, 4, {'weight': 0.2}), (4, 5, {'weight': 0.5}), (5, 6, {'weight': 0.6}), (6, 7, {'weight': 0.7}), (1, 7, {'weight': 0.8}), (5, 7, {'weight': 0.9}), (6, 7, {'weight': 1.0})])
 #         g = nx.Graph([(0, 8, {'weight': 0.1}), (1, 8, {'weight': 0.2}), (2, 8, {'weight': 0.3}), (3, 8, {'weight': 0.2}), (4, 8, {'weight': 0.5}), (5, 8, {'weight': 0.6}), (6, 8, {'weight': 0.7}), (7, 8, {'weight': 0.8})])

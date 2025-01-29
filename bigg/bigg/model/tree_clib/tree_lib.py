@@ -428,7 +428,6 @@ class _tree_lib(object):
             par_idx = np.array([x for i, x in zip(num_chil, idx_list) for _ in range(i)])
             par_idx = par_idx[cur_lv_nonleaf]
             parent_indices[d] = par_idx
-        return most_recent_edge_list
 
 #     def GetMostRecentWeight(self, max_depth, dtype=None):
 #         most_recent_edge_list = [None] * max_depth
