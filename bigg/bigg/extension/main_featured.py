@@ -1036,6 +1036,7 @@ if __name__ == '__main__':
                             if offset > 0:
                                 batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
                                 offset += len(batch_last_edges[b])
+                        batch_last_edges = np.concatenate(batch_last_edgess)
             
             if cmd_args.sigma:
                 batch_idx = np.concatenate([np.repeat(i, len(train_graphs[i])) for i in batch_indices])

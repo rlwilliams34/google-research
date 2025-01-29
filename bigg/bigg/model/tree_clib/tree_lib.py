@@ -329,7 +329,7 @@ class _tree_lib(object):
     
 
     
-    def GetMostRecentWeight(self, max_depth, dtype=None):
+    def GetMostRecentWeight(self, max_depth, batch_last_edges=None):
         most_recent_edge_list = [None] * max_depth
         parent_indices = [None] * max_depth
         is_lch_list = [None] * max_depth
@@ -365,7 +365,12 @@ class _tree_lib(object):
                     cur_is_lch = is_lch_list[lv]
                     
                     if lv == 0:
-                        cur_left_states = np.array([-1] * len(cur_edge))
+                        if batch_last_edges is None:
+                            cur_left_states = np.array([-1] * len(cur_edge))
+                        
+                        else:
+                            has_ch = self.GetChLabel(0, dtype=bool)
+                            cur_left_states = batch_last_edges[has_ch]
                         cur_right_states = np.array([x[0] for x in cur_edge])
                         left_idx[d] = cur_left_states
                         left_idx[d] = cur_right_states

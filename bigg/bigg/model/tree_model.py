@@ -937,7 +937,7 @@ class RecurTreeGen(nn.Module):
             return -loss, label, ll_batch
         return -loss, ll_batch
 
-    def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None):
+    def forward_row_trees(self, graph_ids, node_feats=None, edge_feats=None, list_node_starts=None, num_nodes=-1, list_col_ranges=None, batch_last_edges=None):
         TreeLib.PrepareMiniBatch(graph_ids, list_node_starts, num_nodes, list_col_ranges)
         # embed trees
         all_ids = TreeLib.PrepareTreeEmbed()
@@ -958,10 +958,8 @@ class RecurTreeGen(nn.Module):
         c_buf_list = [None] * (len(all_ids) + 1)
         
         if self.method == "Test75":
-            topdown_edge_index, _= TreeLib.GetTopdownEdgeIdx(len(all_ids) + 1)
-            if self.test_sep:
-                left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1)
-                topdown_edge_index = (left_idx, right_idx)
+            left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1, batch_last_edges=batch_last_edges)
+            topdown_edge_index = (left_idx, right_idx)
         
         for d in range(len(all_ids) - 1, -1, -1):
             fn_ids = lambda i: all_ids[d][i]
@@ -1023,7 +1021,7 @@ class RecurTreeGen(nn.Module):
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
         
         if self.method == "Test75":
-            hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
+            hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
             cur_state = (h_buf_list[0], c_buf_list[0])
             weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
             cur_state = self.merge_top_wt(cur_state, weight_state)
@@ -1040,9 +1038,22 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        print(batch_last_edges)
-        print(STOP)
-        logit_has_edge = self.pred_has_ch(row_states[0][-1])
+        if self.method == "Test75":
+            cur_row_updates = batch_last_edges
+            cur_row_idx = (batch_last_edges != -1)
+            cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
+            row_states_wt = (cur_row_wt_h, cur_row_wt_c)
+            row_has_wt_states = (row_states_wt[0][:, cur_row_idx], row_states_wt[1][:, cur_row_idx])
+            cur_edge_idx = cur_row_updates[cur_row_idx]
+            row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+            row_has_wt_states = self.update_wt(row_has_wt_states, row_feats)
+            row_states_wt[0][:, cur_row_idx] = row_has_wt_states[0]
+            row_states_wt[1][:, cur_row_idx] = row_has_wt_states[1]
+            logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
+            
+        else:
+            logit_has_edge = self.pred_has_ch(row_states[0][-1])
+        
         has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
         ll_cur, ll_batch = self.binary_ll(logit_has_edge, has_ch, batch_idx = batch_idx, ll_batch = ll_batch)
         ll = ll + ll_cur
