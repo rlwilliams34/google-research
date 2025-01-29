@@ -998,7 +998,7 @@ class RecurTreeGen(nn.Module):
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         top_has_wt_states = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states[0]
-        top_states_wt[1][:, update_bool] = top_has_wt_states[1]
+        #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
         return top_states_wt
         
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
