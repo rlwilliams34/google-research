@@ -317,7 +317,7 @@ def get_last_edge(g):
     return np.array(last_edges), np.array(last_edges_1)
 
 
-def get_last_edge_2(g):
+def get_last_edge2(g):
     last_edges = []
     last_edges_1 = []
     idx = -1
