@@ -808,7 +808,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
             topdown_wt_state = None
-            if self.method == "Test75" and self.num_edge > 0:
+            if False and self.method == "Test75" and self.num_edge > 0:
                 topdown_wt_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
@@ -1110,7 +1110,7 @@ class RecurTreeGen(nn.Module):
             else:
                 h_next_buf = c_next_buf = None
 
-            if self.has_edge_feats:
+            if False and self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
