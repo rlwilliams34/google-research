@@ -409,7 +409,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     
     else:
         list_num_edges = None
-        if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
+        if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
             list_num_edges = [len(edge_feats[0]), len(edge_feats[1])]
         
         if isinstance(edge_feats, list):
@@ -557,7 +557,7 @@ if __name__ == '__main__':
             ### To pad: F.pad(input=g1t, pad=(0,0,0,MAX_DEG - SHAPE1),mode='constant',value=-1).shape
 
             last_edge_list = None
-            if cmd_args.method == "Test75":
+            if cmd_args.method in ["Test75", "Test85"]:
                 last_edge_list = [get_last_edge(g)[0] for g in train_graphs]
                 last_edge_1_list = [get_last_edge(g)[1] for g in train_graphs]
             
@@ -809,7 +809,7 @@ if __name__ == '__main__':
         if cmd_args.has_edge_feats and cmd_args.method == "LSTM":
             debug_model(model, [train_graphs[0], train_graphs[1]], None, [list_edge_feats[i] for i in [0,1]], False)
         
-        elif cmd_args.method == "Test75":
+        elif cmd_args.method in ["Test75", "Test85"]:
             if cmd_args.row_LSTM:
                 batch_indices = [0, 1]
                 edge_feats_lstm = [list_edge_feats_lstm[i] for i in batch_indices]
@@ -958,7 +958,7 @@ if __name__ == '__main__':
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
                 rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
                 
-                if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
+                if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
                     list_num_edges = [len(train_graphs[i].edges()) for i in batch_indices]
                     if db_info is not None:
                         if cmd_args.g_type == "db":
@@ -967,7 +967,7 @@ if __name__ == '__main__':
                         elif cmd_args.g_type == "tree":
                             db_info_it = db_info
                         
-                    if cmd_args.method == "Test75":
+                    if cmd_args.method in ["Test75", "Test85"]:
                         if cmd_args.row_LSTM:
                             edge_feats_lstm = [list_edge_feats_lstm[i] for i in batch_indices]
                             max_len = np.max([x.shape[0] for x in edge_feats_lstm])
