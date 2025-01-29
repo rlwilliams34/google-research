@@ -1017,8 +1017,9 @@ class RecurTreeGen(nn.Module):
                 rc = rc.reshape(rc.shape[0], rc.shape[2])
         
         first_edge = [0]
-        for i in range(len(list_num_edges) - 1):
-            first_edge += [first_edge[-1] + list_num_edges[i]]
+        if list_num_edges is not None:
+            for i in range(len(list_num_edges) - 1):
+                first_edge += [first_edge[-1] + list_num_edges[i]]
         
         if self.has_edge_feats:
             if self.row_LSTM:
