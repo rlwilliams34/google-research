@@ -1028,9 +1028,9 @@ class RecurTreeGen(nn.Module):
             #weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
             #cur_state = self.merge_top_wt(cur_state, weight_state)
             
-            edge_embed_idx = list_last_edge[1][0]
-            weight_state = (edge_feats_embed[0][:, edge_embed_idx], edge_feats_embed[1][:, edge_embed_idx])
-            row_states, next_states = self.row_tree.forward_train(*hc_bot, cur_state[0], cur_state[1], *prev_rowsum_states, weight_state, self.merge_top_wt)
+            #edge_embed_idx = list_last_edge[1][0]
+            #weight_state = (edge_feats_embed[0][:, edge_embed_idx], edge_feats_embed[1][:, edge_embed_idx])
+            row_states, next_states = self.row_tree.forward_train(*hc_bot, cur_state[0], cur_state[1], *prev_rowsum_states, None, None)
         
         else:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges)
