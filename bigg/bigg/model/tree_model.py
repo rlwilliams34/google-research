@@ -704,7 +704,7 @@ class RecurTreeGen(nn.Module):
     def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None):
         assert lb <= ub
         if tree_node.is_root:
-            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
                 
@@ -744,7 +744,7 @@ class RecurTreeGen(nn.Module):
                     if self.method == "Test85":
                         col = tree_node.col_range[0]
                         rc = np.array([col, row]).reshape(1, 2)
-                    if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+                    if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         state_update = self.update_wt(state, prev_state)
                         edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)
                     
@@ -806,7 +806,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
             topdown_wt_state = None
-            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 topdown_wt_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
@@ -1046,7 +1046,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        if False and self.method in ["Test75", "Test85"]:
+        if self.method in ["Test75", "Test85"]:
             cur_row_updates = batch_last_edges
             cur_row_idx = (batch_last_edges != -1)
             cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
@@ -1082,7 +1082,7 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = edge_of_lv[has_prev]
                 edge_of_lv = edge_of_lv - 1
                 
-                if False and self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
+                if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt_h, edge_state_wt_c = edge_state[0].clone(), edge_state[1].clone()
                     edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
@@ -1154,7 +1154,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
             ### Need most recent edge at this stage...
-            if False and self.method in ["Test75", "Test85"]:
+            if  self.method in ["Test75", "Test85"]:
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
                 topdown_wt_state = (topdown_h, topdown_c)
