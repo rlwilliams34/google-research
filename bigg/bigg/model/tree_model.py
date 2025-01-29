@@ -770,47 +770,6 @@ class RecurTreeGen(nn.Module):
                     
                 else:
                     return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None
-
-#         if tree_node.is_leaf:
-#             tree_node.bits_rep = [0]
-#             col_sm.add_edge(tree_node.col_range[0])
-#             if self.bits_compress:
-#                 return ll, self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols), 1, None, None
-#             else:
-#                 if self.has_edge_feats:
-#                     self.num_edge += 1
-#                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
-#                     
-#                     rc = None
-#                     if self.method == "Test85":
-#                         col = tree_node.col_range[0]
-#                         rc = np.array([col, row]).reshape(1, 1, 2)
-#                         
-#                     if self.method in ["Test75", "Test85"] and self.num_edge > 0:
-#                         state_update = self.update_wt(state, prev_state)
-#                         edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)
-#                     
-#                     else:
-#                         edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
-#                         
-#                     ll_wt = ll_wt + edge_ll
-#                     if prev_state is None:
-#                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
-#                     else:
-#                         if self.method in ["Test75", "Test85"]:
-#                             edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state, rc=rc)
-#                             prev_state = edge_embed
-#                             return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
-#                         
-#                         else:
-#                             edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
-#                             prev_state = edge_embed
-#                             return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
-#                             
-#                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state, None
-#                     
-#                 else:
-#                     return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, None, None
         else:
             tree_node.split()
 
@@ -1087,7 +1046,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        if self.method in ["Test75", "Test85"]:
+        if False and self.method in ["Test75", "Test85"]:
             cur_row_updates = batch_last_edges
             cur_row_idx = (batch_last_edges != -1)
             cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
