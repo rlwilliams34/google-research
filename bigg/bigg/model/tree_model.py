@@ -454,7 +454,7 @@ class FenwickTree(nn.Module):
             if i == 0:
                 if self.has_edge_feats or self.has_node_feats:
                     if self.method == "Test75":
-                        method = "Special"
+                        method = "Spepojijcial"
                     
                     else:
                         method = self.method
