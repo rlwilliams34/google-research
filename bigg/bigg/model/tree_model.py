@@ -1016,11 +1016,9 @@ class RecurTreeGen(nn.Module):
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
         
-        print(list_num_edges)
         first_edge = [0]
         for i in range(len(list_num_edges) - 1):
             first_edge += [first_edge[-1] + list_num_edges[i]]
-        print(first_edge)
         
         if self.has_edge_feats:
             if self.row_LSTM:
@@ -1077,6 +1075,10 @@ class RecurTreeGen(nn.Module):
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
+                print(edge_of_lv)
+                print(fist_edge)
+                
+                
                 ## For training: need the index of edge JUST before generating this one
                 edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 ll_wt = ll_wt + edge_ll
