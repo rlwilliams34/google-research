@@ -423,7 +423,7 @@ class FenwickTree(nn.Module):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
-        if self.has_edge_feats or self.has_node_feats:
+        if self.method not in ["Test75", "Test85"] and (self.has_edge_feats or self.has_node_feats):
             feat_dict = c_bot
             if 'node' in feat_dict:
                 node_feats, is_tree_trivial, t_lch, t_rch = feat_dict['node']
@@ -450,7 +450,7 @@ class FenwickTree(nn.Module):
             if self.method == "Test75" or self.method == "Test85":
                 has_edge_feats = False
             
-            if i == 0 and (has_edge_feats or self.has_node_feats):
+            if i == 0 and self.method not in ["Test75", "Test85"] and (has_edge_feats or self.has_node_feats):
                 lstm_func = featured_batch_tree_lstm3
             lstm_func = partial(lstm_func, h_buf=row_embeds[-1][0], c_buf=row_embeds[-1][1],
                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
