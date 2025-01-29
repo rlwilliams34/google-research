@@ -475,18 +475,7 @@ class FenwickTree(nn.Module):
         # get history representation
         init_select, all_ids, last_tos, next_ids, pos_info = TreeLib.PrepareRowSummary()
         cur_state = (joint_h[:, init_select], joint_c[:, init_select])
-        
-#         if list_last_edge is not None and len(list_last_edge[1][1]):
-#             cur_1_idx = list_last_edge[1][1]
-#             weight_state = (edge_feats_embed_l[0][:, 0:1].repeat(1, len(cur_1_idx), 1), edge_feats_embed_l[1][:, 0:1].repeat(1, len(cur_1_idx), 1))
-#             cur_state_1 = (cur_state[0][:, cur_1_idx], cur_state[1][:, cur_1_idx])
-#             print("INPUT FOR NODE 1")
-#             print(cur_state_1[0])
-#             print(weight_state[0])
-#             cur_state_1 = func(cur_state_1, weight_state)
-#             cur_state[0][:, cur_1_idx] = cur_state_1[0]
-#             cur_state[1][:, cur_1_idx] = cur_state_1[1]
-        
+                
         if self.has_node_feats:
             base_nodes, _ = TreeLib.GetFenwickBase()
             if len(base_nodes):
@@ -518,7 +507,6 @@ class FenwickTree(nn.Module):
         pos_embed = self.pos_enc(pos_info)
         row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
         row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
-        #print(row_h)
         return (row_h, row_c), ret_state
 
     def forward_train_weights(self, edge_feats_init_embed, list_num_edges, db_info):
@@ -989,8 +977,6 @@ class RecurTreeGen(nn.Module):
         feat_dict = {}
         if self.has_edge_feats:
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(0)
-            print(edge_idx)
-            print(edge_feats[0].shape)
             local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
             feat_dict['edge'] = (local_edge_feats, is_rch)
         if self.has_node_feats:
