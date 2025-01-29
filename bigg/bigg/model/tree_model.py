@@ -1055,6 +1055,7 @@ class RecurTreeGen(nn.Module):
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
         
+        
         if rc is not None:
             if len(rc.shape) == 3:
                 rc = rc.reshape(rc.shape[0], rc.shape[2])
@@ -1067,7 +1068,7 @@ class RecurTreeGen(nn.Module):
             if self.row_LSTM:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info,edge_feats_lstm=edge_feats_lstm)
             else:
-                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info, rc=None)
+                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info, rc=rc)
         
         if self.method in ["Test75", "Test85"]:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
