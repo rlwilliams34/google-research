@@ -755,7 +755,12 @@ class RecurTreeGen(nn.Module):
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
-                    edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
+                    if self.method == "Test75" and self.num_edge > 0:
+                        state_update = self.update_wt(state, prev_state)
+                        edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)
+                    
+                    else:
+                        edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll_wt = ll_wt + edge_ll
                     if prev_state is None:
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
@@ -1075,12 +1080,23 @@ class RecurTreeGen(nn.Module):
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
-                print(edge_of_lv)
-                print(first_edge)
                 
+                has_prev = [k not in edge_of_lv for k in first_edge]
+                edge_of_lv = edge_of_lv[has_prev]
+                edge_of_lv = edge_of_lv - 1
                 
-                ## For training: need the index of edge JUST before generating this one
-                edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
+                if self.method == "Test75":
+                    edge_state_wt_h, edge_state_wt_c = cur_states[0].clone(), cur_states[1].clone()
+                    edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
+                    edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
+                    prev_feat = (edge_feats_embed[0][:, edge_of_lv], edge_feats_embed[1][:, edge_of_lv])
+                    edge_state_wt_has_prev = self.update_wt(edge_state_wt_has_prev, prev_feat)
+                    edge_state_wt[0][:, has_prev] = edge_state_wt_has_prev[0]
+                    edge_state_wt[1][:, has_prev] = edge_state_wt_has_prev[1]
+                    edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
+                
+                else:
+                    edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 ll_wt = ll_wt + edge_ll
             if is_nonleaf is None or np.sum(is_nonleaf) == 0:
                 break
