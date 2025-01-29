@@ -437,13 +437,6 @@ class FenwickTree(nn.Module):
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
         
-#         if list_last_edge is not None:
-#             cur_state = row_embeds[-1]
-#             weight_state = (edge_feats_embed_l[0][:, list_last_edge[0]], edge_feats_embed_l[1][:, list_last_edge[0]])
-#             
-#             cur_state = func(cur_state, weight_state)
-#             row_embeds[-1] = cur_state
-
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
@@ -456,13 +449,7 @@ class FenwickTree(nn.Module):
                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
             if i == 0:
                 if has_edge_feats or self.has_node_feats:
-                    if self.method == "Test75" or self.method == "Test85":
-                        method = "Spepojijcial"
-                    
-                    else:
-                        method = self.method
-                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=method, func=func, weight_state=weight_state)
-                    #new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=self.method, func=func, weight_state=weight_state)
+                    new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=self.method, func=func, weight_state=weight_state)
                 else:
                     new_states = lstm_func(h_bot, c_bot)
             else:
@@ -1042,12 +1029,6 @@ class RecurTreeGen(nn.Module):
         
         if self.method in ["Test75", "Test85"]:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
-            #cur_state = (h_buf_list[0], c_buf_list[0])
-            #weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
-            #cur_state = self.merge_top_wt(cur_state, weight_state)
-            
-            #edge_embed_idx = list_last_edge[1][0]
-            #weight_state = (edge_feats_embed[0][:, edge_embed_idx], edge_feats_embed[1][:, edge_embed_idx])
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, None, None)
         
         else:
@@ -1058,21 +1039,21 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-#         if self.method in ["Test75", "Test85"]:
-#             cur_row_updates = batch_last_edges
-#             cur_row_idx = (batch_last_edges != -1)
-#             cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
-#             row_states_wt = (cur_row_wt_h, cur_row_wt_c)
-#             row_has_wt_states = (row_states_wt[0][:, cur_row_idx], row_states_wt[1][:, cur_row_idx])
-#             cur_edge_idx = cur_row_updates[cur_row_idx]
-#             row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-#             row_has_wt_states = self.update_wt(row_has_wt_states, row_feats)
-#             row_states_wt[0][:, cur_row_idx] = row_has_wt_states[0]
-#             row_states_wt[1][:, cur_row_idx] = row_has_wt_states[1]
-#             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         if self.method in ["Test75", "Test85"]:
-            row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
+            cur_row_updates = batch_last_edges
+            cur_row_idx = (batch_last_edges != -1)
+            cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
+            row_states_wt = (cur_row_wt_h, cur_row_wt_c)
+            row_has_wt_states = (row_states_wt[0][:, cur_row_idx], row_states_wt[1][:, cur_row_idx])
+            cur_edge_idx = cur_row_updates[cur_row_idx]
+            row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+            row_has_wt_states = self.update_wt(row_has_wt_states, row_feats)
+            row_states_wt[0][:, cur_row_idx] = row_has_wt_states[0]
+            row_states_wt[1][:, cur_row_idx] = row_has_wt_states[1]
             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
+#         if self.method in ["Test75", "Test85"]:
+#             row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
+#             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         
         else:
             logit_has_edge = self.pred_has_ch(row_states[0][-1])
