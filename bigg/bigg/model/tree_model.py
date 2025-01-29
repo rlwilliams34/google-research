@@ -989,6 +989,8 @@ class RecurTreeGen(nn.Module):
         feat_dict = {}
         if self.has_edge_feats:
             edge_idx, is_rch = TreeLib.GetEdgeAndLR(0)
+            print(edge_idx)
+            print(edge_feats[0].shape)
             local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
             feat_dict['edge'] = (local_edge_feats, is_rch)
         if self.has_node_feats:
