@@ -299,7 +299,7 @@ def featured_batch_tree_lstm2(edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn
     for i in range(2):
         leaf_check = is_leaf[i]
         local_hbot, local_cbot = h_bot[:, leaf_check], c_bot[:, leaf_check]
-        if edge_feats is not None and method not in ["Test75", "Special"]:
+        if edge_feats is not None and method not in ["Test75", "Test85", "Special"]:
             local_hbot, local_cbot = selective_update_hc(local_hbot, local_cbot, leaf_check, edge_feats[i])
         if cell_node is not None:
             local_hbot, local_cbot = cell_node(node_feats[i], (local_hbot, local_cbot))
@@ -447,7 +447,7 @@ class FenwickTree(nn.Module):
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
-            if self.method == "Test75":
+            if self.method == "Test75" or self.method == "Test85":
                 has_edge_feats = False
             
             if i == 0 and (has_edge_feats or self.has_node_feats):
@@ -456,7 +456,7 @@ class FenwickTree(nn.Module):
                                 h_past=prev_rowsum_h, c_past=prrev_rowsum_c, fn_all_ids=fn_ids, cell=self.merge_cell)
             if i == 0:
                 if has_edge_feats or self.has_node_feats:
-                    if self.method == "Test75":
+                    if self.method == "Test75" or self.method == "Test85":
                         method = "Spepojijcial"
                     
                     else:
@@ -707,7 +707,7 @@ class RecurTreeGen(nn.Module):
     def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None):
         assert lb <= ub
         if tree_node.is_root:
-            if self.method == "Test75" and self.num_edge > 0:
+            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
                 
@@ -743,7 +743,11 @@ class RecurTreeGen(nn.Module):
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
-                    if self.method == "Test75" and self.num_edge > 0:
+                    if self.method == in ["Test75", "Test85"] and self.num_edge > 0:
+                        rc = None
+                        if self.method == "Test85":
+                            col = tree_node.col_range[0]
+                            rc = np.array([col, row]).reshape(1, 1, 2)
                         state_update = self.update_wt(state, prev_state)
                         edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)
                     
@@ -753,7 +757,7 @@ class RecurTreeGen(nn.Module):
                     if prev_state is None:
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                     else:
-                        if self.method == "Test75":
+                        if self.method == in ["Test75", "Test85"]:
                             edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                             prev_state = edge_embed
                             self.num_edge += 1
@@ -772,7 +776,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            if self.method == "Test75" and self.num_edge > 0:
+            if self.method == in ["Test75", "Test85"] and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
             
@@ -804,7 +808,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
             topdown_wt_state = None
-            if self.method == "Test75" and self.num_edge > 0:
+            if self.method == in ["Test75", "Test85"] and self.num_edge > 0:
                 topdown_wt_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
@@ -852,7 +856,7 @@ class RecurTreeGen(nn.Module):
         
         self.row_tree.reset(list_states)
         controller_state = self.row_tree()
-        if self.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
+        if self.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
             self.weight_tree.reset([])
         
         if num_nodes is None:
@@ -864,7 +868,7 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_state = None        
-        if self.method == "Test75":
+        if self.method in ["Test75", "Test85"]:
             prev_state =  self.weight_tree()
         
         self.num_edge = 0
@@ -953,7 +957,7 @@ class RecurTreeGen(nn.Module):
         h_buf_list = [None] * (len(all_ids) + 1)
         c_buf_list = [None] * (len(all_ids) + 1)
         
-        if self.method == "Test75":
+        if self.method in ["Test75", "Test85"]:
             left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1, batch_last_edges=batch_last_edges)
             topdown_edge_index = (left_idx, right_idx)
         
@@ -965,7 +969,7 @@ class RecurTreeGen(nn.Module):
                 h_buf = h_buf_list[d + 1]
                 c_buf = c_buf_list[d + 1]
             h_bot, c_bot = fn_hc_bot(d + 1)
-            if self.has_edge_feats and self.method != "Test75":
+            if self.has_edge_feats and self.method not in ["Test75", "Test85"]:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(d + 1)
                 local_edge_feats = (edge_feats[0][:, edge_idx], edge_feats[1][:, edge_idx])
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, method=self.method)
@@ -989,7 +993,7 @@ class RecurTreeGen(nn.Module):
         if len(feat_dict):
             hc_bot = (hc_bot, feat_dict)
         
-        if self.method == "Test75":
+        if self.method in ["Test75", "Test85"]:
             return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
     
@@ -1001,7 +1005,7 @@ class RecurTreeGen(nn.Module):
         return row_states, next_states
 
     def forward_train(self, graph_ids, node_feats=None, edge_feats=None,
-                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None, list_num_edges=None, db_info=None, list_last_edge=None, edge_feats_lstm=None, batch_last_edges=None):
+                      list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None, batch_idx=None, list_num_edges=None, db_info=None, list_last_edge=None, edge_feats_lstm=None, batch_last_edges=None,rc=None):
         ll = 0.0
         ll_wt = 0.0
         noise = 0.0
@@ -1017,9 +1021,9 @@ class RecurTreeGen(nn.Module):
             if self.row_LSTM:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info,edge_feats_lstm=edge_feats_lstm)
             else:
-                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info)
+                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info, rc=rc)
         
-        if self.method == "Test75":
+        if self.method in ["Test75", "Test85"]:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
             cur_state = (h_buf_list[0], c_buf_list[0])
             #weight_state = (edge_feats_embed[0][:, list_last_edge[0]], edge_feats_embed[1][:, list_last_edge[0]])
@@ -1037,7 +1041,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        if self.method == "Test75":
+        if self.method in ["Test75", "Test85"]:
             cur_row_updates = batch_last_edges
             cur_row_idx = (batch_last_edges != -1)
             cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
@@ -1073,7 +1077,7 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = edge_of_lv[has_prev]
                 edge_of_lv = edge_of_lv - 1
                 
-                if self.method == "Test75" and np.sum(has_prev) > 0:
+                if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt_h, edge_state_wt_c = edge_state[0].clone(), edge_state[1].clone()
                     edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
@@ -1094,7 +1098,7 @@ class RecurTreeGen(nn.Module):
                 batch_idx = batch_idx[is_nonleaf]
             
             ## Need edge index at this stage 
-            if self.method == "Test75":
+            if self.method in ["Test75", "Test85"]:
                 cur_left_updates = topdown_edge_index[0][lv]
                 cur_states_wt_h = cur_states[0].clone()
                 cur_states_wt_c = cur_states[1].clone()
@@ -1129,7 +1133,7 @@ class RecurTreeGen(nn.Module):
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
-                if self.method != "Test75":
+                if self.method not in ["Test75", "Test85"]:
                     h_bot, c_bot = selective_update_hc(h_bot, c_bot, left_ids[0], left_feats)
                 
                 left_wt_ids = left_ids[1][list(map(bool, left_ids[0]))]
@@ -1145,7 +1149,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
             ### Need most recent edge at this stage...
-            if self.method == "Test75":
+            if self.method in ["Test75", "Test85"]:
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
                 topdown_wt_state = (topdown_h, topdown_c)

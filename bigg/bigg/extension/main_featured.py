@@ -293,11 +293,21 @@ def t(n1, n2):
     return t
 
 
-def get_edge_feats(g, method=None):
-    #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
+def get_edge_feats(g):
     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
     weights = [x[2]['weight'] for x in edges]
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
+
+
+def get_rc(g):
+    edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
+    rc = [[x[0], x[1]] for x in edges]
+    return np.expand_dims(np.array(rc, dtype=np.float32), axis=1)
+
+def get_rc(g):
+    edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
+    row, col = np.array([x[0] for x in edges]), np.array([x[1] for x in edges])
+    
 
 def get_last_edge(g):
     last_edges = []
@@ -363,54 +373,7 @@ def get_last_edge_2(g):
                 last_edges.append(last_edges[-1])
     
     last_edges = [-1] + last_edges[:-1]
-    return np.array(last_edges)#, np.array(last_edges_1)
-    #return np.array(last_edges), np.array(last_edges_1
-
-
-# 
-# 
-# def lr_gen(idx_list, y):    
-#     if len(idx_list) == 1:
-#         return ''
-#     if len(idx_list) == 2:
-#         if y == idx_list[0]:
-#             return 'L'
-#         else:
-#             return 'R'
-#     else:
-#         midpoint = len(idx_list) // 2
-#         left_idx_list = idx_list[:midpoint]
-#                 
-#         if y in left_idx_list:
-#             if len(left_idx_list) == 1:
-#                 return 'L'
-#             return 'L' + lr_gen(left_idx_list, y)
-#         
-#         else:
-#             right_idx_list = idx_list[midpoint:]
-#             return 'R' + lr_gen(right_idx_list, y)
-# 
-# 
-# def get_lr_seq(row_, col_):
-#     mydict = {'L': 0, 'R': 1}
-#     row = max(row_, col_)
-#     col = min(row_, col_)
-#     idx_list = list(range(row))
-#     lr_seq = lr_gen(idx_list, col)
-#     bin_lr_seq = list(map(mydict.get, lr_seq))
-#     return bin_lr_seq
-# 
-# 
-# def get_edge_feats_2(g, device):
-#     #edges = sorted(g.edges(data=True), key=lambda x: x[1]) #x[0] * len(g) + x[1])
-#     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
-#     weights = [x[2]['weight'] for x in edges]
-#     weights = np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
-#     weights = torch.from_numpy(weights).to(device)
-#     lr_seq = [get_lr_seq(x[0], x[1]) for x in edges]
-#     max_len = max(len(x) for x in lr_seq)
-#     lr_seq = [x + [-1] * (max_len - len(x)) for x in lr_seq]
-#     return weights, np.transpose(np.array(lr_seq))
+    return np.array(last_edges)
 
 
 def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edge_feats_lstm=None,batch_last_edges=None):
@@ -581,13 +544,6 @@ if __name__ == '__main__':
     
     print(train_graphs[1].edges())
     print(train_graphs[1].edges(data=True))
-#     if cmd_args.g_type == 'er':
-#         #g = nx.Graph([(0, 1, {'weight': 0.1}), (1, 2, {'weight': 0.2}), (2, 3, {'weight': 0.3}), (3, 4, {'weight': 0.2}), (4, 5, {'weight': 0.5}), (5, 6, {'weight': 0.6}), (6, 7, {'weight': 0.7}), (1, 7, {'weight': 0.8}), (5, 7, {'weight': 0.9}), (6, 7, {'weight': 1.0})])
-#         g = nx.Graph([(0, 8, {'weight': 0.1}), (1, 8, {'weight': 0.2}), (2, 8, {'weight': 0.3}), (3, 8, {'weight': 0.2}), (4, 8, {'weight': 0.5}), (5, 8, {'weight': 0.6}), (6, 8, {'weight': 0.7}), (7, 8, {'weight': 0.8})])
-#         print(g.nodes())
-#         train_graphs = [g]
-#         print(train_graphs)
-#         print(train_graphs[0].edges())
     
     if cmd_args.phase == "train": 
         [TreeLib.InsertGraph(g) for g in train_graphs]
@@ -599,6 +555,7 @@ if __name__ == '__main__':
             
             list_edge_feats = [torch.from_numpy(get_edge_feats(g, cmd_args.method)).to(cmd_args.device) for g in train_graphs]
             list_last_edges = [get_last_edge2(g) for g in train_graphs]
+            list_edge_rc = [get_rc(g) for g in train_graphs]
             
             ### To pad: F.pad(input=g1t, pad=(0,0,0,MAX_DEG - SHAPE1),mode='constant',value=-1).shape
 
@@ -1002,6 +959,8 @@ if __name__ == '__main__':
             
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
+                rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
+                
                 if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75"]:
                     list_num_edges = [len(train_graphs[i].edges()) for i in batch_indices]
                     if db_info is not None:
@@ -1063,7 +1022,7 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
             else:
-                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it, list_last_edge=list_last_edge, edge_feats_lstm=edge_feats_lstm, batch_last_edges=batch_last_edges)
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats, batch_idx = batch_idx, list_num_edges = list_num_edges, db_info = db_info_it, list_last_edge=list_last_edge, edge_feats_lstm=edge_feats_lstm, batch_last_edges=batch_last_edges,rc=rc)
                 
             
             loss_top = -ll / num_nodes
@@ -1073,13 +1032,6 @@ if __name__ == '__main__':
             if cmd_args.has_edge_feats:
                 epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
             
-#             if cmd_args.sigma:
-#                 epoch_losses_t.append(ll_batch)
-#                 epoch_losses_w.append(ll_batch_wt)
-#                 loss = -ll / sigma_t**0.5 - ll_wt / sigma_w**0.5
-#                 loss = loss / B
-#             
-#             else:
             loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
             
             loss.backward()
@@ -1098,19 +1050,9 @@ if __name__ == '__main__':
         print("Epoch Loss (Weights): ", epoch_loss_wt)
         loss_tops_list[epoch - cmd_args.epoch_load] = epoch_loss_top
         loss_wts_list[epoch - cmd_args.epoch_load] = epoch_loss_wt 
-                
-#         if cmd_args.sigma and epoch > 0:
-#             sigma_t = np.var(epoch_losses_t, ddof = 1)
-#             sigma_w = np.var(epoch_losses_w, ddof = 1)
-#             print("sigma t: ", sigma_t)
-#             print("sigma w: ", sigma_w)
         
         cur = epoch + 1
         
-        #print("CURRENT LOSSES")
-        #print("Top Loss: ", loss_top)
-        #print("Wt Loss: ", loss_wt)
-                
         if cur % cmd_args.epoch_save == 0 or cur == cmd_args.num_epochs:
             print('saving epoch')
             checkpoint = {'epoch': epoch, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
