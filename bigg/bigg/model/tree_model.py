@@ -983,17 +983,30 @@ class RecurTreeGen(nn.Module):
             return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
     
-    def merge_states(self, update_idx, top_state, edge_feats_embed):
-        ### CUR ROW UPDATES IS UPDATE IDX
-        update_bool = (update_idx != -1)
-        top_state_update = (top_state[0][:, update_bool], top_state[1][:, update_bool])
-        cur_edge_idx = update_idx[update_bool]
-        edge_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-        top_state_update = self.update_wt(top_state_update, edge_feats)
-        top_state[0][:, update_bool] = top_state_update[0]
-        top_state[1][:, update_bool] = top_state_update[1]
-        return top_state
+#     def merge_states(self, update_idx, top_state, edge_feats_embed):
+#         ### CUR ROW UPDATES IS UPDATE IDX
+#         update_bool = (update_idx != -1)
+#         top_state_update = (top_state[0][:, update_bool], top_state[1][:, update_bool])
+#         cur_edge_idx = update_idx[update_bool]
+#         edge_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+#         top_state_update = self.update_wt(top_state_update, edge_feats)
+#         top_state[0][:, update_bool] = top_state_update[0]
+#         top_state[1][:, update_bool] = top_state_update[1]
+#         return top_state
+
     
+    def merge_states(self, batch_last_edges, row_states, edge_feats_embed):            
+        cur_row_updates = batch_last_edges
+        cur_row_idx = (batch_last_edges != -1)
+        cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
+        row_states_wt = (cur_row_wt_h, cur_row_wt_c)
+        row_has_wt_states = (row_states_wt[0][:, cur_row_idx], row_states_wt[1][:, cur_row_idx])
+        cur_edge_idx = cur_row_updates[cur_row_idx]
+        row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+        row_has_wt_states = self.update_wt(row_has_wt_states, row_feats)
+        row_states_wt[0][:, cur_row_idx] = row_has_wt_states[0]
+        row_states_wt[1][:, cur_row_idx] = row_has_wt_states[1]
+        return row_states_wt
     
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
                              list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
