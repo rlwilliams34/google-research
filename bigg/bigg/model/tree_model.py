@@ -1081,7 +1081,8 @@ class RecurTreeGen(nn.Module):
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
                 
-                has_prev = [k not in edge_of_lv for k in first_edge]
+                has_prev = np.array([k not in edge_of_lv for k in first_edge])
+                print(has_prev)
                 edge_of_lv = edge_of_lv[has_prev]
                 edge_of_lv = edge_of_lv - 1
                 
