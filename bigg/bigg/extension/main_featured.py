@@ -421,7 +421,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     
     if cmd_args.g_type == "er":
         print(graph[0].edges())
-        print(graphs[1].edges())
+        print(graph[1].edges())
     
     for i in range(0, 2):
         g = graph[i]
