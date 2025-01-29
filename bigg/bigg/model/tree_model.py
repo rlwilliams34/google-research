@@ -1091,6 +1091,7 @@ class RecurTreeGen(nn.Module):
                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
                     prev_feat = (edge_feats_embed[0][:, edge_of_lv], edge_feats_embed[1][:, edge_of_lv])
                     edge_state_wt_has_prev = self.update_wt(edge_state_wt_has_prev, prev_feat)
+                    print(has_prev.shape)
                     edge_state_wt[0][:, has_prev] = edge_state_wt_has_prev[0]
                     edge_state_wt[1][:, has_prev] = edge_state_wt_has_prev[1]
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
