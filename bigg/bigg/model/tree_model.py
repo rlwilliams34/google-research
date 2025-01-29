@@ -757,7 +757,7 @@ class RecurTreeGen(nn.Module):
                     if prev_state is None:
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                     else:
-                        if self.method == in ["Test75", "Test85"]:
+                        if self.method in ["Test75", "Test85"]:
                             edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                             prev_state = edge_embed
                             self.num_edge += 1
@@ -776,7 +776,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            if self.method == in ["Test75", "Test85"] and self.num_edge > 0:
+            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
             
@@ -808,7 +808,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
             topdown_wt_state = None
-            if self.method == in ["Test75", "Test85"] and self.num_edge > 0:
+            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 topdown_wt_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
