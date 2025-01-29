@@ -1016,6 +1016,8 @@ class RecurTreeGen(nn.Module):
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
         
+        print(list_num_edges)
+        
         if self.has_edge_feats:
             if self.row_LSTM:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info,edge_feats_lstm=edge_feats_lstm)
@@ -1068,8 +1070,6 @@ class RecurTreeGen(nn.Module):
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
             if self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
-                print(edge_of_lv)
-                print(list_num_edges)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
