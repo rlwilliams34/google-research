@@ -365,7 +365,7 @@ class _tree_lib(object):
                     cur_is_lch = is_lch_list[lv]
                     
                     if lv == 0:
-                        if batch_last_edges is None:
+                        if True or batch_last_edges is None:
                             cur_left_states = np.array([-1] * len(cur_edge))
                         
                         else:
