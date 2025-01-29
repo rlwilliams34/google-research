@@ -766,10 +766,10 @@ class RecurTreeGen(nn.Module):
                             prev_state = edge_embed
                             return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                         
-                        edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
-                        prev_state = edge_embed
-                        
-                        return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
+                        else:
+                            edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
+                            prev_state = edge_embed
+                            return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                             
                     return ll, ll_wt, edge_embed, 1, cur_feats, prev_state, None
                     
@@ -1028,7 +1028,7 @@ class RecurTreeGen(nn.Module):
             if self.row_LSTM:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info,edge_feats_lstm=edge_feats_lstm)
             else:
-                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info, rc=rc)
+                edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info, rc=None)
         
         if self.method in ["Test75", "Test85"]:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
