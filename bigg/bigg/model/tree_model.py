@@ -701,7 +701,7 @@ class RecurTreeGen(nn.Module):
             p += self.greedy_frac
         return p
 
-    def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None, , num_nodes=None):
+    def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None, num_nodes=None):
         assert lb <= ub
         if tree_node.is_root:
             if self.method in ["Test75", "Test85"] and self.num_edge > 0:
