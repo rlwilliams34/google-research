@@ -744,7 +744,7 @@ class RecurTreeGen(nn.Module):
                     if self.method == "Test85":
                         col = tree_node.col_range[0]
                         rc = np.array([col, row]).reshape(1, 2)
-                    if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+                    if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         state_update = self.update_wt(state, prev_state)
                         edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)
                     
@@ -1082,7 +1082,7 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = edge_of_lv[has_prev]
                 edge_of_lv = edge_of_lv - 1
                 
-                if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
+                if False and self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt_h, edge_state_wt_c = edge_state[0].clone(), edge_state[1].clone()
                     edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
