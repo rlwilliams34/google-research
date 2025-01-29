@@ -1113,7 +1113,7 @@ class RecurTreeGen(nn.Module):
             else:
                 h_next_buf = c_next_buf = None
 
-            if False and self.has_edge_feats:
+            if self.has_edge_feats:
                 edge_idx, is_rch = TreeLib.GetEdgeAndLR(lv + 1)
                 left_feats = (edge_feats_embed[0][:, edge_idx[~is_rch]], edge_feats_embed[1][:, edge_idx[~is_rch]])
                 h_bot, c_bot = h_bot[:, left_ids[0]], c_bot[:, left_ids[0]]
@@ -1133,7 +1133,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
             ### Need most recent edge at this stage...
-            if self.method == "Test75":
+            if False and self.method == "Test75":
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_h, topdown_c = topdown_state[0].clone(), topdown_state[1].clone()
                 topdown_wt_state = (topdown_h, topdown_c)
