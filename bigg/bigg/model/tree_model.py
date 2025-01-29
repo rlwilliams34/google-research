@@ -1065,7 +1065,7 @@ class RecurTreeGen(nn.Module):
 #             row_states_wt[1][:, cur_row_idx] = row_has_wt_states[1]
 #             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         if self.method in ["Test75", "Test85"]:
-            row_states_wt = self.merge_states(self. batch_last_edges, row_states, edge_feats_embed)
+            row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         
         else:
