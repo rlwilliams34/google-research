@@ -248,6 +248,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         return feats_pad
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, prev_state=None, list_num_edges=None, db_info=None, edge_feats_lstm=None):
+        print(list_num_edges)
         if self.method != "Test12" and not self.row_LSTM: 
             B = edge_feats.shape[0]
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
