@@ -1087,7 +1087,7 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = edge_of_lv - 1
                 
                 if self.method == "Test75" and np.sum(has_prev) > 0:
-                    edge_state_wt_h, edge_state_wt_c = cur_states[0].clone(), cur_states[1].clone()
+                    edge_state_wt_h, edge_state_wt_c = edge_state[0].clone(), edge_state[1].clone()
                     edge_state_wt = (edge_state_wt_h, edge_state_wt_c)
                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
                     prev_feat = (edge_feats_embed[0][:, edge_of_lv], edge_feats_embed[1][:, edge_of_lv])
