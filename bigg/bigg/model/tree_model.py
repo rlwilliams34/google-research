@@ -993,7 +993,7 @@ class RecurTreeGen(nn.Module):
     def merge_states(self, update_idx, top_state, edge_feats_embed):
         ### CUR ROW UPDATES IS UPDATE IDX
         update_bool = (update_idx != -1)
-        top_state_update = (top_state[0][:, update_bool], top_state[1][:, update_bool])
+        top_state_update = (top_state[0][:, update_bool].clone(), top_state[1][:, update_bool].clone())
         cur_edge_idx = update_idx[update_bool]
         edge_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         top_state_update = self.update_wt(top_state_update, edge_feats)
