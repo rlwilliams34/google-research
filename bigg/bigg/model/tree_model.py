@@ -1081,8 +1081,7 @@ class RecurTreeGen(nn.Module):
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
                 
-                has_prev = np.array([k not in edge_of_lv for k in first_edge])
-                print(has_prev)
+                has_prev = np.array([k not in first_edge for k in edge_of_lv])
                 edge_of_lv = edge_of_lv[has_prev]
                 edge_of_lv = edge_of_lv - 1
                 
@@ -1092,9 +1091,6 @@ class RecurTreeGen(nn.Module):
                     edge_state_wt_has_prev = (edge_state[0][:, has_prev], edge_state[1][:, has_prev])
                     prev_feat = (edge_feats_embed[0][:, edge_of_lv], edge_feats_embed[1][:, edge_of_lv])
                     edge_state_wt_has_prev = self.update_wt(edge_state_wt_has_prev, prev_feat)
-                    print(has_prev.shape)
-                    print(edge_state_wt_has_prev[0].shape)
-                    print(edge_state_wt[0].shape)
                     edge_state_wt[0][:, has_prev] = edge_state_wt_has_prev[0]
                     edge_state_wt[1][:, has_prev] = edge_state_wt_has_prev[1]
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
@@ -1120,8 +1116,6 @@ class RecurTreeGen(nn.Module):
                 cur_edge_idx = cur_left_updates[cur_left_idx]
                 left_feat = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
                 left_has_wt_states = self.update_wt(left_has_wt_states, left_feat)
-                print("cur left", cur_left_idx.shape)
-                print("cur wt 0: ", cur_states_wt[0].shape)
                 cur_states_wt[0][:, cur_left_idx] = left_has_wt_states[0]
                 cur_states_wt[1][:, cur_left_idx] = left_has_wt_states[1]
                 left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
