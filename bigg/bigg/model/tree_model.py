@@ -1039,21 +1039,21 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        if self.method in ["Test75", "Test85"]:
-            cur_row_updates = batch_last_edges
-            cur_row_idx = (batch_last_edges != -1)
-            cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
-            row_states_wt = (cur_row_wt_h, cur_row_wt_c)
-            row_has_wt_states = (row_states_wt[0][:, cur_row_idx], row_states_wt[1][:, cur_row_idx])
-            cur_edge_idx = cur_row_updates[cur_row_idx]
-            row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-            row_has_wt_states = self.update_wt(row_has_wt_states, row_feats)
-            row_states_wt[0][:, cur_row_idx] = row_has_wt_states[0]
-            row_states_wt[1][:, cur_row_idx] = row_has_wt_states[1]
-            logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
 #         if self.method in ["Test75", "Test85"]:
-#             row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
+#             cur_row_updates = batch_last_edges
+#             cur_row_idx = (batch_last_edges != -1)
+#             cur_row_wt_h, cur_row_wt_c = row_states[0].clone(), row_states[1].clone()
+#             row_states_wt = (cur_row_wt_h, cur_row_wt_c)
+#             row_has_wt_states = (row_states_wt[0][:, cur_row_idx], row_states_wt[1][:, cur_row_idx])
+#             cur_edge_idx = cur_row_updates[cur_row_idx]
+#             row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+#             row_has_wt_states = self.update_wt(row_has_wt_states, row_feats)
+#             row_states_wt[0][:, cur_row_idx] = row_has_wt_states[0]
+#             row_states_wt[1][:, cur_row_idx] = row_has_wt_states[1]
 #             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
+        if self.method in ["Test75", "Test85"]:
+            row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
+            logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         
         else:
             logit_has_edge = self.pred_has_ch(row_states[0][-1])
