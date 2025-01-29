@@ -372,7 +372,6 @@ class _tree_lib(object):
                             has_ch, _ = self.GetChLabel(0, dtype=bool)
                             cur_lv_nonleaf = self.QueryNonLeaf(lv)
                             cur_left_states = batch_last_edges[has_ch][cur_lv_nonleaf]
-                            
                             assert len(cur_left_states) == len(cur_edge)
                             
                         cur_right_states = np.array([x[0] for x in cur_edge])

@@ -413,7 +413,7 @@ def get_last_edge_2(g):
 #     return weights, np.transpose(np.array(lr_seq))
 
 
-def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edge_feats_lstm=None):
+def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edge_feats_lstm=None,batch_last_edges=None):
     ll_t1 = 0
     ll_w1 = 0
     ll_t2 = 0
@@ -456,7 +456,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     
     #print(info)
     
-    ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info, edge_feats_lstm=edge_feats_lstm)
+    ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info, edge_feats_lstm=edge_feats_lstm, batch_last_edges=batch_last_edges)
     
     print("=============================")
     print("Fast Code Top+Wt Likelihoods: ")
@@ -920,7 +920,16 @@ if __name__ == '__main__':
                 list_last_edge = (list_last_edge, list_last_edge_1)    
                 
                 edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
-                debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=list_last_edge)
+                
+                batch_last_edges = [list_last_edges[i] for i in batch_indices]
+                offset = 0
+                for b in range(len(batch_last_edges)):
+                    if offset > 0:
+                        batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
+                        offset += len(batch_last_edges[b])
+                batch_last_edges = np.concatenate(batch_last_edges)
+                
+                debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=list_last_edge, batch_last_edges=batch_last_edges)
         
         else:
             edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
