@@ -283,7 +283,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             if list_num_edges is None:
                 edge_embed = self.weight_tree(edge_embed)
                 print("+++++++++++++++++++")
-                print("NUM EDGE: ", self.num_edges)
+                print("NUM EDGE: ", self.num_edge)
                 print(edge_embed)
                 print("+++++++++++++++++++")
             else:
