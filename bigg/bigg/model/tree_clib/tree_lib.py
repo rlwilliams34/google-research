@@ -383,7 +383,9 @@ class _tree_lib(object):
                         print(batch_last_edges[has_ch][cur_lv_nonleaf])
                         
                         
-                        par_left_edge = np.array([x[0] if x[0] != -1 else y for x, y in zip(cur_edge, batch_last_edges[has_ch][cur_lv_nonleaf])])
+                        #par_left_edge = np.array([x[0] if x[0] != -1 else y for x, y in zip(cur_edge, batch_last_edges[has_ch][cur_lv_nonleaf])])
+                        par_left_edge = np.array([x[0] for x in cur_edge])
+                        #par_left_edge = np.array([x[0] if x[0] != -1 else y for x, y in zip(cur_edge, batch_last_edges[has_ch][cur_lv_nonleaf])])
 #                         print("cur edge: ", cur_edge)
 #                         print("batch last : ", batch_last_edges[has_ch][cur_lv_nonleaf])
                         
@@ -415,7 +417,7 @@ class _tree_lib(object):
                         print(len(par_left_edge))
                         print(len(cur_edge))
                         print("=------------------------------------")
-                        par_left_edge = np.array([x[0] if x[0] != -1 else y for x,y in zip(cur_edge, par_left_edge[cur_par_idx])])
+                        par_left_edge = np.array([x[0] for x in cur_edge])#np.array([x[0] if x[0] != -1 else y for x,y in zip(cur_edge, par_left_edge[cur_par_idx])])
 #                         print("LEVEL:", lv)
 #                         print("CUR EDGE: ", cur_edge)
 #                         print("NEW PAR LEFT EDGE: ", par_left_edge)
