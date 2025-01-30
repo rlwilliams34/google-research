@@ -333,7 +333,7 @@ class _tree_lib(object):
         most_recent_edge_list = [None] * max_depth
         parent_indices = [None] * max_depth
         is_lch_list = [None] * max_depth
-        print("batch_last edge: ", batch_last_edges)
+#         print("batch_last edge: ", batch_last_edges)
         for d in range(max_depth - 1, -1, -1):
             cur_lv_nonleaf = self.QueryNonLeaf(d)
             cur_lv_edge, _ = self.GetEdgeAndLR(d)
@@ -379,40 +379,40 @@ class _tree_lib(object):
                         left_idx[d] = cur_left_states
                         left_idx[d] = cur_right_states
                         par_left_edge = np.array([x[0] if x[0] != -1 else y for x, y in zip(cur_edge, batch_last_edges[has_ch][cur_lv_nonleaf])])
-                        print("cur edge: ", cur_edge)
-                        print("batch last : ", batch_last_edges[has_ch][cur_lv_nonleaf])
+#                         print("cur edge: ", cur_edge)
+#                         print("batch last : ", batch_last_edges[has_ch][cur_lv_nonleaf])
                         
-                        print("LEVEL ZERO PARENT LEFT EDGE: ", par_left_edge)
-                        print("CURRENT LEFT STATES: ", cur_left_states)
+#                         print("LEVEL ZERO PARENT LEFT EDGE: ", par_left_edge)
+#                         print("CURRENT LEFT STATES: ", cur_left_states)
                         par_left_states = cur_left_states
                         par_right_states = cur_right_states
                     
                     elif cur_edge is not None:
                         # if the node is a left child, the left state will be the PARENTS
-                        print("======================================")
-                        print("current level: ", lv)
-                        print("current parent left states: ", par_left_states)
-                        print("current parent left edge: ", par_left_edge[cur_par_idx])
-                        print("current is left child: ", cur_is_lch)
-                        print("Current par index: ", cur_par_idx)
-                        print("Current edge: ", cur_edge)
-                        print("======================================")
+#                         print("======================================")
+#                         print("current level: ", lv)
+#                         print("current parent left states: ", par_left_states)
+#                         print("current parent left edge: ", par_left_edge[cur_par_idx])
+#                         print("current is left child: ", cur_is_lch)
+#                         print("Current par index: ", cur_par_idx)
+#                         print("Current edge: ", cur_edge)
+#                         print("======================================")
                         
                         cur_left_states = np.array([-1] * len(cur_edge))
                         cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
                         cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
                         cur_right_states = np.array([x[0] for x in cur_edge])
                         #par_left_edge = np.array([x[1] if x[1] != -1 else x[0] for x in cur_edge])
-                        print("TESTING OF THE PARENT LEFT EDGE....")
-                        print("PREV PAR EDGE: ", par_left_edge)
-                        print(len(par_left_edge))
-                        print(len(cur_edge))
+#                         print("TESTING OF THE PARENT LEFT EDGE....")
+#                         print("PREV PAR EDGE: ", par_left_edge)
+#                         print(len(par_left_edge))
+#                         print(len(cur_edge))
                         par_left_edge = np.array([x[0] if x[0] != -1 else y for x,y in zip(cur_edge, par_left_edge[cur_par_idx])])
-                        print("LEVEL:", lv)
-                        print("CUR EDGE: ", cur_edge)
-                        print("NEW PAR LEFT EDGE: ", par_left_edge)
-                        print(len(par_left_edge))
-                        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+#                         print("LEVEL:", lv)
+#                         print("CUR EDGE: ", cur_edge)
+#                         print("NEW PAR LEFT EDGE: ", par_left_edge)
+#                         print(len(par_left_edge))
+#                         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                         
                         par_left_states = cur_left_states
                     

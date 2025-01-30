@@ -759,14 +759,14 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
-#                 print("ROW: ", row)
-#                 print("STATE TO BE UPDATED: ", state[0])
-#                 print("PREVIOUS STATE: ", prev_state[0])
-#                 print("Num Edge: ", self.num_edge)
-#                 print("==========================================")
+                print("ROW: ", row)
+                print("STATE TO BE UPDATED: ", state[0])
+                print("PREVIOUS STATE: ", prev_state[0])
+                print("Num Edge: ", self.num_edge)
+                print("==========================================")
             
             else:
                 left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
@@ -1001,11 +1001,11 @@ class RecurTreeGen(nn.Module):
         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         
-#         if print_it:
-#             print("======================")
-#             print("States to be updated: ", top_has_wt_states[0])
-#             print("Corresponding Edges: ", row_feats[0])
-#             print("======================")
+        if print_it:
+            print("======================")
+            print("States to be updated: ", top_has_wt_states[0])
+            print("Corresponding Edges: ", row_feats[0])
+            print("======================")
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
         
@@ -1099,7 +1099,7 @@ class RecurTreeGen(nn.Module):
             if batch_idx is not None:
                 batch_idx = batch_idx[is_nonleaf]        
             
-            if False and self.method in ["Test75", "Test85"]:
+            if self.method in ["Test75", "Test85"]:
                 cur_left_updates = topdown_edge_index[0][lv]
                 cur_states_wt = self.merge_states(cur_left_updates, cur_states, edge_feats_embed, print_it=True)
                 left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
