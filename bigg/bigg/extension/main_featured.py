@@ -302,7 +302,8 @@ def get_edge_feats(g, method=None):
 def get_rc(g):
     num_nodes = len(g.nodes())
     edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
-    rc = [[num_nodes - x[0], num_nodes - x[1]] for x in edges]
+    #rc = [[num_nodes - x[0], num_nodes - x[1]] for x in edges]
+    rc = [t(x[0], x[1]) for x in edges]
     return np.expand_dims(np.array(rc, dtype=np.float32), axis=1)
 
 
@@ -946,9 +947,6 @@ if __name__ == '__main__':
             node_feats = (torch.cat([list_node_feats[i] for i in batch_indices], dim=0) if list_node_feats is not None else None)
             
             if cmd_args.method in ["Test12", "MLP-Leaf"] and cmd_args.has_edge_feats:
-                #edge_feats_embed_h = (torch.cat([list_edge_feats_embed[0][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
-                #edge_feats_embed_c = (torch.cat([list_edge_feats_embed[1][i] for i in batch_indices], dim=1)) #[list_edge_feats[i] for i in batch_indices]
-                #edge_feats_embed = (edge_feats_embed_h, edge_feats_embed_c)
                 edge_feats = [list_edge_feats[i] for i in batch_indices]
                 
             elif cmd_args.method == "Test4":
