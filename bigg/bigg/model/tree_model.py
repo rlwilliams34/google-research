@@ -996,13 +996,13 @@ class RecurTreeGen(nn.Module):
         cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
         top_states_wt = (cur_top_h, cur_top_c)
         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
-        if print_it:
-            print("top state before: ", top_has_wt_states[0])
+#         if print_it:
+#             print("top state before: ", top_has_wt_states[0])
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
-#         if print_it:
-#             print("edge_embed: ", row_feats[0])
+        if print_it:
+            print("edge_embed: ", row_feats[0])
         #zero_one = torch.tensor(update_bool, dtype=torch.bool).to(cur_top_h.device).unsqueeze(1)
         #cur_top_h = torch.where(zero_one, top_has_wt_states_h, cur_top_h)
         #c = torch.where(zero_one, local_edge_feats_c, c)
