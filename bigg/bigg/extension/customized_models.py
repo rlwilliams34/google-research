@@ -284,8 +284,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = self.weight_tree(edge_embed)
             else:
                 edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges, db_info)
-                print("FINAL STATE HERE")
-                print(edge_embed[0][:, -1])
             return edge_embed 
         
     
