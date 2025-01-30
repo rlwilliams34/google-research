@@ -762,7 +762,7 @@ if __name__ == '__main__':
         epoch_lr_decrease = cmd_args.epoch_plateu
     
     if cmd_args.g_type == 'db':
-        offset_val = 1000
+        offset_val = 500
     
     else:
         offset_val = 100
