@@ -1002,6 +1002,7 @@ if __name__ == '__main__':
                         list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
                         list_last_edge = (list_last_edge, list_last_edge_1)
                         
+                        print("BEFORE: ", batch_last_edges)
                         batch_last_edges = [list_last_edges[i] for i in batch_indices]
                         offset = 0
                         for b in range(len(batch_last_edges)):
@@ -1009,6 +1010,9 @@ if __name__ == '__main__':
                                 batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
                                 offset += len(batch_last_edges[b])
                         batch_last_edges = np.concatenate(batch_last_edges)
+                        print("AFTER: ", batch_last_edges)
+                        print(STOP)
+            
             
             if cmd_args.sigma:
                 batch_idx = np.concatenate([np.repeat(i, len(train_graphs[i])) for i in batch_indices])
