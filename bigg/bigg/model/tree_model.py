@@ -901,6 +901,7 @@ class RecurTreeGen(nn.Module):
             node_feats = torch.cat(list_pred_node_feats, dim=0)
         if self.has_edge_feats:
             edge_feats = torch.cat(list_pred_edge_feats, dim=0)
+        print(prev_state)
         return total_ll, total_ll_wt, edges, self.row_tree.list_states, node_feats, edge_feats
 
 
