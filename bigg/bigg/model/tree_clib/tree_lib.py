@@ -397,7 +397,7 @@ class _tree_lib(object):
                         print("Current par index: ", cur_par_idx)
                         print("Current edge: ", cur_edge)
                         print("======================================")
-                        
+                        cur_lv_nonleaf = self.QueryNonLeaf(lv)
                         cur_left_states = np.array([-1] * len(cur_edge))
                         cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
                         cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
