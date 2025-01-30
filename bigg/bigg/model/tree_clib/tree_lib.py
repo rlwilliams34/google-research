@@ -378,14 +378,7 @@ class _tree_lib(object):
                         cur_right_states = np.array([x[0] for x in cur_edge])
                         left_idx[d] = cur_left_states
                         left_idx[d] = cur_right_states
-                        print("LEVEL ZERO CURRENT EDGE: ", cur_edge)
-                        print(cur_edge)
-                        print(batch_last_edges)
-                        print(cur_left_states)
-                        print(batch_last_edges[has_ch])
-                        print("THIS ONE? ", batch_last_edges[has_ch][cur_lv_nonleaf])
                         par_left_edge = np.array([x[0] if x[0] != -1 else y for x, y in zip(cur_edge, batch_last_edges[has_ch][cur_lv_nonleaf])])
-                        print("THIS ONE? ", par_left_edge)
                         
                         par_left_states = cur_left_states
                         par_right_states = cur_right_states
@@ -398,6 +391,7 @@ class _tree_lib(object):
                         print("current parent left edge: ", par_left_edge)
                         print("current is left child: ", cur_is_lch)
                         print("Current par index: ", cur_par_idx)
+                        print("Current edge: ", cur_edge)
                         print("======================================")
                         
                         cur_left_states = np.array([-1] * len(cur_edge))
