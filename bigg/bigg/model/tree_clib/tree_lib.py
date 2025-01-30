@@ -405,7 +405,7 @@ class _tree_lib(object):
                         #par_left_edge = np.array([x[1] if x[1] != -1 else x[0] for x in cur_edge])
                         print("TESTING OF THE PARENT LEFT EDGE....")
                         print("PREV PAR EDGE: ", par_left_edge)
-                        par_left_edge = np.array([x[0] if x[0] != -1 else y for x,y in zip(cur_edge, par_left_states)])
+                        par_left_edge = np.array([x[0] if x[0] != -1 else x[1] for x in cur_edge])#,y in zip(cur_edge, par_left_edge)])
                         print("LEVEL:", lv)
                         print("CUR EDGE: ", cur_edge)
                         print("NEW PAR LEFT EDGE: ", par_left_edge)
