@@ -793,7 +793,7 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(state, (left_state[0] + right_pos, left_state[1] + right_pos), tree_node.depth)
             
             topdown_wt_state = None
-            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 topdown_wt_state = self.update_wt(topdown_state, prev_state)
             
             rlb = max(0, lb - num_left)
@@ -1129,7 +1129,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            if self.method in ["Test75", "Test85"]:
+            if False and self.method in ["Test75", "Test85"]:
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_wt_state = self.merge_states(cur_right_updates, topdown_state, edge_feats_embed)
                 right_logits = self.pred_has_right(topdown_wt_state[0][-1], lv)
