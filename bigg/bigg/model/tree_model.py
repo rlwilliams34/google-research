@@ -855,7 +855,7 @@ class RecurTreeGen(nn.Module):
         
         prev_state = None        
         if self.method in ["Test75", "Test85"]:
-            prev_state =  self.weight_tree()
+            prev_state =  None #self.weight_tree()
         
         self.num_edge = 0
         
