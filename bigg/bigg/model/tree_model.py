@@ -694,7 +694,7 @@ class RecurTreeGen(nn.Module):
         if tree_node.is_root:
             if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 print("Row: ", row)
-                print("Top to update: ", state[0])
+                print("edge to update: ", prev_state[0])
                 state_update = self.update_wt(state, prev_state)
                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
                 
