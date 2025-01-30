@@ -880,15 +880,11 @@ if __name__ == '__main__':
                 edge_feats = ([list_edge_feats[i] for i in [0,1]] if cmd_args.has_edge_feats else None)
                 
                 batch_last_edges = [list_last_edges[i] for i in batch_indices]
-                print("BEFORE: ", batch_last_edges)
                 offset = 0
                 for b in range(len(batch_last_edges)):
-                    if offset > 0:
-                        batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
-                        offset += len(batch_last_edges[b])
+                    batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
+                    offset += len(batch_last_edges[b])
                 batch_last_edges = np.concatenate(batch_last_edges)
-                print("AFTER: ", batch_last_edges)
-                print(STOP)
                 
                 rc = np.concatenate([list_rc[i] for i in batch_indices], axis=0)
                 debug_model(model, [train_graphs[0], train_graphs[1]], None, edge_feats, True, info=list_last_edge, batch_last_edges=batch_last_edges, rc=rc)
@@ -1002,16 +998,13 @@ if __name__ == '__main__':
                         list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
                         list_last_edge = (list_last_edge, list_last_edge_1)
                         
-                        print("BEFORE: ", batch_last_edges)
+                        
                         batch_last_edges = [list_last_edges[i] for i in batch_indices]
                         offset = 0
                         for b in range(len(batch_last_edges)):
-                            if offset > 0:
-                                batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
-                                offset += len(batch_last_edges[b])
+                            batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
+                            offset += len(batch_last_edges[b])
                         batch_last_edges = np.concatenate(batch_last_edges)
-                        print("AFTER: ", batch_last_edges)
-                        print(STOP)
             
             
             if cmd_args.sigma:
