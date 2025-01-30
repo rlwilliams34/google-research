@@ -388,6 +388,7 @@ class _tree_lib(object):
                         print("current parent left states: ", par_left_states)
                         print("current parent left edge: ", par_left_edge)
                         print("current is left child: ", cur_is_lch)
+                        print("Current par index: ", cur_par_idx)
                         print("======================================")
                         
                         cur_left_states = np.array([-1] * len(cur_edge))
