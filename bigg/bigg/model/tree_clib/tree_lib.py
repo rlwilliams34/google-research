@@ -407,8 +407,11 @@ class _tree_lib(object):
                         print("======================================")
                         
                         cur_left_states = np.array([-1] * len(cur_edge))
-                        cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
-                        cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
+                        idx = np.array([~x and (y != -1) for x, y in zip(cur_is_lch, par_left_edge[cur_par_idx])]
+                        #cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
+                        #cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
+                        cur_left_states[~idx] = par_left_states[cur_par_idx[~idx]]
+                        cur_left_states[idx] = par_left_edge[cur_par_idx[idx]]
                         cur_right_states = np.array([x[0] for x in cur_edge])
                         #par_left_edge = np.array([x[1] if x[1] != -1 else x[0] for x in cur_edge])
                         print("=------------------------------------")
