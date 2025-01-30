@@ -1051,6 +1051,7 @@ class RecurTreeGen(nn.Module):
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
         if self.method in ["Test75", "Test85"]:
+            print("SUCCESS")
             row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         
