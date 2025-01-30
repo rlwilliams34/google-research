@@ -1003,7 +1003,7 @@ if __name__ == '__main__':
                         offset = 0
                         for b in range(len(batch_last_edges)):
                             batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
-                            offset += len(batch_last_edges[b])
+                            offset += len(train_graphs[batch_indices[b]].edges())
                         batch_last_edges = np.concatenate(batch_last_edges)
             
             
