@@ -407,7 +407,7 @@ class _tree_lib(object):
                         print("======================================")
                         
                         cur_left_states = np.array([-1] * len(cur_edge))
-                        idx = np.array([~x and (y != -1) for x, y in zip(cur_is_lch, par_left_edge[cur_par_idx])]
+                        idx = np.array([~x and (y != -1) for x, y in zip(cur_is_lch, par_left_edge[cur_par_idx])])
                         #cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
                         #cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
                         cur_left_states[~idx] = par_left_states[cur_par_idx[~idx]]
