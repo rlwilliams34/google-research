@@ -1090,6 +1090,8 @@ class RecurTreeGen(nn.Module):
             
             if self.method in ["Test75", "Test85"]:
                 cur_left_updates = topdown_edge_index[0][lv]
+                print("topdown edge index: ", topdown_edge_index)
+                print(cur_left_updates)
                 cur_states_wt = self.merge_states(cur_left_updates, cur_states, edge_feats_embed)
                 left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
             else:
