@@ -994,10 +994,10 @@ class RecurTreeGen(nn.Module):
             cur_edge_idx = edge_of_lv[update_bool] - 1
             
         cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
-        top_states_wt = (cur_top_h, cur_top_c)
-        if print_it:
-            print("top state before: ", cur_top_h)
+        top_states_wt = (cur_top_h, cur_top_c))
         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
+        if print_it:
+            print("top state before: ", top_has_wt_states[0])
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
