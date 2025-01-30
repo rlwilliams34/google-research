@@ -379,6 +379,8 @@ class _tree_lib(object):
                         left_idx[d] = cur_left_states
                         left_idx[d] = cur_right_states
                         print("LEVEL ZERO CURRENT EDGE: ", cur_edge)
+                        print(cur_edge)
+                        print(batch_last_edges)
                         par_left_edge = np.array([x[1] if x[1] != -1 else x[0] for x in cur_edge])
                         par_left_states = cur_left_states
                         par_right_states = cur_right_states
