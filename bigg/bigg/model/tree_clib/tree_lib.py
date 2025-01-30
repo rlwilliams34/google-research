@@ -405,7 +405,7 @@ class _tree_lib(object):
                         print("LEVEL:", lv)
                         print("CUR EDGE: ", cur_edge)
                         print("NEW PAR LEFT EDGE: ", par_left_edge)
-                        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~)
+                        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                         
                         par_left_states = cur_left_states
                     
