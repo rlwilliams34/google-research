@@ -24,10 +24,45 @@ import torch
 from bigg.common.pytorch_util import glorot_uniform, MLP, MultiLSTMCell, BinaryTreeLSTMCell
 import torch.nn as nn
 from torch.nn import functional as F
-import numpy 
+import numpy as np
 from torch.nn.parameter import Parameter
 from datetime import datetime
-from bigg.torch_ops import PosEncoding, PosEncoding2D
+from bigg.torch_ops import PosEncoding #, PosEncoding2D
+
+
+from torch.nn import Module
+from bigg.common.consts import t_float
+
+
+class PosEncoding2D(Module):
+    def __init__(self, dim, device, base=10000, bias=0):
+        super(PosEncoding2D, self).__init__()
+        p = []
+        sft = []
+        assert dim % 2 == 0 ## Dimension needs to be even for this to work
+        for i in range(dim // 2):
+            b = 2 * (i - i % 2) / dim
+            p.append(base ** -b)
+            if i % 2:
+                sft.append(np.pi / 2.0 + bias)
+            else:
+                sft.append(bias)
+        self.device = device
+        self.sft = torch.tensor(sft, dtype=t_float).view(1, -1).to(device)
+        self.base = torch.tensor(p, dtype=t_float).view(1, -1).to(device)
+    
+    def forward(self, row, col):
+        with torch.no_grad():
+            if isinstance(row, list):
+                row = torch.tensor(row, dtype=t_float).to(self.device)
+                col = torch.tensor(col, dtype=t_float).to(self.device)
+            row = row.view(-1, 1)
+            col = col.view(-1, 1)
+            x = row / self.base + self.sft
+            y = col / self.base + self.sft
+            out = torch.cat([x, y], dim = -1)
+            return torch.sin(out)
+
 
 # pylint: skip-file
 class BiggWithEdgeLen(RecurTreeGen):
