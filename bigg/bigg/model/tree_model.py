@@ -353,7 +353,7 @@ def featured_batch_tree_lstm3(feat_dict, h_bot, c_bot, h_buf, c_buf, h_past, c_p
 
 
 class FenwickTree(nn.Module):
-    def __init__(self, args, weighted=False, weights=False):
+    def __init__(self, args):
         super(FenwickTree, self).__init__()
         self.method = args.method
         self.has_edge_feats = args.has_edge_feats
@@ -365,14 +365,6 @@ class FenwickTree(nn.Module):
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
         self.merge_cell = BinaryTreeLSTMCell(args.embed_dim)
         self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
-        
-        if weighted:
-            self.merge_cell = WeightedBinaryTreeLSTMCell(args.embed_dim, args.weight_embed_dim, args.rnn_layers)
-            self.summary_cell = WeightedBinaryTreeLSTMCell(args.embed_dim, args.weight_embed_dim, args.rnn_layers)
-        
-        if weights:
-            self.merge_cell = BinaryTreeLSTMCell(args.weight_embed_dim)
-            self.summary_cell = BinaryTreeLSTMCell(args.weight_embed_dim)
         
         if args.pos_enc:
             self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
@@ -738,8 +730,6 @@ class RecurTreeGen(nn.Module):
                     else:
                         edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
                     ll_wt = ll_wt + edge_ll
-#                     if prev_state is None:
-#                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                     
                     if self.method in ["Test75", "Test85"]:
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state, rc=rc)
@@ -991,8 +981,12 @@ class RecurTreeGen(nn.Module):
             update_bool = update_idx[0]
             edge_of_lv = update_idx[1]
             cur_edge_idx = edge_of_lv[update_bool] - 1
-            
-        cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
+        
+        if self.wt_one_layer:
+            cur_top_h, cur_top_c = top_states[0][-1:].clone(), top_states[1][-1:].clone()
+        
+        else:
+            cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
         top_states_wt = (cur_top_h, cur_top_c)
         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
