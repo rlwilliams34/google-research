@@ -391,7 +391,7 @@ class _tree_lib(object):
 #                         if the node is a left child, the left state will be the PARENTS
                         print("======================================")
                         print("current level: ", lv)
-                        print("current parent left states: ", par_left_states)
+                        print("current parent left states: ", par_left_states[cur_par_idx])
                         print("current parent left edge: ", par_left_edge[cur_par_idx])
                         print("current is left child: ", cur_is_lch)
                         print("Current par index: ", cur_par_idx)
