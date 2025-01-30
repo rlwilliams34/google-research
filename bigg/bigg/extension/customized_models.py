@@ -120,7 +120,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             if self.method == "Test85":
                 self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
                 #self.edge_pos_enc = PosEncoding(args.weight_embed_dim, args.device, args.pos_base)
-                self.edge_pos_enc = PosEncoding2D(args.embed_dim, args.device, args.pos_base)
+                self.edge_pos_enc = PosEncoding2D(args.weight_embed_dim, args.device, args.pos_base)
                 self.leaf_LSTM = MultiLSTMCell(args.weight_embed_dim, args.embed_dim, args.rnn_layers)
             
         
@@ -298,12 +298,19 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             else:
                 if self.method == "Test85":
+#                     edge_embed = self.edgelen_encoding(edge_feats_normalized)
+#                     edge_embed = self.leaf_LSTM(edge_embed)
+#                     edge_row = rc[:, 0]
+#                     edge_col = rc[:, 1]
+#                     edge_pos = self.edge_pos_enc(edge_row, edge_col)
+#                     edge_embed = [x + edge_pos for x in edge_embed]
+                    
                     edge_embed = self.edgelen_encoding(edge_feats_normalized)
-                    edge_embed = self.leaf_LSTM(edge_embed)
                     edge_row = rc[:, 0]
                     edge_col = rc[:, 1]
                     edge_pos = self.edge_pos_enc(edge_row, edge_col)
-                    edge_embed = [x + edge_pos for x in edge_embed]
+                    edge_embed = torch.cat([edge_embed, edge_pos], dim = -1)
+                    edge_embed = self.leaf_LSTM(edge_embed)
                     
                     #row_pos = self.edge_pos_enc(edge_row.tolist())
                     #col_pos = self.edge_pos_enc(edge_col.tolist())
