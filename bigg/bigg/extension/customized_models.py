@@ -54,7 +54,8 @@ class PosEncoding2D(Module):
     def forward(self, row, col):
         with torch.no_grad():
             print(row)
-            if isinstance(row, list):
+            #if isinstance(row, list):
+            if not torch.isTensor(row):
                 row = torch.tensor(row, dtype=t_float).to(self.device)
                 col = torch.tensor(col, dtype=t_float).to(self.device)
             row = row.view(-1, 1)
