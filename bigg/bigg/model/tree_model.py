@@ -1001,7 +1001,7 @@ class RecurTreeGen(nn.Module):
         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         
-        if print_it:
+#         if print_it:
 #             print("======================")
 #             print("States to be updated: ", top_has_wt_states[0])
 #             print("Corresponding Edges: ", row_feats[0])
