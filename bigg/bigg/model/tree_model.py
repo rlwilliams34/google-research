@@ -999,13 +999,13 @@ class RecurTreeGen(nn.Module):
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
         
-        zero_one = torch.tensor(update_bool, dtype=torch.bool).to(cur_top_h.device).unsqueeze(1)
-        cur_top_h = torch.where(zero_one, top_has_wt_states_h, cur_top_h)
+        #zero_one = torch.tensor(update_bool, dtype=torch.bool).to(cur_top_h.device).unsqueeze(1)
+        #cur_top_h = torch.where(zero_one, top_has_wt_states_h, cur_top_h)
         #c = torch.where(zero_one, local_edge_feats_c, c)
         
         
         #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
-        return cur_top_h, _
+        return top_states_wt[0], _
         
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
                              list_node_starts=None, num_nodes=-1, prev_rowsum_states=[None, None], list_col_ranges=None):
