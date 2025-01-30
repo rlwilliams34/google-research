@@ -762,11 +762,11 @@ class RecurTreeGen(nn.Module):
             if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 state_update = self.update_wt(state, prev_state)
                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
-                print("ROW: ", row)
-                print("STATE TO BE UPDATED: ", state[0])
-                print("PREVIOUS STATE: ", prev_state[0])
-                print("Num Edge: ", self.num_edge)
-                print("==========================================")
+#                 print("ROW: ", row)
+#                 print("STATE TO BE UPDATED: ", state[0])
+#                 print("PREVIOUS STATE: ", prev_state[0])
+#                 print("Num Edge: ", self.num_edge)
+#                 print("==========================================")
             
             else:
                 left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
@@ -1002,10 +1002,10 @@ class RecurTreeGen(nn.Module):
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         
         if print_it:
-            print("======================")
-            print("States to be updated: ", top_has_wt_states[0])
-            print("Corresponding Edges: ", row_feats[0])
-            print("======================")
+#             print("======================")
+#             print("States to be updated: ", top_has_wt_states[0])
+#             print("Corresponding Edges: ", row_feats[0])
+#             print("======================")
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
         
