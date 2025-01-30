@@ -381,7 +381,7 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     ll_t2 = 0
     ll_w2 = 0
     
-    if cmd_args.g_type == "er":
+    if len(graphs[0]) < 25:
         print(graph[0].edges())
         print(graph[1].edges())
     
