@@ -383,6 +383,13 @@ class _tree_lib(object):
                     
                     elif cur_edge is not None:
                         # if the node is a left child, the left state will be the PARENTS
+                        print("======================================")
+                        print("current level: ", lv)
+                        print("current parent left states: ", par_left_states)
+                        print("current parent left edge: ", par_left_edge)
+                        print("current is left child: ", cur_is_lch)
+                        print("======================================")
+                        
                         cur_left_states = np.array([-1] * len(cur_edge))
                         cur_left_states[cur_is_lch] = par_left_states[cur_par_idx[cur_is_lch]]
                         cur_left_states[~cur_is_lch] = par_left_edge[cur_par_idx[~cur_is_lch]]
