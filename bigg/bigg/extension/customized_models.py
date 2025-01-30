@@ -261,18 +261,13 @@ class BiggWithEdgeLen(RecurTreeGen):
                 if self.method == "Test85":
                     edge_embed = self.edgelen_encoding(edge_feats_normalized)
                     edge_row = rc[:, 0]
-                    #print(edge_embed)
-                    #print(edge_row)
-                    #edge_col = rc[:, 1]
-                    rc_pos = self.edge_pos_enc(edge_row.tolist())
-                    #col_pos = self.edge_pos_enc(edge_col.tolist())
-                    #edge_embed = edge_embed + row_pos + col_pos
-                    #print(edge_embed.shape)
-                    #print(row_pos.shape)
-                    #edge_embed = torch.cat([edge_embed, row_pos], dim = -1)
+                    edge_col = rc[:, 1]
+                    row_pos = self.edge_pos_enc(edge_row.tolist())
+                    col_pos = self.edge_pos_enc(edge_col.tolist())
+                    edge_embed = torch.cat([edge_embed, row_pos, col_pos], dim = -1)
                     edge_embed = self.leaf_LSTM(edge_embed)
                     #rc_pos = (row_pos + col_pos) / 2
-                    edge_embed = [rc_pos + x for x in edge_embed]
+                    #edge_embed = [rc_pos + x for x in edge_embed]
                 else:
                     if self.wt_mlp:
                         edge_embed = self.edgelen_encoding(edge_feats_normalized)
@@ -282,10 +277,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                         
             if list_num_edges is None:
                 edge_embed = self.weight_tree(edge_embed)
-#                 print("+++++++++++++++++++")
-#                 print("NUM EDGE: ", self.num_edge)
-#                 print(edge_embed)
-#                 print("+++++++++++++++++++")
             else:
                 edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges, db_info)
             return edge_embed 

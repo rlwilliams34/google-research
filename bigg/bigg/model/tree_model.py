@@ -729,7 +729,8 @@ class RecurTreeGen(nn.Module):
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
                     col = tree_node.col_range[0]
-                    rc = np.array([row * (row - 1) // 2 + col]).reshape(1, 1)
+                    #rc = np.array([row * (row - 1) // 2 + col]).reshape(1, 1)
+                    rc = np.array([row, col]).reshape(1, 2)
                     if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         state_update = self.update_wt(state, prev_state)
                         edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)
