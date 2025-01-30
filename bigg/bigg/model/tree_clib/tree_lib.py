@@ -384,7 +384,7 @@ class _tree_lib(object):
                         print(cur_left_states)
                         print(batch_last_edges[has_ch])
                         print("THIS ONE? ", batch_last_edges[has_ch][cur_lv_nonleaf])
-                        par_left_edge = np.array([x[1] if x[1] != -1 else x[0] for x in cur_edge])
+                        par_left_edge = np.array([x[0] if x[0] != -1 else y for x, y in zip(cur_edge, batch_last_edges[has_ch][cur_lv_nonleaf])])
                         print("THIS ONE? ", par_left_edge)
                         
                         par_left_states = cur_left_states
