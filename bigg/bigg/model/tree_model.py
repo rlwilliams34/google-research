@@ -693,6 +693,8 @@ class RecurTreeGen(nn.Module):
         assert lb <= ub
         if tree_node.is_root:
             if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+                print("Row: ", row)
+                print("Embed to update: ", prev_state)
                 state_update = self.update_wt(state, prev_state)
                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
                 
@@ -983,7 +985,7 @@ class RecurTreeGen(nn.Module):
             return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
     
-    def merge_states(self, update_idx, top_states, edge_feats_embed, predict_top=True):
+    def merge_states(self, update_idx, top_states, edge_feats_embed, predict_top=True, print_it=False):
         if predict_top:
             update_bool = (update_idx != -1)
             cur_edge_idx = update_idx[update_bool]
@@ -998,7 +1000,7 @@ class RecurTreeGen(nn.Module):
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
-        
+        print("edge_embed: ", row_feats)
         #zero_one = torch.tensor(update_bool, dtype=torch.bool).to(cur_top_h.device).unsqueeze(1)
         #cur_top_h = torch.where(zero_one, top_has_wt_states_h, cur_top_h)
         #c = torch.where(zero_one, local_edge_feats_c, c)
@@ -1052,7 +1054,7 @@ class RecurTreeGen(nn.Module):
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
         if self.method in ["Test75", "Test85"]:
-            row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
+            row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed, print_it=True)
             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         
         else:
