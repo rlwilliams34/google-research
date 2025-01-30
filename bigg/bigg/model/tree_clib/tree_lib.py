@@ -383,6 +383,7 @@ class _tree_lib(object):
                         print("batch last : ", batch_last_edges[has_ch][cur_lv_nonleaf])
                         
                         print("LEVEL ZERO PARENT LEFT EDGE: ", par_left_edge)
+                        print("CURRENT LEFT STATES: ", cur_left_states)
                         par_left_states = cur_left_states
                         par_right_states = cur_right_states
                     
