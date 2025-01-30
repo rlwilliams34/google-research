@@ -692,7 +692,7 @@ class RecurTreeGen(nn.Module):
     def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None, num_nodes=None):
         assert lb <= ub
         if tree_node.is_root:
-            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 print("Row: ", row)
                 print("Top to update: ", state[0])
                 state_update = self.update_wt(state, prev_state)
@@ -1055,7 +1055,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        if self.method in ["Test75", "Test85"]:
+        if False and self.method in ["Test75", "Test85"]:
             print(batch_last_edges)
             has_ch, _ = TreeLib.GetChLabel(0, dtype=bool)
             print(batch_last_edges != -1)
