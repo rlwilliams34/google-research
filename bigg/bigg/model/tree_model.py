@@ -694,7 +694,7 @@ class RecurTreeGen(nn.Module):
         if tree_node.is_root:
             if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                 print("Row: ", row)
-                print("Embed to update: ", prev_state)
+                print("Embed to update: ", prev_state[0])
                 state_update = self.update_wt(state, prev_state)
                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
                 
@@ -1000,7 +1000,7 @@ class RecurTreeGen(nn.Module):
         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
-        print("edge_embed: ", row_feats)
+        print("edge_embed: ", row_feats[0])
         #zero_one = torch.tensor(update_bool, dtype=torch.bool).to(cur_top_h.device).unsqueeze(1)
         #cur_top_h = torch.where(zero_one, top_has_wt_states_h, cur_top_h)
         #c = torch.where(zero_one, local_edge_feats_c, c)
