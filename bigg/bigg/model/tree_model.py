@@ -1033,10 +1033,10 @@ class RecurTreeGen(nn.Module):
             return top_states_wt[0], None
             
         
-        y.masked_gather(bool.reshape(1, 3, 1), x)
-        y.masked_scatter(bool.reshape(1, 3, 1), x)
-        y is the zero tensor
-        x is the tensor to be added
+#         y.masked_gather(bool.reshape(1, 3, 1), x)
+#         y.masked_scatter(bool.reshape(1, 3, 1), x)
+#         y is the zero tensor
+#         x is the tensor to be added
         dev = edge_feats_embed[0].device
         if predict_top:
             update_bool = (update_idx != -1)
