@@ -1052,7 +1052,7 @@ class RecurTreeGen(nn.Module):
         top_has_wt_states = [torch.gather(x, 1, update_idx) for x in top_states]
         edge_feats = [torch.gather(x, 1, update_idx) for x in edge_feats_embed]
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
-        
+        print(top_has_wt_states_h.shape)
         ### Now we have updates states
         
         top_states_wt = top_states[0].clone()
