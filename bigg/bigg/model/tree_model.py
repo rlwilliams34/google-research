@@ -1034,36 +1034,36 @@ class RecurTreeGen(nn.Module):
             
             
         
-#         if predict_top:
-#             update_bool = (update_idx != -1)
-#             update_idx = torch.Tensor(update_idx[update_bool]).to(edge_feats_embed[0].device)
-#             print(update_idx)
-#             
-#         else:
-#             update_bool = update_idx[0]
-#             edge_of_lv = update_idx[1]
-#             update_idx = edge_of_lv[update_bool] - 1
-#             update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
-#         
-#         update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
-#         update_idx = update_idx[..., None].expand(top_states[0].size(0), -1, top_states[0].size(2)).long()
-#         top_has_wt_states = [torch.gather(x, 1, update_idx) for x in top_states]
-#         edge_feats = [torch.gather(x, 1, update_idx) for x in edge_feats_embed]
-#         
-#         
-#         cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
-#         top_states_wt = (cur_top_h, cur_top_c)
-#         test = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
-#         print(torch.sum(torch.square(test[0] - top_has_wt_states[0])))
-#         
-#                 
-#         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
-#         ### Now we have updates states
-#         
-#         top_states_wt = top_states[0].clone()
-#         top_states_wt = top_states_wt.scatter(1, update_idx, top_has_wt_states_h)
-#         return top_states_wt, None
-#         #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
+        if predict_top:
+            update_bool = (update_idx != -1)
+            update_idx = torch.Tensor(update_idx[update_bool]).to(edge_feats_embed[0].device)
+            print(update_idx)
+            
+        else:
+            update_bool = update_idx[0]
+            edge_of_lv = update_idx[1]
+            update_idx = edge_of_lv[update_bool] - 1
+            update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
+        
+        update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
+        update_idx = update_idx[..., None].expand(top_states[0].size(0), -1, top_states[0].size(2)).long()
+        top_has_wt_states = [torch.gather(x, 1, update_idx) for x in top_states]
+        edge_feats = [torch.gather(x, 1, update_idx) for x in edge_feats_embed]
+        
+        
+        cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
+        top_states_wt = (cur_top_h, cur_top_c)
+        test = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
+        print(torch.sum(torch.square(test[0] - top_has_wt_states[0])))
+        
+                
+        top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
+        ### Now we have updates states
+        
+        top_states_wt = top_states[0].clone()
+        top_states_wt = top_states_wt.scatter(1, update_idx, top_has_wt_states_h)
+        return top_states_wt, None
+        #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
         
         
         
