@@ -618,6 +618,7 @@ if __name__ == '__main__':
             model.eval()
             for _ in tqdm(range(cmd_args.num_test_gen)):
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
+                print(k)
                 if k == 1 and cmd_args.add_states:
                     print(torch.sigmoid(model.scale_tops))
                     print(torch.sigmoid(model.scale_wts))
