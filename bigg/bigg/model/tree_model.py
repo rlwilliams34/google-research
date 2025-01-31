@@ -704,7 +704,7 @@ class RecurTreeGen(nn.Module):
 #                 else:
 #                     state_update = self.update_wt(state, prev_state)
 #                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
-                prob_has_edge = self.get_merged_prob(self, state, prev_state, self.pred_has_ch, scale=0)
+                prob_has_edge = self.get_merged_prob(self, state, prev_state, self.pred_has_ch)
 
                 
             else:
