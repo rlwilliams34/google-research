@@ -1052,8 +1052,8 @@ class RecurTreeGen(nn.Module):
             cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
         test_top_states_wt = (cur_top_h, cur_top_c)
         test_top_has_wt_states = (test_top_states_wt[0][:, update_bool], test_top_states_wt[1][:, update_bool])
-        test_row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-        test_top_has_wt_states_h, _ = self.update_wt(test_top_has_wt_states, test_row_feats)
+        test_edge_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+        test_top_has_wt_states_h, _ = self.update_wt(test_top_has_wt_states, test_edge_feats)
         
         
         
