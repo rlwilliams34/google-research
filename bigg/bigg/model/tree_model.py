@@ -1088,7 +1088,7 @@ class RecurTreeGen(nn.Module):
         print("CHEKCPOINT TWO")
         print(torch.sum((test_top_has_wt_states_h - top_has_wt_states_h)**2))
         top_states_wt = top_states[0].clone()
-        top_states_wt[update_bool] = top_has_wt_states_h
+        top_states_wt[:, update_bool.reshape(update_bool.shape[1])] = top_has_wt_states_h
         
         #top_states_wt = torch.masked_scatter(torch.zeros_like(top_states[0]), update_bool, top_has_wt_states_h)
         #top_states_wt = top_states_wt.masked_scatter(~update_bool, top_states[0])
