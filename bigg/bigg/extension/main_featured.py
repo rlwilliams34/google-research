@@ -612,7 +612,7 @@ if __name__ == '__main__':
         with open(path, 'rb') as f:
             val_graphs = cp.load(f)
         print('# val graphs', len(val_graphs))
-        
+        k=1
         gen_graphs = []
         with torch.no_grad():
             model.eval()
@@ -621,6 +621,7 @@ if __name__ == '__main__':
                 if k == 1 and cmd_args.add_states:
                     print(torch.sigmoid(model.scale_tops))
                     print(torch.sigmoid(model.scale_wts))
+                k += 1
                 _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 
                 if cmd_args.model == "BiGG_GCN":
