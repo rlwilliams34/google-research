@@ -1059,13 +1059,13 @@ class RecurTreeGen(nn.Module):
         print("UPDATE BOOL SHAPE: ", update_bool.shape)
         print("TOP STATES SHAPE: ", top_states[0].shape)
         top_has_wt_states = [torch.masked_select(x, update_bool) for x in top_states]
-        top_has_wt_states = [x.reshape(self.num_layers, update_bool.shape[1], self.embed_dim) for x in top_has_wt_states]
+        top_has_wt_states = [x.reshape(self.num_layers, edge_update_idx.shape[1], self.embed_dim) for x in top_has_wt_states]
           
-        cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
-        top_states_wt = (cur_top_h, cur_top_c)
-        test = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
-        print(torch.sum(torch.square(test[0] - top_has_wt_states[0])))
-        
+#         cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
+#         top_states_wt = (cur_top_h, cur_top_c)
+#         test = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
+#         print(torch.sum(torch.square(test[0] - top_has_wt_states[0])))
+#         
                 
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
         ### Now we have updates states
