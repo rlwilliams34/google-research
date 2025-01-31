@@ -1008,7 +1008,26 @@ class RecurTreeGen(nn.Module):
             return hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index
         return hc_bot, fn_hc_bot, h_buf_list, c_buf_list
     
-    def merge_states(self, update_idx, top_states, edge_feats_embed, predict_top=True, print_it=False):
+    def merge_states(self, update_idx, top_states, edge_feats_embed, predict_top=True):
+        if self.add_states:
+            if predict_top:
+                scale = torch.sigmoid(self.scale_wts)
+                update_bool = (update_idx != -1)
+                cur_edge_idx = update_idx[update_bool]
+            else:
+                scale = torch.sigmoid(self.scale_tops)
+                update_bool = update_idx[0]
+                edge_of_lv = update_idx[1]
+                cur_edge_idx = edge_of_lv[update_bool] - 1
+            
+            cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
+            top_states_wt = (cur_top_h, cur_top_c)
+            top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
+            row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+            top_has_wt_states_h, _ = scale * top_has_wt_states[0] + (1 - scale) * row_feats[0]
+            top_states_wt[0][:, update_bool] = top_has_wt_states_h
+            return top_states_wt[0], _
+        
         if predict_top:
             update_bool = (update_idx != -1)
             cur_edge_idx = update_idx[update_bool]
