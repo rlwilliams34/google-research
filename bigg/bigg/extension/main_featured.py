@@ -687,9 +687,9 @@ if __name__ == '__main__':
             k = 1
             for _ in tqdm(range(cmd_args.num_test_gen)):
                 if k == 1 and cmd_args.add_states:
-                    print(torch.sigmoid(model.scale_tops))
-                    print(torch.sigmoid(model.scale_wts))
-                k += 1
+                    print("Info from Scale Tops: ", torch.sigmoid(model.scale_tops))
+                    print("Info from Scale Wts: ", torch.sigmoid(model.scale_wts))
+                    k += 1
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 for e in pred_edges:
