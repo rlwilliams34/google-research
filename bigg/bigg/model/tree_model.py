@@ -1056,7 +1056,9 @@ class RecurTreeGen(nn.Module):
         ### Now we have updates states
         
         top_states_wt = top_states[0].clone()
+        print(top_states_wt.shape)
         top_states_wt = top_states_wt.scatter(1, update_idx, top_has_wt_states_h)
+        print(top_states_wt.shape)
         return top_states_wt
         #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
         
