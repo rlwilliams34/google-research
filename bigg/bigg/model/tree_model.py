@@ -683,7 +683,7 @@ class RecurTreeGen(nn.Module):
     
     def get_merged_prob(self, top_state, wt_state, prob_func, depth=None):
         if self.add_states:
-            scale = torch.sigmoid(self.scale_tops)
+            scale = 0.5 #torch.sigmoid(self.scale_tops)
             state_update = scale * top_state[0][-1] + (1 - scale) * wt_state[0][-1]
             if depth is None:
                 prob = torch.sigmoid(prob_func(state_update))
@@ -751,7 +751,7 @@ class RecurTreeGen(nn.Module):
                     rc = np.array([row, col]).reshape(1, 2)
                     if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         if self.add_states:
-                            scale = torch.sigmoid(self.scale_wts)
+                            scale = 0.5 #torch.sigmoid(self.scale_wts)
                             state_update = [[scale * state[0][-1] + (1 - scale) * prev_state[0][-1]], None]
                         
                         elif self.wt_one_layer:
@@ -1024,6 +1024,7 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = update_idx[1]
                 cur_edge_idx = edge_of_lv[update_bool] - 1
             
+            scale = 0.5
             cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
             top_states_wt = (cur_top_h, cur_top_c)
             top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
