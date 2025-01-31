@@ -1047,14 +1047,24 @@ class RecurTreeGen(nn.Module):
         
         update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
         update_idx = update_idx[..., None].expand(top_states[0].size(0), -1, top_states[0].size(2)).long()
-        
         top_has_wt_states = [torch.gather(x, 1, update_idx) for x in top_states]
         edge_feats = [torch.gather(x, 1, update_idx) for x in edge_feats_embed]
-        print(predict_top)
-        print(top_has_wt_states[0].shape)
-        print(top_has_wt_states[1].shape)
-        print(edge_feats[0].shape)
-        print(edge_feats[1].shape)
+        
+        
+        cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
+        test = (top_states[0][:, update_bool], top_states[1][:, update_bool])
+        print(torch.sum(torch.square(test[0] - top_has_wts[0])))
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
         ### Now we have updates states
         
@@ -1073,12 +1083,9 @@ class RecurTreeGen(nn.Module):
 #             cur_edge_idx = edge_of_lv[update_bool] - 1
 #         
 #         if self.wt_one_layer:
-#             cur_top_h = torch.zeros(top_states[0][-1:].shape)
-#             
 #             cur_top_h, cur_top_c = top_states[0][-1:].clone(), top_states[1][-1:].clone()
 #         
 #         else:
-#             cur_top_h = torch.zeros(top_states[0][-1:].shape)
 #             cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
 #         top_states_wt = (cur_top_h, cur_top_c)
 #         
