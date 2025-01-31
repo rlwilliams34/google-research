@@ -1055,7 +1055,7 @@ class RecurTreeGen(nn.Module):
         test_edge_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         test_top_has_wt_states_h, _ = self.update_wt(test_top_has_wt_states, test_edge_feats)
         
-        
+        test_top_states_wt[0][:, update_bool] = test_top_has_wt_states_h
         
         
         
@@ -1084,8 +1084,16 @@ class RecurTreeGen(nn.Module):
         
         
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
+        
+        print("CHEKCPOINT TWO")
+        print(torch.sum((test_top_has_wt_states_h - top_has_wt_states_h)**2))
+        
         top_states_wt = torch.masked_scatter(torch.zeros_like(top_states[0]), update_bool, top_has_wt_states_h)
-        top_states_wt = top_states_wt.masked_scatter(~update_bool, top_states[0].clone())
+        top_states_wt = top_states_wt.masked_scatter(~update_bool, top_states[0])
+        
+        print("CHECKPOINT THREE")
+        print(torch.sum((test_top_states_wt[0] - top_states_wt)**2))
+        
         return top_states_wt, None
         
         
