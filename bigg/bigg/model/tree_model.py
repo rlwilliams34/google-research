@@ -1014,11 +1014,11 @@ class RecurTreeGen(nn.Module):
     def merge_states(self, update_idx, top_states, edge_feats_embed, predict_top=True):
         if self.add_states:
             if predict_top:
-                scale = torch.sigmoid(self.scale_wts)
+                scale = torch.sigmoid(self.scale_tops)
                 update_bool = (update_idx != -1)
                 cur_edge_idx = update_idx[update_bool]
             else:
-                scale = torch.sigmoid(self.scale_tops)
+                scale = torch.sigmoid(self.scale_wts)
                 update_bool = update_idx[0]
                 edge_of_lv = update_idx[1]
                 cur_edge_idx = edge_of_lv[update_bool] - 1
