@@ -1052,7 +1052,8 @@ class RecurTreeGen(nn.Module):
         print("Update before: ", update_idx.shape)
         update_idx = update_idx.reshape(1, update_idx.shape[0], 1)
         print("Update after: ", update_idx.shape)
-        
+        print(edge_feats_embed[0].shape)
+        print(edge_update_idx.shape)
         edge_feats = [torch.gather(x, 1, edge_update_idx) for x in edge_feats_embed]
         top_has_wt_states = [torch.masked_select(x, update_bool).reshape(edge_feats[0].shape) for x in top_states]
           
