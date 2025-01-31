@@ -1050,6 +1050,7 @@ class RecurTreeGen(nn.Module):
         
         top_has_wt_states = [torch.gather(x, 1, update_idx) for x in top_states]
         edge_feats = [torch.gather(x, 1, update_idx) for x in edge_feats_embed]
+        print(predict_top)
         print(top_has_wt_states[0].shape)
         print(top_has_wt_states[1].shape)
         print(edge_feats[0].shape)
