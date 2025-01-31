@@ -1051,23 +1051,15 @@ class RecurTreeGen(nn.Module):
             
             #update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
         update_bool = update_bool.reshape(1, update_bool.shape[0], 1)
-        print("edge update shape: ", edge_update_idx.shape)
         edge_feats = [torch.gather(x, 1, edge_update_idx) for x in edge_feats_embed]
-        print("Edgefeats state ", edge_feats[0].shape)
         top_has_wt_states = [torch.masked_select(x, update_bool) for x in top_states]
         top_has_wt_states = [x.reshape(self.num_layers, edge_update_idx.shape[1], self.embed_dim) for x in top_has_wt_states]
-          
-#         cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
-#         top_states_wt = (cur_top_h, cur_top_c)
-#         test = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
-#         print(torch.sum(torch.square(test[0] - top_has_wt_states[0])))
-#         
                 
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
         ### Now we have updates states
-        
-        top_states_wt = top_states[0].clone()
-        top_states_wt = top_states_wt.scatter(1, update_idx, top_has_wt_states_h)
+        torch.masked_scatter(x, bool.reshape(1, 3, 1), y)
+        top_states_wt = torch.masked_scatter(torch.zeros_like(top_states[0]), update_bool, top_has_wt_states_h)
+        top_states_wt = top_states_wt.masked_scatter(~update_bool, top_states[0])
         return top_states_wt, None
         #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
         
