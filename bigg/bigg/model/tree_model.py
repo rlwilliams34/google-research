@@ -1031,34 +1031,6 @@ class RecurTreeGen(nn.Module):
             top_has_wt_states_h = scale * top_has_wt_states[0] + (1 - scale) * row_feats[0]
             top_states_wt[0][:, update_bool] = top_has_wt_states_h
             return top_states_wt[0], None
-            
-            
-            
-            
-            
-            
-        if predict_top:
-            update_bool = (update_idx != -1)
-            cur_edge_idx = update_idx[update_bool]
-        else:
-            update_bool = update_idx[0]
-            edge_of_lv = update_idx[1]
-            cur_edge_idx = edge_of_lv[update_bool] - 1
-        
-        if self.wt_one_layer:
-            cur_top_h, cur_top_c = top_states[0][-1:].clone(), top_states[1][-1:].clone()
-        
-        else:
-            cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
-        test_top_states_wt = (cur_top_h, cur_top_c)
-        test_top_has_wt_states = (test_top_states_wt[0][:, update_bool], test_top_states_wt[1][:, update_bool])
-        test_edge_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-        test_top_has_wt_states_h, _ = self.update_wt(test_top_has_wt_states, test_edge_feats)
-        
-        test_top_states_wt[0][:, update_bool] = test_top_has_wt_states_h
-        
-        
-        
         
         dev = edge_feats_embed[0].device
         if predict_top:
@@ -1070,7 +1042,6 @@ class RecurTreeGen(nn.Module):
             update_bool = update_idx[0]
             edge_update_idx = torch.tensor(update_idx[1][update_bool] - 1, dtype = torch.int64).to(dev)
             update_bool = torch.from_numpy(update_bool).to(dev)
-            
         
         update_bool = update_bool.reshape(1, update_bool.shape[0], 1)
         edge_update_idx = edge_update_idx[..., None].expand(edge_feats_embed[0].size(0), -1, edge_feats_embed[0].size(2)).long()
@@ -1078,44 +1049,29 @@ class RecurTreeGen(nn.Module):
         top_has_wt_states = [torch.masked_select(x, update_bool) for x in top_states]
         top_has_wt_states = [x.reshape(self.num_layers, edge_update_idx.shape[1], self.embed_dim) for x in top_has_wt_states]
         top_no_wt_h = torch.masked_select(top_states[0], ~update_bool)
-        
-        print("CHECKPOINT ONE")
-        print(torch.sum((test_top_has_wt_states[0] - top_has_wt_states[0])**2))
-        print(torch.sum((test_edge_feats[0] - edge_feats[0])**2))
-        
-        
         top_has_wt_states_h, _ = self.update_wt((top_has_wt_states[0], top_has_wt_states[1]), edge_feats)
-        
-        print("CHEKCPOINT TWO")
-        print(torch.sum((test_top_has_wt_states_h - top_has_wt_states_h)**2))
-#         top_states_wt = top_states[0].clone()
-#         top_states_wt[:, update_bool.reshape(update_bool.shape[1])] = top_has_wt_states_h
-        
-#         print(top_states[0].shape)
-#         print(top_has_wt_states_h.shape)
-#         print(update_bool.shape)
-        
         top_states_wt = torch.masked_scatter(torch.zeros_like(top_states[0]), update_bool, top_has_wt_states_h)
-        print(top_states_wt.shape)
-        top_states_wt = torch.masked_scatter(top_states_wt, ~update_bool, top_no_wt_h) #top_states_wt.masked_scatter(~update_bool, top_states[0])
-        print(top_states_wt.shape)
-        
-        
-        print("CHECKPOINT THREE")
-        print(torch.sum((test_top_states_wt[0] - top_states_wt)**2))
-        
+        top_states_wt = torch.masked_scatter(top_states_wt, ~update_bool, top_no_wt_h)
         return top_states_wt, None
         
-        
-        
-        
-        
-        
-                
-        #zero_one = torch.tensor(update_bool, dtype=torch.bool).to(cur_top_h.device).unsqueeze(1)
-        #cur_top_h = torch.where(zero_one, top_has_wt_states_h, cur_top_h)
-        #c = torch.where(zero_one, local_edge_feats_c, c)
-        #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
+#         if predict_top:
+#             update_bool = (update_idx != -1)
+#             cur_edge_idx = update_idx[update_bool]
+#         else:
+#             update_bool = update_idx[0]
+#             edge_of_lv = update_idx[1]
+#             cur_edge_idx = edge_of_lv[update_bool] - 1
+#         
+#         if self.wt_one_layer:
+#             cur_top_h, cur_top_c = top_states[0][-1:].clone(), top_states[1][-1:].clone()
+# 
+#         else:
+#             cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
+#         top_states_wt = (cur_top_h, cur_top_c)
+#         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
+#         row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+#         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
+#         top_states_wt[0][:, update_bool] = top_has_wt_states_h
 #         return top_states_wt[0], _
         
     def forward_row_summaries(self, graph_ids, node_feats=None, edge_feats=None,
