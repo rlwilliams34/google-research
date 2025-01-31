@@ -1041,6 +1041,7 @@ class RecurTreeGen(nn.Module):
         else:
             update_bool = update_idx[0]
             edge_update_idx = torch.tensor(update_idx[1][update_bool] - 1, dtype = torch.int64).to(dev)
+            update_bool = torch.from_numpy(update_bool).to(dev)
             
         
         update_bool = update_bool.reshape(1, update_bool.shape[0], 1)
