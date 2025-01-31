@@ -81,11 +81,12 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.num_layers = args.rnn_layers
         self.sigma = args.noise
         self.wt_one_layer = args.wt_one_layer
+        self.add_states = args.add_states
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75', 'Test85', 'None']
         if self.method == "None":
-           assert self.has_egde_feats = 0
+           assert self.has_egde_feats == 0
         
         if args.has_node_feats:
             self.nodelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim])
