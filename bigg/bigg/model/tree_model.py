@@ -1085,7 +1085,7 @@ class RecurTreeGen(nn.Module):
         
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
         top_states_wt = torch.masked_scatter(torch.zeros_like(top_states[0]), update_bool, top_has_wt_states_h)
-        top_states_wt = top_states_wt.masked_scatter(~update_bool, top_states[0])
+        top_states_wt = top_states_wt.masked_scatter(~update_bool, top_states[0].clone())
         return top_states_wt, None
         
         
