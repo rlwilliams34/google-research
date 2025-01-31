@@ -1051,7 +1051,6 @@ class RecurTreeGen(nn.Module):
             
             #update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
         update_bool = update_bool.reshape(1, update_bool.shape[0], 1)
-        edge_update_idx = edge_update_idx.reshape(1, edge_update_idx.shape[0], 1)
         print("edge update shape: ", edge_update_idx.shape)
         edge_feats = [torch.gather(x, 1, edge_update_idx) for x in edge_feats_embed]
         print("Edgefeats state ", edge_feats[0].shape)
