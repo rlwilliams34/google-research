@@ -1044,7 +1044,7 @@ class RecurTreeGen(nn.Module):
             update_idx = edge_of_lv[update_bool] - 1
             update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
         
-        update_idx = torch.Tensor(update_idx).to(edge_feats_embd[0].device)
+        update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
         update_idx = update_idx[..., None].expand(top_states[0].size(0), -1, top_states[0].size(2)).long()
         
         top_has_wt_states = [torch.gather(x, 1, update_idx) for x in top_states]
