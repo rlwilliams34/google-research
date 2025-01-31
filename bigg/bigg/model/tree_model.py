@@ -1031,12 +1031,7 @@ class RecurTreeGen(nn.Module):
             top_has_wt_states_h = scale * top_has_wt_states[0] + (1 - scale) * row_feats[0]
             top_states_wt[0][:, update_bool] = top_has_wt_states_h
             return top_states_wt[0], None
-            
         
-#         y.masked_gather(bool.reshape(1, 3, 1), x)
-#         y.masked_scatter(bool.reshape(1, 3, 1), x)
-#         y is the zero tensor
-#         x is the tensor to be added
         dev = edge_feats_embed[0].device
         if predict_top:
             update_bool = (update_idx != -1)
@@ -1046,21 +1041,19 @@ class RecurTreeGen(nn.Module):
             
         else:
             update_bool = update_idx[0]
-            edge_of_lv = torch.tensor(update_idx[1]).to(dev)
+            edge_of_lv = update_idx[1]
             update_idx = torch.from_numpy(edge_of_lv[update_bool] - 1).to(dev)
             
-            #update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
         update_bool = update_bool.reshape(1, update_bool.shape[0], 1)
         edge_feats = [torch.gather(x, 1, edge_update_idx) for x in edge_feats_embed]
         top_has_wt_states = [torch.masked_select(x, update_bool) for x in top_states]
         top_has_wt_states = [x.reshape(self.num_layers, edge_update_idx.shape[1], self.embed_dim) for x in top_has_wt_states]
                 
         top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
-        ### Now we have updates states
+        
         top_states_wt = torch.masked_scatter(torch.zeros_like(top_states[0]), update_bool, top_has_wt_states_h)
         top_states_wt = top_states_wt.masked_scatter(~update_bool, top_states[0])
         return top_states_wt, None
-        #top_states_wt[1][:, update_bool] = top_has_wt_states[1]
         
         
         
