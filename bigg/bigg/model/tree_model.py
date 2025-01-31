@@ -1039,6 +1039,7 @@ class RecurTreeGen(nn.Module):
             update_idx = torch.Tensor(update_idx[update_bool]).to(edge_feats_embed[0].device)
             
         else:
+            print("Hi!")
             update_bool = update_idx[0]
             edge_of_lv = update_idx[1]
             update_idx = edge_of_lv[update_bool] - 1
