@@ -1049,15 +1049,11 @@ class RecurTreeGen(nn.Module):
             update_idx = torch.from_numpy(edge_of_lv[update_bool] - 1).to(dev)
             
             #update_idx = torch.Tensor(update_idx).to(edge_feats_embed[0].device)
-        print("Update before: ", update_idx.shape)
         update_bool = update_bool.reshape(1, update_bool.shape[0], 1)
         edge_update_idx = edge_update_idx.reshape(1, edge_update_idx.shape[0], 1)
-        print("Update after: ", update_idx.shape)
-        print(edge_feats_embed[0].shape)
-        print(edge_update_idx.shape)
+
         edge_feats = [torch.gather(x, 1, edge_update_idx) for x in edge_feats_embed]
-        print("UPDATE BOOL SHAPE: ", update_bool.shape)
-        print("TOP STATES SHAPE: ", top_states[0].shape)
+        print("Edgefeats state ", edge_feats[0].shape)
         top_has_wt_states = [torch.masked_select(x, update_bool) for x in top_states]
         top_has_wt_states = [x.reshape(self.num_layers, edge_update_idx.shape[1], self.embed_dim) for x in top_has_wt_states]
           
