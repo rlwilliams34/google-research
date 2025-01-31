@@ -1083,7 +1083,7 @@ class RecurTreeGen(nn.Module):
         print(torch.sum((test_edge_feats[0] - edge_feats[0])**2))
         
         
-        top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
+        top_has_wt_states_h, _ = self.update_wt((top_has_wt_states[0].clone(), top_has_wt_states[1].clone()), edge_feats)
         
         print("CHEKCPOINT TWO")
         print(torch.sum((test_top_has_wt_states_h - top_has_wt_states_h)**2))
