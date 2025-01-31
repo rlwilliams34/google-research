@@ -704,7 +704,7 @@ class RecurTreeGen(nn.Module):
 #                 else:
 #                     state_update = self.update_wt(state, prev_state)
 #                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
-                prob_has_edge = self.get_merged_prob(self, state, prev_state, self.pred_has_ch)
+                prob_has_edge = self.get_merged_prob(state, prev_state, self.pred_has_ch)
 
                 
             else:
@@ -782,7 +782,7 @@ class RecurTreeGen(nn.Module):
 #                 else:
 #                     state_update = self.update_wt(state, prev_state)
 #                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
-                left_prob = self.get_merged_prob(self, state, prev_state, self.pred_has_left)
+                left_prob = self.get_merged_prob(state, prev_state, self.pred_has_left)
             
             else:
                 left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
@@ -822,7 +822,7 @@ class RecurTreeGen(nn.Module):
 #                     else:
 #                         topdown_wt_state = self.update_wt(topdown_state, prev_state)
 #                     right_prob = torch.sigmoid(self.pred_has_right(topdown_wt_state[0][-1], tree_node.depth))
-                    prob_has_edge = self.get_merged_prob(self, topdown_state, prev_state, self.pred_has_right)
+                    prob_has_edge = self.get_merged_prob(topdown_state, prev_state, self.pred_has_right)
                 
                 else:
                     right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0][-1], tree_node.depth))
