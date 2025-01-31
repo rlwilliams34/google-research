@@ -1031,7 +1031,7 @@ class RecurTreeGen(nn.Module):
             row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
             top_has_wt_states_h = scale * top_has_wt_states[0] + (1 - scale) * row_feats[0]
             top_states_wt[0][:, update_bool] = top_has_wt_states_h
-            return top_states_wt[0], _
+            return top_states_wt[0], None
             
             
         
