@@ -685,7 +685,10 @@ class RecurTreeGen(nn.Module):
         if self.add_states:
             scale = torch.sigmoid(self.scale_tops)
             state_update = scale * top_state[0][-1] + (1 - scale) * wt_state[0][-1]
-            prob = torch.sigmoid(prob_func(state_update))
+            if depth is None:
+                prob = torch.sigmoid(prob_func(state_update))
+            else:
+                prob = torch.sigmoid(prob_func(state_update, depth))
         
         if self.wt_one_layer:
             state_update = self.update_wt((top_state[0][-1:], top_state[1][-1:]), wt_state)
