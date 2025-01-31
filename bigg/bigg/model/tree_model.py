@@ -1053,7 +1053,7 @@ class RecurTreeGen(nn.Module):
         
         cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
         test = (top_states[0][:, update_bool], top_states[1][:, update_bool])
-        print(torch.sum(torch.square(test[0] - top_has_wts[0])))
+        print(torch.sum(torch.square(test[0] - top_has_wt_states[0])))
         
         
         
