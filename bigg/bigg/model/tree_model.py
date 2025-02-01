@@ -31,7 +31,7 @@ from bigg.model.util import AdjNode, ColAutomata, AdjRow
 from bigg.model.tree_clib.tree_lib import TreeLib
 from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
-
+torch.set_printoptions(threshold=10_000)
 
 
 
@@ -916,6 +916,7 @@ class RecurTreeGen(nn.Module):
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
 
+        print("Final Prev State: ", prev_state[0][-1, -1, :])
         if self.has_node_feats:
             node_feats = torch.cat(list_pred_node_feats, dim=0)
         if self.has_edge_feats:
@@ -1095,6 +1096,7 @@ class RecurTreeGen(nn.Module):
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info, rc=rc)
         
+        print("Edge feats embed: ", edge_feats_embed[0][-1, -1, :])
         if self.method in ["Test75", "Test85"]:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, None, None)
