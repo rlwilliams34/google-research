@@ -1134,7 +1134,7 @@ class RecurTreeGen(nn.Module):
                 has_prev = np.array([k not in first_edge for k in edge_of_lv])
 #                 print("Edge of lv", edge_of_lv)
 #                 print("Has prev", has_prev)
-                if False and self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
+                if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt = self.merge_states([has_prev, edge_of_lv], edge_state, edge_feats_embed, False)
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 else:
