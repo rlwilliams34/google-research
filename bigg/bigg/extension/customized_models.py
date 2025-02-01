@@ -239,12 +239,13 @@ class BiggWithEdgeLen(RecurTreeGen):
         return self.nodelen_encoding(node_feats)
 
     def embed_edge_feats(self, edge_feats, sigma=0.0, prev_state=None, list_num_edges=None, db_info=None, edge_feats_lstm=None, rc=None):
+        print(edge_feats.dtype)
         if not self.row_LSTM: 
             B = edge_feats.shape[0]
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
             if sigma > 0:
                 edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
-        print(edge_feats.dtype)
+        
         else:
             if prev_state is None:
                 edge_feats_lstm = edge_feats_lstm.float()
