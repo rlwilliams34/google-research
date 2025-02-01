@@ -682,6 +682,10 @@ class RecurTreeGen(nn.Module):
         return p
     
     def get_merged_prob(self, top_state, wt_state, prob_func, depth=None):
+        if wt_state is None:
+            prob = torch.sigmoid(prob_func(top_state[0][-1], depth))
+            return prob
+        
         if self.add_states:
             scale = torch.sigmoid(self.scale_tops)
             state_update = scale * top_state[0][-1] + (1 - scale) * wt_state[0][-1]
@@ -705,17 +709,16 @@ class RecurTreeGen(nn.Module):
     def gen_row(self, ll, ll_wt, state, tree_node, col_sm, lb, ub, edge_feats=None, row=None, prev_state=None, num_nodes=None):
         assert lb <= ub
         if tree_node.is_root:
-            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
-#                 if self.wt_one_layer:
-#                     state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
-#                 else:
-#                     state_update = self.update_wt(state, prev_state)
-#                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
-                prob_has_edge = self.get_merged_prob(state, prev_state, self.pred_has_ch)
-
-                
-            else:
-                prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0][-1]))
+            prob_has_edge = self.get_merged_prob(state, prev_state, self.pred_has_ch)
+#             if prev_state is not None: #self.method in ["Test75", "Test85"] and self.num_edge > 0:
+# #                 if self.wt_one_layer:
+# #                     state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
+# #                 else:
+# #                     state_update = self.update_wt(state, prev_state)
+# #                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state_update[0][-1]))
+#                 prob_has_edge = self.get_merged_prob(state, prev_state, self.pred_has_ch)
+#             else:
+#                 prob_has_edge = torch.sigmoid(self.pred_has_ch(state[0][-1]))
             if col_sm.supervised:
                 has_edge = len(col_sm.indices) > 0
             else:
@@ -749,7 +752,7 @@ class RecurTreeGen(nn.Module):
                     col = tree_node.col_range[0]
                     #rc = np.array([row * (row - 1) // 2 + col]).reshape(1, 1)
                     rc = np.array([row, col]).reshape(1, 2)
-                    if prev_state is not None: #False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+                    if prev_state is not None:
                         if self.add_states:
                             scale = torch.sigmoid(self.scale_wts)
                             state_update = [[scale * state[0][-1] + (1 - scale) * prev_state[0][-1]], None]
@@ -783,11 +786,12 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
-                left_prob = self.get_merged_prob(state, prev_state, self.pred_has_left, tree_node.depth)
-            
-            else:
-                left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
+            left_prob = self.get_merged_prob(state, prev_state, self.pred_has_left, tree_node.depth)
+#             if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+#                 left_prob = self.get_merged_prob(state, prev_state, self.pred_has_left, tree_node.depth)
+#             
+#             else:
+#                 left_prob = torch.sigmoid(self.pred_has_left(state[0][-1], tree_node.depth))
 
             if col_sm.supervised:
                 has_left = col_sm.next_edge < mid
@@ -818,11 +822,12 @@ class RecurTreeGen(nn.Module):
             if not has_left:
                 has_right = True
             else:
-                if self.method in ["Test75", "Test85"] and self.num_edge > 0:
-                    right_prob = self.get_merged_prob(topdown_state, prev_state, self.pred_has_right, tree_node.depth)
-                
-                else:
-                    right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0][-1], tree_node.depth))
+                right_prob = self.get_merged_prob(topdown_state, prev_state, self.pred_has_right, tree_node.depth)
+#                 if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+#                     right_prob = self.get_merged_prob(topdown_state, prev_state, self.pred_has_right, tree_node.depth)
+#                 
+#                 else:
+#                     right_prob = torch.sigmoid(self.pred_has_right(topdown_state[0][-1], tree_node.depth))
                 if col_sm.supervised:
                     has_right = col_sm.has_edge(mid, tree_node.col_range[1])
                 else:
