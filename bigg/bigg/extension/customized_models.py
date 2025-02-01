@@ -28,12 +28,10 @@ import numpy as np
 from torch.nn.parameter import Parameter
 from datetime import datetime
 from bigg.torch_ops import PosEncoding #, PosEncoding2D
-
-
 from torch.nn import Module
 from bigg.common.consts import t_float
-torch.set_printoptions(threshold=10_000)
-np.set_printoptions(threshold=10_000)
+torch.set_printoptions(threshold=10000)
+np.set_printoptions(threshold=10000)
 
 
 class PosEncoding2D(Module):
