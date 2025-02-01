@@ -317,6 +317,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                     edge_embed = self.edgelen_encoding(edge_feats_normalized)
                     edge_row = rc[:, 0]
                     edge_col = rc[:, 1]
+                    print(edge_row.shape)
+                    print(edge_col.shape)
                     edge_pos = self.edge_pos_enc(edge_row, edge_col)
                     edge_embed = torch.cat([edge_embed, edge_pos], dim = -1)
                     edge_embed = self.leaf_LSTM(edge_embed)
