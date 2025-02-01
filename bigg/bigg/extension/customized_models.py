@@ -320,6 +320,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                     if self.num_edge <= 10 or list_num_edges is not None:
                         print(self.num_edge)
                         print(edge_embed)
+                        print(rc.dtype)
                     edge_embed = self.leaf_LSTM(edge_embed)
                     
                     #row_pos = self.edge_pos_enc(edge_row.tolist())
