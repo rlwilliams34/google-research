@@ -164,6 +164,7 @@ class PosEncoding2D(Module):
                 col = torch.tensor(col, dtype=t_float).to(self.device)
             row = row.view(-1, 1)
             col = col.view(-1, 1)
+            print(row)
             x = row / self.base + self.sft
             y = col / self.base + self.sft
             out = torch.cat([x, y], dim = -1)
