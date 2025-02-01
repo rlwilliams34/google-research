@@ -387,8 +387,6 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
-        print(h.shape)
-        print(STOP)
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         if self.num_edge < 10:
@@ -397,7 +395,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             print(mus)
             print(edge_feats)
         
-        elif batch_idx is not None:
+        elif h.shape[1] > 1:
             print(h)
             print(mus)
             print(edge_feats)
