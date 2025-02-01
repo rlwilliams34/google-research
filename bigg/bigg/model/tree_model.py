@@ -683,7 +683,10 @@ class RecurTreeGen(nn.Module):
     
     def get_merged_prob(self, top_state, wt_state, prob_func, depth=None):
         if wt_state is None:
-            prob = torch.sigmoid(prob_func(top_state[0][-1], depth))
+            if depth is None:
+                prob = torch.sigmoid(prob_func(top_state[0][-1]))
+            else:
+                prob = torch.sigmoid(prob_func(top_state[0][-1], depth))
             return prob
         
         if self.add_states:
