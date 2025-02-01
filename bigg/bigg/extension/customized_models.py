@@ -390,7 +390,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         if self.num_edge < 10:
-            print(self.num_edges)
+            print(self.num_edge)
             print(h)
             print(mus)
         
