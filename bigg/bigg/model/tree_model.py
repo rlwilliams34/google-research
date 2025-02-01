@@ -749,7 +749,7 @@ class RecurTreeGen(nn.Module):
                     col = tree_node.col_range[0]
                     #rc = np.array([row * (row - 1) // 2 + col]).reshape(1, 1)
                     rc = np.array([row, col]).reshape(1, 2)
-                    if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+                    if self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         if self.add_states:
                             scale = torch.sigmoid(self.scale_wts)
                             state_update = [[scale * state[0][-1] + (1 - scale) * prev_state[0][-1]], None]
@@ -783,7 +783,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
 #                 if self.wt_one_layer:
 #                     state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
 #                 else:
@@ -823,7 +823,7 @@ class RecurTreeGen(nn.Module):
             if not has_left:
                 has_right = True
             else:
-                if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
+                if self.method in ["Test75", "Test85"] and self.num_edge > 0:
 #                     if self.wt_one_layer:
 #                         topdown_wt_state = self.update_wt((topdown_state[0][-1:], topdown_state[1][-1:]), prev_state)
 #                     else:
@@ -1141,7 +1141,7 @@ class RecurTreeGen(nn.Module):
                 target_feats = edge_feats[edge_of_lv]
                 has_prev = np.array([k not in first_edge for k in edge_of_lv])
                 
-                if False and self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
+                if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt = self.merge_states([has_prev, edge_of_lv], edge_state, edge_feats_embed, False)
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 else:
@@ -1155,7 +1155,7 @@ class RecurTreeGen(nn.Module):
             if batch_idx is not None:
                 batch_idx = batch_idx[is_nonleaf]        
             
-            if False and self.method in ["Test75", "Test85"]:
+            if self.method in ["Test75", "Test85"]:
                 cur_left_updates = topdown_edge_index[0][lv]
                 cur_states_wt = self.merge_states(cur_left_updates, cur_states, edge_feats_embed)
                 left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
@@ -1193,7 +1193,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            if False and self.method in ["Test75", "Test85"]:
+            if self.method in ["Test75", "Test85"]:
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_wt_state = self.merge_states(cur_right_updates, topdown_state, edge_feats_embed)
                 right_logits = self.pred_has_right(topdown_wt_state[0][-1], lv)
