@@ -749,7 +749,7 @@ class RecurTreeGen(nn.Module):
                     col = tree_node.col_range[0]
                     #rc = np.array([row * (row - 1) // 2 + col]).reshape(1, 1)
                     rc = np.array([row, col]).reshape(1, 2)
-                    if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+                    if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         if self.add_states:
                             scale = torch.sigmoid(self.scale_wts)
                             state_update = [[scale * state[0][-1] + (1 - scale) * prev_state[0][-1]], None]
@@ -1069,8 +1069,8 @@ class RecurTreeGen(nn.Module):
             cur_top_h, cur_top_c = top_states[0].clone(), top_states[1].clone()
         top_states_wt = (cur_top_h, cur_top_c)
         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
-        row_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
-        top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, row_feats)
+        edge_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
+        top_has_wt_states_h, _ = self.update_wt(top_has_wt_states, edge_feats)
         top_states_wt[0][:, update_bool] = top_has_wt_states_h
         return top_states_wt[0], _
         
@@ -1089,7 +1089,6 @@ class RecurTreeGen(nn.Module):
         ll_batch = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
-        
         
         if rc is not None:
             if len(rc.shape) == 3:
@@ -1142,7 +1141,7 @@ class RecurTreeGen(nn.Module):
                 target_feats = edge_feats[edge_of_lv]
                 has_prev = np.array([k not in first_edge for k in edge_of_lv])
                 
-                if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
+                if False and self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt = self.merge_states([has_prev, edge_of_lv], edge_state, edge_feats_embed, False)
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
                 else:
