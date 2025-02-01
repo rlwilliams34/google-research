@@ -749,7 +749,6 @@ class RecurTreeGen(nn.Module):
                     col = tree_node.col_range[0]
                     #rc = np.array([row * (row - 1) // 2 + col]).reshape(1, 1)
                     rc = np.array([row, col]).reshape(1, 2)
-                    print(prev_state)
                     if prev_state is not None: #False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
                         if self.add_states:
                             scale = torch.sigmoid(self.scale_wts)
@@ -876,7 +875,7 @@ class RecurTreeGen(nn.Module):
             prev_state =  None #self.weight_tree()
         
         self.num_edge = 0
-        
+        print(prev_state)
         for i in pbar:
             if edge_list is None:
                 col_sm = ColAutomata(supervised=False)
