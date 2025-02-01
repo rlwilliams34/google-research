@@ -823,7 +823,7 @@ class RecurTreeGen(nn.Module):
             if not has_left:
                 has_right = True
             else:
-                if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+                if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
 #                     if self.wt_one_layer:
 #                         topdown_wt_state = self.update_wt((topdown_state[0][-1:], topdown_state[1][-1:]), prev_state)
 #                     else:
@@ -1193,7 +1193,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            if self.method in ["Test75", "Test85"]:
+            if False and self.method in ["Test75", "Test85"]:
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_wt_state = self.merge_states(cur_right_updates, topdown_state, edge_feats_embed)
                 right_logits = self.pred_has_right(topdown_wt_state[0][-1], lv)
