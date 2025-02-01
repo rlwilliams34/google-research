@@ -244,7 +244,7 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
             if sigma > 0:
                 edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
-        
+        print(edge_feats.dtype)
         else:
             if prev_state is None:
                 edge_feats_lstm = edge_feats_lstm.float()
@@ -325,8 +325,8 @@ class BiggWithEdgeLen(RecurTreeGen):
 #                         print(rc)
 #                         print(rc.dtype)
                                         
-                    edge_row = 0 * rc[:, 0]
-                    edge_col = 0 * rc[:, 1]
+                    edge_row = rc[:, 0]
+                    edge_col = rc[:, 1]
                     edge_pos = self.edge_pos_enc(edge_row, edge_col)
                     edge_embed = torch.cat([edge_embed, edge_pos], dim = -1)
                     
