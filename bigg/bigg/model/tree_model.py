@@ -916,7 +916,7 @@ class RecurTreeGen(nn.Module):
             total_ll = total_ll + ll
             total_ll_wt = total_ll_wt + ll_wt
 
-        print("Final Prev State: ", prev_state[0][-1, -1, :])
+#         print("Final Prev State: ", prev_state[0][-1, -1, :])
         if self.has_node_feats:
             node_feats = torch.cat(list_pred_node_feats, dim=0)
         if self.has_edge_feats:
@@ -1096,7 +1096,7 @@ class RecurTreeGen(nn.Module):
             else:
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info, rc=rc)
         
-        print("Edge feats embed: ", edge_feats_embed[0][-1, -1, :])
+#         print("Edge feats embed: ", edge_feats_embed[0][-1, -1, :])
         if self.method in ["Test75", "Test85"]:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, None, None)
@@ -1132,8 +1132,8 @@ class RecurTreeGen(nn.Module):
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
                 has_prev = np.array([k not in first_edge for k in edge_of_lv])
-                print("Edge of lv", edge_of_lv)
-                print("Has prev", has_prev)
+#                 print("Edge of lv", edge_of_lv)
+#                 print("Has prev", has_prev)
                 if self.method in ["Test75", "Test85"] and np.sum(has_prev) > 0:
                     edge_state_wt = self.merge_states([has_prev, edge_of_lv], edge_state, edge_feats_embed, False)
                     edge_ll, ll_batch_wt, _ = self.predict_edge_feats(edge_state_wt, target_feats, batch_idx = cur_batch_idx, ll_batch_wt = ll_batch_wt)
