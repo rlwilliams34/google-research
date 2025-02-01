@@ -305,35 +305,11 @@ class BiggWithEdgeLen(RecurTreeGen):
             
             else:
                 if self.method == "Test85":
-#                     edge_embed = self.edgelen_encoding(edge_feats_normalized)
-#                     edge_embed = self.leaf_LSTM(edge_embed)
-#                     edge_row = rc[:, 0]
-#                     edge_col = rc[:, 1]
-#                     edge_pos = self.edge_pos_enc(edge_row, edge_col)
-#                     edge_embed = [x + edge_pos for x in edge_embed]
-                    
                     edge_embed = self.edgelen_encoding(edge_feats_normalized)
-                    
-#                     if list_num_edges is not None:
-#                         print(rc)
-#                         print(rc.dtype)
-#                     
-#                     if rc.dtype != 'int64':
-#                         rc.dtype = 'int64'
-#                     
-#                     if list_num_edges is not None:
-#                         print(rc)
-#                         print(rc.dtype)
-                                        
-                    edge_row = rc[:, 0]
-                    edge_col = rc[:, 1]
-                    edge_pos = self.edge_pos_enc(edge_row, edge_col) + 10
+                    edge_row = rc[:, 0] * 10
+                    edge_col = rc[:, 1] * 10
+                    edge_pos = self.edge_pos_enc(edge_row, edge_col)
                     edge_embed = torch.cat([edge_embed, edge_pos], dim = -1)
-                    
-#                     if self.num_edge <= 10 or list_num_edges is not None:
-#                         print(self.num_edge)
-#                         print(edge_embed)
-#                         print(rc.dtype)
                     edge_embed = self.leaf_LSTM(edge_embed)
                     
                     #row_pos = self.edge_pos_enc(edge_row.tolist())
