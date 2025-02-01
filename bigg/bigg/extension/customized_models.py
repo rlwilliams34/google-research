@@ -313,8 +313,8 @@ class BiggWithEdgeLen(RecurTreeGen):
 #                     edge_embed = [x + edge_pos for x in edge_embed]
                     
                     edge_embed = self.edgelen_encoding(edge_feats_normalized)
-                    edge_row = 0 * rc[:, 0]
-                    edge_col = 0 * rc[:, 1]
+                    edge_row = rc[:, 0]
+                    edge_col = rc[:, 1]
                     edge_pos = self.edge_pos_enc(edge_row, edge_col)
                     edge_embed = torch.cat([edge_embed, edge_pos], dim = -1)
                     edge_embed = self.leaf_LSTM(edge_embed)
