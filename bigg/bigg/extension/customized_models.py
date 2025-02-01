@@ -389,13 +389,6 @@ class BiggWithEdgeLen(RecurTreeGen):
         h, _ = state
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
-        if self.num_edge >= 0:
-            print(self.num_edge)
-            print(h)
-            print(mus)
-            print(edge_feats)
-        
-        
         if edge_feats is None:
             ll = 0
             ll_batch_wt = 0
@@ -444,7 +437,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 diff_sq = torch.div(diff_sq, var)
                 
                 ## add to ll
-                ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+                ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
             
             elif self.sampling_method  == "lognormal":
                 log_edge_feats = torch.log(edge_feats)
