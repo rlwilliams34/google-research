@@ -61,6 +61,7 @@ class PosEncoding2D(Module):
             col = col.view(-1, 1)
             x = row / self.base + self.sft
             y = col / self.base + self.sft
+            print(row)
             out = torch.cat([x, y], dim = -1)
             return torch.sin(out)
 

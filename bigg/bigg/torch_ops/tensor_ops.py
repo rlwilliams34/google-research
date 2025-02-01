@@ -165,6 +165,7 @@ class PosEncoding2D(Module):
             row = row.view(-1, 1)
             col = col.view(-1, 1)
             print(row)
+            print("HELLO HELLO")
             x = row / self.base + self.sft
             y = col / self.base + self.sft
             out = torch.cat([x, y], dim = -1)
