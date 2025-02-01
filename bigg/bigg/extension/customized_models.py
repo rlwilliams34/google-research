@@ -461,9 +461,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ll = ll - torch.lgamma(a)
                 ll = ll + torch.mul(a - 1, log_edge_feats)
                 ll = ll - torch.mul(b, edge_feats)
-                
+                print(a)
+                print(b)
                 if self.penalty:
-                    print("HELLO...")
                     ll = ll - 1e-4 * a - 1e-4 * b
             
             if batch_idx is not None:
