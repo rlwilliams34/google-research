@@ -485,8 +485,8 @@ class FenwickTree(nn.Module):
         hist_tos.append(last_tos)
         hist_h_list, hist_c_list = zip(*hist_rnn_states)
         pos_embed = self.pos_enc(pos_info)
-        row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed + 000.2
-        row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed + 000.2
+        row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed
+        row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed
         return (row_h, row_c), ret_state
 
     def forward_train_weights(self, edge_feats_init_embed, list_num_edges, db_info):
@@ -891,7 +891,7 @@ class RecurTreeGen(nn.Module):
             lb = 0 if lb_list is None else lb_list[i]
             ub = cur_row.root.n_cols if ub_list is None else ub_list[i]
             cur_pos_embed = self.row_tree.pos_enc([num_nodes - i])
-            controller_state = [x + cur_pos_embed + 000.2 for x in controller_state]
+            controller_state = [x + cur_pos_embed for x in controller_state]
             
             if self.has_node_feats:
                 target_node_feats = None if node_feats is None else node_feats[[i]]
