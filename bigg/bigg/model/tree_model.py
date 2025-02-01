@@ -783,7 +783,7 @@ class RecurTreeGen(nn.Module):
             tree_node.split()
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            if self.method in ["Test75", "Test85"] and self.num_edge > 0:
+            if False and self.method in ["Test75", "Test85"] and self.num_edge > 0:
 #                 if self.wt_one_layer:
 #                     state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
 #                 else:
@@ -1155,7 +1155,7 @@ class RecurTreeGen(nn.Module):
             if batch_idx is not None:
                 batch_idx = batch_idx[is_nonleaf]        
             
-            if self.method in ["Test75", "Test85"]:
+            if False and self.method in ["Test75", "Test85"]:
                 cur_left_updates = topdown_edge_index[0][lv]
                 cur_states_wt = self.merge_states(cur_left_updates, cur_states, edge_feats_embed)
                 left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
