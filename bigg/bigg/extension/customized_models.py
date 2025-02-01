@@ -61,7 +61,6 @@ class PosEncoding2D(Module):
             col = col.view(-1, 1)
             x = row / self.base + self.sft
             y = col / self.base + self.sft
-            print(row)
             out = torch.cat([x, y], dim = -1)
             return torch.sin(out)
 
@@ -307,8 +306,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             else:
                 if self.method == "Test85":
                     edge_embed = self.edgelen_encoding(edge_feats_normalized)
-                    edge_row = rc[:, 0] * 10
-                    edge_col = rc[:, 1] * 10
+                    edge_row = rc[:, 0]
+                    edge_col = rc[:, 1]
                     edge_pos = self.edge_pos_enc(edge_row, edge_col)
                     edge_embed = torch.cat([edge_embed, edge_pos], dim = -1)
                     edge_embed = self.leaf_LSTM(edge_embed)
