@@ -485,8 +485,8 @@ class FenwickTree(nn.Module):
         hist_tos.append(last_tos)
         hist_h_list, hist_c_list = zip(*hist_rnn_states)
         pos_embed = self.pos_enc(pos_info)
-        row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed + 1
-        row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed + 1
+        row_h = multi_index_select(hist_froms, hist_tos, *hist_h_list) + pos_embed + 000
+        row_c = multi_index_select(hist_froms, hist_tos, *hist_c_list) + pos_embed + 000
         return (row_h, row_c), ret_state
 
     def forward_train_weights(self, edge_feats_init_embed, list_num_edges, db_info):
@@ -784,11 +784,6 @@ class RecurTreeGen(nn.Module):
 
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
             if self.method in ["Test75", "Test85"] and self.num_edge > 0:
-#                 if self.wt_one_layer:
-#                     state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
-#                 else:
-#                     state_update = self.update_wt(state, prev_state)
-#                 left_prob = torch.sigmoid(self.pred_has_left(state_update[0][-1], tree_node.depth))
                 left_prob = self.get_merged_prob(state, prev_state, self.pred_has_left, tree_node.depth)
             
             else:
@@ -824,11 +819,6 @@ class RecurTreeGen(nn.Module):
                 has_right = True
             else:
                 if self.method in ["Test75", "Test85"] and self.num_edge > 0:
-#                     if self.wt_one_layer:
-#                         topdown_wt_state = self.update_wt((topdown_state[0][-1:], topdown_state[1][-1:]), prev_state)
-#                     else:
-#                         topdown_wt_state = self.update_wt(topdown_state, prev_state)
-#                     right_prob = torch.sigmoid(self.pred_has_right(topdown_wt_state[0][-1], tree_node.depth))
                     right_prob = self.get_merged_prob(topdown_state, prev_state, self.pred_has_right, tree_node.depth)
                 
                 else:
@@ -901,7 +891,7 @@ class RecurTreeGen(nn.Module):
             lb = 0 if lb_list is None else lb_list[i]
             ub = cur_row.root.n_cols if ub_list is None else ub_list[i]
             cur_pos_embed = self.row_tree.pos_enc([num_nodes - i])
-            controller_state = [x + cur_pos_embed + 1 for x in controller_state]
+            controller_state = [x + cur_pos_embed + 000 for x in controller_state]
             
             if self.has_node_feats:
                 target_node_feats = None if node_feats is None else node_feats[[i]]
