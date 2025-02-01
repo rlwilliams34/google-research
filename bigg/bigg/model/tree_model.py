@@ -1126,7 +1126,7 @@ class RecurTreeGen(nn.Module):
         lv=0
         while True:
             is_nonleaf = TreeLib.QueryNonLeaf(lv)
-            if self.has_edge_feats:
+            if False and self.has_edge_feats:
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
