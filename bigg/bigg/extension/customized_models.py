@@ -328,12 +328,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                     edge_row = rc[:, 0]
                     edge_col = rc[:, 1]
                     edge_pos = self.edge_pos_enc(edge_row, edge_col)
-                    edge_embed = torch.cat([edge_embed, edge_pos], dim = -1)
+                    edge_embed = torch.cat([edge_embed, 0 * edge_pos], dim = -1)
                     
-                    if self.num_edge <= 10 or list_num_edges is not None:
-                        print(self.num_edge)
-                        print(edge_embed)
-                        print(rc.dtype)
+#                     if self.num_edge <= 10 or list_num_edges is not None:
+#                         print(self.num_edge)
+#                         print(edge_embed)
+#                         print(rc.dtype)
                     edge_embed = self.leaf_LSTM(edge_embed)
                     
                     #row_pos = self.edge_pos_enc(edge_row.tolist())
