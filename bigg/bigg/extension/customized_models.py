@@ -82,6 +82,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.sigma = args.noise
         self.wt_one_layer = args.wt_one_layer
         self.add_states = args.add_states
+        self.penalty = args.penalty
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75', 'Test85', 'None']
@@ -437,7 +438,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 diff_sq = torch.div(diff_sq, var)
                 
                 ## add to ll
-                ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq, 0.5) + edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
+                ll = - torch.mul(lvars, 0.5) - torch.mul(diff_sq, 0.5) #+ edge_feats - edge_feats_invsp - 0.5 * np.log(2*np.pi)
             
             elif self.sampling_method  == "lognormal":
                 log_edge_feats = torch.log(edge_feats)
@@ -460,6 +461,9 @@ class BiggWithEdgeLen(RecurTreeGen):
                 ll = ll - torch.lgamma(a)
                 ll = ll + torch.mul(a - 1, log_edge_feats)
                 ll = ll - torch.mul(b, edge_feats)
+                
+                if self.penalty:
+                    ll = ll - 1e-4 * a - 1e-4 * b
             
             if batch_idx is not None:
                 i = 0
