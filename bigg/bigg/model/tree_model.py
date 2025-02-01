@@ -31,7 +31,9 @@ from bigg.model.util import AdjNode, ColAutomata, AdjRow
 from bigg.model.tree_clib.tree_lib import TreeLib
 from bigg.torch_ops import multi_index_select, PosEncoding
 from functools import partial
+import numpy as np
 torch.set_printoptions(threshold=10_000)
+np.set_printoptions(threshold=10_000)
 
 
 

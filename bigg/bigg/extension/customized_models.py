@@ -32,6 +32,8 @@ from bigg.torch_ops import PosEncoding #, PosEncoding2D
 
 from torch.nn import Module
 from bigg.common.consts import t_float
+torch.set_printoptions(threshold=10_000)
+np.set_printoptions(threshold=10_000)
 
 
 class PosEncoding2D(Module):
@@ -335,7 +337,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = (edge_embed[0][-1:], edge_embed[1][-1:])
             
             if list_num_edges is None:
-                if self.num_edge <= 1:
+                if self.num_edge <= 10:
                     print(self.num_edge)
                     print(edge_feats)
                     print(rc)
