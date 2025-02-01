@@ -770,7 +770,7 @@ class RecurTreeGen(nn.Module):
         else:
             tree_node.split()
             mid = (tree_node.col_range[0] + tree_node.col_range[1]) // 2
-            left_prob = self.get_merged_prob(state, prev_state, func = partial(self.pred_has_left, depth = tree_node.depth))
+            left_prob = self.get_merged_prob(state, prev_state, prob_func = partial(self.pred_has_left, depth = tree_node.depth))
 
             if col_sm.supervised:
                 has_left = col_sm.next_edge < mid
@@ -801,7 +801,7 @@ class RecurTreeGen(nn.Module):
             if not has_left:
                 has_right = True
             else:
-                right_prob = self.get_merged_prob(topdown_state, prev_state, func = partial(self.pred_has_right, depth = tree_node.depth))
+                right_prob = self.get_merged_prob(topdown_state, prev_state, prob_func = partial(self.pred_has_right, depth = tree_node.depth))
                 if col_sm.supervised:
                     has_right = col_sm.has_edge(mid, tree_node.col_range[1])
                 else:
