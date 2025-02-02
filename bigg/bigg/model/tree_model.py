@@ -421,6 +421,8 @@ class FenwickTree(nn.Module):
         if len(h_bot.shape) == 2:
             h_bot = h_bot.unsqueeze(0)
             c_bot = c_bot.unsqueeze(0)
+        
+        if h_buf0 is not None and len(h_buf0.shape) == 2:
             h_buf0 = h_buf0.unsqueeze(0)
             c_buf0 = c_buf0.unsqueeze(0)
         
