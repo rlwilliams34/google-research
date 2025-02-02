@@ -622,8 +622,8 @@ class RecurTreeGen(nn.Module):
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
         self.method = args.method
-        if self.has_edge_feats:
-            assert self.bits_compress == 0
+#         if self.has_edge_feats:
+#             assert self.bits_compress == 0
         self.greedy_frac = args.greedy_frac
         self.share_param = args.share_param
         if not self.bits_compress:
@@ -864,7 +864,7 @@ class RecurTreeGen(nn.Module):
         
         self.row_tree.reset(list_states)
         controller_state = self.row_tree()
-        if cmd_args.has_edge_feats and self.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
+        if self.has_edge_feats and self.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
             self.weight_tree.reset([])
         
         if num_nodes is None:
@@ -876,7 +876,7 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_state = None        
-        if self.method in cmd_args.has_edge_feats and ["Test75", "Test85"]:
+        if self.method in self.has_edge_feats and ["Test75", "Test85"]:
             prev_state =  None #self.weight_tree()
         
         self.num_edge = 0
