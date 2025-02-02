@@ -876,7 +876,7 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_state = None        
-        if self.method in self.has_edge_feats and ["Test75", "Test85"]:
+        if self.has_edge_feats and self.method in ["Test75", "Test85"]:
             prev_state =  None #self.weight_tree()
         
         self.num_edge = 0
