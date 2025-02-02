@@ -418,9 +418,14 @@ class FenwickTree(nn.Module):
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
         
-        if len(h_bot.shape) == 2:
+        if (self.method in ['Test75', 'Test85'] or not self.has_edge_feats) and len(h_bot.shape) == 2:
             h_bot = h_bot.unsqueeze(0)
             c_bot = c_bot.unsqueeze(0)
+        
+        else:
+            h_bot_new = h_bot[0].unsqueeze(0)
+            c_bot_new = c_bot[1].unsqueeze(0)
+            h_bot = (h_bot_new, c_bot_new)
         
         if h_buf0 is not None and len(h_buf0.shape) == 2:
             h_buf0 = h_buf0.unsqueeze(0)

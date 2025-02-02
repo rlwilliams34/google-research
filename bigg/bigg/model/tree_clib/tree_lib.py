@@ -333,7 +333,7 @@ class _tree_lib(object):
         most_recent_edge_list = [None] * max_depth
         parent_indices = [None] * max_depth
         is_lch_list = [None] * max_depth
-        print(max_depth)
+        
         for d in range(max_depth - 1, -1, -1):
             cur_lv_nonleaf = self.QueryNonLeaf(d)
             cur_lv_edge, _ = self.GetEdgeAndLR(d)
@@ -398,10 +398,6 @@ class _tree_lib(object):
             up_lv_nonleaf = self.QueryNonLeaf(d - 1)
             up_is_left, _ = self.GetChLabel(-1, d - 1)
             up_is_right, _ = self.GetChLabel(1, d - 1)
-            
-            print(up_lv_nonleaf)
-            print(up_is_left)
-            print(up_is_right)
             
             num_internal_parents = np.sum(up_lv_nonleaf)
             lch = np.array([-1] * num_internal_parents)
