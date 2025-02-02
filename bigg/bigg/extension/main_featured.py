@@ -560,11 +560,11 @@ if __name__ == '__main__':
             ### To pad: F.pad(input=g1t, pad=(0,0,0,MAX_DEG - SHAPE1),mode='constant',value=-1).shape
 
             last_edge_list = None
-            if cmd_args.method in ["Test75", "Test85"]:
+            if cmd_args.has_edge_feats and cmd_args.method in ["Test75", "Test85"]:
                 last_edge_list = [get_last_edge(g)[0] for g in train_graphs]
                 last_edge_1_list = [get_last_edge(g)[1] for g in train_graphs]
             
-            if cmd_args.g_type == "db":
+            if cmd_args.has_edge_feats and cmd_args.g_type == "db":
                 list_num_edges = [len(g.edges()) for g in train_graphs]
                 db_info = []
                 for num_edges in list_num_edges:
@@ -573,7 +573,7 @@ if __name__ == '__main__':
                     info2 = prepare_batch(batch_lv_list)
                     db_info += [(info1, info2)]
             
-            elif cmd_args.g_type == "tree" and max_num_nodes == 199:
+            elif cmd_args.has_edge_feats and  cmd_args.g_type == "tree" and max_num_nodes == 199:
                 list_num_edges = [len(train_graphs[0].edges())] * cmd_args.batch_size
                 info1 = get_list_indices(list_num_edges)
                 batch_lv_list = get_batch_lv_list_fast(list_num_edges)
@@ -964,7 +964,7 @@ if __name__ == '__main__':
                 batch_last_edges = None
                 list_last_edge = None
                 
-                if cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
+                if cmd_args.has_edge_feats and cmd_args.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
                     list_num_edges = [len(train_graphs[i].edges()) for i in batch_indices]
                     if db_info is not None:
                         if cmd_args.g_type == "db":
@@ -1013,10 +1013,10 @@ if __name__ == '__main__':
                         batch_last_edges = np.concatenate(batch_last_edges)
             
             
-            if cmd_args.sigma:
+            if cmd_args.has_edge_feats and cmd_args.sigma:
                 batch_idx = np.concatenate([np.repeat(i, len(train_graphs[i])) for i in batch_indices])
             
-            if len(batch_indices) == 1 and cmd_args.g_type == "er":
+            if cmd_args.has_edge_feats and len(batch_indices) == 1 and cmd_args.g_type == "er":
                 print("BATCH: ", batch_indices)
                 print(train_graphs[batch_indices[0]].edges())
             

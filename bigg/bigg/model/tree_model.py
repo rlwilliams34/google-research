@@ -840,7 +840,7 @@ class RecurTreeGen(nn.Module):
         
         self.row_tree.reset(list_states)
         controller_state = self.row_tree()
-        if self.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
+        if cmd_args.has_edge_feats and self.method in ["Test285", "Test286", "Test287", "Test288", "Test75", "Test85"]:
             self.weight_tree.reset([])
         
         if num_nodes is None:
@@ -852,7 +852,7 @@ class RecurTreeGen(nn.Module):
         list_pred_edge_feats = []
         
         prev_state = None        
-        if self.method in ["Test75", "Test85"]:
+        if self.method in cmd_args.has_edge_feats and ["Test75", "Test85"]:
             prev_state =  None #self.weight_tree()
         
         self.num_edge = 0
@@ -938,6 +938,7 @@ class RecurTreeGen(nn.Module):
         
         else:
             binary_embeds, base_feat = TreeLib.PrepareBinary()
+            print(binary_embeds)
             fn_hc_bot = lambda d: (binary_embeds[d], binary_embeds[d]) if d < len(binary_embeds) else base_feat
         max_level = len(all_ids) - 1
         h_buf_list = [None] * (len(all_ids) + 1)
@@ -1061,7 +1062,7 @@ class RecurTreeGen(nn.Module):
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
         
-        if self.sigma > 0:
+        if self.has_edge_feats and self.sigma > 0:
             noise = torch.randn_like(edge_feats).to(edge_feats.device)
             edge_feats = edge_feats * torch.exp(self.sigma * noise)
         
@@ -1069,8 +1070,8 @@ class RecurTreeGen(nn.Module):
             if len(rc.shape) == 3:
                 rc = rc.reshape(rc.shape[0], rc.shape[2])
         
-        first_edge = [0]
         if list_num_edges is not None:
+            first_edge = [0]
             for i in range(len(list_num_edges) - 1):
                 first_edge += [first_edge[-1] + list_num_edges[i]]
         
@@ -1081,7 +1082,7 @@ class RecurTreeGen(nn.Module):
                 edge_feats_embed = self.embed_edge_feats(edge_feats, sigma=self.sigma, list_num_edges=list_num_edges, db_info=db_info, rc=rc)
         
 #         print("Edge feats embed: ", edge_feats_embed[0][-1, -1, :])
-        if self.method in ["Test75", "Test85"]:
+        if self.has_edge_feats and self.method in ["Test75", "Test85"]:
             hc_bot, fn_hc_bot, h_buf_list, c_buf_list, topdown_edge_index = self.forward_row_trees(graph_ids, node_feats, edge_feats_embed, list_node_starts, num_nodes, list_col_ranges, batch_last_edges)
             row_states, next_states = self.row_tree.forward_train(*hc_bot, h_buf_list[0], c_buf_list[0], *prev_rowsum_states, None, None)
         
@@ -1093,7 +1094,7 @@ class RecurTreeGen(nn.Module):
             ll = ll + ll_node_feats
             
         ## HERE WE NEED TO ADD AN UPDATE USING MOST. RECENT. EDGE...
-        if self.method in ["Test75", "Test85"]:
+        if self.has_edge_feats and self.method in ["Test75", "Test85"]:
             row_states_wt = self.merge_states(batch_last_edges, row_states, edge_feats_embed)
             logit_has_edge = self.pred_has_ch(row_states_wt[0][-1])
         
@@ -1132,7 +1133,7 @@ class RecurTreeGen(nn.Module):
             if batch_idx is not None:
                 batch_idx = batch_idx[is_nonleaf]        
             
-            if self.method in ["Test75", "Test85"]:
+            if self.has_edge_feats and self.method in ["Test75", "Test85"]:
                 cur_left_updates = topdown_edge_index[0][lv]
                 cur_states_wt = self.merge_states(cur_left_updates, cur_states, edge_feats_embed)
                 left_logits = self.pred_has_left(cur_states_wt[0][-1], lv)
@@ -1170,7 +1171,7 @@ class RecurTreeGen(nn.Module):
             left_subtree_states = [x + right_pos for x in left_subtree_states]
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
-            if self.method in ["Test75", "Test85"]:
+            if self.has_edge_feats and self.method in ["Test75", "Test85"]:
                 cur_right_updates = topdown_edge_index[1][lv]
                 topdown_wt_state = self.merge_states(cur_right_updates, topdown_state, edge_feats_embed)
                 right_logits = self.pred_has_right(topdown_wt_state[0][-1], lv)
