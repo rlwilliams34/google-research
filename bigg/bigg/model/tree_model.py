@@ -987,7 +987,6 @@ class RecurTreeGen(nn.Module):
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
-            
         
         if self.has_edge_feats and self.method in ["Test75", "Test85"]:
             left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1, batch_last_edges=batch_last_edges)

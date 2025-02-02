@@ -589,8 +589,8 @@ if __name__ == '__main__':
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     
-    #optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
-    optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    #optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     if cmd_args.model_dump is not None and os.path.isfile(cmd_args.model_dump):
         print('loading from', cmd_args.model_dump)
