@@ -1024,7 +1024,7 @@ class RecurTreeGen(nn.Module):
                         h_bot = h_bot.unsqueeze(0)
                         c_bot = c_bot.unsqueeze(0)
                     
-                    if h_buf is not None and len(h_buff.shape) == 2:
+                    if h_buf is not None and len(h_buf.shape) == 2:
                         h_buf = h_buf.unsqueeze(0)
                         c_bot = c_bot.unsqueeze(0)
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
