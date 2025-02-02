@@ -1128,6 +1128,7 @@ class RecurTreeGen(nn.Module):
         ll_batch_wt = (None if batch_idx is None else np.zeros(len(np.unique(batch_idx))))
         edge_feats_embed = None
         
+        print(self.sigma)
         if self.has_edge_feats and self.sigma > 0:
             noise = torch.randn_like(edge_feats).to(edge_feats.device)
             edge_feats = edge_feats * torch.exp(self.sigma * noise)
