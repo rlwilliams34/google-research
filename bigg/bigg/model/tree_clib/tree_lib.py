@@ -338,7 +338,7 @@ class _tree_lib(object):
         max_depth = max_d_bin + max_d_tree + 1 + int(max_d_tree != 0)
         print("guessed max depth: ", max_depth)
         print("ACTUAL max_depth: ", 8)
-        max_depth = 8
+        max_depth = max_d_bin + max_depth - (max_d_tree + 1)
         
         most_recent_edge_list = [None] * max_depth
         parent_indices = [None] * max_depth
