@@ -340,7 +340,7 @@ class _tree_lib(object):
         parent_indices = [None] * max_depth
         is_lch_list = [None] * max_depth
         
-        for d in range(max_depth, -1, -1):
+        for d in range(max_depth - 1, -1, -1):
             cur_lv_nonleaf = self.QueryNonLeaf(d)
             cur_lv_edge, _ = self.GetEdgeAndLR(d)
             
