@@ -1129,10 +1129,11 @@ class RecurTreeGen(nn.Module):
         edge_feats_embed = None
         
         print(self.sigma)
+        print(edge_feats)
         if self.has_edge_feats and self.sigma > 0:
             noise = torch.randn_like(edge_feats).to(edge_feats.device)
             edge_feats = edge_feats * torch.exp(self.sigma * noise)
-        
+        print(edge_feats)
         if rc is not None:
             if len(rc.shape) == 3:
                 rc = rc.reshape(rc.shape[0], rc.shape[2])
