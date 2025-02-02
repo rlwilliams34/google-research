@@ -83,6 +83,7 @@ class _tree_lib(object):
         self.device = config.device
         self.num_graphs = 0
         self.graph_stats = []
+        self.bits_compress = args.bits_compress
 
     def TotalTreeNodes(self):
         return self.lib.TotalTreeNodes()
@@ -330,9 +331,10 @@ class _tree_lib(object):
 
     
     def GetMostRecentWeight(self, max_depth, batch_last_edges=None):
-        max_d_bin = self.lib.MaxBinFeatDepth()
-        max_d_tree = self.lib.MaxTreeDepth()
-        max_depth = max_d_bin + max_depth - (max_d_tree + 1)
+        if self.bits_compress:
+            max_d_bin = self.lib.MaxBinFeatDepth()
+            max_d_tree = self.lib.MaxTreeDepth()
+            max_depth = max_d_bin + max_depth - (max_d_tree + 1)
         
         most_recent_edge_list = [None] * max_depth
         parent_indices = [None] * max_depth
