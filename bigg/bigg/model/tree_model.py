@@ -950,14 +950,13 @@ class RecurTreeGen(nn.Module):
         # embed trees
         if self.method in ["Test75", "Test85"]:
             edge_feats=None
-        
-        if self.has_edge_feats and self.method in ["Test75", "Test85"]:
-            left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1, batch_last_edges=batch_last_edges)
-            topdown_edge_index = (left_idx, right_idx)
-        
         all_ids = TreeLib.PrepareTreeEmbed()
         if self.has_node_feats:
             node_feats = self.embed_node_feats(node_feats)
+            
+        if self.has_edge_feats and self.method in ["Test75", "Test85"]:
+            left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1, batch_last_edges=batch_last_edges)
+            topdown_edge_index = (left_idx, right_idx)
         
         if not self.bits_compress:
             empty_h0, empty_c0 = self.get_empty_state()
