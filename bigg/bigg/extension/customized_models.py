@@ -18,6 +18,50 @@
 # from bigg.common.pytorch_util import glorot_uniform, MLP
 # import torch.nn as nn
 
+# 
+# 
+# import numpy as np
+# import scipy.stats as stats 
+# from matplotlib import pyplot as plt
+# 
+# data = stats.gamma.rvs(alpha, loc = 0, scale = 1/beta, size = 10000)
+# y1 = sns.kdeplot(data)
+# y2 = sns.kdeplot(weights)
+# #stats.gamma.pdf(sorted(weights), a=alpha, scale=1/beta)
+# # plt.plot(x, y1, "y-", label=(r'Gamma Dist')) 
+# # plt.plot(weights, y2, "y-", label=(r'Weights')) 
+# # plt.xlim([0,1])
+# plt.show()
+# 
+# 
+# 
+# 
+# # Generate some data
+# stats.gamma.sample(x, a=alpha, scale=1/beta)
+# data = np.random.normal(0, 1, 1000)
+# 
+# # Fit a normal distribution to the data
+# mu, std = stats.norm.fit(data)
+# 
+# # Create a histogram of the data
+# plt.hist(data, bins=20, density=True, alpha=0.6)
+# 
+# # Plot the PDF of the fitted normal distribution
+# xmin, xmax = plt.xlim()
+# x = np.linspace(xmin, xmax, 100)
+# p = stats.norm.pdf(x, mu, std)
+# plt.plot(x, p, 'k', linewidth=2)
+# 
+# plt.show()
+# 
+
+
+
+
+
+
+
+
 from bigg.model.tree_model import RecurTreeGen, FenwickTree
 from bigg.extension.gcn_build import *
 import torch
