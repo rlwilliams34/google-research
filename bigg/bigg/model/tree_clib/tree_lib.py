@@ -365,10 +365,6 @@ class _tree_lib(object):
                     cur_edge = most_recent_edge_list[lv]
                     cur_is_lch = is_lch_list[lv]
                     
-                    print(parent_indices)
-                    print(most_recent_edge_list)
-                    print(is_lch_list)
-                    
                     if lv == 0:
                         if batch_last_edges is None:
                             cur_left_states = np.array([-1] * len(cur_edge))
@@ -402,6 +398,10 @@ class _tree_lib(object):
             up_lv_nonleaf = self.QueryNonLeaf(d - 1)
             up_is_left, _ = self.GetChLabel(-1, d - 1)
             up_is_right, _ = self.GetChLabel(1, d - 1)
+            
+            print(up_lv_nonleaf)
+            print(up_is_left)
+            print(up_is_right)
             
             num_internal_parents = np.sum(up_lv_nonleaf)
             lch = np.array([-1] * num_internal_parents)
