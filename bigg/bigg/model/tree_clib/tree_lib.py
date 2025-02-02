@@ -334,7 +334,7 @@ class _tree_lib(object):
         print("Max bin: ", max_d_bin)
         max_d_tree = self.lib.MaxTreeDepth()
         print("max tree: ", max_d_tree)
-        max_depth = max_d_bin + max_d_tree #+ 1 + int(max_d_tree != 0)
+        max_depth = max_d_bin + max_d_tree + 1 + int(max_d_tree != 0)
         print("max depth: ", max_depth)
         #max_depth = 8
         #max_depth = 8
