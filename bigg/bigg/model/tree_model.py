@@ -756,7 +756,7 @@ class RecurTreeGen(nn.Module):
             tree_node.bits_rep = [0]
             col_sm.add_edge(tree_node.col_range[0])
             if self.bits_compress:
-                return ll, self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols), 1, None, None
+                return ll, ll_wt, self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols), 1, None, None
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
