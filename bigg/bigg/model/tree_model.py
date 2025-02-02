@@ -467,8 +467,6 @@ class FenwickTree(nn.Module):
                 if has_edge_feats or self.has_node_feats:
                     new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=self.method, func=func, weight_state=weight_state)
                 else:
-                    print(h_bot.shape)
-                    print(c_bot.shape)
                     new_states = lstm_func(h_bot, c_bot)
             else:
                 new_states = lstm_func(None, None)
@@ -574,7 +572,9 @@ class BitsRepNet(nn.Module):
         h = torch.zeros(1, self.out_dim).to(self.device)
         h[0, :n_cols] = -1.0
         h[0, on_bits] = 1.0
-
+        
+        if len(h.shape) == 2:
+            h = h.unsqueeze(0)
         return h, h
 
 
