@@ -435,6 +435,7 @@ class FenwickTree(nn.Module):
             if len(x.shape) == 2:
                 new_embed = (x.unsqueeze(0), y.unsqueeze(0))
                 row_embeds[i] = new_embed
+            print(row_embeds[i][0].shape)
         
         
         for i, all_ids in enumerate(tree_agg_ids):
