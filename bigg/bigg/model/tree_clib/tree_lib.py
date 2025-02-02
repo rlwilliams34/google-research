@@ -330,6 +330,7 @@ class _tree_lib(object):
 
     
     def GetMostRecentWeight(self, max_depth, batch_last_edges=None):
+        print("cur max depth: ", max_depth)
         max_d_bin = self.lib.MaxBinFeatDepth()
         print("Max bin: ", max_d_bin)
         max_d_tree = self.lib.MaxTreeDepth()
