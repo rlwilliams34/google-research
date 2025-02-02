@@ -445,6 +445,7 @@ class FenwickTree(nn.Module):
                 if has_edge_feats or self.has_node_feats:
                     new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=self.method, func=func, weight_state=weight_state)
                 else:
+                    print(h_bot.shape)
                     new_states = lstm_func(h_bot, c_bot)
             else:
                 new_states = lstm_func(None, None)
@@ -938,7 +939,6 @@ class RecurTreeGen(nn.Module):
         
         else:
             binary_embeds, base_feat = TreeLib.PrepareBinary()
-            print(binary_embeds)
             fn_hc_bot = lambda d: (binary_embeds[d], binary_embeds[d]) if d < len(binary_embeds) else base_feat
         max_level = len(all_ids) - 1
         h_buf_list = [None] * (len(all_ids) + 1)
