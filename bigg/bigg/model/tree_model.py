@@ -1172,6 +1172,11 @@ class RecurTreeGen(nn.Module):
 
             left_ids = TreeLib.GetLeftRootStates(lv)
             h_bot, c_bot = fn_hc_bot(lv + 1)
+            
+            if len(h_bot.shape) == 2:
+                h_bot = h_bot.unsqueeze(0)
+                c_bot = c_bot.unsqueeze(0)
+            
             if lv + 1 < len(h_buf_list):
                 h_next_buf, c_next_buf = h_buf_list[lv + 1], c_buf_list[lv + 1]
             else:
