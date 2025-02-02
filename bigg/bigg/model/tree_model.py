@@ -763,7 +763,34 @@ class RecurTreeGen(nn.Module):
             tree_node.bits_rep = [0]
             col_sm.add_edge(tree_node.col_range[0])
             if self.bits_compress:
-                return ll, ll_wt, self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols), 1, None, None
+                if self.has_edge_feats:
+                    assert self.method in ["Test75", "Test85"]
+                    cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
+                    col = tree_node.col_range[0]
+                    #rc = np.array([row * (row - 1) // 2 + col]).reshape(1, 1)
+                    rc = np.array([row, col], dtype = np.float32).reshape(1, 2)
+                    if prev_state is not None:
+                        if self.add_states:
+                            scale = torch.sigmoid(self.scale_wts)
+                            state_update = [[scale * state[0][-1] + (1 - scale) * prev_state[0][-1]], None]
+                        
+                        elif self.wt_one_layer:
+                            state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
+                        
+                        else:
+                            state_update = self.update_wt(state, prev_state)
+                        edge_ll, _, cur_feats = self.predict_edge_feats(state_update, cur_feats)                    
+                    else:
+                        edge_ll, _, cur_feats = self.predict_edge_feats(state, cur_feats)
+                    
+                    ll_wt = ll_wt + edge_ll
+                    edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state, rc=rc)
+                    prev_state = edge_embed
+                    self.num_edge += 1
+                    return ll, ll_wt, self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols), 1, cur_feats, prev_state
+                
+                else:
+                    return ll, ll_wt, self.bit_rep_net(tree_node.bits_rep, tree_node.n_cols), 1, None, None
             else:
                 if self.has_edge_feats:
                     cur_feats = edge_feats[col_sm.pos - 1].unsqueeze(0) if col_sm.supervised else None
