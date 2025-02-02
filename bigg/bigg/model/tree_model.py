@@ -431,6 +431,12 @@ class FenwickTree(nn.Module):
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
         
+        for i,(x,y) in enumerate(row_embeds):
+            if len(x.shape) == 2:
+                new_embed = (x.unsqueeze(0), y.unsqueeze(0))
+                row_embeds[i] = new_embed
+        
+        
         for i, all_ids in enumerate(tree_agg_ids):
             fn_ids = lambda x: all_ids[x]
             lstm_func = batch_tree_lstm3
@@ -445,7 +451,6 @@ class FenwickTree(nn.Module):
                 if has_edge_feats or self.has_node_feats:
                     new_states = lstm_func(feat_dict, h_bot, c_bot, cell_node=None if not self.has_node_feats else self.node_feat_update, method=self.method, func=func, weight_state=weight_state)
                 else:
-                    print(h_bot.shape)
                     new_states = lstm_func(h_bot, c_bot)
             else:
                 new_states = lstm_func(None, None)
