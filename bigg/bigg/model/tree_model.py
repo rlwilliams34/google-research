@@ -1020,10 +1020,13 @@ class RecurTreeGen(nn.Module):
                 new_h, new_c = featured_batch_tree_lstm2(local_edge_feats, is_rch, h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell, method=self.method)
             else:
                 if self.bits_compress:
-                    print(h_bot.shape)
-                    print(c_bot.shape)
-                    print(h_buf.shape)
-                    print(c_buf.shape)
+                    if len(h_bot.shape) == 2:
+                        h_bot = h_bot.unsqueeze(0)
+                        c_bot = c_bot.unsqueeze(0)
+                    
+                    if h_buf is not None and len(h_buff.shape) == 2:
+                        h_buf = h_buf.unsqueeze(0)
+                        c_bot = c_bot.unsqueeze(0)
                 new_h, new_c = batch_tree_lstm2(h_bot, c_bot, h_buf, c_buf, fn_ids, self.lr2p_cell)
             h_buf_list[d] = new_h
             c_buf_list[d] = new_c
