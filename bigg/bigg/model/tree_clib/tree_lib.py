@@ -336,7 +336,8 @@ class _tree_lib(object):
         max_d_tree = self.lib.MaxTreeDepth()
         print("max tree: ", max_d_tree)
         max_depth = max_d_bin + max_d_tree + 1 + int(max_d_tree != 0)
-        print("max depth: ", max_depth)
+        print("guessed max depth: ", max_depth)
+        print("ACTUAL max_depth: ", 8)
         max_depth = 8
         
         most_recent_edge_list = [None] * max_depth
