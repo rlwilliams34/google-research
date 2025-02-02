@@ -83,7 +83,7 @@ class _tree_lib(object):
         self.device = config.device
         self.num_graphs = 0
         self.graph_stats = []
-        self.bits_compress = args.bits_compress
+        self.bits_compress = config.bits_compress
 
     def TotalTreeNodes(self):
         return self.lib.TotalTreeNodes()
