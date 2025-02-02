@@ -417,6 +417,13 @@ class FenwickTree(nn.Module):
         # embed row tree
         tree_agg_ids = TreeLib.PrepareRowEmbed()
         row_embeds = [(self.init_h0, self.init_c0)]
+        
+        if len(h_bot.shape) == 2:
+            h_bot = h_bot.unsqueeze(0)
+            c_bot = c_bot.unsqueeze(0)
+            h_buf0 = h_buf0.unsqueeze(0)
+            c_buf0 = c_buf0.unsqueeze(0)
+        
         if self.method not in ["Test75", "Test85"] and (self.has_edge_feats or self.has_node_feats):
             feat_dict = c_bot
             if 'node' in feat_dict:
@@ -430,13 +437,13 @@ class FenwickTree(nn.Module):
             row_embeds.append((prev_rowsum_h, prrev_rowsum_c))
         if h_buf0 is not None:
             row_embeds.append((h_buf0, c_buf0))
-        
-        if len(h_bot.shape) == 2:
-            h_bot = h_bot.unsqueeze(0)
-            c_bot = c_bot.unsqueeze(0)
-            h_buf0 = h_buf0.unsqueeze(0)
-            c_buf0 = c_buf0.unsqueeze(0)
-        
+#         
+#         if len(h_bot.shape) == 2:
+#             h_bot = h_bot.unsqueeze(0)
+#             c_bot = c_bot.unsqueeze(0)
+#             h_buf0 = h_buf0.unsqueeze(0)
+#             c_buf0 = c_buf0.unsqueeze(0)
+#         
 #         for i,(x,y) in enumerate(row_embeds):
 #             if len(x.shape) == 2:
 #                 new_embed = (x.unsqueeze(0), y.unsqueeze(0))
