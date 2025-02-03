@@ -818,6 +818,9 @@ class RecurTreeGen(nn.Module):
                         self.num_edge += 1
                         return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
                     
+                    elif self.method == "MLP-Repeat":
+                        return ll, ll_wt, edge_embed, 1, cur_feats, prev_state
+                    
                     else:
                         edge_embed = self.embed_edge_feats(cur_feats, prev_state=prev_state)
                         return ll, ll_wt, (self.leaf_h0, self.leaf_c0), 1, cur_feats, prev_state
