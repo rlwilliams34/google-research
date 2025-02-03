@@ -509,7 +509,7 @@ class BiggWithEdgeLen(RecurTreeGen):
 #                 print("loga: ", loga)
 #                 print("logb: ", logb)
 #                 print("mu: ", a / b)
-#                 print("sigma: ", a / b * 1 / b)
+#                 print("sigma: ", (a / b * 1 / b)**0.5)
 #                 print("============================")
                 if self.penalty:
                     ll = ll - 1e-4 * a - 1e-4 * b
