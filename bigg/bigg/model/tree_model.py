@@ -422,7 +422,7 @@ class FenwickTree(nn.Module):
             h_bot = h_bot.unsqueeze(0)
             c_bot = c_bot.unsqueeze(0)
         
-        elif self.method not in ['Test75', 'Test85'] and self.has_edge_feats and self.bits_compress:
+        elif self.method not in ['Test75', 'Test85'] and self.has_edge_feats and len(h_bot[0].shape) == 2:
             h_bot_new = h_bot[0].unsqueeze(0)
             c_bot_new = h_bot[1].unsqueeze(0)
             h_bot = (h_bot_new, c_bot_new)
