@@ -287,8 +287,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         if not self.row_LSTM: 
             B = edge_feats.shape[0]
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
-            if sigma > 0:
-                edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
+#             if sigma > 0:
+#                 edge_feats_normalized = edge_feats_normalized + sigma * torch.randn(edge_feats.shape).to(edge_feats.device)
         
         else:
             if prev_state is None:
