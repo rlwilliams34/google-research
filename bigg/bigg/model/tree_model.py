@@ -280,8 +280,6 @@ def selective_update_hc(h, c, zero_one, feats):
     local_edge_feats_h = scatter(feats[0], nz_idx, dim=1, dim_size=h.shape[1])
     local_edge_feats_c = scatter(feats[1], nz_idx, dim=1, dim_size=h.shape[1])
     zero_one = torch.tensor(zero_one, dtype=torch.bool).to(h.device).unsqueeze(1)
-    print(local_edge_feats_h.shape)
-    print(h.shape)
     h = torch.where(zero_one, local_edge_feats_h, h)
     c = torch.where(zero_one, local_edge_feats_c, c)
     return h, c
@@ -424,7 +422,7 @@ class FenwickTree(nn.Module):
             h_bot = h_bot.unsqueeze(0)
             c_bot = c_bot.unsqueeze(0)
         
-        elif self.method not in ['Test75', 'Test85'] and self.has_edge_feats:
+        elif self.method not in ['Test75', 'Test85'] and self.has_edge_feats and self.bits_compress:
             h_bot_new = h_bot[0].unsqueeze(0)
             c_bot_new = h_bot[1].unsqueeze(0)
             h_bot = (h_bot_new, c_bot_new)
