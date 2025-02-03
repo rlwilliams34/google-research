@@ -399,7 +399,8 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
         if edge_feats_i is not None and not torch.is_tensor(edge_feats_i):
             edge_feats_i = edge_feats_i[0]
         
-        ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
+        with torch.no_grad():
+            ll, ll_wt, _, _, _, _ = model(len(g), edges, node_feats=node_feats, edge_feats=edge_feats_i)
         ll_t2 = ll + ll_t2
         ll_w2 = ll_wt + ll_w2
     
@@ -423,7 +424,8 @@ def debug_model(model, graph, node_feats, edge_feats, method=None, info=None,edg
     
     #print(info)
     
-    ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info, edge_feats_lstm=edge_feats_lstm, batch_last_edges=batch_last_edges,rc=rc)
+    with torch.no_grad():
+        ll_t1, ll_w1, _, _, _ = model.forward_train([0, 1], node_feats=node_feats, edge_feats=edge_feats, list_num_edges=list_num_edges, list_last_edge=info, edge_feats_lstm=edge_feats_lstm, batch_last_edges=batch_last_edges,rc=rc)
     
     print("=============================")
     print("Fast Code Top+Wt Likelihoods: ")
