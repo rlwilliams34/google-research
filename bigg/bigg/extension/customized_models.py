@@ -283,7 +283,7 @@ class BiggWithEdgeLen(RecurTreeGen):
     def embed_node_feats(self, node_feats):
         return self.nodelen_encoding(node_feats)
 
-    def embed_edge_feats(self, edge_feats, prev_state=None, list_num_edges=None, db_info=None, edge_feats_lstm=None, rc=None):
+    def embed_edge_feats(self, edge_feats, sigma = 0, prev_state=None, list_num_edges=None, db_info=None, edge_feats_lstm=None, rc=None):
         if not self.row_LSTM: 
             B = edge_feats.shape[0]
             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
