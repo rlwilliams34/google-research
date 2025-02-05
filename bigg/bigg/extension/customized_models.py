@@ -129,7 +129,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.penalty = args.penalty
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
-        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75', 'Test85', 'None']
+        assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75', 'Test85', 'None', 'Leaf-LSTM']
         if self.method == "None":
            assert self.has_egde_feats == 0
         
@@ -146,7 +146,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
             self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
         
-        if self.method == "MLP-Repeat":
+        if self.method == "Leaf-LSTM":
+            self.leaf_embed = Parameter(torch.Tensor(1, args.weight_embed_dim))
+            self.edgelen_encoding = MLP(1, [2 * args.weight_embed_dim, args.weight_embed_dim], dropout = args.wt_drop)
+            self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
+        
+        elif self.method == "MLP-Repeat":
             self.edgelen_encoding = MLP(1, [2 * args.embed_dim, args.embed_dim], dropout = args.wt_drop)
         
         elif self.method == "Test75" or self.method == "Test85":
@@ -310,6 +315,12 @@ class BiggWithEdgeLen(RecurTreeGen):
             edge_embed = self.edgelen_encoding(edge_feats_normalized)
             edge_embed = edge_embed.unsqueeze(0).repeat(self.num_layers, 1, 1)
             edge_embed = (edge_embed, edge_embed)
+            return edge_embed
+        
+        elif self.method == "Leaf-LSTM":
+            edge_embed = self.edgelen_encoding(edge_feats_normalized)
+            edge_embed = torch.cat([edge_embed, self.leaf_embed.repeat(B, 1)], dim = -1)
+            edge_embed = self.leaf_LSTM(edge_embed)
             return edge_embed
 
         else:
