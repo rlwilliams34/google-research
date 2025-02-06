@@ -535,7 +535,7 @@ if __name__ == '__main__':
             info1 = get_list_indices([m])
             batch_lv_list = get_batch_lv_list_fast([m])
             info2 = prepare_batch(batch_lv_list)
-            db_info += [(info1, info2)]
+            db_info = [(info1, info2)]
             
             ## List num edges
             list_num_edges = [m]
