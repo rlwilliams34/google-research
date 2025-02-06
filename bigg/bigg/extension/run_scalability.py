@@ -499,6 +499,7 @@ if __name__ == '__main__':
             g = get_graph_data(g[0], 'BFS')
             train_graphs += g
             [TreeLib.InsertGraph(train_graphs[i])]
+            edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
 #             
 #             feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, [i], cmd_args)
 #             edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
