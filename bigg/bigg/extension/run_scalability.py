@@ -39,6 +39,34 @@ from bigg.experiments.train_utils import get_node_dist
 from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
+
+def flatten(xss):
+    return [x for xs in xss for x in xs]
+
+def prepare_batch(batch_lv_in):
+    batch_size = len(batch_lv_in)
+    list_num_edges = [len(lv_in) for lv_in in batch_lv_in]
+    tot_num_edges = np.sum(list_num_edges)
+    flat_lv_in = flatten(batch_lv_in)
+    list_lvs = [[len(l) for l in lv_in] for lv_in in batch_lv_in]
+    flat_list_lvs = flatten(list_lvs)
+    max_len = np.max([np.max(l) for l in list_lvs])
+    all_ids = []
+    init_select = flatten([[x[0] for x in batch_lv_in[i]] for i in range(batch_size)])
+    last_tos = [j for j in range(len(flat_lv_in)) if flat_list_lvs[j] == max_len]
+    lv = 1
+    while True:
+        done_from = [j for j in range(len(flat_lv_in)) if len(flat_lv_in[j]) == 1]
+        done_to = [j for j in range(tot_num_edges) if flat_list_lvs[j] == lv]
+        proceed_from = [j for j in range(len(flat_lv_in)) if len(flat_lv_in[j]) > 1]
+        proceed_input = [l[1] for l in flat_lv_in if len(l) > 1]
+        all_ids.append((done_from, done_to, proceed_from, proceed_input))
+        flat_lv_in = [l[1:] for l in flat_lv_in if len(l) > 1]
+        lv += 1
+        if max([len(l) for l in flat_lv_in]) <= 1:
+            break
+    return init_select, all_ids, last_tos
+
 def get_list_edge(cur_nedge_list):
     offset = 0
     list_edge = []
