@@ -537,6 +537,7 @@ if __name__ == '__main__':
             batch_lv_list = get_batch_lv_list_fast([m])
             info2 = prepare_batch(batch_lv_list)
             db_info = [(info1, info2)]
+            print(db_info)
             
             ## List num edges
             list_num_edges = [m]
