@@ -408,7 +408,7 @@ if __name__ == '__main__':
     
     #model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     if cmd_args.phase != "train": 
-        num_leaves_list = [50, 250, 500, 1000, 2500, 5000, 7500]
+        num_leaves_list = [50, 250, 500, 1000, 2500, 5000]
         times_bigg_e = []
         times_bigg_gcn = []
         path = os.getcwd()
