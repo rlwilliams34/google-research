@@ -483,7 +483,7 @@ if __name__ == '__main__':
     if cmd_args.training_time:
         print("Getting training times")
         #num_leaves_list = [cmd_args.num_nodes]
-        num_leaves_list = [100] #[5, 10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
+        num_leaves_list = [5, 10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 100, 200, 500, 1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
         #num_leaves_list = 
         #num_leaves_list = [50, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 7.5e3]
         bigg_times = []
@@ -544,8 +544,6 @@ if __name__ == '__main__':
             
             ## list_last_edge
             batch_last_edges = np.array(get_last_edge2(g[0]))
-            print(batch_last_edges)
-            print(batch_last_edges.dtype)
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
             optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
             model.update_weight_stats(edge_feats)
