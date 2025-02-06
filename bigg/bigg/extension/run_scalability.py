@@ -465,13 +465,14 @@ if __name__ == '__main__':
             ### BIGG-E
             
             ## DB Info
-            info1 = get_list_indices([len(g.edges())])
-            batch_lv_list = get_batch_lv_list_fast([len(g.edges())])
+            m = len(g[0].edges())
+            info1 = get_list_indices([m])
+            batch_lv_list = get_batch_lv_list_fast([m])
             info2 = prepare_batch(batch_lv_list)
             db_info += [(info1, info2)]
             
             ## List num edges
-            list_num_edges = [len(g.edges())]
+            list_num_edges = [m]
             
             ## list_last_edge
             batch_last_edges = [get_last_edge2(g)]
