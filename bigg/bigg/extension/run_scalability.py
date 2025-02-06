@@ -39,6 +39,44 @@ from bigg.experiments.train_utils import get_node_dist
 from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
+def get_list_edge(cur_nedge_list):
+    offset = 0
+    list_edge = []
+    for nedge in cur_nedge_list:
+        nedge2 = nedge - nedge % 2
+        list_edge += list(range(offset, nedge2 + offset))
+        offset += nedge
+    return list_edge
+
+def get_list_indices(nedge_list):
+    '''Retries list of indices for states of batched graphs'''
+    max_lv = int(np.log(max(nedge_list)) / np.log(2))
+    list_indices = []
+    list_edge = get_list_edge(nedge_list)
+    cur_nedge_list = nedge_list
+    empty = np.array([], dtype=np.int32)
+    for lv in range(max_lv):
+        left = list_edge[0::2]
+        right = list_edge[1::2]
+        cur_nedge_list = [x // 2 for x in cur_nedge_list]
+        list_edge = get_list_edge(cur_nedge_list)
+        list_indices.append([(empty, empty, np.array(left, dtype=np.int32), np.array(range(len(left)), dtype = np.int32), empty, empty), (empty, empty, np.array(right, dtype=np.int32), np.array(range(len(right)), dtype=np.int32), empty, empty)])
+    return list_indices
+
+####
+def lv_offset(num_edges, max_lv = -1):
+    offset_list = []
+    lv = 0
+    while num_edges >= 1:
+        offset_list.append(num_edges)
+        num_edges = num_edges // 2
+        lv += 1
+    
+    if max_lv > 0:
+        offset_list = np.pad(offset_list, (0, max_lv - len(offset_list)), 'constant', constant_values=0)
+    num_entries = np.sum(offset_list)
+    return offset_list, num_entries
+
 def get_last_edge2(g):
     last_edges = []
     last_edges_1 = []
