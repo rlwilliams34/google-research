@@ -493,6 +493,7 @@ if __name__ == '__main__':
         for num_leaves in num_leaves_list:
             num_leaves = int(num_leaves)
             num_nodes = 2 * int(num_leaves) - 1
+            print(num_leaves)
             
             ### DATA
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
