@@ -493,11 +493,10 @@ if __name__ == '__main__':
         for num_leaves in num_leaves_list:
             num_leaves = int(num_leaves)
             num_nodes = 2 * int(num_leaves) - 1
-            print(num_leaves)
             
             ### DATA
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
-            g = get_graph_data(g[0], 'BFS')
+            g = get_graph_data(g[0], 'DFS')
             train_graphs += g
             [TreeLib.InsertGraph(train_graphs[i])]
             edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
@@ -537,7 +536,7 @@ if __name__ == '__main__':
             info1 = get_list_indices([m])
             batch_lv_list = get_batch_lv_list_fast([m])
             info2 = prepare_batch(batch_lv_list)
-            db_info = [(info1, info2)]
+            db_info = (info1, info2)
             
             
             ## List num edges
@@ -551,6 +550,7 @@ if __name__ == '__main__':
             model.update_weight_stats(edge_feats)
             model.epoch_num += 1
         
+            
             
             init = datetime.now()
             #ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
