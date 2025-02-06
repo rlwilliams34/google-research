@@ -396,7 +396,7 @@ if __name__ == '__main__':
     cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
     
     ### NEWLY ADDED
-    cmd_args.method == "Test75"
+    #cmd_args.method == "Test75"
     cmd_args.noise = 0.0
     
     random.seed(cmd_args.seed)
