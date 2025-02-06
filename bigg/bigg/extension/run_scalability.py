@@ -570,8 +570,6 @@ if __name__ == '__main__':
                 print(cur.total_seconds())
             
             i+=1
-            if i == 2:
-                print(STOP)
             
         print(num_leaves_list)
         print(gcn_times)
