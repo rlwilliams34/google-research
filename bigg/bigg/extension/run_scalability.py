@@ -39,6 +39,105 @@ from bigg.experiments.train_utils import get_node_dist
 from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
+def get_last_edge2(g):
+    last_edges = []
+    last_edges_1 = []
+    idx = -1
+    idx_count = -1
+    for r in sorted(g.nodes()):
+        neighbors = [n for n in list(g.neighbors(r)) if n < r]
+        idx_count += len(neighbors)
+        if len(neighbors) > 0:
+            c = max(neighbors)
+            idx = idx_count
+            if r == 1:
+                last_edges_1.append(idx)
+            last_edges.append(idx)
+        else:
+            if r == 0:
+                last_edges.append(-1)
+            else:
+                last_edges.append(last_edges[-1])
+    
+    last_edges = [-1] + last_edges[:-1]
+    return np.array(last_edges)
+
+def get_list_indices(nedge_list):
+    '''Retries list of indices for states of batched graphs'''
+    max_lv = int(np.log(max(nedge_list)) / np.log(2))
+    list_indices = []
+    list_edge = get_list_edge(nedge_list)
+    cur_nedge_list = nedge_list
+    empty = np.array([], dtype=np.int32)
+    for lv in range(max_lv):
+        left = list_edge[0::2]
+        right = list_edge[1::2]
+        cur_nedge_list = [x // 2 for x in cur_nedge_list]
+        list_edge = get_list_edge(cur_nedge_list)
+        list_indices.append([(empty, empty, np.array(left, dtype=np.int32), np.array(range(len(left)), dtype = np.int32), empty, empty), (empty, empty, np.array(right, dtype=np.int32), np.array(range(len(right)), dtype=np.int32), empty, empty)])
+    return list_indices
+
+def lv_offset(num_edges, max_lv = -1):
+    offset_list = []
+    lv = 0
+    while num_edges >= 1:
+        offset_list.append(num_edges)
+        num_edges = num_edges // 2
+        lv += 1
+    
+    if max_lv > 0:
+        offset_list = np.pad(offset_list, (0, max_lv - len(offset_list)), 'constant', constant_values=0)
+    num_entries = np.sum(offset_list)
+    return offset_list, num_entries
+
+def lv_list(k, list_offset, batch_id):
+    offset = list_offset[batch_id]
+    lv_list = []
+    for i in range(len(bin(k)[2:])):
+        if k & 2**i == 2**i:
+            offset_tot = np.sum([np.sum(l[:i]) for l in list_offset])
+            val = int(k // 2**i + offset_tot - 1)
+            offset_batch = np.sum([l[i] for l in list_offset[:batch_id] if len(l) >= i])
+            val += offset_batch
+            lv_list += [int(val)]
+    return lv_list
+
+def batch_lv_list1(k, list_offset):
+    lv_list = []
+    for i in range(len(bin(k)[2:])):
+        if k & 2**i == 2**i:
+            offset_tot = np.sum(list_offset[:, :i])
+            val = int(k // 2**i + offset_tot - 1)
+            offset_batch = np.cumsum([0] + [l[i] for l in list_offset[:-1]])
+            offset_batch = offset_batch[list_offset[:,0] >= k]
+            val = val + offset_batch
+            lv_list.append(val)
+    lv_list = np.stack(lv_list, axis = 1)
+    return lv_list
+
+
+def get_batch_lv_list_fast(list_num_edges): 
+    list_offset = []
+    max_lv = int(np.max([np.log(e)/np.log(2) for e in list_num_edges]) + 1)
+    list_offset = np.array([lv_offset(num_edges, max_lv)[0] for num_edges in list_num_edges])
+    
+    max_edge = np.max(list_num_edges)
+    batch_size = len(list_num_edges)
+    out = np.empty((batch_size,), object)
+    out.fill([])
+    
+    for k in range(1, max_edge+1):
+        cur = (k <= np.array(list_num_edges))
+        cur_lvs = batch_lv_list1(k, list_offset)
+        i = 0
+        for batch, cur_it in enumerate(cur):
+            if cur_it:
+                out[batch] = out[batch] + [cur_lvs[i].tolist()]
+                i += 1
+    return out.tolist()
+
+    
+
 def GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args):
     batch_g = nx.Graph()
     feat_idx = torch.Tensor().to(cmd_args.device)
@@ -230,6 +329,10 @@ if __name__ == '__main__':
     cmd_args.rnn_layers = 1
     cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
     
+    ### NEWLY ADDED
+    cmd_args.method == "Test75"
+    cmd_args.noise = 0.0
+    
     random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
     np.random.seed(cmd_args.seed)
@@ -329,39 +432,50 @@ if __name__ == '__main__':
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
             g = get_graph_data(g[0], 'BFS')
             train_graphs += g
-            
             [TreeLib.InsertGraph(train_graphs[i])]
-            
-            feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, [i], cmd_args)
-            edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
-            
-            ### FIRST BIGG-GCN
-            cmd_args.max_num_nodes = num_nodes
-            cmd_args.has_edge_feats = False
-            cmd_args.has_node_feats = False
-            model = BiggWithGCN(cmd_args).to(cmd_args.device)
-            cmd_args.has_edge_feats = True
-            optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
-                
-            init = datetime.now()
-            ll, ll_wt = model.forward_train2([i], feat_idx, edge_list, batch_weight_idx)
-            loss = -(ll + ll_wt) / num_nodes
-            loss.backward()    
-            optimizer.step()
-            optimizer.zero_grad()
-            cur = datetime.now() - init
-            
-            del model
-            del optimizer
-            
-            if i >= 2:
-                gcn_times.append(cur.total_seconds())
-                print("BIGG-GCN")
-                print(num_leaves)
-                print(cur.total_seconds())
+#             
+#             feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, [i], cmd_args)
+#             edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
+#             
+#             ### FIRST BIGG-GCN
+#             cmd_args.max_num_nodes = num_nodes
+#             cmd_args.has_edge_feats = False
+#             cmd_args.has_node_feats = False
+#             model = BiggWithGCN(cmd_args).to(cmd_args.device)
+#             cmd_args.has_edge_feats = True
+#             optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+#                 
+#             init = datetime.now()
+#             ll, ll_wt = model.forward_train2([i], feat_idx, edge_list, batch_weight_idx)
+#             loss = -(ll + ll_wt) / num_nodes
+#             loss.backward()    
+#             optimizer.step()
+#             optimizer.zero_grad()
+#             cur = datetime.now() - init
+#             
+#             del model
+#             del optimizer
+#             
+#             if i >= 2:
+#                 gcn_times.append(cur.total_seconds())
+#                 print("BIGG-GCN")
+#                 print(num_leaves)
+#                 print(cur.total_seconds())
             
             ### BIGG-E
             
+            ## DB Info
+            info1 = get_list_indices([len(g.edges())])
+            batch_lv_list = get_batch_lv_list_fast([len(g.edges())])
+            info2 = prepare_batch(batch_lv_list)
+            db_info += [(info1, info2)]
+            
+            ## List num edges
+            list_num_edges = [len(g.edges())]
+            
+            ## list_last_edge
+            batch_last_edges = [get_last_edge2(g)]
+                        
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
             optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
             model.update_weight_stats(edge_feats)
@@ -369,7 +483,8 @@ if __name__ == '__main__':
         
             
             init = datetime.now()
-            ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
+            #ll, ll_wt, _ = model.forward_train([i], node_feats = None, edge_feats = edge_feats)
+            ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train([i], edge_feats = edge_feats, list_num_edges = list_num_edges, db_info = db_info, batch_last_edges=batch_last_edges)
             loss = -(ll + ll_wt) / num_nodes
             loss.backward()    
             optimizer.step()

@@ -1910,6 +1910,10 @@ class RecurTreeGen(nn.Module):
         if self.bits_compress:
             return self.bit_rep_net([], 1)
         else:
+            if self.has_edge_feats and self.method == "Leaf-LSTM":
+                empty_embed = torch.cat([self.empty_embed, torch.zeros(self.empty_embed.shape).to(self.empty_embed.device)])
+                empty_embed = self.leaf_LSTM(empty_embed)
+                return empty_embed
             return (self.empty_h0, self.empty_c0)
 
     def get_prob_fix(self, prob):
