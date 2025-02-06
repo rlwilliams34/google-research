@@ -544,7 +544,8 @@ if __name__ == '__main__':
             
             ## list_last_edge
             batch_last_edges = [np.array(get_last_edge2(g[0]))]
-                        
+            print(batch_last_edges)
+            print(batch_last_edges.dtype)
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
             optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
             model.update_weight_stats(edge_feats)
