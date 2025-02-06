@@ -543,7 +543,7 @@ if __name__ == '__main__':
             list_num_edges = [m]
             
             ## list_last_edge
-            batch_last_edges = [np.array(get_last_edge2(g[0]))]
+            batch_last_edges = np.array(get_last_edge2(g[0]))
             print(batch_last_edges)
             print(batch_last_edges.dtype)
             model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
