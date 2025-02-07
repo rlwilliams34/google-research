@@ -518,8 +518,11 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
             p = 2 * m / (n * (n - 1))
             probs.append(p)
             for (n1, n2, w) in g.edges(data=True):
-                w_sm = np.log(np.exp(w['weight']) - 1)
-                weights.append(w_sm)
+                if w['weight'] > 1e-8:
+                    w_sm = np.log(np.exp(w['weight']) - 1)
+                    weights.append(w_sm)
+                else:
+                    print("Small weight: ", w['weight'])
         
         num_nodes = []
         num_edges = []
