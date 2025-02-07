@@ -693,8 +693,10 @@ if __name__ == '__main__':
     db_info = None
     last_edge_list = None
     last_edge_1_list = None
+    list_last_edges = None
     if cmd_args.method == "Test75":
         ## DB info
+        list_last_edges = [get_last_edge2(g) for g in train_graphs]
         list_num_edges = [len(g.edges()) for g in train_graphs]
         db_info = []
         for num_edges in list_num_edges:
