@@ -39,7 +39,7 @@ cmd_opt.add_argument('-node_order', default='default', help='default/DFS/BFS/deg
 cmd_opt.add_argument('-dist_backend', default='gloo', help='dist package backend', choices=['gloo', 'nccl'])
 
 cmd_opt.add_argument('-embed_dim', default=256, type=int, help='embed size')
-cmd_opt.add_argument('-bits_compress', default=256, type=int, help='num of bits to compress')
+cmd_opt.add_argument('-bits_compress', default=0, type=int, help='num of bits to compress')
 cmd_opt.add_argument('-param_layers', default=1, type=int, help='num of param groups')
 cmd_opt.add_argument('-num_test_gen', default=-1, type=int, help='num of graphs generated for test')
 cmd_opt.add_argument('-max_num_nodes', default=-1, type=int, help='max num of nodes')
