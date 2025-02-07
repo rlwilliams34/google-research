@@ -371,7 +371,7 @@ def tree_weight_statistics(graphs, transform = False):
   print('95% CI: ', ' (' + str(results_rounded[7]) + ',' + str(results_rounded[8]), ')')
   print('Empirical Interval: ', ' (' + str(s_t_lo) + ',' + str(s_t_hi) + ')')
   
-  joint = True
+  joint = False
   if joint:
     lengths = []
     lbars = []
