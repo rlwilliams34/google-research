@@ -314,10 +314,21 @@ def get_node_feats(g):
     return np.expand_dims(np.array(length, dtype=np.float32), axis=1)
 
 
-def get_edge_feats(g, blksize = -1):
-    edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
+def t(n1, n2):
+    r = max(n1, n2)
+    c = min(n1, n2)
+    t = r * (r - 1) // 2 + c
+    return t
+
+def get_edge_feats(g, method=None):
+    edges = sorted(g.edges(data=True), key=lambda x: t(x[0], x[1]))
     weights = [x[2]['weight'] for x in edges]
     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
+
+# def get_edge_feats(g, blksize = -1):
+#     edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
+#     weights = [x[2]['weight'] for x in edges]
+#     return np.expand_dims(np.array(weights, dtype=np.float32), axis=1)
 
 def get_edge_idx(g):
     edges = sorted(g.edges(data=True), key=lambda x: x[0] * len(g) + x[1])
@@ -414,6 +425,7 @@ if __name__ == '__main__':
     ### NEWLY ADDED
     #cmd_args.method == "Test75"
     cmd_args.noise = 0.0
+    print("Method: ", cmd_args.method)
     
     random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
@@ -512,7 +524,7 @@ if __name__ == '__main__':
             
             ### DATA
             g = graph_generator(num_leaves, 1, cmd_args.seed) #get_rand_er(int(num_nodes), 1)[0]
-            g = get_graph_data(g[0], 'DFS')
+            g = get_graph_data(g[0], 'BFS')
             train_graphs += g
             [TreeLib.InsertGraph(train_graphs[i])]
             edge_feats = torch.from_numpy(get_edge_feats(train_graphs[i])).to(cmd_args.device)
@@ -603,7 +615,7 @@ if __name__ == '__main__':
     
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     ## CREATE TRAINING GRAPHS HERE 
     path = os.path.join(os.getcwd(), 'temp_graphs')
@@ -624,7 +636,7 @@ if __name__ == '__main__':
         ordered_graphs = []
         
         for g in graphs:
-            cano_g = get_graph_data(g, 'DFS')
+            cano_g = get_graph_data(g, 'BFS')
             ordered_graphs += cano_g
         
         if cmd_args.num_leaves > 1000:
@@ -809,36 +821,23 @@ if __name__ == '__main__':
                 batch_last_edges = np.concatenate(batch_last_edges)
             
             
-            if cmd_args.blksize < 0 or num_nodes <= cmd_args.blksize:
-                if cmd_args.model == "BiGG_GCN":
-                    feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
-                    ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
-                
-                else:
-                    ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, edge_feats = edge_feats, list_num_edges = list_num_edges, db_info = db_info_it, batch_last_edges=batch_last_edges)
-                    #ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
-                
-                true_loss = -(ll  + ll_wt) / num_nodes
-                loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
-                loss.backward()
-                
-                loss_top = -ll / num_nodes
-                loss_wt = -ll_wt / num_nodes
-                epoch_loss_top = epoch_loss_top + loss_top.item()  / num_iter
-                epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
-                
-                
-                epoch_loss += loss.item() / num_iter
+            if cmd_args.model == "BiGG_GCN":
+                feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
+                ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
             
             else:
-                ll = 0.0
-                for i in batch_indices:
-                    n = len(train_graphs[i])
-                    cur_ll, _ = sqrtn_forward_backward(model, graph_ids=[i], list_node_starts=[0],
-                                                    num_nodes=n, blksize=cmd_args.blksize, loss_scale=1.0/n, edge_feats = list_edge_feats[i], edge_idx = list_edge_idx[i])
-                    ll += cur_ll
-                loss = -ll / num_nodes
-                epoch_loss += loss / num_iter
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, edge_feats = edge_feats, list_num_edges = list_num_edges, db_info = db_info_it, batch_last_edges=batch_last_edges)
+                #ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+            
+            true_loss = -(ll  + ll_wt) / num_nodes
+            loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
+            loss.backward()
+            
+            loss_top = -ll / num_nodes
+            loss_wt = -ll_wt / num_nodes
+            epoch_loss_top = epoch_loss_top + loss_top.item()  / num_iter
+            epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
+            epoch_loss += loss.item() / num_iter
             
             if (idx + 1) % cmd_args.accum_grad == 0:
                 if cmd_args.grad_clip > 0:
@@ -874,7 +873,6 @@ if __name__ == '__main__':
         print("Epoch Loss (Weights): ", epoch_loss_wt)
         
     print("Evaluation...")
-    num_node_dist = get_node_dist(train_graphs)
     gen_graphs = []
       
     with torch.no_grad():
