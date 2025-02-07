@@ -1576,16 +1576,18 @@ class FenwickTree(nn.Module):
         self.method = args.method
         self.has_edge_feats = args.has_edge_feats
         self.has_node_feats = args.has_node_feats
-        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
-        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, args.embed_dim))
+        self.embed_dim = (args.proj_dim if args.proj else args.embed_dim)
+        
+        self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, self.embed_dim))
+        self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, self.embed_dim))
         glorot_uniform(self)
         if self.has_node_feats:
             self.node_feat_update = nn.LSTMCell(args.embed_dim, args.embed_dim)
-        self.merge_cell = BinaryTreeLSTMCell(args.embed_dim)
-        self.summary_cell = BinaryTreeLSTMCell(args.embed_dim)
+        self.merge_cell = BinaryTreeLSTMCell(self.embed_dim)
+        self.summary_cell = BinaryTreeLSTMCell(self.embed_dim)
         
         if args.pos_enc:
-            self.pos_enc = PosEncoding(args.embed_dim, args.device, args.pos_base)
+            self.pos_enc = PosEncoding(self.embed_dim, args.device, args.pos_base)
         else:
             self.pos_enc = lambda x: 0
 

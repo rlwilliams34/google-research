@@ -176,6 +176,12 @@ class BiggWithEdgeLen(RecurTreeGen):
                 self.edge_pos_enc = PosEncoding2D(args.weight_embed_dim, args.device, args.pos_base)
                 self.leaf_LSTM = MultiLSTMCell(2 * args.weight_embed_dim, args.embed_dim, args.rnn_layers)
             
+            if self.proj:
+                self.proj_h = nn.Linear(args.proj_dim, self.embed_dim)
+                self.proj_c = nn.Linear(args.proj_dim, self.embed_dim)
+                self.leaf_LSTM = MultiLSTMCell(1, args.proj_dim, args.rnn_layers)
+                
+            
             if self.add_states:
                 self.scale_tops = Parameter(torch.Tensor(1))
                 self.scale_wts = Parameter(torch.Tensor(1))
@@ -385,8 +391,20 @@ class BiggWithEdgeLen(RecurTreeGen):
                 edge_embed = self.weight_tree(edge_embed)
             else:
                 edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges, db_info)
+            
+            if self.proj:
+                edge_embed_h = self.proj_h(edge_embed[0])
+                edge_embed_c = self.proj_c(edge_embed[1])
+                edge_embed = (edge_embed_h, edge_embed_c)
             return edge_embed 
-        
+            
+#             edge_feats_normalized = self.standardize_edge_feats(edge_feats)
+#             edge_embed = self.leaf_LSTM(edge_feats_normalized)
+#             if list_num_edges is None:
+#                 edge_embed = self.weight_tree(edge_embed)
+#             else:
+#                 edge_embed = self.weight_tree.forward_train_weights(edge_embed, list_num_edges, db_info)
+#             return edge_embed 
     
     def compute_softminus(self, edge_feats, threshold = 20):
       '''
