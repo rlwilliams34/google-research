@@ -682,6 +682,16 @@ if __name__ == '__main__':
         optimizer.load_state_dict(checkpoint['optimizer'])
         epoch_load = checkpoint['epoch'] + 1
     
+    offset_val = 100
+    if cmd_args.epoch_load >= epoch_lr_decrease:
+        cmd_args.learning_rate = 1e-4
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = cmd_args.learning_rate
+        if cmd_args.epoch_load >= epoch_lr_decrease + offset_val:
+            cmd_args.learning_rate = 1e-5
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = cmd_args.learning_rate
+    
     num_epochs = cmd_args.num_epochs
     epoch_plateu = cmd_args.epoch_plateu
     
@@ -726,6 +736,17 @@ if __name__ == '__main__':
         epoch_loss = 0.0
         epoch_loss_top = 0.0
         epoch_loss_wt = 0.0
+        if epoch >= epoch_lr_decrease and cmd_args.learning_rate == 1e-3:
+            cmd_args.learning_rate = cmd_args.learning_rate / 10
+            print("Lowering Larning Rate to: ", cmd_args.learning_rate)
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = cmd_args.learning_rate
+        
+        elif epoch >= epoch_lr_decrease + offset_val and cmd_args.learning_rate == 1e-4:
+            cmd_args.learning_rate = cmd_args.learning_rate / 10
+            print("Lowering Larning Rate to: ", cmd_args.learning_rate)
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = cmd_args.learning_rate
         
         for idx in pbar:
             start = B * idx
@@ -834,21 +855,6 @@ if __name__ == '__main__':
             
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
         
-        if cmd_args.learning_rate != 1e-5 and epoch > epoch_plateu:
-            plateu = int(epoch_loss > prev_loss)
-            prev_loss = epoch_loss
-            
-            if len(plateus) == 10:
-                plateus = plateus[1:] + [plateu]
-            
-            else:
-                plateus.append(plateu)
-            
-            if sum(plateus) > 5:
-                print("Plateu LR")
-                cmd_args.learning_rate = 1e-5
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] = 1e-5
         
         if (epoch+1) % 20 == 0 or epoch == 0:
             print('Saving Model')
