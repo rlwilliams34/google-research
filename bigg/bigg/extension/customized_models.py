@@ -467,6 +467,10 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
+        
+        if len(h.shape) == 2:
+            h = h.unsqueeze(0)
+        
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         if edge_feats is None:
