@@ -772,6 +772,8 @@ if __name__ == '__main__':
                 
                 
                 batch_last_edges = [list_last_edges[i] for i in batch_indices]
+                print(cmd_args.batch_size)
+                print(len(batch_last_edges))
                 offset = 0
                 if cmd_args.batch_size > 1:
                     for b in range(len(batch_last_edges)):
