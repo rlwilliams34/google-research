@@ -614,7 +614,7 @@ if __name__ == '__main__':
     
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     ## CREATE TRAINING GRAPHS HERE 
     path = os.path.join(os.getcwd(), 'temp_graphs')
@@ -686,7 +686,7 @@ if __name__ == '__main__':
     path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
     epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load is not None else 0)
     
-    if os.path.isfile(path):
+    if epoch_load > 0 and os.path.isfile(path):
         print('Loading Model')
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model'])
@@ -735,6 +735,9 @@ if __name__ == '__main__':
     for epoch in range(epoch_load, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
+        epoch_loss = 0.0
+        epoch_loss_top = 0.0
+        epoch_loss_wt = 0.0
         
         if epoch == 0 and cmd_args.has_edge_feats and cmd_args.model == "BiGG_E":
             for i in range(len(list_edge_feats)):
@@ -747,9 +750,6 @@ if __name__ == '__main__':
         else:
             model.epoch_num += 1
         
-        epoch_loss = 0.0
-        epoch_loss_top = 0.0
-        epoch_loss_wt = 0.0
         if epoch >= epoch_lr_decrease and cmd_args.learning_rate == 1e-3:
             cmd_args.learning_rate = cmd_args.learning_rate / 10
             print("Lowering Larning Rate to: ", cmd_args.learning_rate)
@@ -773,14 +773,13 @@ if __name__ == '__main__':
             node_feats = None
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
-            edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             batch_last_edges = None
             list_last_edge = None
             
             if cmd_args.method ==  "Test75":
                 list_num_edges = [len(train_graphs[i].edges()) for i in batch_indices]
-                if db_info is not None:
-                    db_info_it = db_info
+#                 if db_info is not None:
+#                     db_info_it = db_info
                 
                 list_last_edge = [last_edge_list[i] for i in batch_indices]
                 list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
@@ -825,31 +824,22 @@ if __name__ == '__main__':
                 ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
             
             else:
-                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, edge_feats = edge_feats, list_num_edges = list_num_edges, db_info = db_info_it, batch_last_edges=batch_last_edges)
-                #ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+                ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train(batch_indices, edge_feats = edge_feats, list_num_edges = list_num_edges, db_info = db_info, batch_last_edges=batch_last_edges)
             
             true_loss = -(ll  + ll_wt) / num_nodes
-            loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
-            loss.backward()
-            
             loss_top = -ll / num_nodes
             loss_wt = -ll_wt / num_nodes
             epoch_loss_top = epoch_loss_top + loss_top.item()  / num_iter
             epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
             epoch_loss += loss.item() / num_iter
             
-            if (idx + 1) % cmd_args.accum_grad == 0:
-                if cmd_args.grad_clip > 0:
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
-                optimizer.step()
-                optimizer.zero_grad()
-            
+            loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
+            loss.backward()
             grad_accum_counter += 1
             
             if grad_accum_counter == cmd_args.accum_grad:
                 if cmd_args.grad_clip > 0:
                     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=cmd_args.grad_clip)
-                
                 optimizer.step()
                 optimizer.zero_grad()
                 grad_accum_counter = 0
