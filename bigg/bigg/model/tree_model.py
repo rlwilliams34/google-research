@@ -2202,11 +2202,11 @@ class RecurTreeGen(nn.Module):
             node_feats = self.embed_node_feats(node_feats)
         
         if self.has_edge_feats and self.method in ["Test75", "Test85"]:
-            init = datetime.now()
+            #init = datetime.now()
             left_idx, right_idx = TreeLib.GetMostRecentWeight(len(all_ids) + 1, batch_last_edges=batch_last_edges)
             topdown_edge_index = (left_idx, right_idx)
-            cur = datetime.now() - init
-            print(cur.total_seconds())
+            #cur = datetime.now() - init
+            #print(cur.total_seconds())
         
         if not self.bits_compress:
             empty_h0, empty_c0 = self.get_empty_state()
