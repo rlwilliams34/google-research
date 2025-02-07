@@ -113,7 +113,7 @@ class PosEncoding2D(Module):
 class BiggWithEdgeLen(RecurTreeGen):
     def __init__(self, args):
         super().__init__(args)
-        cmd_args.wt_drop = -1
+        #cmd_args.wt_drop = -1
         self.method = args.method
         self.sampling_method = cmd_args.sampling_method
         self.row_LSTM = args.row_LSTM
