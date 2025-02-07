@@ -2324,6 +2324,8 @@ class RecurTreeGen(nn.Module):
         edge_feats_embed = None
         
         if self.has_edge_feats and self.sigma > 0:
+            print("TEST TEST TEST")
+            print(self.sigma)
             noise = torch.randn_like(edge_feats).to(edge_feats.device)
             edge_feats = edge_feats * torch.exp(self.sigma * noise)
         
