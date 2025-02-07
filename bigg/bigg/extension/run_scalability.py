@@ -845,7 +845,7 @@ if __name__ == '__main__':
         if (epoch+1) % 20 == 0 or epoch == 0:
             print('Saving Model')
             
-            if os.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
+            if os.path.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
                 os.remove(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves))
             
             checkpoint = {'epoch': epoch+1, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
