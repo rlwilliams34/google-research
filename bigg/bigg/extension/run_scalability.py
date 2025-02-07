@@ -685,6 +685,7 @@ if __name__ == '__main__':
     print(cmd_args.epoch_plateu)
     offset_val = 100
     epoch_lr_decrease = cmd_args.epoch_plateu
+    cmd_args.epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load is not None else 0)
     if cmd_args.epoch_load >= epoch_lr_decrease:
         cmd_args.learning_rate = 1e-4
         for param_group in optimizer.param_groups:
