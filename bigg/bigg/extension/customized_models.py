@@ -127,6 +127,7 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.wt_one_layer = args.wt_one_layer
         self.add_states = args.add_states
         self.penalty = args.penalty
+        self.project = args.project
         
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75', 'Test85', 'None', 'Leaf-LSTM']
