@@ -39,6 +39,22 @@ from bigg.experiments.train_utils import get_node_dist
 from bigg.experiments.train_utils import sqrtn_forward_backward, get_node_dist
 #from bigg.data_process.data_util import create_graphs, get_graph_data
 
+def get_last_edge(g):
+    last_edges = []
+    last_edges_1 = []
+    idx = -1
+    idx_count = -1
+    for r in sorted(g.nodes()):
+        neighbors = [n for n in list(g.neighbors(r)) if n < r]
+        idx_count += len(neighbors)
+        if len(neighbors) > 0:
+            c = max(neighbors)
+            idx = idx_count
+            if r == 1:
+                last_edges_1.append(idx)
+            elif r > 1:
+                last_edges.append(idx)
+    return np.array(last_edges), np.array(last_edges_1)
 
 def flatten(xss):
     return [x for xs in xss for x in xs]
