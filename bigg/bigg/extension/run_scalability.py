@@ -673,7 +673,7 @@ if __name__ == '__main__':
     
     
     path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
-    epoch_load = 0
+    epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load > -1 else 0)
     
     if os.path.isfile(path):
         print('Loading Model')
@@ -687,7 +687,7 @@ if __name__ == '__main__':
     
     #num_epochs = epoch_load
     model.train()
-    num_epochs = epoch_load
+    #num_epochs = epoch_load
     
     list_num_edges = None
     db_info = None
@@ -867,7 +867,7 @@ if __name__ == '__main__':
                 pred_edges, pred_weighted_tensor = model.sample2(num_nodes = num_nodes, display = cmd_args.display)
             
             else:
-                _, pred_edges, _, _, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+                _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
             
             if i % 5 == 0:
                 cur = datetime.now() - init
