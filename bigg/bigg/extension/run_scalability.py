@@ -831,7 +831,7 @@ if __name__ == '__main__':
             loss_wt = -ll_wt / num_nodes
             epoch_loss_top = epoch_loss_top + loss_top.item()  / num_iter
             epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
-            epoch_loss += ture_loss.item() / num_iter
+            epoch_loss += true_loss.item() / num_iter
             
             loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
             loss.backward()
