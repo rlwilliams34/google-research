@@ -181,7 +181,10 @@ class BiggWithEdgeLen(RecurTreeGen):
             if self.proj:
                 self.proj_h = nn.Linear(args.proj_dim, self.embed_dim)
                 self.proj_c = nn.Linear(args.proj_dim, self.embed_dim)
-                self.leaf_LSTM = MultiLSTMCell(1, args.proj_dim, args.rnn_layers)
+                if self.wt_mlp:
+                    self.leaf_LSTM = MultiLSTMCell(args.weight_embed_dim, args.proj_dim, args.rnn_layers)
+                else:
+                    self.leaf_LSTM = MultiLSTMCell(1, args.proj_dim, args.rnn_layers)
                 
             
             if self.add_states:
