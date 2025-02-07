@@ -129,6 +129,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.penalty = args.penalty
         self.proj = args.proj
         
+        print(self.method)
+        
         assert self.sampling_method in ['gamma', 'lognormal', 'softplus']
         assert self.method in ['Test9', 'Test10', 'Test11', 'Test12', 'MLP-Repeat', 'Test285', 'Test286', 'Test287', 'Test75', 'Test85', 'None', 'Leaf-LSTM']
         if self.method == "None":
@@ -202,6 +204,8 @@ class BiggWithEdgeLen(RecurTreeGen):
         self.register_buffer("max_wt", max_wt)
         self.register_buffer("epoch_num", epoch_num)
         self.mode = args.wt_mode
+        
+        print(self.mode)
         
         self.log_wt = False
         self.sm_wt = False
