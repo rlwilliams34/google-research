@@ -697,13 +697,11 @@ if __name__ == '__main__':
     if cmd_args.method == "Test75":
         ## DB info
         list_last_edges = [get_last_edge2(g) for g in train_graphs]
-        list_num_edges = [len(g.edges()) for g in train_graphs]
-        db_info = []
-        for num_edges in list_num_edges:
-            info1 = get_list_indices([num_edges])
-            batch_lv_list = get_batch_lv_list_fast([num_edges])
-            info2 = prepare_batch(batch_lv_list)
-            db_info += [(info1, info2)]
+        list_num_edges = [len(train_graphs[0].edges())] * cmd_args.batch_size
+        info1 = get_list_indices(list_num_edges)
+        batch_lv_list = get_batch_lv_list_fast(list_num_edges)
+        info2 = prepare_batch(batch_lv_list)
+        db_info = (info1, info2)
             
         ## Last Edge info
         last_edge_list = [get_last_edge(g)[0] for g in train_graphs]
