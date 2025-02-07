@@ -129,6 +129,7 @@ cmd_opt.add_argument('-penalty', default=False, type=eval, help='computing train
 
 cmd_opt.add_argument('-proj', default=False, type=eval, help='computing training times')
 cmd_opt.add_argument('-proj_dim', default=64, type=int, help='computing training times')
+cmd_opt.add_argument('-comb_states', default=False, type=eval, help='computing training times')
 
 
 cmd_args, _ = cmd_opt.parse_known_args()
