@@ -550,6 +550,9 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         get_mmd_stats(out_graphs, test_graphs)
     
     elif graph_type == "scale_test":
+        prop, _ = correct_tree_topology_check(out_graphs)
+        print("Proportion Correct Topology: ", prop)
+        
         mmd_sepctral_weighted = spectral_stats(out_graphs, test_graphs, True, cmd_args.num_leaves)
         print("MMD on Specta of L Normalized, Weighted: ", mmd_sepctral_weighted)
         
