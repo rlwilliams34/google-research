@@ -1994,7 +1994,7 @@ class RecurTreeGen(nn.Module):
                             state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
                         
                         elif self.comb_states:
-                            state_update = [self.combine(torch.cat([top_state[0][-1], wt_state[0][-1]], dim = -1)), None]
+                            state_update = [self.combine(torch.cat([state[0][-1], prev_state[0][-1]], dim = -1)), None]
                         
                         else:
                             state_update = self.update_wt(state, prev_state)
