@@ -673,7 +673,7 @@ if __name__ == '__main__':
     
     
     path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
-    epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load > -1 else 0)
+    epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load is not None else 0)
     
     if os.path.isfile(path):
         print('Loading Model')
