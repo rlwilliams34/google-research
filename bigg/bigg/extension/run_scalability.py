@@ -624,7 +624,7 @@ if __name__ == '__main__':
         ordered_graphs = []
         
         for g in graphs:
-            cano_g = get_graph_data(g, 'BFS')
+            cano_g = get_graph_data(g, 'DFS')
             ordered_graphs += cano_g
         
         if cmd_args.num_leaves > 1000:
