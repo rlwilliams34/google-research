@@ -1578,7 +1578,7 @@ class FenwickTree(nn.Module):
         self.has_node_feats = args.has_node_feats
         self.embed_dim = (args.proj_dim if args.proj and weights else args.embed_dim)
         if weights and args.comb_states:
-            self.embed_dim = self.weight_embed_dim
+            self.embed_dim = args.weight_embed_dim
         
         self.init_h0 = Parameter(torch.Tensor(args.rnn_layers, 1, self.embed_dim))
         self.init_c0 = Parameter(torch.Tensor(args.rnn_layers, 1, self.embed_dim))
