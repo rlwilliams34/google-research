@@ -191,7 +191,7 @@ class BiggWithEdgeLen(RecurTreeGen):
                 self.scale_tops = Parameter(torch.Tensor(1))
                 self.scale_wts = Parameter(torch.Tensor(1))
                 
-            self.comb_states = args.com_states
+            self.comb_states = args.comb_states
             if self.comb_states:
                 self.comb_state = nn.Linear(2 * self.embed_dim, self.embed_dim)
         
