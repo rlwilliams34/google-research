@@ -643,7 +643,7 @@ if __name__ == '__main__':
                 cp.dump(ordered_graphs, f, protocol=cp.HIGHEST_PROTOCOL)
     
     num_graphs = len(ordered_graphs)
-    num_train = 80
+    num_train = 100
     num_test_gt = num_graphs - num_train
     
     train_graphs = ordered_graphs[:num_train]
