@@ -424,7 +424,6 @@ if __name__ == '__main__':
     
     ### NEWLY ADDED
     #cmd_args.method == "Test75"
-    cmd_args.noise = 0.0
     print("Method: ", cmd_args.method)
     
     random.seed(cmd_args.seed)
