@@ -390,8 +390,6 @@ class BiggWithEdgeLen(RecurTreeGen):
                     #rc_pos = (row_pos + col_pos) / 2
                     #edge_embed = [rc_pos + x for x in edge_embed]
                 else:
-                    print(edge_feats_normalized)
-                    print(edge_feats_normalized.shape)
                     if self.wt_mlp:
                         edge_embed = self.edgelen_encoding(edge_feats_normalized)
                         edge_embed = self.leaf_LSTM(edge_embed)
@@ -472,7 +470,8 @@ class BiggWithEdgeLen(RecurTreeGen):
             else return the edge_feats as it is
         """
         h, _ = state
-        print(h.shape)
+        if len(h.shape) == 2:
+            h = h.unsqueeze(0)
         mus, lvars = self.edgelen_mean(h[-1]), self.edgelen_lvar(h[-1])
         
         if edge_feats is None:
