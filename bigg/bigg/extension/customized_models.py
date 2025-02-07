@@ -190,11 +190,13 @@ class BiggWithEdgeLen(RecurTreeGen):
             if self.add_states:
                 self.scale_tops = Parameter(torch.Tensor(1))
                 self.scale_wts = Parameter(torch.Tensor(1))
-                
+                self.weight_tree = FenwickTree(args, weights=True)
             self.comb_states = args.comb_states
             if self.comb_states:
-                self.combine_t = nn.Linear(2 * self.embed_dim, self.embed_dim)
-                self.combine_w = nn.Linear(2 * self.embed_dim, self.embed_dim)
+                self.leaf_LSTM = MultiLSTMCell(1, self.weight_embed_dim, args.rnn_layers)
+                
+                self.combine_t = nn.Linear(self.weight_embed_dim + self.embed_dim, self.embed_dim)
+                self.combine_w = nn.Linear(self.weight_embed_dim + self.embed_dim, self.embed_dim)
         
         mu_wt = torch.tensor(0, dtype = float)
         var_wt = torch.tensor(1, dtype = float)
