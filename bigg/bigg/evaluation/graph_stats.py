@@ -556,6 +556,10 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         prop, _ = correct_tree_topology_check(out_graphs)
         print("Proportion Correct Topology: ", prop)
         
+        if cmd_args.num_leaves <= 500:
+            mmd_sepctral = spectral_stats(out_graphs, test_graphs, False, cmd_args.num_leaves)
+            print("MMD on Specta of L Normalized, Unweighted: ", mmd_sepctral)
+        
         mmd_sepctral_weighted = spectral_stats(out_graphs, test_graphs, True, cmd_args.num_leaves)
         print("MMD on Specta of L Normalized, Weighted: ", mmd_sepctral_weighted)
         
@@ -564,6 +568,8 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         
         mmd_weights = mmd_weights_only(out_graphs, test_graphs, gaussian_tv, cmd_args.num_leaves)
         print("MMD on Weights Only: ", mmd_weights)
+        
+        
         
         #mmd_orbit = orbit_stats_all(out_graphs, test_graphs)
         #print("MMD on Orbit: ", mmd_orbit)
