@@ -1937,7 +1937,7 @@ class RecurTreeGen(nn.Module):
             return prob
         
         if self.comb_states:
-            state_update = self.combine(torch.cat([top_state[0][-1], wt_state[0][-1]], dim = -1))
+            state_update = self.combine_t(torch.cat([top_state[0][-1], wt_state[0][-1]], dim = -1))
             prob = torch.sigmoid(prob_func(state_update))
             return prob
         
@@ -1994,7 +1994,7 @@ class RecurTreeGen(nn.Module):
                             state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
                         
                         elif self.comb_states:
-                            state_update = [self.combine(torch.cat([state[0][-1], prev_state[0][-1]], dim = -1)), None]
+                            state_update = [self.combine_w(torch.cat([state[0][-1], prev_state[0][-1]], dim = -1)), None]
                         
                         else:
                             state_update = self.update_wt(state, prev_state)
@@ -2025,7 +2025,7 @@ class RecurTreeGen(nn.Module):
                             state_update = self.update_wt((state[0][-1:], state[1][-1:]), prev_state)
                         
                         elif self.comb_states:
-                            state_update = [self.combine(torch.cat([state[0][-1], prev_state[0][-1]], dim = -1)), None]
+                            state_update = [self.combine_w(torch.cat([state[0][-1], prev_state[0][-1]], dim = -1)), None]
                         
                         else:
                             state_update = self.update_wt(state, prev_state)
@@ -2315,7 +2315,11 @@ class RecurTreeGen(nn.Module):
         top_has_wt_states = (top_states_wt[0][:, update_bool], top_states_wt[1][:, update_bool])
         edge_feats = (edge_feats_embed[0][:, cur_edge_idx], edge_feats_embed[1][:, cur_edge_idx])
         if self.comb_states:
-            top_has_wt_states_h = self.combine(torch.cat([top_has_wt_states[0], edge_feats[0]], dim = -1))
+            if predict_top:
+                top_has_wt_states_h = self.combine_t(torch.cat([top_has_wt_states[0], edge_feats[0]], dim = -1))
+            
+            else:
+                top_has_wt_states_h = self.combine_w(torch.cat([top_has_wt_states[0], edge_feats[0]], dim = -1))
             _ = None
         
         else:

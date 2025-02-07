@@ -193,7 +193,8 @@ class BiggWithEdgeLen(RecurTreeGen):
                 
             self.comb_states = args.comb_states
             if self.comb_states:
-                self.combine = nn.Linear(2 * self.embed_dim, self.embed_dim)
+                self.combine_t = nn.Linear(2 * self.embed_dim, self.embed_dim)
+                self.combine_w = nn.Linear(2 * self.embed_dim, self.embed_dim)
         
         mu_wt = torch.tensor(0, dtype = float)
         var_wt = torch.tensor(1, dtype = float)
