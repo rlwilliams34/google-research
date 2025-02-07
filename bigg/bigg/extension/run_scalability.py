@@ -724,6 +724,8 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         epoch_loss = 0.0
+        epoch_loss_top = 0.0
+        epoch_loss_wt = 0.0
         
         for idx in pbar:
             start = B * idx
@@ -796,6 +798,12 @@ if __name__ == '__main__':
                 loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
                 loss.backward()
                 
+                loss_top = -ll / num_nodes
+                loss_wt = -ll_wt / num_nodes
+                epoch_loss_top = epoch_loss_top + loss_top.item()  / num_iter
+                epoch_loss_wt = epoch_loss_wt + loss_wt.item()  / num_iter
+                
+                
                 epoch_loss += loss.item() / num_iter
             
             else:
@@ -851,6 +859,10 @@ if __name__ == '__main__':
             checkpoint = {'epoch': epoch+1, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
             torch.save(checkpoint, path)
+        
+        print('epoch complete')
+        print("Epoch Loss (Topology): ", epoch_loss_top)
+        print("Epoch Loss (Weights): ", epoch_loss_wt)
         
     print("Evaluation...")
     num_node_dist = get_node_dist(train_graphs)
