@@ -624,10 +624,10 @@ if __name__ == '__main__':
             ordered_graphs = cp.load(f) ## List of nx val graphs
     
     else:   
-        graphs = graph_generator(cmd_args.num_leaves, 100, cmd_args.seed)
+        graphs = graph_generator(cmd_args.num_leaves, 125, cmd_args.seed)
         
         num_graphs = len(graphs)
-        num_train = 80
+        num_train = 100
         num_test_gt = num_graphs - num_train
         
         # npr = np.random.RandomState(cmd_args.seed)
@@ -876,7 +876,7 @@ if __name__ == '__main__':
       
     with torch.no_grad():
         model.eval()
-        for i in tqdm(range(20)):
+        for i in tqdm(range(25)):
             num_nodes = 2 * cmd_args.num_leaves - 1
             
             init = datetime.now()
