@@ -436,6 +436,9 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         if cmd_args.has_edge_feats and prop > 0.1:
             print("Weight stats of ALL graphs")
             test_stats2 = tree_weight_statistics(out_graphs)
+            
+            print("Weight stats on TEST GRAPHS")
+            test_stats3 = tree_weight_statistics(test_graphs)
         
         if test_graphs is None:
             return prop
@@ -573,8 +576,11 @@ def get_graph_stats(out_graphs, test_graphs, graph_type):
         
         #mmd_orbit = orbit_stats_all(out_graphs, test_graphs)
         #print("MMD on Orbit: ", mmd_orbit)
-        
+        print("weight stats on sampled graphs: ")
         wt_stats = tree_weight_statistics(out_graphs)
+        
+        print("weight stats on test graphs: ")
+        wt_stats = tree_weight_statistics(test_graphs)
     
     elif graph_type == "span":
         correct = 0

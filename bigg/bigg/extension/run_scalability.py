@@ -413,6 +413,9 @@ if __name__ == '__main__':
 #     else:
 #         cmd_args.scale_loss = 1
     
+    cmd_args.g_type = "tree"
+    cmd_args.method = "Test75"
+    cmd_args.
     cmd_args.wt_drop = 0.0
     cmd_args.wt_mode = "score"
     cmd_args.has_edge_feats = True
@@ -424,7 +427,6 @@ if __name__ == '__main__':
     
     ### NEWLY ADDED
     #cmd_args.method == "Test75"
-    print("Method: ", cmd_args.method)
     
     random.seed(cmd_args.seed)
     torch.manual_seed(cmd_args.seed)
