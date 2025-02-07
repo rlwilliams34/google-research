@@ -683,6 +683,7 @@ if __name__ == '__main__':
         epoch_load = checkpoint['epoch'] + 1
     
     offset_val = 100
+    epoch_lr_decrease = cmd_args.epoch_plateu
     if cmd_args.epoch_load >= epoch_lr_decrease:
         cmd_args.learning_rate = 1e-4
         for param_group in optimizer.param_groups:
