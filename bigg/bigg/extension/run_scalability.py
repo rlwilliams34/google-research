@@ -682,6 +682,7 @@ if __name__ == '__main__':
         optimizer.load_state_dict(checkpoint['optimizer'])
         epoch_load = checkpoint['epoch'] + 1
     
+    print(cmd_args.epoch_plateu)
     offset_val = 100
     epoch_lr_decrease = cmd_args.epoch_plateu
     if cmd_args.epoch_load >= epoch_lr_decrease:
