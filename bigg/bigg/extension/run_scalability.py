@@ -587,7 +587,7 @@ if __name__ == '__main__':
     
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     ## CREATE TRAINING GRAPHS HERE 
     path = os.path.join(os.getcwd(), 'temp_graphs')
@@ -666,12 +666,32 @@ if __name__ == '__main__':
         optimizer.load_state_dict(checkpoint['optimizer'])
         epoch_load = checkpoint['epoch'] + 1
     
-    num_epochs = 1500
-    epoch_plateu = 800
+    num_epochs = cmd_args.num_epochs
+    epoch_plateu = cmd_args.epoch_plateu
     
     #num_epochs = epoch_load
     model.train()
     num_epochs = epoch_load
+    
+    list_num_edges = None
+    db_info = None
+    last_edge_list = None
+    last_edge_1_list = None
+    if cmd_args.method == "Test75":
+        ## DB info
+        list_num_edges = [len(g.edges()) for g in train_graphs]
+        db_info = []
+        for num_edges in list_num_edges:
+            info1 = get_list_indices([num_edges])
+            batch_lv_list = get_batch_lv_list_fast([num_edges])
+            info2 = prepare_batch(batch_lv_list)
+            db_info += [(info1, info2)]
+            
+        ## Last Edge info
+        last_edge_list = [get_last_edge(g)[0] for g in train_graphs]
+        last_edge_1_list = [get_last_edge(g)[1] for g in train_graphs]
+    
+    
     for epoch in range(epoch_load, num_epochs):
         pbar = tqdm(range(num_iter))
         random.shuffle(indices)
@@ -700,23 +720,67 @@ if __name__ == '__main__':
             node_feats = None
             edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
             
-            ###
+            edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
+            batch_last_edges = None
+            list_last_edge = None
+            
+            if cmd_args.method ==  "Test75":
+                list_num_edges = [len(train_graphs[i].edges()) for i in batch_indices]
+                if db_info is not None:
+                    db_info_it = db_info
+                
+                list_last_edge = [last_edge_list[i] for i in batch_indices]
+                list_last_edge_1 = [last_edge_1_list[i] for i in batch_indices]
+                list_offsets = [len(list_edge_feats[i]) for i in batch_indices]
+                offset = 0
+                for k in range(len(list_last_edge)):
+                    list_last_edge_k = list_last_edge[k]
+                    list_last_edge_1_k = list_last_edge_1[k]
+                    offset_list_last_edge_k = [k + offset if k > -1 else 0 for k in list_last_edge_k]
+                    offset_list_last_edge_1_k = [k + offset if k > -1 else 0 for k in list_last_edge_1_k]
+                    offset += list_offsets[k]
+                    list_last_edge[k] = np.array(offset_list_last_edge_k)
+                    list_last_edge_1[k] = np.array(offset_list_last_edge_1_k)
+                
+                list_last_edge = np.concatenate(list_last_edge, axis = 0)
+                list_last_edge_1 = np.concatenate(list_last_edge_1, axis = 0)
+                
+            
+                last_edge_1_idx = []
+                id_ = 1
+                for b in batch_indices:
+                    last_edge_1_idx.append(id_)
+                    id_ += len(train_graphs[b])
+                list_last_edge_1 = [list_last_edge_1, np.array(last_edge_1_idx)]
+                list_last_edge = (list_last_edge, list_last_edge_1)
+                
+                
+                batch_last_edges = [list_last_edges[i] for i in batch_indices]
+                offset = 0
+                if cmd_args.batch_size > 1:
+                    for b in range(len(batch_last_edges)):
+                        batch_last_edges[b] = np.array([x + offset if x != -1 else x for x in batch_last_edges[b]])
+                        offset += len(train_graphs[batch_indices[b]].edges())
+                else;
+                    batch_last_edges = [np.array(batch_last_edges[0])]
+                
+                batch_last_edges = np.concatenate(batch_last_edges)
+            
+            
             if cmd_args.blksize < 0 or num_nodes <= cmd_args.blksize:
                 if cmd_args.model == "BiGG_GCN":
                     feat_idx, edge_list, batch_weight_idx = GCNN_batch_train_graphs(train_graphs, batch_indices, cmd_args)
                     ll, ll_wt = model.forward_train2(batch_indices, feat_idx, edge_list, batch_weight_idx)
                 
                 else:
-                    ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
+                    ll, ll_wt, ll_batch, ll_batch_wt, _ = model.forward_train([i], edge_feats = edge_feats, list_num_edges = list_num_edges, db_info = db_info_it, batch_last_edges=batch_last_edges)
+                    #ll, ll_wt, _ = model.forward_train(batch_indices, node_feats = node_feats, edge_feats = edge_feats)
                 
-                true_loss = -(ll * cmd_args.scale_loss + ll_wt) / num_nodes
-                loss = true_loss / cmd_args.accum_grad
+                true_loss = -(ll  + ll_wt) / num_nodes
+                loss = -(ll + ll_wt / cmd_args.scale_loss) / (num_nodes * cmd_args.accum_grad)
                 loss.backward()
                 
                 epoch_loss += loss.item() / num_iter
-#                 if idx % 40 == 0:
-#                     print(ll / num_nodes)
-#                     print(ll_wt / num_nodes)
             
             else:
                 ll = 0.0
@@ -765,8 +829,8 @@ if __name__ == '__main__':
         if (epoch+1) % 20 == 0 or epoch == 0:
             print('Saving Model')
             
-            #if os.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
-            #    os.remove(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves))
+            if os.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
+                os.remove(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves))
             
             checkpoint = {'epoch': epoch+1, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
             path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)

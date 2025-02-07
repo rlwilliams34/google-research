@@ -591,8 +591,11 @@ if __name__ == '__main__':
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     
-    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
-    #optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    if cmd_args.g_type == "db":
+        optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    else:
+        optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    
     
     if cmd_args.model_dump is not None and os.path.isfile(cmd_args.model_dump):
         print('loading from', cmd_args.model_dump)
@@ -954,11 +957,6 @@ if __name__ == '__main__':
             
             if cmd_args.method in ["Test12", "MLP-Leaf"] and cmd_args.has_edge_feats:
                 edge_feats = [list_edge_feats[i] for i in batch_indices]
-                
-            elif cmd_args.method == "Test4":
-                edge_feats = [list_edge_feats[i] for i in batch_indices]
-                edge_feats, lr = zip(*edge_feats)
-                edge_feats = (torch.cat(edge_feats, dim = 0), np.concatenate(lr, axis = 1))
             
             else:
                 edge_feats = (torch.cat([list_edge_feats[i] for i in batch_indices], dim=0) if list_edge_feats is not None else None)
