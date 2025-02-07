@@ -772,8 +772,6 @@ if __name__ == '__main__':
                 
                 
                 batch_last_edges = [list_last_edges[i] for i in batch_indices]
-                print(cmd_args.batch_size)
-                print(len(batch_last_edges))
                 offset = 0
                 if cmd_args.batch_size > 1:
                     for b in range(len(batch_last_edges)):
@@ -783,6 +781,7 @@ if __name__ == '__main__':
                     batch_last_edges = [np.array(batch_last_edges[0])]
                 
                 batch_last_edges = np.concatenate(batch_last_edges)
+                print(batch_last_edges.shape)
             
             
             if cmd_args.blksize < 0 or num_nodes <= cmd_args.blksize:
