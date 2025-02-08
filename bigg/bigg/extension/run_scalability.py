@@ -627,10 +627,10 @@ if __name__ == '__main__':
             ordered_graphs = cp.load(f) ## List of nx val graphs
     
     else:   
-        graphs = graph_generator(cmd_args.num_leaves, 125, cmd_args.seed)
+        graphs = graph_generator(cmd_args.num_leaves, 100, cmd_args.seed)
         
         num_graphs = len(graphs)
-        num_train = 100
+        num_train = 80
         num_test_gt = num_graphs - num_train
         
         # npr = np.random.RandomState(cmd_args.seed)
@@ -646,7 +646,7 @@ if __name__ == '__main__':
                 cp.dump(ordered_graphs, f, protocol=cp.HIGHEST_PROTOCOL)
     
     num_graphs = len(ordered_graphs)
-    num_train = 100
+    num_train = 80
     num_test_gt = num_graphs - num_train
     
     train_graphs = ordered_graphs[:num_train]
