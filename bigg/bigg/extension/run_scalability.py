@@ -416,7 +416,8 @@ if __name__ == '__main__':
     cmd_args.g_type = "tree"
     cmd_args.method = "Test75"
     cmd_args.
-    cmd_args.wt_drop = 0.0
+    cmd_args.wt_drop = 0.5
+    cmd_args.scale_loss = 1
     cmd_args.wt_mode = "score"
     cmd_args.has_edge_feats = True
     cmd_args.has_node_feats = False
@@ -424,6 +425,7 @@ if __name__ == '__main__':
     cmd_args.gpu = 0
     cmd_args.rnn_layers = 1
     cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
+    
     
     ### NEWLY ADDED
     #cmd_args.method == "Test75"
@@ -701,10 +703,12 @@ if __name__ == '__main__':
     cmd_args.epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load is not None else 0)
     if cmd_args.epoch_load >= epoch_lr_decrease:
         cmd_args.learning_rate = 1e-4
+        cmd_args.scale_loss = 10 * cmd_args.scale_loss
         for param_group in optimizer.param_groups:
             param_group['lr'] = cmd_args.learning_rate
         if cmd_args.epoch_load >= epoch_lr_decrease + offset_val:
             cmd_args.learning_rate = 1e-5
+            cmd_args.scale_loss = 10 * cmd_args.scale_loss
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
     
@@ -754,12 +758,14 @@ if __name__ == '__main__':
         
         if epoch >= epoch_lr_decrease and cmd_args.learning_rate == 1e-3:
             cmd_args.learning_rate = cmd_args.learning_rate / 10
+            cmd_args.scale_loss = 10 * cmd_args.scale_loss
             print("Lowering Larning Rate to: ", cmd_args.learning_rate)
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
         
         elif epoch >= epoch_lr_decrease + offset_val and cmd_args.learning_rate == 1e-4:
             cmd_args.learning_rate = cmd_args.learning_rate / 10
+            cmd_args.scale_loss = 10 * cmd_args.scale_loss
             print("Lowering Larning Rate to: ", cmd_args.learning_rate)
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
