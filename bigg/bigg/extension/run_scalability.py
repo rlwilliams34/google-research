@@ -415,7 +415,7 @@ if __name__ == '__main__':
     
     cmd_args.g_type = "tree"
     cmd_args.method = "Test75"
-    cmd_args.scale_loss = 10
+    cmd_args.scale_loss = 1
     cmd_args.wt_mode = "score"
     cmd_args.has_edge_feats = True
     cmd_args.has_node_feats = False
