@@ -591,7 +591,7 @@ if __name__ == '__main__':
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     
-    if cmd_args.g_type == "db":
+    if cmd_args.g_type == "db" or cmd_args.g_type == "tree":
         optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     else:
         optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
