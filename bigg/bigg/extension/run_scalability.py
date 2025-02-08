@@ -873,7 +873,7 @@ if __name__ == '__main__':
       
     with torch.no_grad():
         model.eval()
-        for i in tqdm(range(25)):
+        for i in tqdm(range(20)):
             num_nodes = 2 * cmd_args.num_leaves - 1
             
             init = datetime.now()
