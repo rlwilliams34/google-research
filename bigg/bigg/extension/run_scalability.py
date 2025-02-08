@@ -866,6 +866,7 @@ if __name__ == '__main__':
         print('epoch complete')
         print("Epoch Loss (Topology): ", epoch_loss_top)
         print("Epoch Loss (Weights): ", epoch_loss_wt)
+        print("Total Loss: ", epoch_loss_top + epoch_loss_wt)
         
     print("Evaluation...")
     gen_graphs = []
