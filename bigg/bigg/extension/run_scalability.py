@@ -618,7 +618,7 @@ if __name__ == '__main__':
     
     else:
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
-    optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+    optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
     ## CREATE TRAINING GRAPHS HERE 
     path = os.path.join(os.getcwd(), 'temp_graphs')
