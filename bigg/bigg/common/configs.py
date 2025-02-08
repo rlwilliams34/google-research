@@ -48,7 +48,7 @@ cmd_opt.add_argument('-max_num_nodes', default=-1, type=int, help='max num of no
 cmd_opt.add_argument('-rnn_layers', default=2, type=int, help='num layers in rnn')
 cmd_opt.add_argument('-seed', default=34, type=int, help='seed')
 cmd_opt.add_argument('-learning_rate', default=1e-3, type=float, help='learning rate')
-cmd_opt.add_argument('-grad_clip', default=5, type=float, help='gradient clip')
+cmd_opt.add_argument('-grad_clip', default=3, type=float, help='gradient clip')
 cmd_opt.add_argument('-train_ratio', default=0.8, type=float, help='ratio for training')
 cmd_opt.add_argument('-dev_ratio', default=0.2, type=float, help='ratio for dev')
 cmd_opt.add_argument('-greedy_frac', default=0, type=float, help='prob for greedy decode')

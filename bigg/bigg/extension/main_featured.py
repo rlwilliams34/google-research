@@ -803,7 +803,7 @@ if __name__ == '__main__':
     
     if cmd_args.epoch_load >= epoch_lr_decrease:
         cmd_args.learning_rate = 1e-4
-        cmd_args.scale_loss = 10 * cmd_arg.scale_loss
+        cmd_args.scale_loss = 10 * cmd_args.scale_loss
         for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
         if cmd_args.epoch_load >= epoch_lr_decrease + offset_val:
