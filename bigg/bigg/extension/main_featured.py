@@ -592,7 +592,7 @@ if __name__ == '__main__':
         model = BiggWithEdgeLen(cmd_args).to(cmd_args.device)
     
     if cmd_args.g_type == "db" or cmd_args.g_type == "tree" or cmd_args.g_type == "er":
-        optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
+        optimizer = optim.AdamW(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-3)
     else:
         optimizer = optim.Adam(model.parameters(), lr=cmd_args.learning_rate, weight_decay=1e-4)
     
@@ -797,9 +797,9 @@ if __name__ == '__main__':
     if cmd_args.schedule:
         pass
     elif cmd_args.g_type == 'db':
-        cmd_args.scale_loss = 50
+        cmd_args.scale_loss = 1
     else:
-        cmd_args.scale_loss = 10
+        cmd_args.scale_loss = 1
     
     if cmd_args.epoch_load >= epoch_lr_decrease:
         cmd_args.learning_rate = 1e-4
