@@ -703,11 +703,9 @@ if __name__ == '__main__':
     
     print(cmd_args.epoch_plateu)
     offset_val = 100
-<<<<<<< HEAD
     if cmd_args.num_leaves > 1000:
-=======
+        offset_val = 100
     if cmd_args.num_leaves >= 2500:
->>>>>>> ddc0cb02602efa4f795a1842bc283c8b516e86f0
         offset_val = 250
     epoch_lr_decrease = cmd_args.epoch_plateu
     cmd_args.epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load is not None else 0)
@@ -953,11 +951,7 @@ if __name__ == '__main__':
     print(gen_graphs[0].edges(data=True))
     
     get_graph_stats(gen_graphs, test_graphs, 'scale_test')
-<<<<<<< HEAD
 
-    
 
-        
-=======
-        
->>>>>>> ddc0cb02602efa4f795a1842bc283c8b516e86f0
+
+
