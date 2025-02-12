@@ -415,7 +415,8 @@ if __name__ == '__main__':
     
     cmd_args.g_type = "tree"
     cmd_args.method = "Test75"
-    cmd_args.scale_loss = 1
+    if not cmd_args.schedule:
+        cmd_args.scale_loss = 1
     cmd_args.wt_mode = "score"
     cmd_args.has_edge_feats = True
     cmd_args.has_node_feats = False
@@ -423,7 +424,8 @@ if __name__ == '__main__':
     cmd_args.gpu = 0
     cmd_args.rnn_layers = 1
     cmd_args.max_num_nodes = 2 * cmd_args.num_leaves - 1
-    
+    if cmd_args.num_leaves >= 5000:
+        cmd_args.grad_clip = 5
     
     ### NEWLY ADDED
     #cmd_args.method == "Test75"
@@ -640,7 +642,7 @@ if __name__ == '__main__':
             cano_g = get_graph_data(g, 'BFS')
             ordered_graphs += cano_g
         
-        if cmd_args.num_leaves > 1000:
+        if cmd_args.num_leaves >= 1000:
             with open(path, 'wb') as f:
                 cp.dump(ordered_graphs, f, protocol=cp.HIGHEST_PROTOCOL)
     
@@ -653,7 +655,7 @@ if __name__ == '__main__':
     graphs = None
     ordered_graphs = None
     
-    if len(train_graphs[0]) < 5000:
+    if len(train_graphs[0]) < 0:
         print(train_graphs[0].edges(data=True))
     
     
@@ -688,33 +690,41 @@ if __name__ == '__main__':
     path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
     epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load is not None else 0)
     
-    if epoch_load > 0 and os.path.isfile(path):
+    if epoch_load > -1 and os.path.isfile(path):
         print('Loading Model')
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
-        epoch_load = checkpoint['epoch'] + 1
+        epoch_load = checkpoint['epoch']
+        print("Epoch load: ", epoch_load)
+    
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = cmd_args.learning_rate
     
     print(cmd_args.epoch_plateu)
     offset_val = 100
+<<<<<<< HEAD
+    if cmd_args.num_leaves > 1000:
+=======
     if cmd_args.num_leaves >= 2500:
+>>>>>>> ddc0cb02602efa4f795a1842bc283c8b516e86f0
         offset_val = 250
     epoch_lr_decrease = cmd_args.epoch_plateu
     cmd_args.epoch_load = (cmd_args.epoch_load if cmd_args.epoch_load is not None else 0)
     if cmd_args.epoch_load >= epoch_lr_decrease:
         cmd_args.learning_rate = 1e-4
-        cmd_args.scale_loss = 10 * cmd_args.scale_loss
+        cmd_args.scale_loss =  10
         for param_group in optimizer.param_groups:
             param_group['lr'] = cmd_args.learning_rate
         if cmd_args.epoch_load >= epoch_lr_decrease + offset_val:
             cmd_args.learning_rate = 1e-5
-            cmd_args.scale_loss = 10 * cmd_args.scale_loss
+            cmd_args.scale_loss =  10
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
     
     num_epochs = cmd_args.num_epochs
     epoch_plateu = cmd_args.epoch_plateu
-    
+    print(cmd_args.learning_rate)
     #num_epochs = epoch_load
     model.train()
     #num_epochs = epoch_load
@@ -757,15 +767,15 @@ if __name__ == '__main__':
             model.epoch_num += 1
         
         if epoch >= epoch_lr_decrease and cmd_args.learning_rate == 1e-3:
-            cmd_args.learning_rate = cmd_args.learning_rate / 10
-            cmd_args.scale_loss = 10 * cmd_args.scale_loss
+            cmd_args.learning_rate = 1e-4
+            cmd_args.scale_loss = 10
             print("Lowering Larning Rate to: ", cmd_args.learning_rate)
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
         
         elif epoch >= epoch_lr_decrease + offset_val and cmd_args.learning_rate == 1e-4:
-            cmd_args.learning_rate = cmd_args.learning_rate / 10
-            cmd_args.scale_loss = 10 * cmd_args.scale_loss
+            cmd_args.learning_rate = 1e-5
+            cmd_args.scale_loss = 10
             print("Lowering Larning Rate to: ", cmd_args.learning_rate)
             for param_group in optimizer.param_groups:
                 param_group['lr'] = cmd_args.learning_rate
@@ -854,16 +864,42 @@ if __name__ == '__main__':
             
             pbar.set_description('epoch %.2f, loss: %.4f' % (epoch + (idx + 1) / num_iter, true_loss))
         
+        if epoch_loss_top <= 0.05:
+            print('GOOD MODEL')
+            if os.path.isfile(os.path.join(os.getcwd(), 'GOOD_MODEL.ckpt')):
+                os.remove(os.path.join(os.getcwd(), 'GOOD_MODEL.ckpt'))
+            
+            checkpoint = {'epoch': epoch+1, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+            path = os.path.join(os.getcwd(), 'GOOD_MODEL.ckpt')
+            torch.save(checkpoint, path)
+        
+        if cmd_args.num_leaves == 5000:
+            print('SAVING BACKUP')
+            if os.path.isfile(os.path.join(os.getcwd(), 'BACKUP')):
+                os.remove(os.path.join(os.getcwd(), 'BACKUP'))
+            
+            checkpoint = {'epoch': epoch+1, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+            path = os.path.join(os.getcwd(), 'BACKUP')
+            torch.save(checkpoint, path)
         
         if (epoch+1) % 20 == 0 or epoch == 0:
             print('Saving Model')
             
-            if os.path.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
-                os.remove(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves))
+            if cmd_args.extra:
+                if os.path.isfile(os.path.join(os.getcwd(), 'second_temp%d.ckpt' % cmd_args.num_leaves)):
+                    os.remove(os.path.join(os.getcwd(), 'second_temp%d.ckpt' % cmd_args.num_leaves))
             
-            checkpoint = {'epoch': epoch+1, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
-            path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
-            torch.save(checkpoint, path)
+                checkpoint = {'epoch': epoch+2, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+                path = os.path.join(os.getcwd(), 'second_temp%d.ckpt' % cmd_args.num_leaves)
+                torch.save(checkpoint, path)
+
+            else:
+                if os.path.isfile(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)):
+                    os.remove(os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves))
+                
+                checkpoint = {'epoch': epoch+2, 'model': model.state_dict(), 'optimizer': optimizer.state_dict()}
+                path = os.path.join(os.getcwd(), 'temp%d.ckpt' % cmd_args.num_leaves)
+                torch.save(checkpoint, path)
         
         print('epoch complete')
         print("Epoch Loss (Topology): ", epoch_loss_top)
@@ -917,4 +953,11 @@ if __name__ == '__main__':
     print(gen_graphs[0].edges(data=True))
     
     get_graph_stats(gen_graphs, test_graphs, 'scale_test')
+<<<<<<< HEAD
+
+    
+
         
+=======
+        
+>>>>>>> ddc0cb02602efa4f795a1842bc283c8b516e86f0
