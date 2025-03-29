@@ -619,10 +619,12 @@ if __name__ == '__main__':
         print('# val graphs', len(val_graphs))
         k=1
         gen_graphs = []
+        
         with torch.no_grad():
             model.eval()
             for _ in tqdm(range(cmd_args.num_test_gen)):
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
+                
                 _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
                 
                 if cmd_args.model == "BiGG_GCN":
@@ -679,6 +681,11 @@ if __name__ == '__main__':
         with open(path, 'rb') as f:
             gt_graphs = cp.load(f)
         print('# gt graphs', len(gt_graphs))
+        
+        ##
+        g = train_graphs[0]
+        degree_list = [g.degree(i) for i in range(len(g))]
+        ##
 #         
 #         print("Training graphs MMD Check")
 #         get_graph_stats(train_graphs, gt_graphs, cmd_args.g_type)
@@ -696,7 +703,8 @@ if __name__ == '__main__':
                     print("Info from Scale Wts: ", torch.sigmoid(model.scale_wts))
                     k += 1
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
-                _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+                #_, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
+                _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, lb_list = degree_list, ub_list = degree_list, display=cmd_args.display)
                 for e in pred_edges:
                     assert e[0] > e[1]
                 
