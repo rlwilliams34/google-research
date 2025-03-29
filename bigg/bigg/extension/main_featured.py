@@ -684,7 +684,7 @@ if __name__ == '__main__':
         
         ##
         g = train_graphs[0]
-        degree_list = [g.degree(i) for i in range(len(g))]
+        degree_list = [0] + [1] * (len(g) - 1)
         ##
 #         
 #         print("Training graphs MMD Check")
