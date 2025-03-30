@@ -2401,9 +2401,9 @@ class RecurTreeGen(nn.Module):
                 if edge_of_lv is None:
                     edge_of_lv = np.array([])
                 target_feats = edge_feats[edge_of_lv]
-                print(edge_of_lv)
-                print(edge_state[0].shape)
-                print(target_feats.shape)
+#                 print(edge_of_lv)
+#                 print(edge_state[0].shape)
+#                 print(target_feats.shape)
                 if self.method in ["Test75", "Test85"]:
                     has_prev = []
                     if edge_of_lv is not None:
