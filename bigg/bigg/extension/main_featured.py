@@ -684,7 +684,7 @@ if __name__ == '__main__':
         
         ##
         g = train_graphs[0]
-        degree_list = [0] + [1] * (len(g) - 1)
+        degree_list = [2] * (cmd_args.num_leaves - 1)
         ##
 #         
 #         print("Training graphs MMD Check")
@@ -704,7 +704,7 @@ if __name__ == '__main__':
                     k += 1
                 num_nodes = np.argmax(np.random.multinomial(1, num_node_dist)) 
                 #_, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, display=cmd_args.display)
-                _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_end = num_nodes, lb_list = degree_list, ub_list = degree_list, display=cmd_args.display)
+                _, _, pred_edges, _, pred_node_feats, pred_edge_feats = model(node_state = cmd_args.num_leaves, node_end = num_nodes, lb_list = degree_list, ub_list = degree_list, display=cmd_args.display)
                 for e in pred_edges:
                     assert e[0] > e[1]
                 
