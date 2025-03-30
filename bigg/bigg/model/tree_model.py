@@ -2398,6 +2398,8 @@ class RecurTreeGen(nn.Module):
                 edge_of_lv = TreeLib.GetEdgeOf(lv)
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
+                if edge_of_lv is None:
+                    edge_of_lv = np.array([])
                 target_feats = edge_feats[edge_of_lv]
                 print(edge_of_lv)
                 print(edge_state[0].shape)
