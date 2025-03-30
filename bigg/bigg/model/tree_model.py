@@ -2399,6 +2399,7 @@ class RecurTreeGen(nn.Module):
                 edge_state = (cur_states[0][:, ~is_nonleaf], cur_states[1][:, ~is_nonleaf])
                 cur_batch_idx = (None if batch_idx is None else batch_idx[~is_nonleaf])
                 target_feats = edge_feats[edge_of_lv]
+                print(edge_of_lv)
                 print(edge_state[0].shape)
                 print(target_feats.shape)
                 if self.method in ["Test75", "Test85"]:
