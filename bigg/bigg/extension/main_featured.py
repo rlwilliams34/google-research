@@ -22,9 +22,9 @@ from copyreg import pickle
 
 import os
 import sys
+import numpy as np
 import pickle as cp
 import networkx as nx
-import numpy as np
 import random
 from tqdm import tqdm
 import torch
