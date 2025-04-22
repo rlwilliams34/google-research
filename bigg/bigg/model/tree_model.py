@@ -2468,8 +2468,8 @@ class RecurTreeGen(nn.Module):
             topdown_state = self.l2r_cell(cur_states, left_subtree_states, lv)
             
             if self.has_edge_feats and self.method in ["Test75", "Test85"]:
-                print(cur_right_updates)
                 cur_right_updates = topdown_edge_index[1][lv]
+                print(cur_right_updates)
                 topdown_wt_state = self.merge_states(cur_right_updates, topdown_state, edge_feats_embed)
                 right_logits = self.pred_has_right(topdown_wt_state[0][-1], lv)
             
